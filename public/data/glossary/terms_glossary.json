@@ -1,0 +1,126 @@
+{
+  "Active Player": {
+    "name": "Active Player",
+    "description": "A player who is on a team's roster, but is not on the Bench, meaning they normally play during games."
+  },
+  "Archetype": {
+    "name": "Archetype",
+    "description": "A target build path that defines which stats to prioritize, which boons to take, and (for pitchers) which pitches to select. Examples: Power Pitcher, Contact Specialist, Speedster."
+  },
+  "Base Stats": {
+    "name": "Base Stats",
+    "description": "A player's raw attribute values before applying bonuses from Items, Modifications, and Boons. Displayed as 0-100 scale in the player report."
+  },
+  "Boon Levels": {
+    "name": "Boon Levels",
+    "description": "Boons are acquired at specific levels: Lesser Boon at 20, Greater Boon at 40, Lesser Boon at 60, Greater Boon at 80, Lesser Boon at 100. Final configuration is 3 Lesser + 2 Greater Boons."
+  },
+  "Augment": {
+    "name": "Augment",
+    "description": "Augments are a way to alter players. Each Lesser League Team Owner is given one Augment per day, which applies at Midnight, Central US time."
+  },
+  "Ballpark Village": {
+    "name": "Ballpark Village",
+    "description": "The district surrounding your Ballpark, home to several attractions which can be used by fans to interact with their Lesser League Team."
+  },
+  "Bench Player": {
+    "name": "Bench Player",
+    "description": "A player who is on a team's roster, specifically on the Bench slots, meaning they do not normally play during games."
+  },
+  "Best Batter": {
+    "name": "Best Batter",
+    "description": "The Batter with the most total Attribute points in Batting and Baserunning Attributes after applying all bonuses from Items, Modifications, and Boons."
+  },
+  "Best Pitcher": {
+    "name": "Best Pitcher",
+    "description": "The Pitcher with the most total Attribute points in Pitching Attributes after applying all bonuses from Items, Modifications, and Boons."
+  },
+  "Election": {
+    "name": "Election",
+    "description": "The Election is a community vote that happens at the end of each Season, after the Postseason. Fans vote on a Proclamation and which player to call up from their top Lesser League team."
+  },
+  "Greater Augment": {
+    "name": "Greater Augment",
+    "description": "In each Season's Election, fans of each Greater League Team vote on a Greater Augment to apply to their Greater League Team in the Election. See Augment for further details."
+  },
+  "Greater League": {
+    "name": "Greater League",
+    "description": "The Greater League consists of Teams managed collectively by the community. Each Greater League has an associated Lesser League where fan-managed teams compete."
+  },
+  "Hall of Unmaking": {
+    "name": "Hall of Unmaking",
+    "description": "A dark hall where players can be offered up for Recomposition."
+  },
+  "Home Run Challenge": {
+    "name": "Home Run Challenge",
+    "description": "A contest to see who can hit the most Home Runs, held once per Season during the Superstar Break."
+  },
+  "Inventory": {
+    "name": "Inventory",
+    "description": "A personal space for storing and crafting Equipment Items."
+  },
+  "Level-Up": {
+    "name": "Level-Up",
+    "description": "When a player gains enough XP, they level up and receive stat points to distribute. Players choose from offered attributes. Max level is 100."
+  },
+  "Lesser League": {
+    "name": "Lesser League",
+    "description": "The Lesser League consists of Teams managed by you, the fans. At the end of each Season, the top Team from each Lesser League gets one of their players called up to the Greater League, selected by community vote."
+  },
+  "Lucky": {
+    "name": "Lucky",
+    "description": "Lucky is a special effect that causes all rolls (unless otherwise specified i.e. \"Your Cunning rolls are Lucky.\") to happen twice, and the higher roll is used. Not to be confused with the Modification 🍀 Lucky, which grants a player \"Your Luck rolls are Lucky\"."
+  },
+  "MMOLDB": {
+    "name": "MMOLDB",
+    "description": "The public MMOLB database (mmoldb.beiju.me) containing player stats, team rosters, and historical data. Used to import real player data into the progression planner."
+  },
+  "Motes": {
+    "name": "Motes",
+    "description": "Motes are a currency that can be spent to reroll your selection of Augments. Each Lesser League Team earns 3 Motes per day."
+  },
+  "Pitch Arsenal": {
+    "name": "Pitch Arsenal",
+    "description": "A pitcher's set of pitch types and their usage frequencies. Pitchers can have 1-6 different pitch types. Arsenal composition affects effectiveness based on fast vs. breaking variety."
+  },
+  "Pitch Categories": {
+    "name": "Pitch Categories",
+    "description": "Pitch types are grouped as Fast (FF, FC, SI), Breaking (CU, KC, SL, ST), and Offspeed (CH, FS)."
+  },
+  "Postseason": {
+    "name": "Postseason",
+    "description": "The Postseason is a contest to determine the Champion of the Season. In the Greater League, this consists of a 6-team Postseason with a Wildcard Round, Semi-Final Round, and the Greatest Series. In the Lesser League, all Teams play in the Kumite."
+  },
+  "Roster Slot": {
+    "name": "Roster Slot",
+    "description": "A player's assigned position on the team. Batters: C, 1B, 2B, 3B, SS, LF, CF, RF, DH. Pitchers: SP (Starting Pitcher), RP (Relief Pitcher), CL (Closer)."
+  },
+  "Recomposition": {
+    "name": "Recomposition",
+    "description": "The ritual of transforming one Player into another, which rerolls their Name, Likes, Dislikes, and Attributes once per day."
+  },
+  "Superstar Game": {
+    "name": "Superstar Game",
+    "description": "A legally distinct exhibition game with All of the Star players, held once per Season during the Superstar Break."
+  },
+  "Tokens": {
+    "name": "Tokens",
+    "description": "Tokens are a currency that can be spent at Quaelyth's Curios to purchase new Equipment Items and Crafting Materials or to reroll the available wares. They are earned by Teams playing in specific Weather types."
+  },
+  "Vending Machine": {
+    "name": "Vending Machine",
+    "description": "A Ballpark Village fixture that dispenses training foods, weighting a player's level-up choices."
+  },
+  "Worst Batter": {
+    "name": "Worst Batter",
+    "description": "The Batter with the least total Attribute points in Batting and Baserunning Attributes after all applying bonuses from Items, Modifications, and Boons."
+  },
+  "Worst Pitcher": {
+    "name": "Worst Pitcher",
+    "description": "The Pitcher with the least total Attribute points in Pitching Attributes after all applying bonuses from Items, Modifications, and Boons."
+  },
+  "Unlucky": {
+    "name": "Unlucky",
+    "description": "Unlucky is a special effect that causes all rolls (unless otherwise specified i.e. \"Your Defiance rolls are Unlucky.\") to happen twice, and the lower roll is used."
+  }
+}

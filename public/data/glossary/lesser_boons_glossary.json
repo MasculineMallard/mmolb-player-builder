@@ -1,0 +1,1794 @@
+{
+  "Accountant": {
+    "name": "Accountant",
+    "emoji": "📒",
+    "description": "This Player keeps a balanced ledger",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Accuracy",
+        "value": "+50%"
+      },
+      {
+        "stat": "Persuasion",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Afterburner": {
+    "name": "Afterburner",
+    "emoji": "🚀",
+    "description": "This Player is ignited",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Velocity",
+        "value": "+50%"
+      },
+      {
+        "stat": "Stuff",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Air Elemental": {
+    "name": "Air Elemental",
+    "emoji": "💨",
+    "description": "This Player is the air itself",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Aiming",
+        "value": "+50%"
+      },
+      {
+        "stat": "Contact",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Ambassador": {
+    "name": "Ambassador",
+    "emoji": "🎖️",
+    "description": "This Player carries the banner with grace",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Persuasion",
+        "value": "+50%"
+      },
+      {
+        "stat": "Guts",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Amphibian": {
+    "name": "Amphibian",
+    "emoji": "🐸",
+    "description": "This Player adapts to land and sea",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Performance",
+        "value": "+50%"
+      },
+      {
+        "stat": "Aiming",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Analyst": {
+    "name": "Analyst",
+    "emoji": "📊",
+    "description": "This Player knows the trends",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Wisdom",
+        "value": "+50%"
+      },
+      {
+        "stat": "Selflessness",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Anchor": {
+    "name": "Anchor",
+    "emoji": "⚓",
+    "description": "This Player is stuck in place",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Defiance",
+        "value": "+50%"
+      },
+      {
+        "stat": "Accuracy",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Angelic": {
+    "name": "Angelic",
+    "emoji": "👼",
+    "description": "This Player is blessed by the heavens",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Control",
+        "value": "+50%"
+      },
+      {
+        "stat": "Presence",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Arachnid": {
+    "name": "Arachnid",
+    "emoji": "🕷️",
+    "description": "This Player's has eight legs",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Intimidation",
+        "value": "+50%"
+      },
+      {
+        "stat": "Vision",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Archer's Mark": {
+    "name": "Archer's Mark",
+    "emoji": "🏹",
+    "description": "This Player becomes a sharpshooter",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Aiming",
+        "value": "+50%"
+      },
+      {
+        "stat": "Discipline",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Battery": {
+    "name": "Battery",
+    "emoji": "🔋",
+    "description": "This Player runs forever",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Stamina",
+        "value": "+50%"
+      },
+      {
+        "stat": "Rotation",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Beacon": {
+    "name": "Beacon",
+    "emoji": "🕯️",
+    "description": "This Player shines steady leadership",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Presence",
+        "value": "+50%"
+      },
+      {
+        "stat": "Control",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Bulwark": {
+    "name": "Bulwark",
+    "emoji": "🛡️",
+    "description": "This Player raises their shield",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Determination",
+        "value": "+50%"
+      },
+      {
+        "stat": "Selflessness",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Calculated": {
+    "name": "Calculated",
+    "emoji": "🧮",
+    "description": "This Player refines their logic",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Discipline",
+        "value": "+50%"
+      },
+      {
+        "stat": "Cunning",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Caped": {
+    "name": "Caped",
+    "emoji": "🪶",
+    "description": "This Player flies around with their cape",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Lift",
+        "value": "+50%"
+      },
+      {
+        "stat": "Vision",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Charger": {
+    "name": "Charger",
+    "emoji": "🦏",
+    "description": "This Player charges ahead",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Speed",
+        "value": "+50%"
+      },
+      {
+        "stat": "Insight",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Clean": {
+    "name": "Clean",
+    "emoji": "🧹",
+    "description": "This Player stays completely clean",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Discipline",
+        "value": "+50%"
+      },
+      {
+        "stat": "Determination",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Clockwork": {
+    "name": "Clockwork",
+    "emoji": "🕰️",
+    "description": "This Player pitches on perfect time",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Control",
+        "value": "+50%"
+      },
+      {
+        "stat": "Stamina",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Confused": {
+    "name": "Confused",
+    "emoji": "🤷",
+    "description": "This Player is a little mixed up",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Deception",
+        "value": "+50%"
+      },
+      {
+        "stat": "Accuracy",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Courier": {
+    "name": "Courier",
+    "emoji": "🕊️",
+    "description": "This Player carries the mail",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Persuasion",
+        "value": "+50%"
+      },
+      {
+        "stat": "Stuff",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Cyclist": {
+    "name": "Cyclist",
+    "emoji": "🚲",
+    "description": "This Player is riding a bike",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Velocity",
+        "value": "+50%"
+      },
+      {
+        "stat": "Deception",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Cyclone": {
+    "name": "Cyclone",
+    "emoji": "🌪️",
+    "description": "This Player is a rolling storm",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Rotation",
+        "value": "+50%"
+      },
+      {
+        "stat": "Presence",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Deadeye": {
+    "name": "Deadeye",
+    "emoji": "🔭",
+    "description": "This Player never loses the mark",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Aiming",
+        "value": "+50%"
+      },
+      {
+        "stat": "Determination",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Demonic": {
+    "name": "Demonic",
+    "emoji": "😈",
+    "description": "This Player is possessed by infernal power",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Defiance",
+        "value": "+50%"
+      },
+      {
+        "stat": "Control",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Director": {
+    "name": "Director",
+    "emoji": "🎥",
+    "description": "This Player is on set",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Control",
+        "value": "+50%"
+      },
+      {
+        "stat": "Accuracy",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Disguised": {
+    "name": "Disguised",
+    "emoji": "🌳",
+    "description": "This Player's is disguising as a tree",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Deception",
+        "value": "+50%"
+      },
+      {
+        "stat": "Velocity",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Draconic": {
+    "name": "Draconic",
+    "emoji": "🐲",
+    "description": "This Player channels draconic might",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Muscle",
+        "value": "+50%"
+      },
+      {
+        "stat": "Aiming",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Eagle-eye": {
+    "name": "Eagle-eye",
+    "emoji": "🦅",
+    "description": "This Player locks onto the target",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Aiming",
+        "value": "+50%"
+      },
+      {
+        "stat": "Cunning",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Earth Elemental": {
+    "name": "Earth Elemental",
+    "emoji": "⛰️",
+    "description": "This Player stands like stone",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Determination",
+        "value": "+50%"
+      },
+      {
+        "stat": "Stealth",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Elvish": {
+    "name": "Elvish",
+    "emoji": "🧝",
+    "description": "This Player has pointy ears",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Intuition",
+        "value": "+50%"
+      },
+      {
+        "stat": "Persuasion",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Excavator": {
+    "name": "Excavator",
+    "emoji": "⛏️",
+    "description": "This Player is digging",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Greed",
+        "value": "+50%"
+      },
+      {
+        "stat": "Muscle",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Fae": {
+    "name": "Fae",
+    "emoji": "🧚",
+    "description": "This Player is touched by the Fae",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Cunning",
+        "value": "+50%"
+      },
+      {
+        "stat": "Discipline",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Feral Sense": {
+    "name": "Feral Sense",
+    "emoji": "🐺",
+    "description": "This Player trusts their instincts",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Intuition",
+        "value": "+50%"
+      },
+      {
+        "stat": "Stamina",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Fire Elemental": {
+    "name": "Fire Elemental",
+    "emoji": "🔥",
+    "description": "This Player burns with elemental fire",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Lift",
+        "value": "+50%"
+      },
+      {
+        "stat": "Selflessness",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Gambit": {
+    "name": "Gambit",
+    "emoji": "♟️",
+    "description": "This Player plays the long con",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Deception",
+        "value": "+50%"
+      },
+      {
+        "stat": "Rotation",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Geometry Expert": {
+    "name": "Geometry Expert",
+    "emoji": "📐",
+    "description": "This Player has mastered geometry",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Rotation",
+        "value": "+50%"
+      },
+      {
+        "stat": "Stamina",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Giant": {
+    "name": "Giant",
+    "emoji": "🗿",
+    "description": "This Player is gigantic",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Intimidation",
+        "value": "+50%"
+      },
+      {
+        "stat": "Insight",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Gorilla": {
+    "name": "Gorilla",
+    "emoji": "🦍",
+    "description": "This Player wins with brute force",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Muscle",
+        "value": "+50%"
+      },
+      {
+        "stat": "Cunning",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Granite": {
+    "name": "Granite",
+    "emoji": "🏔️",
+    "description": "This Player is solid",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Muscle",
+        "value": "+50%"
+      },
+      {
+        "stat": "Determination",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Grounded": {
+    "name": "Grounded",
+    "emoji": "🌱",
+    "description": "This Player stays planted in the ground",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Contact",
+        "value": "+50%"
+      },
+      {
+        "stat": "Lift",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Guardian": {
+    "name": "Guardian",
+    "emoji": "🐑",
+    "description": "This Player stands guard",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Selflessness",
+        "value": "+50%"
+      },
+      {
+        "stat": "Intimidation",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Hardy": {
+    "name": "Hardy",
+    "emoji": "🐪",
+    "description": "This Player is hardy",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Stamina",
+        "value": "+50%"
+      },
+      {
+        "stat": "Velocity",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Headliner": {
+    "name": "Headliner",
+    "emoji": "🎤",
+    "description": "This Player owns the stage",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Presence",
+        "value": "+50%"
+      },
+      {
+        "stat": "Velocity",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Hextouch": {
+    "name": "Hextouch",
+    "emoji": "🪄",
+    "description": "This Player's pitches are cursed",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Stuff",
+        "value": "+50%"
+      },
+      {
+        "stat": "Stamina",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Holey": {
+    "name": "Holey",
+    "emoji": "🕳️",
+    "description": "This Player is full of holes",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Stealth",
+        "value": "+50%"
+      },
+      {
+        "stat": "Greed",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Horizon": {
+    "name": "Horizon",
+    "emoji": "🌅",
+    "description": "This Player can see beyond the horizon",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Vision",
+        "value": "+50%"
+      },
+      {
+        "stat": "Wisdom",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Ill": {
+    "name": "Ill",
+    "emoji": "🤢",
+    "description": "This Player is not feeling well",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Guts",
+        "value": "+50%"
+      },
+      {
+        "stat": "Deception",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Insectoid": {
+    "name": "Insectoid",
+    "emoji": "🐞",
+    "description": "This Player takes on an insect form",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Cunning",
+        "value": "+50%"
+      },
+      {
+        "stat": "Determination",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Ironclad": {
+    "name": "Ironclad",
+    "emoji": "⚙️",
+    "description": "This Player grinds on without pause",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Determination",
+        "value": "+50%"
+      },
+      {
+        "stat": "Greed",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Kind": {
+    "name": "Kind",
+    "emoji": "💖",
+    "description": "This Player lifts everyone around them",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Selflessness",
+        "value": "+50%"
+      },
+      {
+        "stat": "Discipline",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Kite": {
+    "name": "Kite",
+    "emoji": "🪁",
+    "description": "This Player is attached to a kite",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Lift",
+        "value": "+50%"
+      },
+      {
+        "stat": "Stealth",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Leaf": {
+    "name": "Leaf",
+    "emoji": "🍃",
+    "description": "This Player is a leaf on the wind",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Speed",
+        "value": "+50%"
+      },
+      {
+        "stat": "Intimidation",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Lionheart": {
+    "name": "Lionheart",
+    "emoji": "🦁",
+    "description": "This Player roars at pressure",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Guts",
+        "value": "+50%"
+      },
+      {
+        "stat": "Accuracy",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Loyal": {
+    "name": "Loyal",
+    "emoji": "🐕",
+    "description": "This Player's loyalty shines",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Selflessness",
+        "value": "+50%"
+      },
+      {
+        "stat": "Insight",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Magnetic": {
+    "name": "Magnetic",
+    "emoji": "🧲",
+    "description": "This Player attracts things to them",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Greed",
+        "value": "+50%"
+      },
+      {
+        "stat": "Performance",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Majestic": {
+    "name": "Majestic",
+    "emoji": "🦬",
+    "description": "This Player's majesty is undeniable",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Presence",
+        "value": "+50%"
+      },
+      {
+        "stat": "Accuracy",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Marathoner": {
+    "name": "Marathoner",
+    "emoji": "🏃",
+    "description": "This Player really likes running",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Speed",
+        "value": "+50%"
+      },
+      {
+        "stat": "Lift",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Mer": {
+    "name": "Mer",
+    "emoji": "🧜",
+    "description": "This Player embraces the tides",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Wisdom",
+        "value": "+50%"
+      },
+      {
+        "stat": "Stealth",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Meteor": {
+    "name": "Meteor",
+    "emoji": "☄️",
+    "description": "This Player is a shooting star",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Velocity",
+        "value": "+50%"
+      },
+      {
+        "stat": "Accuracy",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Metronome": {
+    "name": "Metronome",
+    "emoji": "🎼",
+    "description": "This Player keeps the rhythm",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Discipline",
+        "value": "+50%"
+      },
+      {
+        "stat": "Contact",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Miasma": {
+    "name": "Miasma",
+    "emoji": "☠️",
+    "description": "This Player leaves a toxic wake",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Stuff",
+        "value": "+50%"
+      },
+      {
+        "stat": "Presence",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Mischievous": {
+    "name": "Mischievous",
+    "emoji": "🐒",
+    "description": "This Player is monkeying around",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Performance",
+        "value": "+50%"
+      },
+      {
+        "stat": "Stealth",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Navigator": {
+    "name": "Navigator",
+    "emoji": "⛵",
+    "description": "This Player charts the seas",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Control",
+        "value": "+50%"
+      },
+      {
+        "stat": "Rotation",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Needle": {
+    "name": "Needle",
+    "emoji": "🪡",
+    "description": "This Player can thread the needle",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Stealth",
+        "value": "+50%"
+      },
+      {
+        "stat": "Aiming",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Night Owl": {
+    "name": "Night Owl",
+    "emoji": "🌙",
+    "description": "This Player thrives in darkness",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Stealth",
+        "value": "+50%"
+      },
+      {
+        "stat": "Speed",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Observer": {
+    "name": "Observer",
+    "emoji": "🦉",
+    "description": "This Player watches every detail",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Insight",
+        "value": "+50%"
+      },
+      {
+        "stat": "Muscle",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Ogre": {
+    "name": "Ogre",
+    "emoji": "👹",
+    "description": "This Player looms large",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Intimidation",
+        "value": "+50%"
+      },
+      {
+        "stat": "Wisdom",
+        "value": "-50%"
+      }
+    ]
+  },
+  "One With All": {
+    "name": "One With All",
+    "emoji": "⚾",
+    "description": "This Player trains with the basics",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Contact",
+        "value": "+50%"
+      },
+      {
+        "stat": "Muscle",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Orator": {
+    "name": "Orator",
+    "emoji": "💬",
+    "description": "This Player talks a lot",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Persuasion",
+        "value": "+50%"
+      },
+      {
+        "stat": "Velocity",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Peacebroker": {
+    "name": "Peacebroker",
+    "emoji": "🤝",
+    "description": "This Player smooths over every dispute",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Persuasion",
+        "value": "+50%"
+      },
+      {
+        "stat": "Defiance",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Pinpoint": {
+    "name": "Pinpoint",
+    "emoji": "📌",
+    "description": "This Player has pinpoint precision",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Accuracy",
+        "value": "+50%"
+      },
+      {
+        "stat": "Velocity",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Playful": {
+    "name": "Playful",
+    "emoji": "🐠",
+    "description": "This Player is very playful",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Performance",
+        "value": "+50%"
+      },
+      {
+        "stat": "Muscle",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Psychic": {
+    "name": "Psychic",
+    "emoji": "🔮",
+    "description": "This Player glimpses the future",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Intuition",
+        "value": "+50%"
+      },
+      {
+        "stat": "Rotation",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Quarterback": {
+    "name": "Quarterback",
+    "emoji": "🏈",
+    "description": "This Player is a quarterback",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Accuracy",
+        "value": "+50%"
+      },
+      {
+        "stat": "Control",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Sage": {
+    "name": "Sage",
+    "emoji": "🧙",
+    "description": "This Player always offers good advice",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Wisdom",
+        "value": "+50%"
+      },
+      {
+        "stat": "Vision",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Satellite": {
+    "name": "Satellite",
+    "emoji": "🛰️",
+    "description": "This Player can see the ball from orbit",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Vision",
+        "value": "+50%"
+      },
+      {
+        "stat": "Muscle",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Scooter": {
+    "name": "Scooter",
+    "emoji": "🛴",
+    "description": "This Player hops on a scooter",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Speed",
+        "value": "+50%"
+      },
+      {
+        "stat": "Discipline",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Second Wind": {
+    "name": "Second Wind",
+    "emoji": "🌬️",
+    "description": "This Player breathes in extra innings",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Stamina",
+        "value": "+50%"
+      },
+      {
+        "stat": "Accuracy",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Seer": {
+    "name": "Seer",
+    "emoji": "👁️",
+    "description": "This Player reads the room at a glance",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Intuition",
+        "value": "+50%"
+      },
+      {
+        "stat": "Presence",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Shiny": {
+    "name": "Shiny",
+    "emoji": "🌟",
+    "description": "This Player shines brightly",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Vision",
+        "value": "+50%"
+      },
+      {
+        "stat": "Performance",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Shopper": {
+    "name": "Shopper",
+    "emoji": "🛒",
+    "description": "This Player shops til' they drop",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Rotation",
+        "value": "+50%"
+      },
+      {
+        "stat": "Persuasion",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Sneaky": {
+    "name": "Sneaky",
+    "emoji": "🦊",
+    "description": "This Player moves unseen",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Cunning",
+        "value": "+50%"
+      },
+      {
+        "stat": "Intimidation",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Snowperson": {
+    "name": "Snowperson",
+    "emoji": "☃️",
+    "description": "This Player waits patiently",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Discipline",
+        "value": "+50%"
+      },
+      {
+        "stat": "Aiming",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Softballer": {
+    "name": "Softballer",
+    "emoji": "🥎",
+    "description": "This Player pitches with a softball",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Stuff",
+        "value": "+50%"
+      },
+      {
+        "stat": "Rotation",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Soul in the Machine": {
+    "name": "Soul in the Machine",
+    "emoji": "🤖",
+    "description": "This Player has assumed a ROBO",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Accuracy",
+        "value": "+50%"
+      },
+      {
+        "stat": "Deception",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Spectral": {
+    "name": "Spectral",
+    "emoji": "👻",
+    "description": "This Player is mostly transparent",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Stealth",
+        "value": "+50%"
+      },
+      {
+        "stat": "Contact",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Spotlight": {
+    "name": "Spotlight",
+    "emoji": "✨",
+    "description": "This Player craves attention",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Presence",
+        "value": "+50%"
+      },
+      {
+        "stat": "Intuition",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Stargazer": {
+    "name": "Stargazer",
+    "emoji": "🌠",
+    "description": "This Player likes looking at the stars",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Insight",
+        "value": "+50%"
+      },
+      {
+        "stat": "Discipline",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Stoneskin": {
+    "name": "Stoneskin",
+    "emoji": "🪨",
+    "description": "This Player is made of stone",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Guts",
+        "value": "+50%"
+      },
+      {
+        "stat": "Control",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Stonewall": {
+    "name": "Stonewall",
+    "emoji": "🧱",
+    "description": "This Player refuses to budge",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Defiance",
+        "value": "+50%"
+      },
+      {
+        "stat": "Intuition",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Stormrider": {
+    "name": "Stormrider",
+    "emoji": "⛈️",
+    "description": "This Player rides the storm",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Velocity",
+        "value": "+50%"
+      },
+      {
+        "stat": "Control",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Striker": {
+    "name": "Striker",
+    "emoji": "⚽",
+    "description": "This Player is good at soccer",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Insight",
+        "value": "+50%"
+      },
+      {
+        "stat": "Lift",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Sweet Tooth": {
+    "name": "Sweet Tooth",
+    "emoji": "🍬",
+    "description": "This Player needs more candy",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Contact",
+        "value": "+50%"
+      },
+      {
+        "stat": "Aiming",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Techie": {
+    "name": "Techie",
+    "emoji": "🖥️",
+    "description": "This Player is knowledgeable about tech",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Insight",
+        "value": "+50%"
+      },
+      {
+        "stat": "Intimidation",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Tenacious Badger": {
+    "name": "Tenacious Badger",
+    "emoji": "🦡",
+    "description": "This Player digs in",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Guts",
+        "value": "+50%"
+      },
+      {
+        "stat": "Intuition",
+        "value": "-50%"
+      }
+    ]
+  },
+  "The Light": {
+    "name": "The Light",
+    "emoji": "🚦",
+    "description": "This Player sees the light",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Vision",
+        "value": "+50%"
+      },
+      {
+        "stat": "Speed",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Thief": {
+    "name": "Thief",
+    "emoji": "🦝",
+    "description": "This Player likes other people's stuff",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Greed",
+        "value": "+50%"
+      },
+      {
+        "stat": "Wisdom",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Thoroughbred": {
+    "name": "Thoroughbred",
+    "emoji": "🐎",
+    "description": "This Player is purebred speed",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Performance",
+        "value": "+50%"
+      },
+      {
+        "stat": "Cunning",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Tireless": {
+    "name": "Tireless",
+    "emoji": "🐜",
+    "description": "This Player never tires",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Stamina",
+        "value": "+50%"
+      },
+      {
+        "stat": "Guts",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Titan": {
+    "name": "Titan",
+    "emoji": "🐘",
+    "description": "This Player moves like a colossus",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Muscle",
+        "value": "+50%"
+      },
+      {
+        "stat": "Contact",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Treasure Map": {
+    "name": "Treasure Map",
+    "emoji": "🗺️",
+    "description": "This Player has a map",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Greed",
+        "value": "+50%"
+      },
+      {
+        "stat": "Vision",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Tusked": {
+    "name": "Tusked",
+    "emoji": "🐗",
+    "description": "This Player tusks are on display",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Intimidation",
+        "value": "+50%"
+      },
+      {
+        "stat": "Performance",
+        "value": "-50%"
+      }
+    ]
+  },
+  "UFO": {
+    "name": "UFO",
+    "emoji": "🛸",
+    "description": "This Player takes flight",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Lift",
+        "value": "+50%"
+      },
+      {
+        "stat": "Greed",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Undead": {
+    "name": "Undead",
+    "emoji": "🧟",
+    "description": "This Player rises as Undead",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Determination",
+        "value": "+50%"
+      },
+      {
+        "stat": "Speed",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Vampiric": {
+    "name": "Vampiric",
+    "emoji": "🧛",
+    "description": "This Player has a taste for blood",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Cunning",
+        "value": "+50%"
+      },
+      {
+        "stat": "Vision",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Venomous": {
+    "name": "Venomous",
+    "emoji": "🐍",
+    "description": "This Player's touch is venom",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Stuff",
+        "value": "+50%"
+      },
+      {
+        "stat": "Persuasion",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Water Elemental": {
+    "name": "Water Elemental",
+    "emoji": "💧",
+    "description": "This Player flows like water",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Contact",
+        "value": "+50%"
+      },
+      {
+        "stat": "Intimidation",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Weaver": {
+    "name": "Weaver",
+    "emoji": "🧵",
+    "description": "This Player weaves magic into each pitch",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Deception",
+        "value": "+50%"
+      },
+      {
+        "stat": "Stuff",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Wheel": {
+    "name": "Wheel",
+    "emoji": "🎡",
+    "description": "This Player likes to roll around",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Rotation",
+        "value": "+50%"
+      },
+      {
+        "stat": "Stuff",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Wildcard": {
+    "name": "Wildcard",
+    "emoji": "🃏",
+    "description": "This Player never plays by the book",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Defiance",
+        "value": "+50%"
+      },
+      {
+        "stat": "Deception",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Wingmate": {
+    "name": "Wingmate",
+    "emoji": "🛩️",
+    "description": "This Player boosts others into the sky",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Selflessness",
+        "value": "+50%"
+      },
+      {
+        "stat": "Lift",
+        "value": "-50%"
+      }
+    ]
+  },
+  "Wise": {
+    "name": "Wise",
+    "emoji": "🐢",
+    "description": "This Player grows wise",
+    "type": "lesser",
+    "modifiers": [
+      {
+        "stat": "Wisdom",
+        "value": "+50%"
+      },
+      {
+        "stat": "Greed",
+        "value": "-50%"
+      }
+    ]
+  }
+}

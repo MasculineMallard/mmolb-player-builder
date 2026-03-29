@@ -1,0 +1,422 @@
+{
+  "power_slugger": {
+    "name": "Power Slugger",
+    "emoji": "💥",
+    "tagline": "Raw home run power",
+    "description": "Maximum home run potential with elite muscle and lift. Sacrifices contact for raw power.",
+    "priority_stats": ["muscle", "lift", "intimidation"],
+    "secondary_stats": ["contact", "discipline", "aiming"],
+    "stat_weights": {
+      "muscle": 0.12,
+      "lift": 0.12,
+      "intimidation": 0.12,
+      "contact": 0.08,
+      "discipline": 0.08,
+      "aiming": 0.08
+    },
+    "recommended_greater_boons": ["Clutch", "Insider"],
+    "recommended_lesser_boons": ["Draconic", "Giant", "Fire Elemental"],
+    "equipment_priority": ["hands", "head", "body"],
+    "equipment_affixes": ["muscle", "lift", "intimidation"]
+  },
+  "contact_specialist": {
+    "name": "Contact Specialist",
+    "emoji": "✋",
+    "tagline": "Put the ball in play",
+    "description": "Elite contact rate puts the ball in play consistently. High batting average potential with gap power.",
+    "priority_stats": ["contact", "aiming", "muscle"],
+    "secondary_stats": ["discipline", "insight", "performance"],
+    "stat_weights": {
+      "contact": 0.12,
+      "aiming": 0.12,
+      "muscle": 0.12,
+      "discipline": 0.08,
+      "insight": 0.08,
+      "performance": 0.08
+    },
+    "recommended_greater_boons": ["Clutch", "All Knowing"],
+    "recommended_lesser_boons": ["Geometry Expert", "Majestic", "Archer's Mark"],
+    "equipment_priority": ["hands", "head"],
+    "equipment_affixes": ["contact", "aiming", "muscle"]
+  },
+  "discipline_master": {
+    "name": "Discipline Master",
+    "emoji": "🚶",
+    "tagline": "Draw walks, work counts",
+    "description": "Elite plate discipline draws walks and works counts. Cunning helps manipulate the at-bat.",
+    "priority_stats": ["discipline", "cunning", "intimidation"],
+    "secondary_stats": ["contact", "vision", "wisdom"],
+    "stat_weights": {
+      "discipline": 0.12,
+      "cunning": 0.12,
+      "intimidation": 0.12,
+      "contact": 0.08,
+      "vision": 0.08,
+      "wisdom": 0.08
+    },
+    "recommended_greater_boons": ["All Knowing", "Logical"],
+    "recommended_lesser_boons": ["Crafty", "Wise", "Majestic"],
+    "equipment_priority": ["head", "hands"],
+    "equipment_affixes": ["discipline", "cunning", "intimidation"]
+  },
+  "speedster": {
+    "name": "Speedster",
+    "emoji": "💨",
+    "tagline": "Cunning on the basepaths",
+    "description": "Elite cunning for stolen bases and extra bases. Outsmarts pitchers and catchers.",
+    "priority_stats": ["cunning", "stealth", "greed"],
+    "secondary_stats": ["contact", "performance", "aiming"],
+    "stat_weights": {
+      "cunning": 0.12,
+      "stealth": 0.12,
+      "greed": 0.12,
+      "contact": 0.08,
+      "performance": 0.08,
+      "aiming": 0.08
+    },
+    "recommended_greater_boons": ["Lucky", "Underdog"],
+    "recommended_lesser_boons": ["Sneaky", "Thief", "Crafty"],
+    "equipment_priority": ["feet", "hands"],
+    "equipment_affixes": ["cunning", "stealth", "greed"]
+  },
+  "line_drive_hitter": {
+    "name": "Line Drive Hitter",
+    "emoji": "➡️",
+    "tagline": "Find the gaps",
+    "description": "Elite aiming produces line drives consistently. High BABIP through gap hitting.",
+    "priority_stats": ["aiming", "contact", "insight"],
+    "secondary_stats": ["muscle", "speed", "performance"],
+    "stat_weights": {
+      "aiming": 0.12,
+      "contact": 0.12,
+      "insight": 0.12,
+      "muscle": 0.08,
+      "speed": 0.08,
+      "performance": 0.08
+    },
+    "recommended_greater_boons": ["Insider", "Clutch"],
+    "recommended_lesser_boons": ["Geometry Expert", "Archer's Mark", "Majestic"],
+    "equipment_priority": ["hands", "head"],
+    "equipment_affixes": ["aiming", "contact", "insight"]
+  },
+  "obp_machine": {
+    "name": "OBP Machine",
+    "emoji": "🎯",
+    "tagline": "Get on base any way possible",
+    "description": "Elite on-base percentage through walks, HBP, and cunning plate presence. Forces pitchers into bad counts.",
+    "priority_stats": ["cunning", "intimidation", "discipline"],
+    "secondary_stats": ["contact", "aiming", "vision"],
+    "stat_weights": {
+      "cunning": 0.12,
+      "intimidation": 0.12,
+      "discipline": 0.12,
+      "contact": 0.08,
+      "aiming": 0.08,
+      "vision": 0.08
+    },
+    "recommended_greater_boons": ["All Knowing", "Underdog"],
+    "recommended_lesser_boons": ["Crafty", "Sneaky", "Majestic"],
+    "equipment_priority": ["head", "hands"],
+    "equipment_affixes": ["cunning", "intimidation", "discipline"]
+  },
+  "intimidator": {
+    "name": "Intimidator",
+    "emoji": "😤",
+    "tagline": "Scare pitchers off the zone",
+    "description": "Presence at the plate forces pitchers to throw balls. Reduces whiff rate significantly.",
+    "priority_stats": ["intimidation", "muscle", "contact"],
+    "secondary_stats": ["discipline", "lift", "determination"],
+    "stat_weights": {
+      "intimidation": 0.12,
+      "muscle": 0.12,
+      "contact": 0.12,
+      "discipline": 0.08,
+      "lift": 0.08,
+      "determination": 0.08
+    },
+    "recommended_greater_boons": ["Clutch", "Iron Will"],
+    "recommended_lesser_boons": ["Draconic", "Giant", "Tenacious Badger"],
+    "equipment_priority": ["head", "hands", "body"],
+    "equipment_affixes": ["intimidation", "muscle", "contact"]
+  },
+  "grinder": {
+    "name": "At-Bat Grinder",
+    "emoji": "⚔️",
+    "tagline": "Foul off everything",
+    "description": "Elite determination extends at-bats by fouling off pitches. Never gives up an at-bat.",
+    "priority_stats": ["determination", "discipline", "contact"],
+    "secondary_stats": ["vision", "cunning", "intimidation"],
+    "stat_weights": {
+      "determination": 0.12,
+      "discipline": 0.12,
+      "contact": 0.12,
+      "vision": 0.08,
+      "cunning": 0.08,
+      "intimidation": 0.08
+    },
+    "recommended_greater_boons": ["Iron Will", "Unwavering"],
+    "recommended_lesser_boons": ["Tenacious Badger", "Tireless", "Loyal"],
+    "equipment_priority": ["head", "hands"],
+    "equipment_affixes": ["determination", "discipline", "contact"]
+  },
+  "vision_specialist": {
+    "name": "Vision Specialist",
+    "emoji": "👁️",
+    "tagline": "See the ball, hit the ball",
+    "description": "Sees the ball exceptionally well. Swings at strikes and puts ball in play.",
+    "priority_stats": ["vision", "contact", "aiming"],
+    "secondary_stats": ["discipline", "insight", "muscle"],
+    "stat_weights": {
+      "vision": 0.12,
+      "contact": 0.12,
+      "aiming": 0.12,
+      "discipline": 0.08,
+      "insight": 0.08,
+      "muscle": 0.08
+    },
+    "recommended_greater_boons": ["All Knowing", "Insider"],
+    "recommended_lesser_boons": ["Observer", "Wise", "Geometry Expert"],
+    "equipment_priority": ["head", "hands"],
+    "equipment_affixes": ["vision", "contact", "aiming"]
+  },
+  "spray_hitter": {
+    "name": "Spray Hitter",
+    "emoji": "🌊",
+    "tagline": "Singles machine, finds holes",
+    "description": "Elite insight finds holes in the defense. Singles machine with gap-finding ability.",
+    "priority_stats": ["insight", "contact", "aiming"],
+    "secondary_stats": ["speed", "performance", "vision"],
+    "stat_weights": {
+      "insight": 0.12,
+      "contact": 0.12,
+      "aiming": 0.12,
+      "speed": 0.08,
+      "performance": 0.08,
+      "vision": 0.08
+    },
+    "recommended_greater_boons": ["Insider", "Lucky"],
+    "recommended_lesser_boons": ["Geometry Expert", "Sneaky", "Archer's Mark"],
+    "equipment_priority": ["hands", "feet"],
+    "equipment_affixes": ["insight", "contact", "aiming"]
+  },
+  "performer": {
+    "name": "Clutch Performer",
+    "emoji": "🎭",
+    "tagline": "Rises to the moment",
+    "description": "Elite performance boosts all hit types. Well-rounded hitting with extra base potential.",
+    "priority_stats": ["performance", "contact", "muscle"],
+    "secondary_stats": ["aiming", "speed", "insight"],
+    "stat_weights": {
+      "performance": 0.12,
+      "contact": 0.12,
+      "muscle": 0.12,
+      "aiming": 0.08,
+      "speed": 0.08,
+      "insight": 0.08
+    },
+    "recommended_greater_boons": ["Clutch", "Insider"],
+    "recommended_lesser_boons": ["Majestic", "One With All", "Loyal"],
+    "equipment_priority": ["hands", "feet", "head"],
+    "equipment_affixes": ["performance", "contact", "muscle"]
+  },
+  "fly_ball_hitter": {
+    "name": "Fly Ball Hitter",
+    "emoji": "🎈",
+    "tagline": "Launch angle power",
+    "description": "Elite lift launches fly balls for home run potential. Power over contact approach.",
+    "priority_stats": ["lift", "muscle", "contact"],
+    "secondary_stats": ["intimidation", "aiming", "vision"],
+    "stat_weights": {
+      "lift": 0.12,
+      "muscle": 0.12,
+      "contact": 0.12,
+      "intimidation": 0.08,
+      "aiming": 0.08,
+      "vision": 0.08
+    },
+    "recommended_greater_boons": ["Clutch", "Insider"],
+    "recommended_lesser_boons": ["Draconic", "Giant", "Air Elemental"],
+    "equipment_priority": ["hands", "head"],
+    "equipment_affixes": ["lift", "muscle", "contact"]
+  },
+  "sacrifice_specialist": {
+    "name": "Team Player",
+    "emoji": "🤝",
+    "tagline": "Sacrifice for the team",
+    "description": "Elite selflessness drives in runs with sacrifice flies. Team-first approach.",
+    "priority_stats": ["selflessness", "lift", "contact"],
+    "secondary_stats": ["muscle", "discipline", "aiming"],
+    "stat_weights": {
+      "selflessness": 0.12,
+      "lift": 0.12,
+      "contact": 0.12,
+      "muscle": 0.08,
+      "discipline": 0.08,
+      "aiming": 0.08
+    },
+    "recommended_greater_boons": ["Clutch", "Underdog"],
+    "recommended_lesser_boons": ["One With All", "Loyal", "Guardian"],
+    "equipment_priority": ["hands", "head"],
+    "equipment_affixes": ["selflessness", "lift", "contact"]
+  },
+  "balanced_hitter": {
+    "name": "Balanced Hitter",
+    "emoji": "⚖️",
+    "tagline": "No weaknesses, all-around",
+    "description": "Well-rounded offensive approach with no major weaknesses. Adapts to any situation.",
+    "priority_stats": ["contact", "discipline", "muscle"],
+    "secondary_stats": ["aiming", "vision", "speed"],
+    "stat_weights": {
+      "contact": 0.12,
+      "discipline": 0.12,
+      "muscle": 0.12,
+      "aiming": 0.08,
+      "vision": 0.08,
+      "speed": 0.08
+    },
+    "recommended_greater_boons": ["Clutch", "All Knowing"],
+    "recommended_lesser_boons": ["One With All", "Majestic", "Loyal"],
+    "equipment_priority": ["hands", "head", "feet"],
+    "equipment_affixes": ["contact", "discipline", "muscle"]
+  },
+  "base_stealer": {
+    "name": "Elite Base Stealer",
+    "emoji": "🦝",
+    "tagline": "Swipe bags at will",
+    "description": "Combines stealth with cunning for elite stolen base success. Reads pitchers perfectly.",
+    "priority_stats": ["stealth", "cunning", "greed"],
+    "secondary_stats": ["insight", "performance", "contact"],
+    "stat_weights": {
+      "stealth": 0.12,
+      "cunning": 0.12,
+      "greed": 0.12,
+      "insight": 0.08,
+      "performance": 0.08,
+      "contact": 0.08
+    },
+    "recommended_greater_boons": ["Lucky", "All Knowing"],
+    "recommended_lesser_boons": ["Thief", "Sneaky", "Crafty"],
+    "equipment_priority": ["feet", "hands", "head"],
+    "equipment_affixes": ["stealth", "cunning", "greed"]
+  },
+  "aggressive_runner": {
+    "name": "Aggressive Runner",
+    "emoji": "🏃",
+    "tagline": "Take the extra base",
+    "description": "Elite greed takes extra bases aggressively. First to third, scores from second.",
+    "priority_stats": ["greed", "speed", "performance"],
+    "secondary_stats": ["stealth", "contact", "aiming"],
+    "stat_weights": {
+      "greed": 0.12,
+      "speed": 0.12,
+      "performance": 0.12,
+      "stealth": 0.08,
+      "contact": 0.08,
+      "aiming": 0.08
+    },
+    "recommended_greater_boons": ["Lucky", "Underdog"],
+    "recommended_lesser_boons": ["Air Elemental", "Thief", "Charger"],
+    "equipment_priority": ["feet", "hands"],
+    "equipment_affixes": ["greed", "speed", "performance"]
+  },
+  "analytical_hitter": {
+    "name": "Analytical Hitter",
+    "emoji": "🧠",
+    "tagline": "Outsmart the pitcher",
+    "description": "Wisdom-based approach for smart at-bats. Future-proofed for when wisdom gets buffed.",
+    "priority_stats": ["wisdom", "discipline", "vision"],
+    "secondary_stats": ["contact", "insight", "cunning"],
+    "stat_weights": {
+      "wisdom": 0.12,
+      "discipline": 0.12,
+      "vision": 0.12,
+      "contact": 0.08,
+      "insight": 0.08,
+      "cunning": 0.08
+    },
+    "recommended_greater_boons": ["All Knowing", "Logical"],
+    "recommended_lesser_boons": ["Wise", "Observer", "Majestic"],
+    "equipment_priority": ["head", "hands"],
+    "equipment_affixes": ["wisdom", "discipline", "vision"]
+  },
+  "insight_speedster": {
+    "name": "Insight Speedster",
+    "emoji": "🔍",
+    "tagline": "Find gaps and leg them out",
+    "description": "Elite insight finds defensive holes while speed legs out extra bases. High BABIP through gap-finding and hustle. Based on S10 BABIP leaders like Debbie Kemp (Insight 420, Speed 355).",
+    "priority_stats": ["insight", "speed", "aiming"],
+    "secondary_stats": ["contact", "performance", "stealth"],
+    "stat_weights": {
+      "insight": 0.12,
+      "speed": 0.12,
+      "aiming": 0.12,
+      "contact": 0.08,
+      "performance": 0.08,
+      "stealth": 0.08
+    },
+    "recommended_greater_boons": ["Insider", "Lucky"],
+    "recommended_lesser_boons": ["Geometry Expert", "Air Elemental", "Sneaky"],
+    "equipment_priority": ["feet", "hands", "head"],
+    "equipment_affixes": ["insight", "speed", "aiming"]
+  },
+  "greed_merchant": {
+    "name": "Greed Merchant",
+    "emoji": "💰",
+    "tagline": "Take every base possible",
+    "description": "Extreme greed dominates the basepaths. Steals bases and takes extras through sheer avarice. Based on S10 SB leaders like Lance Petersen (Greed 622) and Hobble Trout (Greed 586).",
+    "priority_stats": ["greed", "cunning", "stealth"],
+    "secondary_stats": ["contact", "aiming", "performance"],
+    "stat_weights": {
+      "greed": 0.12,
+      "cunning": 0.12,
+      "stealth": 0.12,
+      "contact": 0.08,
+      "aiming": 0.08,
+      "performance": 0.08
+    },
+    "recommended_greater_boons": ["Lucky", "Underdog"],
+    "recommended_lesser_boons": ["Thief", "Sneaky", "Crafty"],
+    "equipment_priority": ["feet", "hands"],
+    "equipment_affixes": ["greed", "cunning", "stealth"]
+  },
+  "contact_power": {
+    "name": "Contact Power",
+    "emoji": "🔨",
+    "tagline": "Hit hard and often",
+    "description": "Combines elite contact with power for high BA and SLG. Based on S10 top BA/SLG leader profiles.",
+    "priority_stats": ["contact", "muscle", "aiming"],
+    "secondary_stats": ["lift", "discipline", "performance"],
+    "stat_weights": {
+      "contact": 0.12,
+      "muscle": 0.12,
+      "aiming": 0.12,
+      "lift": 0.08,
+      "discipline": 0.08,
+      "performance": 0.08
+    },
+    "recommended_greater_boons": ["Clutch", "Insider"],
+    "recommended_lesser_boons": ["Draconic", "Geometry Expert", "Majestic"],
+    "equipment_priority": ["hands", "head", "body"],
+    "equipment_affixes": ["contact", "muscle", "aiming"]
+  },
+  "five_tool_player": {
+    "name": "Five Tool Player",
+    "emoji": "⭐",
+    "tagline": "Elite at everything",
+    "description": "Elite in all areas - contact, power, speed, throwing, and fielding. The complete player.",
+    "priority_stats": ["contact", "muscle", "speed"],
+    "secondary_stats": ["discipline", "aiming", "lift"],
+    "stat_weights": {
+      "contact": 0.12,
+      "muscle": 0.12,
+      "speed": 0.12,
+      "discipline": 0.08,
+      "aiming": 0.08,
+      "lift": 0.08
+    },
+    "recommended_greater_boons": ["Clutch", "All Knowing"],
+    "recommended_lesser_boons": ["One With All", "Majestic", "Air Elemental"],
+    "equipment_priority": ["hands", "feet", "body"],
+    "equipment_affixes": ["contact", "muscle", "speed"]
+  }
+}

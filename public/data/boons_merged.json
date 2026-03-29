@@ -1,0 +1,1518 @@
+{
+  "lesser_boons": [
+    {
+      "name": "Accountant",
+      "type": "lesser",
+      "emoji": "📒",
+      "description": "This Player keeps a balanced ledger",
+      "bonuses": {
+        "Accuracy": 50
+      },
+      "penalties": {
+        "Persuasion": 50
+      }
+    },
+    {
+      "name": "Afterburner",
+      "type": "lesser",
+      "emoji": "🚀",
+      "description": "This Player is ignited",
+      "bonuses": {
+        "Velocity": 50
+      },
+      "penalties": {
+        "Stuff": 50
+      }
+    },
+    {
+      "name": "Air Elemental",
+      "type": "lesser",
+      "emoji": "💨",
+      "description": "This Player is the air itself",
+      "bonuses": {
+        "Aiming": 50
+      },
+      "penalties": {
+        "Contact": 50
+      }
+    },
+    {
+      "name": "Ambassador",
+      "type": "lesser",
+      "emoji": "🎖️",
+      "description": "This Player carries the banner with grace",
+      "bonuses": {
+        "Persuasion": 50
+      },
+      "penalties": {
+        "Guts": 50
+      }
+    },
+    {
+      "name": "Amphibian",
+      "type": "lesser",
+      "emoji": "🐸",
+      "description": "This Player adapts to land and sea",
+      "bonuses": {
+        "Performance": 50
+      },
+      "penalties": {
+        "Aiming": 50
+      }
+    },
+    {
+      "name": "Analyst",
+      "type": "lesser",
+      "emoji": "📊",
+      "description": "This Player knows the trends",
+      "bonuses": {
+        "Wisdom": 50
+      },
+      "penalties": {
+        "Selflessness": 50
+      }
+    },
+    {
+      "name": "Anchor",
+      "type": "lesser",
+      "emoji": "⚓",
+      "description": "This Player is stuck in place",
+      "bonuses": {
+        "Defiance": 50
+      },
+      "penalties": {
+        "Accuracy": 50
+      }
+    },
+    {
+      "name": "Angelic",
+      "type": "lesser",
+      "emoji": "👼",
+      "description": "This Player is blessed by the heavens",
+      "bonuses": {
+        "Control": 50
+      },
+      "penalties": {
+        "Presence": 50
+      }
+    },
+    {
+      "name": "Arachnid",
+      "type": "lesser",
+      "emoji": "🕷️",
+      "description": "This Player's has eight legs",
+      "bonuses": {
+        "Intimidation": 50
+      },
+      "penalties": {
+        "Vision": 50
+      }
+    },
+    {
+      "name": "Archer's Mark",
+      "type": "lesser",
+      "emoji": "🏹",
+      "description": "This Player becomes a sharpshooter",
+      "bonuses": {
+        "Aiming": 50
+      },
+      "penalties": {
+        "Discipline": 50
+      }
+    },
+    {
+      "name": "Battery",
+      "type": "lesser",
+      "emoji": "🔋",
+      "description": "This Player runs forever",
+      "bonuses": {
+        "Stamina": 50
+      },
+      "penalties": {
+        "Rotation": 50
+      }
+    },
+    {
+      "name": "Beacon",
+      "type": "lesser",
+      "emoji": "🕯️",
+      "description": "This Player shines steady leadership",
+      "bonuses": {
+        "Presence": 50
+      },
+      "penalties": {
+        "Control": 50
+      }
+    },
+    {
+      "name": "Bulwark",
+      "type": "lesser",
+      "emoji": "🛡️",
+      "description": "This Player raises their shield",
+      "bonuses": {
+        "Determination": 50
+      },
+      "penalties": {
+        "Selflessness": 50
+      }
+    },
+    {
+      "name": "Calculated",
+      "type": "lesser",
+      "emoji": "🧮",
+      "description": "This Player refines their logic",
+      "bonuses": {
+        "Discipline": 50
+      },
+      "penalties": {
+        "Cunning": 50
+      }
+    },
+    {
+      "name": "Caped",
+      "type": "lesser",
+      "emoji": "🪶",
+      "description": "This Player flies around with their cape",
+      "bonuses": {
+        "Lift": 50
+      },
+      "penalties": {
+        "Vision": 50
+      }
+    },
+    {
+      "name": "Charger",
+      "type": "lesser",
+      "emoji": "🦏",
+      "description": "This Player charges ahead",
+      "bonuses": {
+        "Speed": 50
+      },
+      "penalties": {
+        "Insight": 50
+      }
+    },
+    {
+      "name": "Clean",
+      "type": "lesser",
+      "emoji": "🧹",
+      "description": "This Player stays completely clean",
+      "bonuses": {
+        "Discipline": 50
+      },
+      "penalties": {
+        "Determination": 50
+      }
+    },
+    {
+      "name": "Clockwork",
+      "type": "lesser",
+      "emoji": "🕰️",
+      "description": "This Player pitches on perfect time",
+      "bonuses": {
+        "Control": 50
+      },
+      "penalties": {
+        "Stamina": 50
+      }
+    },
+    {
+      "name": "Confused",
+      "type": "lesser",
+      "emoji": "🤷",
+      "description": "This Player is a little mixed up",
+      "bonuses": {
+        "Deception": 50
+      },
+      "penalties": {
+        "Accuracy": 50
+      }
+    },
+    {
+      "name": "Courier",
+      "type": "lesser",
+      "emoji": "🕊️",
+      "description": "This Player carries the mail",
+      "bonuses": {
+        "Persuasion": 50
+      },
+      "penalties": {
+        "Stuff": 50
+      }
+    },
+    {
+      "name": "Cyclist",
+      "type": "lesser",
+      "emoji": "🚲",
+      "description": "This Player is riding a bike",
+      "bonuses": {
+        "Velocity": 50
+      },
+      "penalties": {
+        "Deception": 50
+      }
+    },
+    {
+      "name": "Cyclone",
+      "type": "lesser",
+      "emoji": "🌪️",
+      "description": "This Player is a rolling storm",
+      "bonuses": {
+        "Rotation": 50
+      },
+      "penalties": {
+        "Presence": 50
+      }
+    },
+    {
+      "name": "Deadeye",
+      "type": "lesser",
+      "emoji": "🔭",
+      "description": "This Player never loses the mark",
+      "bonuses": {
+        "Aiming": 50
+      },
+      "penalties": {
+        "Determination": 50
+      }
+    },
+    {
+      "name": "Demonic",
+      "type": "lesser",
+      "emoji": "😈",
+      "description": "This Player is possessed by infernal power",
+      "bonuses": {
+        "Defiance": 50
+      },
+      "penalties": {
+        "Control": 50
+      }
+    },
+    {
+      "name": "Director",
+      "type": "lesser",
+      "emoji": "🎥",
+      "description": "This Player is on set",
+      "bonuses": {
+        "Control": 50
+      },
+      "penalties": {
+        "Accuracy": 50
+      }
+    },
+    {
+      "name": "Disguised",
+      "type": "lesser",
+      "emoji": "🌳",
+      "description": "This Player's is disguising as a tree",
+      "bonuses": {
+        "Deception": 50
+      },
+      "penalties": {
+        "Velocity": 50
+      }
+    },
+    {
+      "name": "Draconic",
+      "type": "lesser",
+      "emoji": "🐲",
+      "description": "This Player channels draconic might",
+      "bonuses": {
+        "Muscle": 50
+      },
+      "penalties": {
+        "Aiming": 50
+      }
+    },
+    {
+      "name": "Eagle-eye",
+      "type": "lesser",
+      "emoji": "🦅",
+      "description": "This Player locks onto the target",
+      "bonuses": {
+        "Aiming": 50
+      },
+      "penalties": {
+        "Cunning": 50
+      }
+    },
+    {
+      "name": "Earth Elemental",
+      "type": "lesser",
+      "emoji": "⛰️",
+      "description": "This Player stands like stone",
+      "bonuses": {
+        "Determination": 50
+      },
+      "penalties": {
+        "Stealth": 50
+      }
+    },
+    {
+      "name": "Elvish",
+      "type": "lesser",
+      "emoji": "🧝",
+      "description": "This Player has pointy ears",
+      "bonuses": {
+        "Intuition": 50
+      },
+      "penalties": {
+        "Persuasion": 50
+      }
+    },
+    {
+      "name": "Excavator",
+      "type": "lesser",
+      "emoji": "⛏️",
+      "description": "This Player is digging",
+      "bonuses": {
+        "Greed": 50
+      },
+      "penalties": {
+        "Muscle": 50
+      }
+    },
+    {
+      "name": "Fae",
+      "type": "lesser",
+      "emoji": "🧚",
+      "description": "This Player is touched by the Fae",
+      "bonuses": {
+        "Cunning": 50
+      },
+      "penalties": {
+        "Discipline": 50
+      }
+    },
+    {
+      "name": "Feral Sense",
+      "type": "lesser",
+      "emoji": "🐺",
+      "description": "This Player trusts their instincts",
+      "bonuses": {
+        "Intuition": 50
+      },
+      "penalties": {
+        "Stamina": 50
+      }
+    },
+    {
+      "name": "Fire Elemental",
+      "type": "lesser",
+      "emoji": "🔥",
+      "description": "This Player burns with elemental fire",
+      "bonuses": {
+        "Lift": 50
+      },
+      "penalties": {
+        "Selflessness": 50
+      }
+    },
+    {
+      "name": "Gambit",
+      "type": "lesser",
+      "emoji": "♟️",
+      "description": "This Player plays the long con",
+      "bonuses": {
+        "Deception": 50
+      },
+      "penalties": {
+        "Rotation": 50
+      }
+    },
+    {
+      "name": "Geometry Expert",
+      "type": "lesser",
+      "emoji": "📐",
+      "description": "This Player has mastered geometry",
+      "bonuses": {
+        "Rotation": 50
+      },
+      "penalties": {
+        "Stamina": 50
+      }
+    },
+    {
+      "name": "Giant",
+      "type": "lesser",
+      "emoji": "🗿",
+      "description": "This Player is gigantic",
+      "bonuses": {
+        "Intimidation": 50
+      },
+      "penalties": {
+        "Insight": 50
+      }
+    },
+    {
+      "name": "Gorilla",
+      "type": "lesser",
+      "emoji": "🦍",
+      "description": "This Player wins with brute force",
+      "bonuses": {
+        "Muscle": 50
+      },
+      "penalties": {
+        "Cunning": 50
+      }
+    },
+    {
+      "name": "Granite",
+      "type": "lesser",
+      "emoji": "🏔️",
+      "description": "This Player is solid",
+      "bonuses": {
+        "Muscle": 50
+      },
+      "penalties": {
+        "Determination": 50
+      }
+    },
+    {
+      "name": "Grounded",
+      "type": "lesser",
+      "emoji": "🌱",
+      "description": "This Player stays planted in the ground",
+      "bonuses": {
+        "Contact": 50
+      },
+      "penalties": {
+        "Lift": 50
+      }
+    },
+    {
+      "name": "Guardian",
+      "type": "lesser",
+      "emoji": "🐑",
+      "description": "This Player stands guard",
+      "bonuses": {
+        "Selflessness": 50
+      },
+      "penalties": {
+        "Intimidation": 50
+      }
+    },
+    {
+      "name": "Hardy",
+      "type": "lesser",
+      "emoji": "🐪",
+      "description": "This Player is hardy",
+      "bonuses": {
+        "Stamina": 50
+      },
+      "penalties": {
+        "Velocity": 50
+      }
+    },
+    {
+      "name": "Headliner",
+      "type": "lesser",
+      "emoji": "🎤",
+      "description": "This Player owns the stage",
+      "bonuses": {
+        "Presence": 50
+      },
+      "penalties": {
+        "Velocity": 50
+      }
+    },
+    {
+      "name": "Hextouch",
+      "type": "lesser",
+      "emoji": "🪄",
+      "description": "This Player's pitches are cursed",
+      "bonuses": {
+        "Stuff": 50
+      },
+      "penalties": {
+        "Stamina": 50
+      }
+    },
+    {
+      "name": "Holey",
+      "type": "lesser",
+      "emoji": "🕳️",
+      "description": "This Player is full of holes",
+      "bonuses": {
+        "Stealth": 50
+      },
+      "penalties": {
+        "Greed": 50
+      }
+    },
+    {
+      "name": "Horizon",
+      "type": "lesser",
+      "emoji": "🌅",
+      "description": "This Player can see beyond the horizon",
+      "bonuses": {
+        "Vision": 50
+      },
+      "penalties": {
+        "Wisdom": 50
+      }
+    },
+    {
+      "name": "Ill",
+      "type": "lesser",
+      "emoji": "🤢",
+      "description": "This Player is not feeling well",
+      "bonuses": {
+        "Guts": 50
+      },
+      "penalties": {
+        "Deception": 50
+      }
+    },
+    {
+      "name": "Insectoid",
+      "type": "lesser",
+      "emoji": "🐞",
+      "description": "This Player takes on an insect form",
+      "bonuses": {
+        "Cunning": 50
+      },
+      "penalties": {
+        "Determination": 50
+      }
+    },
+    {
+      "name": "Ironclad",
+      "type": "lesser",
+      "emoji": "⚙️",
+      "description": "This Player grinds on without pause",
+      "bonuses": {
+        "Determination": 50
+      },
+      "penalties": {
+        "Greed": 50
+      }
+    },
+    {
+      "name": "Kind",
+      "type": "lesser",
+      "emoji": "💖",
+      "description": "This Player lifts everyone around them",
+      "bonuses": {
+        "Selflessness": 50
+      },
+      "penalties": {
+        "Discipline": 50
+      }
+    },
+    {
+      "name": "Kite",
+      "type": "lesser",
+      "emoji": "🪁",
+      "description": "This Player is attached to a kite",
+      "bonuses": {
+        "Lift": 50
+      },
+      "penalties": {
+        "Stealth": 50
+      }
+    },
+    {
+      "name": "Leaf",
+      "type": "lesser",
+      "emoji": "🍃",
+      "description": "This Player is a leaf on the wind",
+      "bonuses": {
+        "Speed": 50
+      },
+      "penalties": {
+        "Intimidation": 50
+      }
+    },
+    {
+      "name": "Lionheart",
+      "type": "lesser",
+      "emoji": "🦁",
+      "description": "This Player roars at pressure",
+      "bonuses": {
+        "Guts": 50
+      },
+      "penalties": {
+        "Accuracy": 50
+      }
+    },
+    {
+      "name": "Loyal",
+      "type": "lesser",
+      "emoji": "🐕",
+      "description": "This Player's loyalty shines",
+      "bonuses": {
+        "Selflessness": 50
+      },
+      "penalties": {
+        "Insight": 50
+      }
+    },
+    {
+      "name": "Magnetic",
+      "type": "lesser",
+      "emoji": "🧲",
+      "description": "This Player attracts things to them",
+      "bonuses": {
+        "Greed": 50
+      },
+      "penalties": {
+        "Performance": 50
+      }
+    },
+    {
+      "name": "Majestic",
+      "type": "lesser",
+      "emoji": "🦬",
+      "description": "This Player's majesty is undeniable",
+      "bonuses": {
+        "Presence": 50
+      },
+      "penalties": {
+        "Accuracy": 50
+      }
+    },
+    {
+      "name": "Marathoner",
+      "type": "lesser",
+      "emoji": "🏃",
+      "description": "This Player really likes running",
+      "bonuses": {
+        "Speed": 50
+      },
+      "penalties": {
+        "Lift": 50
+      }
+    },
+    {
+      "name": "Mer",
+      "type": "lesser",
+      "emoji": "🧜",
+      "description": "This Player embraces the tides",
+      "bonuses": {
+        "Wisdom": 50
+      },
+      "penalties": {
+        "Stealth": 50
+      }
+    },
+    {
+      "name": "Meteor",
+      "type": "lesser",
+      "emoji": "☄️",
+      "description": "This Player is a shooting star",
+      "bonuses": {
+        "Velocity": 50
+      },
+      "penalties": {
+        "Accuracy": 50
+      }
+    },
+    {
+      "name": "Metronome",
+      "type": "lesser",
+      "emoji": "🎼",
+      "description": "This Player keeps the rhythm",
+      "bonuses": {
+        "Discipline": 50
+      },
+      "penalties": {
+        "Contact": 50
+      }
+    },
+    {
+      "name": "Miasma",
+      "type": "lesser",
+      "emoji": "☠️",
+      "description": "This Player leaves a toxic wake",
+      "bonuses": {
+        "Stuff": 50
+      },
+      "penalties": {
+        "Presence": 50
+      }
+    },
+    {
+      "name": "Mischievous",
+      "type": "lesser",
+      "emoji": "🐒",
+      "description": "This Player is monkeying around",
+      "bonuses": {
+        "Performance": 50
+      },
+      "penalties": {
+        "Stealth": 50
+      }
+    },
+    {
+      "name": "Navigator",
+      "type": "lesser",
+      "emoji": "⛵",
+      "description": "This Player charts the seas",
+      "bonuses": {
+        "Control": 50
+      },
+      "penalties": {
+        "Rotation": 50
+      }
+    },
+    {
+      "name": "Needle",
+      "type": "lesser",
+      "emoji": "🪡",
+      "description": "This Player can thread the needle",
+      "bonuses": {
+        "Stealth": 50
+      },
+      "penalties": {
+        "Aiming": 50
+      }
+    },
+    {
+      "name": "Night Owl",
+      "type": "lesser",
+      "emoji": "🌙",
+      "description": "This Player thrives in darkness",
+      "bonuses": {
+        "Stealth": 50
+      },
+      "penalties": {
+        "Speed": 50
+      }
+    },
+    {
+      "name": "Observer",
+      "type": "lesser",
+      "emoji": "🦉",
+      "description": "This Player watches every detail",
+      "bonuses": {
+        "Insight": 50
+      },
+      "penalties": {
+        "Muscle": 50
+      }
+    },
+    {
+      "name": "Ogre",
+      "type": "lesser",
+      "emoji": "👹",
+      "description": "This Player looms large",
+      "bonuses": {
+        "Intimidation": 50
+      },
+      "penalties": {
+        "Wisdom": 50
+      }
+    },
+    {
+      "name": "One With All",
+      "type": "lesser",
+      "emoji": "⚾",
+      "description": "This Player trains with the basics",
+      "bonuses": {
+        "Contact": 50
+      },
+      "penalties": {
+        "Muscle": 50
+      }
+    },
+    {
+      "name": "Orator",
+      "type": "lesser",
+      "emoji": "💬",
+      "description": "This Player talks a lot",
+      "bonuses": {
+        "Persuasion": 50
+      },
+      "penalties": {
+        "Velocity": 50
+      }
+    },
+    {
+      "name": "Peacebroker",
+      "type": "lesser",
+      "emoji": "🤝",
+      "description": "This Player smooths over every dispute",
+      "bonuses": {
+        "Persuasion": 50
+      },
+      "penalties": {
+        "Defiance": 50
+      }
+    },
+    {
+      "name": "Pinpoint",
+      "type": "lesser",
+      "emoji": "📌",
+      "description": "This Player has pinpoint precision",
+      "bonuses": {
+        "Accuracy": 50
+      },
+      "penalties": {
+        "Velocity": 50
+      }
+    },
+    {
+      "name": "Playful",
+      "type": "lesser",
+      "emoji": "🐠",
+      "description": "This Player is very playful",
+      "bonuses": {
+        "Performance": 50
+      },
+      "penalties": {
+        "Muscle": 50
+      }
+    },
+    {
+      "name": "Psychic",
+      "type": "lesser",
+      "emoji": "🔮",
+      "description": "This Player glimpses the future",
+      "bonuses": {
+        "Intuition": 50
+      },
+      "penalties": {
+        "Rotation": 50
+      }
+    },
+    {
+      "name": "Quarterback",
+      "type": "lesser",
+      "emoji": "🏈",
+      "description": "This Player is a quarterback",
+      "bonuses": {
+        "Accuracy": 50
+      },
+      "penalties": {
+        "Control": 50
+      }
+    },
+    {
+      "name": "Sage",
+      "type": "lesser",
+      "emoji": "🧙",
+      "description": "This Player always offers good advice",
+      "bonuses": {
+        "Wisdom": 50
+      },
+      "penalties": {
+        "Vision": 50
+      }
+    },
+    {
+      "name": "Satellite",
+      "type": "lesser",
+      "emoji": "🛰️",
+      "description": "This Player can see the ball from orbit",
+      "bonuses": {
+        "Vision": 50
+      },
+      "penalties": {
+        "Muscle": 50
+      }
+    },
+    {
+      "name": "Scooter",
+      "type": "lesser",
+      "emoji": "🛴",
+      "description": "This Player hops on a scooter",
+      "bonuses": {
+        "Speed": 50
+      },
+      "penalties": {
+        "Discipline": 50
+      }
+    },
+    {
+      "name": "Second Wind",
+      "type": "lesser",
+      "emoji": "🌬️",
+      "description": "This Player breathes in extra innings",
+      "bonuses": {
+        "Stamina": 50
+      },
+      "penalties": {
+        "Accuracy": 50
+      }
+    },
+    {
+      "name": "Seer",
+      "type": "lesser",
+      "emoji": "👁️",
+      "description": "This Player reads the room at a glance",
+      "bonuses": {
+        "Intuition": 50
+      },
+      "penalties": {
+        "Presence": 50
+      }
+    },
+    {
+      "name": "Shiny",
+      "type": "lesser",
+      "emoji": "🌟",
+      "description": "This Player shines brightly",
+      "bonuses": {
+        "Vision": 50
+      },
+      "penalties": {
+        "Performance": 50
+      }
+    },
+    {
+      "name": "Shopper",
+      "type": "lesser",
+      "emoji": "🛒",
+      "description": "This Player shops til' they drop",
+      "bonuses": {
+        "Rotation": 50
+      },
+      "penalties": {
+        "Persuasion": 50
+      }
+    },
+    {
+      "name": "Sneaky",
+      "type": "lesser",
+      "emoji": "🦊",
+      "description": "This Player moves unseen",
+      "bonuses": {
+        "Cunning": 50
+      },
+      "penalties": {
+        "Intimidation": 50
+      }
+    },
+    {
+      "name": "Snowperson",
+      "type": "lesser",
+      "emoji": "☃️",
+      "description": "This Player waits patiently",
+      "bonuses": {
+        "Discipline": 50
+      },
+      "penalties": {
+        "Aiming": 50
+      }
+    },
+    {
+      "name": "Softballer",
+      "type": "lesser",
+      "emoji": "🥎",
+      "description": "This Player pitches with a softball",
+      "bonuses": {
+        "Stuff": 50
+      },
+      "penalties": {
+        "Rotation": 50
+      }
+    },
+    {
+      "name": "Soul in the Machine",
+      "type": "lesser",
+      "emoji": "🤖",
+      "description": "This Player has assumed a ROBO",
+      "bonuses": {
+        "Accuracy": 50
+      },
+      "penalties": {
+        "Deception": 50
+      }
+    },
+    {
+      "name": "Spectral",
+      "type": "lesser",
+      "emoji": "👻",
+      "description": "This Player is mostly transparent",
+      "bonuses": {
+        "Stealth": 50
+      },
+      "penalties": {
+        "Contact": 50
+      }
+    },
+    {
+      "name": "Spotlight",
+      "type": "lesser",
+      "emoji": "✨",
+      "description": "This Player craves attention",
+      "bonuses": {
+        "Presence": 50
+      },
+      "penalties": {
+        "Intuition": 50
+      }
+    },
+    {
+      "name": "Stargazer",
+      "type": "lesser",
+      "emoji": "🌠",
+      "description": "This Player likes looking at the stars",
+      "bonuses": {
+        "Insight": 50
+      },
+      "penalties": {
+        "Discipline": 50
+      }
+    },
+    {
+      "name": "Stoneskin",
+      "type": "lesser",
+      "emoji": "🪨",
+      "description": "This Player is made of stone",
+      "bonuses": {
+        "Guts": 50
+      },
+      "penalties": {
+        "Control": 50
+      }
+    },
+    {
+      "name": "Stonewall",
+      "type": "lesser",
+      "emoji": "🧱",
+      "description": "This Player refuses to budge",
+      "bonuses": {
+        "Defiance": 50
+      },
+      "penalties": {
+        "Intuition": 50
+      }
+    },
+    {
+      "name": "Stormrider",
+      "type": "lesser",
+      "emoji": "⛈️",
+      "description": "This Player rides the storm",
+      "bonuses": {
+        "Velocity": 50
+      },
+      "penalties": {
+        "Control": 50
+      }
+    },
+    {
+      "name": "Striker",
+      "type": "lesser",
+      "emoji": "⚽",
+      "description": "This Player is good at soccer",
+      "bonuses": {
+        "Insight": 50
+      },
+      "penalties": {
+        "Lift": 50
+      }
+    },
+    {
+      "name": "Sweet Tooth",
+      "type": "lesser",
+      "emoji": "🍬",
+      "description": "This Player needs more candy",
+      "bonuses": {
+        "Contact": 50
+      },
+      "penalties": {
+        "Aiming": 50
+      }
+    },
+    {
+      "name": "Techie",
+      "type": "lesser",
+      "emoji": "🖥️",
+      "description": "This Player is knowledgeable about tech",
+      "bonuses": {
+        "Insight": 50
+      },
+      "penalties": {
+        "Intimidation": 50
+      }
+    },
+    {
+      "name": "Tenacious Badger",
+      "type": "lesser",
+      "emoji": "🦡",
+      "description": "This Player digs in",
+      "bonuses": {
+        "Guts": 50
+      },
+      "penalties": {
+        "Intuition": 50
+      }
+    },
+    {
+      "name": "The Light",
+      "type": "lesser",
+      "emoji": "🚦",
+      "description": "This Player sees the light",
+      "bonuses": {
+        "Vision": 50
+      },
+      "penalties": {
+        "Speed": 50
+      }
+    },
+    {
+      "name": "Thief",
+      "type": "lesser",
+      "emoji": "🦝",
+      "description": "This Player likes other people's stuff",
+      "bonuses": {
+        "Greed": 50
+      },
+      "penalties": {
+        "Wisdom": 50
+      }
+    },
+    {
+      "name": "Thoroughbred",
+      "type": "lesser",
+      "emoji": "🐎",
+      "description": "This Player is purebred speed",
+      "bonuses": {
+        "Performance": 50
+      },
+      "penalties": {
+        "Cunning": 50
+      }
+    },
+    {
+      "name": "Tireless",
+      "type": "lesser",
+      "emoji": "🐜",
+      "description": "This Player never tires",
+      "bonuses": {
+        "Stamina": 50
+      },
+      "penalties": {
+        "Guts": 50
+      }
+    },
+    {
+      "name": "Titan",
+      "type": "lesser",
+      "emoji": "🐘",
+      "description": "This Player moves like a colossus",
+      "bonuses": {
+        "Muscle": 50
+      },
+      "penalties": {
+        "Contact": 50
+      }
+    },
+    {
+      "name": "Treasure Map",
+      "type": "lesser",
+      "emoji": "🗺️",
+      "description": "This Player has a map",
+      "bonuses": {
+        "Greed": 50
+      },
+      "penalties": {
+        "Vision": 50
+      }
+    },
+    {
+      "name": "Tusked",
+      "type": "lesser",
+      "emoji": "🐗",
+      "description": "This Player tusks are on display",
+      "bonuses": {
+        "Intimidation": 50
+      },
+      "penalties": {
+        "Performance": 50
+      }
+    },
+    {
+      "name": "UFO",
+      "type": "lesser",
+      "emoji": "🛸",
+      "description": "This Player takes flight",
+      "bonuses": {
+        "Lift": 50
+      },
+      "penalties": {
+        "Greed": 50
+      }
+    },
+    {
+      "name": "Undead",
+      "type": "lesser",
+      "emoji": "🧟",
+      "description": "This Player rises as Undead",
+      "bonuses": {
+        "Determination": 50
+      },
+      "penalties": {
+        "Speed": 50
+      }
+    },
+    {
+      "name": "Vampiric",
+      "type": "lesser",
+      "emoji": "🧛",
+      "description": "This Player has a taste for blood",
+      "bonuses": {
+        "Cunning": 50
+      },
+      "penalties": {
+        "Vision": 50
+      }
+    },
+    {
+      "name": "Venomous",
+      "type": "lesser",
+      "emoji": "🐍",
+      "description": "This Player's touch is venom",
+      "bonuses": {
+        "Stuff": 50
+      },
+      "penalties": {
+        "Persuasion": 50
+      }
+    },
+    {
+      "name": "Water Elemental",
+      "type": "lesser",
+      "emoji": "💧",
+      "description": "This Player flows like water",
+      "bonuses": {
+        "Contact": 50
+      },
+      "penalties": {
+        "Intimidation": 50
+      }
+    },
+    {
+      "name": "Weaver",
+      "type": "lesser",
+      "emoji": "🧵",
+      "description": "This Player weaves magic into each pitch",
+      "bonuses": {
+        "Deception": 50
+      },
+      "penalties": {
+        "Stuff": 50
+      }
+    },
+    {
+      "name": "Wheel",
+      "type": "lesser",
+      "emoji": "🎡",
+      "description": "This Player likes to roll around",
+      "bonuses": {
+        "Rotation": 50
+      },
+      "penalties": {
+        "Stuff": 50
+      }
+    },
+    {
+      "name": "Wildcard",
+      "type": "lesser",
+      "emoji": "🃏",
+      "description": "This Player never plays by the book",
+      "bonuses": {
+        "Defiance": 50
+      },
+      "penalties": {
+        "Deception": 50
+      }
+    },
+    {
+      "name": "Wingmate",
+      "type": "lesser",
+      "emoji": "🛩️",
+      "description": "This Player boosts others into the sky",
+      "bonuses": {
+        "Selflessness": 50
+      },
+      "penalties": {
+        "Lift": 50
+      }
+    },
+    {
+      "name": "Wise",
+      "type": "lesser",
+      "emoji": "🐢",
+      "description": "This Player grows wise",
+      "bonuses": {
+        "Wisdom": 50
+      },
+      "penalties": {
+        "Greed": 50
+      }
+    }
+  ],
+  "greater_boons": [
+    {
+      "name": "All Knowing",
+      "type": "greater",
+      "emoji": "🧠",
+      "description": "100% increased Wisdom when the count is 3",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Analytical",
+      "type": "greater",
+      "emoji": "🔍",
+      "description": "10% increased batting Attributes when facing a left",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Clutch",
+      "type": "greater",
+      "emoji": "👏",
+      "description": "25% increased Contact if a runner is on second or third base",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Cowardly",
+      "type": "greater",
+      "emoji": "🐇",
+      "description": "50% reduced Contact. Opposing Pitcher gains 50% increased Stuff",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Creative",
+      "type": "greater",
+      "emoji": "🎨",
+      "description": "10% increased pitching Attributes when facing a right",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Criminal",
+      "type": "greater",
+      "emoji": "🕶️",
+      "description": "Upon successfully stealing a base, next attempt has a 100% increased success chance",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "First Strike",
+      "type": "greater",
+      "emoji": "☄️",
+      "description": "25% increased Velocity when the count is 0",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Insider",
+      "type": "greater",
+      "emoji": "⬅️",
+      "description": "10% increased Batting Attributes if a pitch is Inside",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Introverted",
+      "type": "greater",
+      "emoji": "🤐",
+      "description": "10% increased Batting Attributes when no runners are on base",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Intuitive",
+      "type": "greater",
+      "emoji": "✨",
+      "description": "10% increased batting Attributes when facing a right",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Iron Will",
+      "type": "greater",
+      "emoji": "🦾",
+      "description": "10% increased Pitching Attributes if a runner is in scoring position",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Logical",
+      "type": "greater",
+      "emoji": "💭",
+      "description": "10% increased pitching Attributes when facing a left",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Lucky",
+      "type": "greater",
+      "emoji": "🍀",
+      "description": "This player's Luck rolls are Lucky",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Immovable",
+      "type": "greater",
+      "emoji": "🪨",
+      "description": "This Player cannot be Moved",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Outsider",
+      "type": "greater",
+      "emoji": "➡️",
+      "description": "10% increased Batting Attributes if a pitch is Outside",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Partier",
+      "type": "greater",
+      "emoji": "🎉",
+      "description": "300% increased Luck within 10 days of their Birthday",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Prolific",
+      "type": "greater",
+      "emoji": "🛡️",
+      "description": "30% chance to negate Durability damage",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Strong Starter",
+      "type": "greater",
+      "emoji": "🚀",
+      "description": "10% increased Pitching Attributes if no runners are on base",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Underdog",
+      "type": "greater",
+      "emoji": "🐶",
+      "description": "10% increased Batting Attributes if trailing by 3 or more Runs",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Unrelenting",
+      "type": "greater",
+      "emoji": "🦛",
+      "description": "100% increased Guts and Defiance. 50% reduced maximum Energy",
+      "bonuses": {},
+      "penalties": {}
+    },
+    {
+      "name": "Unwavering",
+      "type": "greater",
+      "emoji": "🌳",
+      "description": "2% increased Pitching Attributes per Run the opposing Team has scored",
+      "bonuses": {},
+      "penalties": {}
+    }
+  ]
+}

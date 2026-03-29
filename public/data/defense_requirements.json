@@ -1,0 +1,88 @@
+{
+  "C": {
+    "position_name": "Catcher",
+    "requirements": {
+      "awareness": 5,
+      "arm": 4,
+      "composure": 3,
+      "reaction": 3
+    },
+    "description": "Catchers need high awareness to manage the game and a strong arm to throw out base stealers."
+  },
+  "1B": {
+    "position_name": "First Base",
+    "requirements": {
+      "reaction": 4,
+      "composure": 3,
+      "acrobatics": 2
+    },
+    "description": "First basemen need quick reactions for ground balls and composure for handling throws."
+  },
+  "2B": {
+    "position_name": "Second Base",
+    "requirements": {
+      "reaction": 4,
+      "composure": 3,
+      "acrobatics": 3,
+      "agility": 2
+    },
+    "description": "Second basemen need quick reactions, agility for double plays, and acrobatics for diving stops."
+  },
+  "3B": {
+    "position_name": "Third Base",
+    "requirements": {
+      "reaction": 4,
+      "composure": 3,
+      "arm": 3,
+      "acrobatics": 2
+    },
+    "description": "Third basemen need elite reactions for hot corner plays and a strong arm for throws across the diamond."
+  },
+  "SS": {
+    "position_name": "Shortstop",
+    "requirements": {
+      "reaction": 5,
+      "arm": 4,
+      "composure": 3,
+      "acrobatics": 2
+    },
+    "description": "Shortstops are the most demanding defensive position, requiring elite reactions and a strong arm."
+  },
+  "LF": {
+    "position_name": "Left Field",
+    "requirements": {
+      "acrobatics": 4,
+      "agility": 3,
+      "arm": 3
+    },
+    "description": "Left fielders need good range (acrobatics/agility) and an adequate arm."
+  },
+  "CF": {
+    "position_name": "Center Field",
+    "requirements": {
+      "acrobatics": 5,
+      "agility": 4,
+      "arm": 3
+    },
+    "description": "Center fielders cover the most ground and need elite acrobatics and agility."
+  },
+  "RF": {
+    "position_name": "Right Field",
+    "requirements": {
+      "acrobatics": 4,
+      "agility": 3,
+      "arm": 4
+    },
+    "description": "Right fielders need a strong arm for throws to third base and good range."
+  },
+  "DH": {
+    "position_name": "Designated Hitter",
+    "requirements": {},
+    "description": "Designated hitters don't play defense."
+  },
+  "P": {
+    "position_name": "Pitcher",
+    "requirements": {},
+    "description": "Pitchers primarily focus on pitching; fielding is less emphasized."
+  }
+}

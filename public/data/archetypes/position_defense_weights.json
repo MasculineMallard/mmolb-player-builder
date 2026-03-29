@@ -1,0 +1,118 @@
+{
+  "_comment": "Defense stat weights by position. Primary stats get 0.12, secondary get 0.08. Based on positional requirements diagram.",
+  "C": {
+    "name": "Catcher",
+    "emoji": "🥎",
+    "description": "Awareness is king for catchers. Reaction and composure help with passed balls and blocking.",
+    "primary_stats": ["awareness"],
+    "secondary_stats": ["reaction", "composure"],
+    "stat_weights": {
+      "awareness": 0.12,
+      "reaction": 0.08,
+      "composure": 0.08
+    }
+  },
+  "1B": {
+    "name": "First Base",
+    "emoji": "1️⃣",
+    "description": "Reaction for scooping throws. Composure for handling difficult plays.",
+    "primary_stats": ["reaction", "composure"],
+    "secondary_stats": ["dexterity"],
+    "stat_weights": {
+      "reaction": 0.12,
+      "composure": 0.12,
+      "dexterity": 0.08
+    }
+  },
+  "2B": {
+    "name": "Second Base",
+    "emoji": "2️⃣",
+    "description": "Reaction for double play turns. Composure and acrobatics for range.",
+    "primary_stats": ["reaction", "composure", "acrobatics"],
+    "secondary_stats": ["agility"],
+    "stat_weights": {
+      "reaction": 0.12,
+      "composure": 0.10,
+      "acrobatics": 0.10,
+      "agility": 0.08
+    }
+  },
+  "SS": {
+    "name": "Shortstop",
+    "emoji": "🔷",
+    "description": "Reaction is critical. Composure and arm for throws across the diamond.",
+    "primary_stats": ["reaction", "composure", "arm"],
+    "secondary_stats": ["acrobatics"],
+    "stat_weights": {
+      "reaction": 0.12,
+      "composure": 0.10,
+      "arm": 0.10,
+      "acrobatics": 0.08
+    }
+  },
+  "3B": {
+    "name": "Third Base",
+    "emoji": "3️⃣",
+    "description": "Reaction for hot corner. Composure and arm for long throws.",
+    "primary_stats": ["reaction", "composure", "arm"],
+    "secondary_stats": ["dexterity"],
+    "stat_weights": {
+      "reaction": 0.12,
+      "composure": 0.10,
+      "arm": 0.10,
+      "dexterity": 0.08
+    }
+  },
+  "LF": {
+    "name": "Left Field",
+    "emoji": "⬅️",
+    "description": "Acrobatics for catches. Agility for range. Arm for throws home.",
+    "primary_stats": ["acrobatics", "agility", "arm"],
+    "secondary_stats": [],
+    "stat_weights": {
+      "acrobatics": 0.12,
+      "agility": 0.10,
+      "arm": 0.10
+    }
+  },
+  "CF": {
+    "name": "Center Field",
+    "emoji": "⬆️",
+    "description": "Most demanding outfield position. Acrobatics, agility, and arm all critical.",
+    "primary_stats": ["acrobatics", "agility", "arm"],
+    "secondary_stats": [],
+    "stat_weights": {
+      "acrobatics": 0.12,
+      "agility": 0.12,
+      "arm": 0.10
+    }
+  },
+  "RF": {
+    "name": "Right Field",
+    "emoji": "➡️",
+    "description": "Acrobatics for catches. Agility for range. Strong arm for throws to third.",
+    "primary_stats": ["acrobatics", "agility", "arm"],
+    "secondary_stats": [],
+    "stat_weights": {
+      "acrobatics": 0.12,
+      "agility": 0.10,
+      "arm": 0.10
+    }
+  },
+  "DH": {
+    "name": "Designated Hitter",
+    "emoji": "🏏",
+    "description": "No defensive requirements. Focus entirely on batting stats.",
+    "primary_stats": [],
+    "secondary_stats": [],
+    "stat_weights": {}
+  },
+  "P": {
+    "name": "Pitcher",
+    "emoji": "⚾",
+    "description": "Defense doesn't matter much for pitchers. Focus on pitching stats.",
+    "primary_stats": [],
+    "secondary_stats": [],
+    "stat_weights": {}
+  }
+}

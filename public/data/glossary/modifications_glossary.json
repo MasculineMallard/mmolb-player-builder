@@ -1,0 +1,104 @@
+{
+  "Celestial Infusion": {
+    "name": "Celestial Infusion",
+    "emoji": "🌌",
+    "description": "Infused with Celestial Energy. +25 to Muscle and Presence",
+    "modifiers": [
+      {
+        "stat": "Muscle",
+        "value": "+25"
+      }
+    ]
+  },
+  "Celestial Infusion II": {
+    "name": "Celestial Infusion II",
+    "emoji": "🌌",
+    "description": "Infused with Celestial Energy. +50 to Muscle and Presence",
+    "modifiers": [
+      {
+        "stat": "Muscle",
+        "value": "+50"
+      }
+    ]
+  },
+  "Celestial Infusion III": {
+    "name": "Celestial Infusion III",
+    "emoji": "🌌",
+    "description": "Infused with Celestial Energy. +100 to Muscle and Presence",
+    "modifiers": [
+      {
+        "stat": "Muscle",
+        "value": "+100"
+      }
+    ]
+  },
+  "Corrupted": {
+    "name": "Corrupted",
+    "emoji": "🫀",
+    "description": "Corrupted by an ancient power. +20% to All Attributes.",
+    "modifiers": [
+      {
+        "stat": "All Attributes",
+        "value": "+20%"
+      }
+    ]
+  },
+  "Effloresced": {
+    "name": "Effloresced",
+    "emoji": "🌹",
+    "description": "The Corruption has blossomed. +20% to All Attributes. Unlucky.",
+    "modifiers": [
+      {
+        "stat": "All Attributes",
+        "value": "+20%"
+      }
+    ]
+  },
+  "Immunity": {
+    "name": "Immunity",
+    "emoji": "🦠",
+    "description": "Immune to the Wither.",
+    "modifiers": []
+  },
+  "Hype": {
+    "name": "Hype",
+    "emoji": "📣",
+    "description": "Fired up by the crowd!",
+    "modifiers": []
+  },
+  "Lineal Belt": {
+    "name": "Lineal Belt",
+    "emoji": "➰",
+    "description": "A belt held by the current Lineal Champion.",
+    "modifiers": []
+  },
+  "Relegated": {
+    "name": "Relegated",
+    "emoji": "🧳",
+    "description": "This Player now plays in the Even Lesser League.",
+    "modifiers": []
+  },
+  "Replacement": {
+    "name": "Replacement",
+    "emoji": "📦",
+    "description": "This player is a Replacement.",
+    "modifiers": []
+  },
+  "Retired": {
+    "name": "Retired",
+    "emoji": "😇",
+    "description": "This player no longer plays in the MMOLB.",
+    "modifiers": []
+  },
+  "Rookie": {
+    "name": "Rookie",
+    "emoji": "🌱",
+    "description": "Still learning the game. -20% to All Attributes",
+    "modifiers": [
+      {
+        "stat": "All Attributes",
+        "value": "-20%"
+      }
+    ]
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "Cloudy": {
+    "name": "Cloudy",
+    "emoji": "☁️",
+    "description": "It is Cloudy."
+  },
+  "Consumption": {
+    "name": "Consumption",
+    "emoji": "🍽️",
+    "description": "Home Runs trigger a Consumption Contest."
+  },
+  "Delivery": {
+    "name": "Delivery",
+    "emoji": "📦",
+    "description": "Equipment is delivered to the winning team."
+  },
+  "Efflorescence": {
+    "name": "Efflorescence",
+    "emoji": "🌹",
+    "description": "Beautiful flora in full bloom."
+  },
+  "Fireworks": {
+    "name": "Fireworks",
+    "emoji": "🎆",
+    "description": "Beautiful Fireworks light up the field."
+  },
+  "Fog": {
+    "name": "Fog",
+    "emoji": "🌫️",
+    "description": "It is Foggy."
+  },
+  "Geomagnetic Storms": {
+    "name": "Geomagnetic Storms",
+    "emoji": "🧲",
+    "description": "ROBO-UMP may absorb energy from the storms, causing Ejections. A Photo Contest is held at the end of each game."
+  },
+  "Mostly Sunny": {
+    "name": "Mostly Sunny",
+    "emoji": "🌤️",
+    "description": "It is Mostly Sunny."
+  },
+  "Partly Cloudy": {
+    "name": "Partly Cloudy",
+    "emoji": "⛅",
+    "description": "It is Partly Cloudy."
+  },
+  "Party": {
+    "name": "Party",
+    "emoji": "🥳",
+    "description": "Players may Party and win Door Prizes when they first appear."
+  },
+  "Prosperity": {
+    "name": "Prosperity",
+    "emoji": "💰",
+    "description": "Runs reward tokens to team owners."
+  },
+  "Rain Showers": {
+    "name": "Rain Showers",
+    "emoji": "🌧️",
+    "description": "It is Raining."
+  },
+  "Reflection": {
+    "name": "Reflection",
+    "emoji": "🪞",
+    "description": "Countless possibilities."
+  },
+  "Shipment": {
+    "name": "Shipment",
+    "emoji": "🚚",
+    "description": "Three magic items are delivered. The winning team receives one, while the losing team receives two."
+  },
+  "Snow": {
+    "name": "Snow",
+    "emoji": "🌨️",
+    "description": "It is Snowing."
+  },
+  "Special Delivery": {
+    "name": "Special Delivery",
+    "emoji": "📦",
+    "description": "The winning team receives a Rare item."
+  },
+  "Starfall": {
+    "name": "Starfall",
+    "emoji": "🌠",
+    "description": "A chance of Falling Stars."
+  },
+  "Sunny": {
+    "name": "Sunny",
+    "emoji": "☀️",
+    "description": "It is Very Sunny."
+  },
+  "Thunderstorms": {
+    "name": "Thunderstorms",
+    "emoji": "⛈️",
+    "description": "It is Storming."
+  },
+  "Wither": {
+    "name": "Wither",
+    "emoji": "🥀",
+    "description": "Decaying petals litter the field."
+  }
+}

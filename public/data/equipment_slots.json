@@ -1,0 +1,48 @@
+{
+  "slots": {
+    "head": {
+      "name": "Head",
+      "allowed_categories": ["batting", "pitching", "luck"],
+      "description": "Helmets and headgear can have batting, pitching, or luck affixes"
+    },
+    "body": {
+      "name": "Body",
+      "allowed_categories": ["batting", "pitching", "defense"],
+      "description": "Jerseys and chest gear can have batting, pitching, or defense affixes"
+    },
+    "hands": {
+      "name": "Hands",
+      "allowed_categories": ["batting", "baserunning", "defense"],
+      "description": "Gloves and batting gloves can have batting, baserunning, or defense affixes"
+    },
+    "feet": {
+      "name": "Feet",
+      "allowed_categories": ["baserunning", "defense", "luck"],
+      "description": "Cleats can have baserunning, defense, or luck affixes"
+    },
+    "accessory": {
+      "name": "Accessory",
+      "allowed_categories": ["special"],
+      "allowed_attributes": ["performance", "composure", "awareness", "agility", "luck"],
+      "description": "Accessories have specific allowed attributes only"
+    }
+  },
+  "recommendations": {
+    "pitcher": {
+      "priorities": ["head", "body"],
+      "reasoning": "Pitchers benefit most from head and body items with pitching affixes"
+    },
+    "power_hitter": {
+      "priorities": ["head", "hands"],
+      "reasoning": "Power hitters want batting affixes on head and hands for muscle/lift"
+    },
+    "speedster": {
+      "priorities": ["hands", "feet"],
+      "reasoning": "Speed-focused players want baserunning affixes on hands and feet"
+    },
+    "defender": {
+      "priorities": ["body", "hands", "feet"],
+      "reasoning": "Defensive specialists want defense affixes across body/hands/feet"
+    }
+  }
+}

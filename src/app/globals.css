@@ -83,38 +83,39 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* MMOLB dark theme - always dark, no light mode */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0F1419;
+  --foreground: #E8F1F2;
+  --card: #161B22;
+  --card-foreground: #E8F1F2;
+  --popover: #161B22;
+  --popover-foreground: #E8F1F2;
+  --primary: #0066FF;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1E2832;
+  --secondary-foreground: #E8F1F2;
+  --muted: #1E2832;
+  --muted-foreground: #8B949E;
+  --accent: #1E2832;
+  --accent-foreground: #E8F1F2;
+  --destructive: #F85149;
+  --border: #30363D;
+  --input: #30363D;
+  --ring: #0066FF;
+  --chart-1: #0066FF;
+  --chart-2: #FFD700;
+  --chart-3: #3FB950;
+  --chart-4: #F85149;
+  --chart-5: #A371F7;
+  --sidebar: #161B22;
+  --sidebar-foreground: #E8F1F2;
+  --sidebar-primary: #0066FF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1E2832;
+  --sidebar-accent-foreground: #E8F1F2;
+  --sidebar-border: #30363D;
+  --sidebar-ring: #0066FF;
 }
 
 @layer base {

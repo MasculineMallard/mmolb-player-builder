@@ -1,0 +1,202 @@
+{
+  "batting": {
+    "Discipline": {
+      "name": "Discipline",
+      "description": "Batter's ability to remain disciplined at the plate, increasing Balls.",
+      "category": "batting"
+    },
+    "Vision": {
+      "name": "Vision",
+      "description": "Batter's ability to track the pitch as it's coming at them, reducing Called Strikes.",
+      "category": "batting"
+    },
+    "Intimidation": {
+      "name": "Intimidation",
+      "description": "Batter's ability to intimidate the Pitcher, reducing Swinging Strikes.",
+      "category": "batting"
+    },
+    "Muscle": {
+      "name": "Muscle",
+      "description": "Batter's ability to hit Doubles, Triples, and Home Runs.",
+      "category": "batting"
+    },
+    "Contact": {
+      "name": "Contact",
+      "description": "Batter's ability to make contact with a pitch, putting the ball in play.",
+      "category": "batting"
+    },
+    "Cunning": {
+      "name": "Cunning",
+      "description": "Batter's ability to coax pitches outside the zone and increase Hit By Pitch.",
+      "category": "batting"
+    },
+    "Selflessness": {
+      "name": "Selflessness",
+      "description": "Batter's willingness to hit into a sacrifice play.",
+      "category": "batting"
+    },
+    "Determination": {
+      "name": "Determination",
+      "description": "Batter's ability to hit a Foul on pitches in the Strike Zone.",
+      "category": "batting"
+    },
+    "Wisdom": {
+      "name": "Wisdom",
+      "description": "Batter's ability to adapt to repeated Pitch Types, boosting effectiveness on seen Pitches.",
+      "category": "batting"
+    },
+    "Insight": {
+      "name": "Insight",
+      "description": "Batter's ability to hit a Single.",
+      "category": "batting"
+    },
+    "Aiming": {
+      "name": "Aiming",
+      "description": "Batter's ability to hit Line Drives.",
+      "category": "batting"
+    },
+    "Lift": {
+      "name": "Lift",
+      "description": "Batter's ability to hit Fly Balls.",
+      "category": "batting"
+    }
+  },
+  "pitching": {
+    "Control": {
+      "name": "Control",
+      "description": "Pitcher's ability to have control of their pitch, reducing Balls and Hit By Pitch.",
+      "category": "pitching"
+    },
+    "Velocity": {
+      "name": "Velocity",
+      "description": "Pitcher's ability to throw hard and fast, increasing Swinging Strikes.",
+      "category": "pitching"
+    },
+    "Rotation": {
+      "name": "Rotation",
+      "description": "Pitcher's ability to throw pitches with a high spin rate, reducing balls in play.",
+      "category": "pitching"
+    },
+    "Stuff": {
+      "name": "Stuff",
+      "description": "Pitcher's ability to throw dirty pitches that result in more Ground Balls or Popups. Also increases Hit By Pitch.",
+      "category": "pitching"
+    },
+    "Deception": {
+      "name": "Deception",
+      "description": "Pitcher's ability to fool the batter into taking Called Strikes.",
+      "category": "pitching"
+    },
+    "Intuition": {
+      "name": "Intuition",
+      "description": "Pitcher's ability to confound the batter by mixing up their Pitch Types and Categories.",
+      "category": "pitching"
+    },
+    "Persuasion": {
+      "name": "Persuasion",
+      "description": "Pitcher's ability to pitch a Foul ball.",
+      "category": "pitching"
+    },
+    "Presence": {
+      "name": "Presence",
+      "description": "Pitcher's ability to frighten the Batter, reducing Home Runs, Doubles, and Triples.",
+      "category": "pitching"
+    },
+    "Defiance": {
+      "name": "Defiance",
+      "description": "Pitcher's ability to remain in the game when out of Energy. Also increases the amount of Energy restored on success.",
+      "category": "pitching"
+    },
+    "Accuracy": {
+      "name": "Accuracy",
+      "description": "Pitcher's ability to locate pitches in the strike zone.",
+      "category": "pitching"
+    },
+    "Stamina": {
+      "name": "Stamina",
+      "description": "Pitcher's ability to remain in top form, reducing their penalty when Energy is lost and increasing their overall effectiveness.",
+      "category": "pitching"
+    },
+    "Guts": {
+      "name": "Guts",
+      "description": "Pitcher's ability to play better when their Energy is reduced below one third of their total, increasing their overall effectiveness.",
+      "category": "pitching"
+    }
+  },
+  "baserunning": {
+    "Performance": {
+      "name": "Performance",
+      "description": "Batter's ability to distract fielders, allowing them to reach base more often when a ball is in play.",
+      "category": "baserunning"
+    },
+    "Speed": {
+      "name": "Speed",
+      "description": "Player's raw speed on the basepaths. Increases Hits when Batting and extra bases when Baserunning.",
+      "category": "baserunning"
+    },
+    "Greed": {
+      "name": "Greed",
+      "description": "Baserunner's willingness to attempt to steal a base.",
+      "category": "baserunning"
+    },
+    "Stealth": {
+      "name": "Stealth",
+      "description": "Baserunner's ability to remain undetected when attempting to steal a base, increasing the success of stolen base attempts, and increasing their willingness to attempt to steal a base.",
+      "category": "baserunning"
+    }
+  },
+  "defense": {
+    "Arm": {
+      "name": "Arm",
+      "description": "Fielder's ability to throw the ball, reducing Doubles and Triples.",
+      "category": "defense"
+    },
+    "Dexterity": {
+      "name": "Dexterity",
+      "description": "Fielder's ability to make quick dextrous moves, preventing runners from getting extra bases.",
+      "category": "defense"
+    },
+    "Reaction": {
+      "name": "Reaction",
+      "description": "Fielder's ability to field Ground Balls.",
+      "category": "defense"
+    },
+    "Acrobatics": {
+      "name": "Acrobatics",
+      "description": "Fielder's ability to field Line Drives.",
+      "category": "defense"
+    },
+    "Agility": {
+      "name": "Agility",
+      "description": "Fielder's ability to field Fly Balls.",
+      "category": "defense"
+    },
+    "Patience": {
+      "name": "Patience",
+      "description": "Fielder's ability to field Popups.",
+      "category": "defense"
+    },
+    "Awareness": {
+      "name": "Awareness",
+      "description": "Fielder's ability to turn a Double Play, and Catcher's ability to catch a Baserunner attempting to steal a base.",
+      "category": "defense"
+    },
+    "Composure": {
+      "name": "Composure",
+      "description": "Fielder's ability to play without making Errors, and Pitcher's ability to not Balk.",
+      "category": "defense"
+    }
+  },
+  "other": {
+    "Luck": {
+      "name": "Luck",
+      "description": "Player's ability to affect the outcomes of weather events. Does not directly affect the performance of a Player.",
+      "category": "other"
+    },
+    "Priority": {
+      "name": "Priority",
+      "description": "Determines a batter's position in the Lineup. Higher Priority players will bat ahead of lower Priority players.",
+      "category": "other"
+    }
+  }
+}

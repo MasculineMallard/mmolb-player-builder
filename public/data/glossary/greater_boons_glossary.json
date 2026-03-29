@@ -1,0 +1,149 @@
+{
+  "All Knowing": {
+    "name": "All Knowing",
+    "emoji": "🧠",
+    "description": "100% increased Wisdom when the count is 3",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Analytical": {
+    "name": "Analytical",
+    "emoji": "🔍",
+    "description": "10% increased batting Attributes when facing a left",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Clutch": {
+    "name": "Clutch",
+    "emoji": "👏",
+    "description": "25% increased Contact if a runner is on second or third base",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Cowardly": {
+    "name": "Cowardly",
+    "emoji": "🐇",
+    "description": "50% reduced Contact. Opposing Pitcher gains 50% increased Stuff",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Creative": {
+    "name": "Creative",
+    "emoji": "🎨",
+    "description": "10% increased pitching Attributes when facing a right",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Criminal": {
+    "name": "Criminal",
+    "emoji": "🕶️",
+    "description": "Upon successfully stealing a base, next attempt has a 100% increased success chance",
+    "type": "greater",
+    "modifiers": []
+  },
+  "First Strike": {
+    "name": "First Strike",
+    "emoji": "☄️",
+    "description": "25% increased Velocity when the count is 0",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Insider": {
+    "name": "Insider",
+    "emoji": "⬅️",
+    "description": "10% increased Batting Attributes if a pitch is Inside",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Introverted": {
+    "name": "Introverted",
+    "emoji": "🤐",
+    "description": "10% increased Batting Attributes when no runners are on base",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Intuitive": {
+    "name": "Intuitive",
+    "emoji": "✨",
+    "description": "10% increased batting Attributes when facing a right",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Iron Will": {
+    "name": "Iron Will",
+    "emoji": "🦾",
+    "description": "10% increased Pitching Attributes if a runner is in scoring position",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Logical": {
+    "name": "Logical",
+    "emoji": "💭",
+    "description": "10% increased pitching Attributes when facing a left",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Lucky": {
+    "name": "Lucky",
+    "emoji": "🍀",
+    "description": "This player's Luck rolls are Lucky",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Immovable": {
+    "name": "Immovable",
+    "emoji": "🪨",
+    "description": "This Player cannot be Moved",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Outsider": {
+    "name": "Outsider",
+    "emoji": "➡️",
+    "description": "10% increased Batting Attributes if a pitch is Outside",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Partier": {
+    "name": "Partier",
+    "emoji": "🎉",
+    "description": "300% increased Luck within 10 days of their Birthday",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Prolific": {
+    "name": "Prolific",
+    "emoji": "🛡️",
+    "description": "30% chance to negate Durability damage",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Strong Starter": {
+    "name": "Strong Starter",
+    "emoji": "🚀",
+    "description": "10% increased Pitching Attributes if no runners are on base",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Underdog": {
+    "name": "Underdog",
+    "emoji": "🐶",
+    "description": "10% increased Batting Attributes if trailing by 3 or more Runs",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Unrelenting": {
+    "name": "Unrelenting",
+    "emoji": "🦛",
+    "description": "100% increased Guts and Defiance. 50% reduced maximum Energy",
+    "type": "greater",
+    "modifiers": []
+  },
+  "Unwavering": {
+    "name": "Unwavering",
+    "emoji": "🌳",
+    "description": "2% increased Pitching Attributes per Run the opposing Team has scored",
+    "type": "greater",
+    "modifiers": []
+  }
+}

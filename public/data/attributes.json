@@ -1,0 +1,222 @@
+{
+  "batting": {
+    "Aiming": {
+      "name": "Aiming",
+      "adjective": "Accurate",
+      "description": "Batters with higher Aiming are better at hitting line drives.",
+      "category": "batting"
+    },
+    "Contact": {
+      "name": "Contact",
+      "adjective": "Consistent",
+      "description": "Batters with higher Contact have a greater ability to hit the ball into play, on pitches within and outside the strike zone.",
+      "category": "batting"
+    },
+    "Cunning": {
+      "name": "Cunning",
+      "adjective": "Crafty",
+      "description": "Batters with high Cunning can coerce the pitcher to hit them with the pitch, advancing them instantly to first base.",
+      "category": "batting"
+    },
+    "Discipline": {
+      "name": "Discipline",
+      "adjective": "Disciplined",
+      "description": "It affects a batter's ability to avoid swinging at pitches that land outside the strike zone, avoiding Strikes and increasing Balls.",
+      "category": "batting"
+    },
+    "Insight": {
+      "name": "Insight",
+      "adjective": "Insightful",
+      "description": "Batters with a higher Insight can choose where in the field of play their hit ball will land, generally increases bases gained by themself and their teammates already on base.",
+      "category": "batting"
+    },
+    "Intimidation": {
+      "name": "Intimidation",
+      "adjective": "Intimidating",
+      "description": "Batters with high Intimidation can scare the opposing pitcher into throwing fewer pitches within the strike zone.",
+      "category": "batting"
+    },
+    "Lift": {
+      "name": "Lift",
+      "adjective": "Lofty",
+      "description": "Batters with high Lift will hit more fly balls.",
+      "category": "batting"
+    },
+    "Vision": {
+      "name": "Vision",
+      "adjective": "Perceptive",
+      "description": "A higher Vision attribute correlates with an improved ability for the batter to swing at pitches within the strike zone.",
+      "category": "batting"
+    },
+    "Determination": {
+      "name": "Determination",
+      "adjective": "Resilient",
+      "description": "Batters with a high Determination are more likely to foul off balls pitched to them outside the strike zone.",
+      "category": "batting"
+    },
+    "Wisdom": {
+      "name": "Wisdom",
+      "adjective": "Strategic",
+      "description": "Batters with a higher Wisdom are able to \"learn from each pitch\", reducing their odds of being struck out.",
+      "category": "batting"
+    },
+    "Muscle": {
+      "name": "Muscle",
+      "adjective": "Strong",
+      "description": "According to statistical analysis of lineups re-ordered by Paradigm Shift, players with higher Muscle are more likely to hit Home Runs and Doubles.",
+      "category": "batting"
+    },
+    "Selflessness": {
+      "name": "Selflessness",
+      "adjective": "Team-Focused",
+      "description": "Batters with high Selflessness are more likely to hit into sacrifice plays.",
+      "category": "batting"
+    }
+  },
+  "pitching": {
+    "Guts": {
+      "name": "Guts",
+      "adjective": "Courageous",
+      "description": "Pitchers with high Guts will play better as their Energy lowers.",
+      "category": "pitching"
+    },
+    "Stamina": {
+      "name": "Stamina",
+      "adjective": "Enduring",
+      "description": "Pitchers with high Stamina can continue to pitch to the best of their ability, even as their Energy fades.",
+      "category": "pitching"
+    },
+    "Accuracy": {
+      "name": "Accuracy",
+      "adjective": "Accurate",
+      "description": "Its exact function is unknown, however it can be assumed to impact where a Pitcher throws the ball.",
+      "category": "pitching"
+    },
+    "Rotation": {
+      "name": "Rotation",
+      "adjective": "Sharp",
+      "description": "Pitchers with high Rotation throw balls which are harder for Batters to hit into play.",
+      "category": "pitching"
+    },
+    "Presence": {
+      "name": "Presence",
+      "adjective": "Commanding",
+      "description": "Pitchers with high Presence will pressure opposing batters, reducing their ability to hit home runs.",
+      "category": "pitching"
+    },
+    "Persuasion": {
+      "name": "Persuasion",
+      "adjective": "Convincing",
+      "description": "Pitchers with higher Persuasion will make opposing batters produce more foul balls.",
+      "category": "pitching"
+    },
+    "Velocity": {
+      "name": "Velocity",
+      "adjective": "Powerful",
+      "description": "Its exact function is unknown, however batters opposing a pitcher with high Velocity are less likely to swing at pitches within the strike zone.",
+      "category": "pitching"
+    },
+    "Control": {
+      "name": "Control",
+      "adjective": "Precise",
+      "description": "Pitchers with high Control are better at keeping their pitches within the strike zone.",
+      "category": "pitching"
+    },
+    "Stuff": {
+      "name": "Stuff",
+      "adjective": "Unpredictable",
+      "description": "Batters opposing a pitcher with high Stuff are less likely to hit line drives and fly balls.",
+      "category": "pitching"
+    },
+    "Defiance": {
+      "name": "Defiance",
+      "adjective": "Defiant",
+      "description": "Pitchers with high Defiance are more likely to defy a manager when they appear on the mound, remaining in the game instead of being swapped for a relief pitcher.",
+      "category": "pitching"
+    }
+  },
+  "defense": {
+    "Acrobatics": {
+      "name": "Acrobatics",
+      "adjective": "Acrobatic",
+      "description": "Players with higher Acrobatics are better at fielding Line Drives.",
+      "category": "defense"
+    },
+    "Agility": {
+      "name": "Agility",
+      "adjective": "Agile",
+      "description": "Fielders with higher Agility are better at fielding Fly Balls.",
+      "category": "defense"
+    },
+    "Arm": {
+      "name": "Arm",
+      "adjective": "Armed",
+      "description": "Fielders with high Arm will reduce the opposing Batters' ability to hit Doubles and Triples.",
+      "category": "defense"
+    },
+    "Awareness": {
+      "name": "Awareness",
+      "adjective": "Aware",
+      "description": "High Awareness allows Fielders to make Double Plays more often, and can prevent stolen bases.",
+      "category": "defense"
+    },
+    "Composure": {
+      "name": "Composure",
+      "adjective": "Composed",
+      "description": "Fielders with higher Composure are less likely to make Fielding Errors.",
+      "category": "defense"
+    },
+    "Dexterity": {
+      "name": "Dexterity",
+      "adjective": "Nimble",
+      "description": "Fielders with high dexterity can prevent runners on base from advancing.",
+      "category": "defense"
+    },
+    "Patience": {
+      "name": "Patience",
+      "adjective": "Patient",
+      "description": "Fielders with high Patience are better at fielding Popups.",
+      "category": "defense"
+    },
+    "Reaction": {
+      "name": "Reaction",
+      "adjective": "Reactive",
+      "description": "Fielders with a higher Reaction are better at fielding Ground Balls.",
+      "category": "defense"
+    }
+  },
+  "baserunning": {
+    "Greed": {
+      "name": "Greed",
+      "adjective": "Aggressive",
+      "description": "Baserunners with a higher Greed are likelier to try to steal bases.",
+      "category": "baserunning"
+    },
+    "Performance": {
+      "name": "Performance",
+      "adjective": "Distracting",
+      "description": "Players with high Performance are more successful at reaching bases while the ball is in play.",
+      "category": "baserunning"
+    },
+    "Speed": {
+      "name": "Speed",
+      "adjective": "Fast",
+      "description": "Players with a higher speed will tend to gain more bases, on fly balls or ground balls.",
+      "category": "baserunning"
+    },
+    "Stealth": {
+      "name": "Stealth",
+      "adjective": "Sneaky",
+      "description": "Players with higher Stealth will steal bases more often, and be more successful at doing so.",
+      "category": "baserunning"
+    }
+  },
+  "luck": {
+    "Luck": {
+      "name": "Luck",
+      "adjective": "Lucky",
+      "description": "Players with higher Luck will have better outcomes from weather-based events.",
+      "category": "luck"
+    }
+  }
+}

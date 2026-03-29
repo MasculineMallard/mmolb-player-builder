@@ -1,0 +1,191 @@
+{
+  "ff": {
+    "name": "Fastball",
+    "abbreviation": "ff",
+    "tier": 3,
+    "priority_stats": ["velocity", "presence"],
+    "secondary_stats": ["control", "accuracy"],
+    "category": "fast",
+    "purpose": "accuracy_strikeout",
+    "zone_rate": "high",
+    "plate_discipline": "better_in_zone",
+    "contact_outcomes": "linedrive_flyball",
+    "description": "Standard four-seam fastball with high velocity",
+    "regression_data": {
+      "z_ct": 0.678,
+      "o_sw": 0.278,
+      "csw": 0.335,
+      "babip": 0.227,
+      "slg": 0.449,
+      "notes": "High zone rate pitch. Best when paired with offspeed. Presence > Control + Accuracy"
+    }
+  },
+  "ch": {
+    "name": "Changeup",
+    "abbreviation": "ch",
+    "tier": 2,
+    "priority_stats": ["velocity", "rotation"],
+    "secondary_stats": ["stuff", "presence"],
+    "category": "offspeed",
+    "purpose": "control_contact",
+    "zone_rate": "high",
+    "plate_discipline": "better_in_zone",
+    "contact_outcomes": "groundball_popup",
+    "description": "Off-speed pitch that looks like a fastball. Best BABIP suppression.",
+    "regression_data": {
+      "z_ct": 0.634,
+      "o_sw": 0.376,
+      "csw": 0.258,
+      "babip": 0.147,
+      "slg": 0.315,
+      "notes": "LOWEST BABIP (.147) - elite weak contact. Good chase rate. Rotation > Stuff + Presence"
+    }
+  },
+  "cu": {
+    "name": "Curveball",
+    "abbreviation": "cu",
+    "tier": 2,
+    "priority_stats": ["velocity", "presence"],
+    "secondary_stats": ["accuracy", "control"],
+    "category": "breaking",
+    "purpose": "accuracy_strikeout",
+    "zone_rate": "low",
+    "plate_discipline": "better_out_zone",
+    "contact_outcomes": "linedrive_flyball",
+    "description": "Breaking ball with 12-6 movement. Highest CSW rate.",
+    "regression_data": {
+      "z_ct": 0.607,
+      "o_sw": 0.214,
+      "csw": 0.394,
+      "babip": 0.215,
+      "slg": 0.327,
+      "notes": "HIGHEST CSW (.394) - elite strikeout pitch. Low chase rate so needs command. Presence > Accuracy > Control"
+    }
+  },
+  "sl": {
+    "name": "Slider",
+    "abbreviation": "sl",
+    "tier": 1,
+    "priority_stats": ["velocity", "control"],
+    "secondary_stats": ["rotation", "persuasion"],
+    "category": "breaking",
+    "purpose": "control_strikeout",
+    "zone_rate": "low",
+    "plate_discipline": "better_in_zone",
+    "contact_outcomes": "neutral",
+    "description": "Breaking ball with lateral movement. Elite chase rate.",
+    "regression_data": {
+      "z_ct": 0.665,
+      "o_sw": 0.359,
+      "csw": 0.277,
+      "babip": 0.388,
+      "slg": null,
+      "notes": "T1 pitch. Good chase rate but higher BABIP - needs tunneling. Control > Rotation, Persuasion"
+    }
+  },
+  "si": {
+    "name": "Sinker",
+    "abbreviation": "si",
+    "tier": 3,
+    "priority_stats": ["velocity", "stuff"],
+    "secondary_stats": ["persuasion", "control", "rotation"],
+    "category": "fast",
+    "purpose": "control_contact",
+    "zone_rate": "high",
+    "plate_discipline": "better_in_zone",
+    "contact_outcomes": "groundball",
+    "description": "Two-seam fastball with downward movement. Ground ball inducer.",
+    "regression_data": {
+      "z_ct": 0.704,
+      "o_sw": 0.24,
+      "csw": 0.463,
+      "babip": null,
+      "slg": null,
+      "notes": "Ground ball specialist pitch. High zone contact but weak contact. Stuff > Persuasion, Control, Rotation"
+    }
+  },
+  "fc": {
+    "name": "Cutter",
+    "abbreviation": "fc",
+    "tier": 2,
+    "priority_stats": ["velocity", "rotation", "stuff", "persuasion"],
+    "secondary_stats": ["presence", "control"],
+    "category": "fast",
+    "purpose": "control_strikeout",
+    "zone_rate": "low",
+    "plate_discipline": "better_out_zone",
+    "contact_outcomes": "linedrive_flyball",
+    "description": "Fastball with late cutting action. Excellent weak contact.",
+    "regression_data": {
+      "z_ct": 0.681,
+      "o_sw": 0.263,
+      "csw": 0.303,
+      "babip": 0.166,
+      "slg": 0.346,
+      "notes": "Excellent BABIP (.166) - very weak contact. Rotation + Stuff + Persuasion > Presence + Control"
+    }
+  },
+  "kc": {
+    "name": "Knuckle Curve",
+    "abbreviation": "kc",
+    "tier": 1,
+    "priority_stats": ["velocity", "stuff", "accuracy"],
+    "secondary_stats": ["persuasion", "rotation", "presence"],
+    "category": "breaking",
+    "purpose": "accuracy_contact",
+    "zone_rate": "low",
+    "plate_discipline": "better_out_zone",
+    "contact_outcomes": "linedrive_flyball",
+    "description": "Curveball gripped like a knuckleball. Solid all-around pitch.",
+    "regression_data": {
+      "z_ct": 0.613,
+      "o_sw": 0.234,
+      "csw": 0.378,
+      "babip": 0.231,
+      "slg": 0.343,
+      "notes": "T1 pitch. Good CSW, balanced performance. Stuff + Accuracy >> Persuasion, Rotation, Presence"
+    }
+  },
+  "fs": {
+    "name": "Splitter",
+    "abbreviation": "fs",
+    "tier": 1,
+    "priority_stats": ["velocity", "stuff", "presence"],
+    "secondary_stats": ["control", "rotation"],
+    "category": "offspeed",
+    "purpose": "control_contact",
+    "zone_rate": "high",
+    "plate_discipline": "better_in_zone",
+    "contact_outcomes": "groundball_popup",
+    "description": "Split-finger fastball with sharp downward break. Elite chase rate.",
+    "regression_data": {
+      "z_ct": 0.719,
+      "o_sw": 0.321,
+      "csw": 0.398,
+      "babip": 0.201,
+      "slg": 0.346,
+      "notes": "T1 ELITE pitch. Best chase rate, high CSW, low BABIP. Complete package."
+    }
+  },
+  "st": {
+    "name": "Sweeper",
+    "abbreviation": "st",
+    "tier": 2,
+    "priority_stats": ["velocity", "rotation", "deception"],
+    "secondary_stats": ["control", "stuff"],
+    "category": "breaking",
+    "purpose": "accuracy_strikeout",
+    "zone_rate": "low",
+    "plate_discipline": "better_out_zone",
+    "contact_outcomes": "neutral",
+    "description": "Slider with exaggerated horizontal break. Very weak contact allowed.",
+    "regression_data": {
+      "z_ct": 0.647,
+      "o_sw": 0.262,
+      "csw": 0.385,
+      "babip": 0.19,
+      "slg": 0.319,
+      "notes": "Very low BABIP (.190), good CSW. Elite weak contact pitch."
+    }
+  }
+}
