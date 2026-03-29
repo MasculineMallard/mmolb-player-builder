@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -48,7 +49,7 @@ export default function BuilderLayout({
         </div>
       </header>
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6">
-        {children}
+        <Suspense>{children}</Suspense>
       </main>
     </div>
   );
