@@ -10,10 +10,10 @@ export function NavLinks() {
   return (
     <nav className="flex gap-1">
       <Link
-        href="/pitcher"
+        href="/pop/pitcher"
         className={cn(
           "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-          pathname === "/pitcher"
+          pathname === "/pop/pitcher"
             ? "bg-primary text-primary-foreground"
             : "text-muted-foreground hover:text-foreground hover:bg-secondary"
         )}
@@ -21,10 +21,10 @@ export function NavLinks() {
         Pitcher Planner
       </Link>
       <Link
-        href="/batter"
+        href="/pop/batter"
         className={cn(
           "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-          pathname === "/batter"
+          pathname === "/pop/batter"
             ? "bg-primary text-primary-foreground"
             : "text-muted-foreground hover:text-foreground hover:bg-secondary"
         )}
@@ -32,10 +32,10 @@ export function NavLinks() {
         Batter Builder
       </Link>
       <Link
-        href="/evaluate"
+        href="/pop/mulch"
         className={cn(
           "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-          pathname === "/evaluate"
+          pathname === "/pop/mulch"
             ? "bg-primary text-primary-foreground"
             : "text-muted-foreground hover:text-foreground hover:bg-secondary"
         )}
