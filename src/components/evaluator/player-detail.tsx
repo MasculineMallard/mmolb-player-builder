@@ -6,6 +6,7 @@ import { DefenseStatBars } from "./position-fit-card";
 import {
   BATTING_STAT_WEIGHTS, PITCHING_STAT_WEIGHTS,
   BATTING_PERCENTILES, PITCHING_PERCENTILES,
+  type LivePercentileTables,
 } from "@/lib/evaluator-data";
 
 const STAT_DISPLAY: Record<string, string> = {
@@ -16,7 +17,7 @@ const STAT_DISPLAY: Record<string, string> = {
   SB_PCT: "SB%",
   K9: "K/9",
   WHIP: "WHIP",
-  ERA: "ERA",
+  ERA: "RA/9",
   BB9: "BB/9",
   HR9: "HR/9",
 };
@@ -127,9 +128,15 @@ function formatStatValue(key: string, value: number | undefined): string {
 
 import { percentileToScore } from "@/lib/evaluator";
 
-function StatsTable({ gameStats, role }: { gameStats: GameStats | null; role: "batter" | "pitcher" }) {
+function StatsTable({ gameStats, role, liveTables }: {
+  gameStats: GameStats | null;
+  role: "batter" | "pitcher";
+  liveTables?: LivePercentileTables;
+}) {
   const weights = role === "pitcher" ? PITCHING_STAT_WEIGHTS : BATTING_STAT_WEIGHTS;
-  const tables = role === "pitcher" ? PITCHING_PERCENTILES : BATTING_PERCENTILES;
+  const tables = liveTables
+    ? (role === "pitcher" ? liveTables.pitching : liveTables.batting)
+    : (role === "pitcher" ? PITCHING_PERCENTILES : BATTING_PERCENTILES);
 
   if (!gameStats) {
     return (
@@ -185,7 +192,7 @@ function StatsTable({ gameStats, role }: { gameStats: GameStats | null; role: "b
   );
 }
 
-export function PlayerDetail({ eval: ev }: { eval: EvaluatedPlayer }) {
+export function PlayerDetail({ eval: ev, percentileTables }: { eval: EvaluatedPlayer; percentileTables?: LivePercentileTables }) {
   const role = getPlayerRole(ev.player.position);
   const { reasoning } = ev;
 
@@ -203,7 +210,7 @@ export function PlayerDetail({ eval: ev }: { eval: EvaluatedPlayer }) {
               <span className="w-0.5 h-3 bg-primary/40 rounded-full" />
               Stats
             </h3>
-            <StatsTable gameStats={ev.player.gameStats ?? null} role={role} />
+            <StatsTable gameStats={ev.player.gameStats ?? null} role={role} liveTables={percentileTables} />
           </div>
 
           {/* Fit */}

@@ -97,11 +97,14 @@ export function percentileToScore(value: number, table: PercentileEntry[]): numb
 export function computeStatsScore(
   role: PlayerRole,
   gameStats: GameStats | null,
+  overrideTables?: { batting: Record<string, PercentileEntry[]>; pitching: Record<string, PercentileEntry[]> },
 ): number | null {
   if (!gameStats) return null;
 
   const weights = role === "batter" ? BATTING_STAT_WEIGHTS : PITCHING_STAT_WEIGHTS;
-  const tables = role === "batter" ? BATTING_PERCENTILES : PITCHING_PERCENTILES;
+  const tables = overrideTables
+    ? (role === "batter" ? overrideTables.batting : overrideTables.pitching)
+    : (role === "batter" ? BATTING_PERCENTILES : PITCHING_PERCENTILES);
 
   let totalWeight = 0;
   let weightedSum = 0;
@@ -425,10 +428,11 @@ export function evaluatePlayer(
   archetypes: Record<string, Archetype>,
   positionDefense: PositionDefenseMap,
   boonLookup: Map<string, { bonuses: Record<string, number>; penalties: Record<string, number> }>,
+  percentileTables?: { batting: Record<string, PercentileEntry[]>; pitching: Record<string, PercentileEntry[]> },
 ): EvaluatedPlayer {
   const role = getPlayerRole(player.position);
   const attributeScore = computeAttributeScore(player, role);
-  const statsScore = computeStatsScore(role, gameStats);
+  const statsScore = computeStatsScore(role, gameStats, percentileTables);
   const growthScore = computeGrowthScore(player);
   const positionFitScore = computePositionFitScore(player, role, positionDefense);
   const detectedArchetype = detectArchetype(player, role, archetypes);

@@ -9,7 +9,9 @@ import {
   loadPitcherArchetypes,
   loadPositionDefense,
   getBoonLookup,
+  loadLivePercentiles,
   type PositionDefenseMap,
+  type LivePercentileTables,
 } from "@/lib/evaluator-data";
 import { getPlayerRole } from "@/lib/evaluator";
 import { RosterTable } from "@/components/evaluator/roster-table";
@@ -19,6 +21,7 @@ interface EvalRefData {
   pitcherArch: Record<string, Archetype>;
   posDef: PositionDefenseMap;
   boonLookup: Map<string, { bonuses: Record<string, number>; penalties: Record<string, number> }>;
+  percentileTables?: LivePercentileTables | null;
 }
 
 type LoadState = "idle" | "searching" | "loading" | "ready" | "error";
@@ -108,17 +111,18 @@ export default function EvaluatePage() {
         (p): p is PlayerData => p != null,
       );
 
-      // Load reference data
-      const [batterArchetypes, pitcherArchetypes, positionDefense, boonLookup] =
+      // Load reference data (including live percentiles)
+      const [batterArchetypes, pitcherArchetypes, positionDefense, boonLookup, percentileTables] =
         await Promise.all([
           loadBatterArchetypes(),
           loadPitcherArchetypes(),
           loadPositionDefense(),
           getBoonLookup(),
+          loadLivePercentiles(),
         ]);
 
       // Store for position change re-evaluation
-      evalRef.current = { batterArch: batterArchetypes, pitcherArch: pitcherArchetypes, posDef: positionDefense, boonLookup };
+      evalRef.current = { batterArch: batterArchetypes, pitcherArch: pitcherArchetypes, posDef: positionDefense, boonLookup, percentileTables };
 
       // Evaluate each player (bench batters get assigned their best-fit position)
       const results: EvaluatedPlayer[] = players.map((player) => {
@@ -130,7 +134,7 @@ export default function EvaluatePage() {
         const role = getPlayerRole(evalPlayer.position);
         const archetypes =
           role === "pitcher" ? pitcherArchetypes : batterArchetypes;
-        return evaluatePlayer(evalPlayer, evalPlayer.gameStats ?? null, archetypes, positionDefense, boonLookup);
+        return evaluatePlayer(evalPlayer, evalPlayer.gameStats ?? null, archetypes, positionDefense, boonLookup, percentileTables ?? undefined);
       });
 
       setEvaluated(results);
@@ -150,7 +154,7 @@ export default function EvaluatePage() {
       const modified = { ...ev.player, position: newPosition };
       const role = getPlayerRole(newPosition);
       const archetypes = role === "pitcher" ? ref.pitcherArch : ref.batterArch;
-      return evaluatePlayer(modified, modified.gameStats ?? null, archetypes, ref.posDef, ref.boonLookup);
+      return evaluatePlayer(modified, modified.gameStats ?? null, archetypes, ref.posDef, ref.boonLookup, ref.percentileTables ?? undefined);
     }));
   }, []);
 
@@ -272,7 +276,7 @@ export default function EvaluatePage() {
               ⚠ {evaluated.filter(ev => ev.player.recomped).length} player(s) recently recomposed. Season stats suppressed (from previous build).
             </div>
           )}
-          <RosterTable players={evaluated} onPositionChange={handlePositionChange} />
+          <RosterTable players={evaluated} onPositionChange={handlePositionChange} percentileTables={evalRef.current?.percentileTables ?? undefined} />
         </>
       )}
 

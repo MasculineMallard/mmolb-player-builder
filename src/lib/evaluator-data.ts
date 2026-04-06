@@ -251,3 +251,32 @@ export async function getBoonLookup(): Promise<Map<string, BoonEntry>> {
   }
   return map;
 }
+
+// ---------------------------------------------------------------------------
+// Live percentile tables (from mmoldb via /api/percentiles)
+// ---------------------------------------------------------------------------
+
+export interface LivePercentileTables {
+  batting: Record<string, PercentileEntry[]>;
+  pitching: Record<string, PercentileEntry[]>;
+}
+
+/**
+ * Load live S11 percentile tables from the server.
+ * Returns null if no live data is available (falls back to hardcoded S10).
+ */
+export async function loadLivePercentiles(): Promise<LivePercentileTables | null> {
+  try {
+    const res = await fetch("/api/percentiles", {
+      signal: AbortSignal.timeout(5000),
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.source !== "live") return null;
+    if (!data.batting || !data.pitching) return null;
+    return { batting: data.batting, pitching: data.pitching };
+  } catch {
+    return null;
+  }
+}

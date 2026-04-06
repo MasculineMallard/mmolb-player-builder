@@ -5,6 +5,7 @@ import type { EvaluatedPlayer } from "@/lib/evaluator-types";
 import { ScoreBadge } from "./score-badge";
 import { VerdictBadge } from "./verdict-badge";
 import { PlayerDetail } from "./player-detail";
+import type { LivePercentileTables } from "@/lib/evaluator-data";
 
 function DurabilityPips({ durability }: { durability: number }) {
   return (
@@ -26,9 +27,10 @@ function DurabilityPips({ durability }: { durability: number }) {
 
 const POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH", "SP", "RP", "CL"];
 
-export function PlayerRow({ eval: ev, onPositionChange }: {
+export function PlayerRow({ eval: ev, onPositionChange, percentileTables }: {
   eval: EvaluatedPlayer;
   onPositionChange?: (playerId: string, newPosition: string) => void;
+  percentileTables?: LivePercentileTables;
 }) {
   const [expanded, setExpanded] = useState(false);
   const p = ev.player;
@@ -91,7 +93,7 @@ export function PlayerRow({ eval: ev, onPositionChange }: {
       {expanded && (
         <tr>
           <td colSpan={11} className="p-0">
-            <PlayerDetail eval={ev} />
+            <PlayerDetail eval={ev} percentileTables={percentileTables} />
           </td>
         </tr>
       )}

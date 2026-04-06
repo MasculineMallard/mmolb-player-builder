@@ -26,9 +26,12 @@ function positionRank(pos: string | null): number {
 
 type SortDir = "asc" | "desc";
 
-export function RosterTable({ players, onPositionChange }: {
+import type { LivePercentileTables } from "@/lib/evaluator-data";
+
+export function RosterTable({ players, onPositionChange, percentileTables }: {
   players: EvaluatedPlayer[];
   onPositionChange?: (playerId: string, newPosition: string) => void;
+  percentileTables?: LivePercentileTables;
 }) {
   const [verdictFilter, setVerdictFilter] = useState<Recommendation | "ALL">("ALL");
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
@@ -191,7 +194,7 @@ export function RosterTable({ players, onPositionChange }: {
           </thead>
           <tbody>
             {filtered.map((ev) => (
-              <PlayerRow key={ev.player.mmolbPlayerId} eval={ev} onPositionChange={onPositionChange} />
+              <PlayerRow key={ev.player.mmolbPlayerId} eval={ev} onPositionChange={onPositionChange} percentileTables={percentileTables} />
             ))}
           </tbody>
         </table>
