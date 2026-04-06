@@ -26,56 +26,31 @@ export default function Home() {
         evaluate rosters, and figure out who to mulch.
       </p>
 
-      <div className="flex gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl w-full">
         <Link
           href="/pop/pitcher"
-          className="flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-primary-foreground font-medium hover:bg-primary/90 transition-colors text-sm"
+          className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
         >
-          🎯 Pitcher Planner
+          <span className="text-3xl">🎯</span>
+          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Pitcher Planner</span>
+          <span className="text-xs text-muted-foreground text-center">Optimize pitching builds and pitch arsenals</span>
         </Link>
         <Link
           href="/pop/batter"
-          className="flex items-center justify-center gap-2 rounded-lg bg-secondary px-5 py-2.5 text-secondary-foreground font-medium hover:bg-secondary/80 transition-colors border border-border text-sm"
+          className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
         >
-          💪 Batter Builder
+          <span className="text-3xl">💪</span>
+          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Batter Builder</span>
+          <span className="text-xs text-muted-foreground text-center">Plan batting stat allocation and boon choices</span>
         </Link>
         <Link
           href="/pop/mulch"
-          className="flex items-center justify-center gap-2 rounded-lg bg-secondary px-5 py-2.5 text-secondary-foreground font-medium hover:bg-secondary/80 transition-colors border border-border text-sm"
+          className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
         >
-          ⚾ Mulch-o-Meter
+          <span className="text-3xl">⚾</span>
+          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Mulch-o-Meter</span>
+          <span className="text-xs text-muted-foreground text-center">Evaluate your roster: mulch, hold, or keep</span>
         </Link>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 max-w-3xl w-full text-sm">
-        <div className="bg-card border border-border rounded-lg p-4 text-center">
-          <div className="text-2xl mb-2">📊</div>
-          <div className="font-medium mb-1">Stat Targets</div>
-          <div className="text-sm text-muted-foreground">
-            See which stats to invest in and track your progress.
-          </div>
-        </div>
-        <div className="bg-card border border-border rounded-lg p-4 text-center">
-          <div className="text-2xl mb-2">🔮</div>
-          <div className="font-medium mb-1">Boon Planning</div>
-          <div className="text-sm text-muted-foreground">
-            Boon recommendations for levels 10, 20, and 30.
-          </div>
-        </div>
-        <div className="bg-card border border-border rounded-lg p-4 text-center">
-          <div className="text-2xl mb-2">🎯</div>
-          <div className="font-medium mb-1">Pitch Arsenal</div>
-          <div className="text-sm text-muted-foreground">
-            Optimize your pitch selection based on your build.
-          </div>
-        </div>
-        <div className="bg-card border border-border rounded-lg p-4 text-center">
-          <div className="text-2xl mb-2">⚾</div>
-          <div className="font-medium mb-1">Mulch-o-Meter</div>
-          <div className="text-sm text-muted-foreground">
-            Evaluate your full roster for mulch, hold, or keep.
-          </div>
-        </div>
       </div>
     </div>
   );
