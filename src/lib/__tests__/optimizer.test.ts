@@ -33,7 +33,7 @@ describe("calculateStatTargets", () => {
     expect(supportPer).toBe(172);
   });
 
-  it("caps corePer at statCap", () => {
+  it("does not cap corePer (no stat cap in S11)", () => {
     const arch: Archetype = {
       name: "Test",
       description: "",
@@ -42,11 +42,11 @@ describe("calculateStatTargets", () => {
       stat_weights: {},
     };
     const { corePer } = calculateStatTargets(arch);
-    // floor(1150 * 0.5 / 1) = 575, capped at 300
-    expect(corePer).toBe(300);
+    // floor(1150 * 0.5 / 1) = 575, no cap in S11
+    expect(corePer).toBe(575);
   });
 
-  it("distributes core overflow to support", () => {
+  it("computes supportPer without overflow redistribution", () => {
     const arch: Archetype = {
       name: "Test",
       description: "",
@@ -55,8 +55,7 @@ describe("calculateStatTargets", () => {
       stat_weights: {},
     };
     const { supportPer } = calculateStatTargets(arch);
-    // coreOverflow = (575 - 300) * 1 = 275
-    // supportPer = floor((1150 * 0.3 + 275) / 1) = floor(620) = 300 (capped)
-    expect(supportPer).toBe(300);
+    // floor(1150 * 0.3 / 1) = 345
+    expect(supportPer).toBe(345);
   });
 });

@@ -28,11 +28,24 @@ interface PlayerContentProps {
   searchOpen?: boolean;
 }
 
-export function PlayerContent({ player, playerType, onChangePlayer, searchOpen }: PlayerContentProps) {
+const BATTER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"];
+
+export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, searchOpen }: PlayerContentProps) {
   const [archetype, setArchetype] = useState<Archetype | null>(null);
   const prevPlayerType = useRef(playerType);
   const boonEmojis = useBoonEmojis();
   const [targetOverrides, setTargetOverrides] = useState<Record<string, number>>({});
+  const [positionOverride, setPositionOverride] = useState<string | null>(null);
+
+  // Apply position override for batters
+  const player = positionOverride && playerType === "batter"
+    ? { ...rawPlayer, position: positionOverride }
+    : rawPlayer;
+
+  // Reset position override when player changes
+  useEffect(() => {
+    setPositionOverride(null);
+  }, [rawPlayer.mmolbPlayerId]);
 
   useEffect(() => {
     if (prevPlayerType.current !== playerType) {
@@ -202,6 +215,18 @@ export function PlayerContent({ player, playerType, onChangePlayer, searchOpen }
                   />
                 ))}
               </span>
+              {/* Position dropdown (batters only) */}
+              {playerType === "batter" && (
+                <select
+                  value={player.position ?? ""}
+                  onChange={(e) => setPositionOverride(e.target.value)}
+                  className="bg-[#1a2332] text-[#00e5ff] px-1.5 py-0.5 rounded text-[13px] font-bold border-none cursor-pointer shrink-0"
+                >
+                  {BATTER_POSITIONS.map(pos => (
+                    <option key={pos} value={pos}>{pos}</option>
+                  ))}
+                </select>
+              )}
             </div>
             {/* Change Player button if no team bar above */}
             {!player.teamName && onChangePlayer && !searchOpen && (

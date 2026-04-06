@@ -25,20 +25,20 @@ describe("calculatePitchEffectiveness", () => {
   it("weights primary stats at 0.7 and secondary at 0.3", () => {
     // primaryScore = 150, secondaryScore = 90
     // raw = 150 * 0.7 + 90 * 0.3 = 105 + 27 = 132
-    // result = min(100, (132 / 300) * 100) = 44
+    // result = min(100, (132 / 1000) * 100) = 13.2
     const score = calculatePitchEffectiveness(
       { velocity: 150, control: 90 },
       { priority_stats: ["velocity"], secondary_stats: ["control"] }
     );
-    expect(score).toBe(44);
+    expect(score).toBeCloseTo(13.2, 5);
   });
 
   it("caps at 100", () => {
-    // primaryScore = 500, secondaryScore = 500
-    // raw = 500 * 0.7 + 500 * 0.3 = 500
-    // result = min(100, (500 / 300) * 100) = 100 (capped)
+    // primaryScore = 1000, secondaryScore = 1000
+    // raw = 1000 * 0.7 + 1000 * 0.3 = 1000
+    // result = min(100, (1000 / 1000) * 100) = 100 (capped)
     const score = calculatePitchEffectiveness(
-      { velocity: 500, control: 500 },
+      { velocity: 1000, control: 1000 },
       { priority_stats: ["velocity"], secondary_stats: ["control"] }
     );
     expect(score).toBe(100);
@@ -48,24 +48,24 @@ describe("calculatePitchEffectiveness", () => {
     // primaryScore = (120 + 60) / 2 = 90
     // secondaryScore = 0
     // raw = 90 * 0.7 = 63
-    // result = min(100, (63 / 300) * 100) ≈ 21
+    // result = min(100, (63 / 1000) * 100) = 6.3
     const score = calculatePitchEffectiveness(
       { velocity: 120, stuff: 60 },
       { priority_stats: ["velocity", "stuff"], secondary_stats: [] }
     );
-    expect(score).toBeCloseTo(21, 5);
+    expect(score).toBeCloseTo(6.3, 5);
   });
 
   it("handles missing stats as 0", () => {
     // velocity=150, "missing" not in stats → 0
     // primaryScore = (150 + 0) / 2 = 75
     // raw = 75 * 0.7 = 52.5
-    // result = (52.5 / 300) * 100 = 17.5
+    // result = (52.5 / 1000) * 100 = 5.25
     const score = calculatePitchEffectiveness(
       { velocity: 150 },
       { priority_stats: ["velocity", "missing"], secondary_stats: [] }
     );
-    expect(score).toBe(17.5);
+    expect(score).toBe(5.25);
   });
 
   it("handles undefined priority_stats and secondary_stats", () => {
@@ -147,11 +147,13 @@ describe("optimizePitchArsenal", () => {
   });
 
   it("keeps non-recommended pitches with high effectiveness", () => {
-    // changeup with highStats: primary=deception(100), secondary=control(600)
-    // raw = 100*0.7 + 600*0.3 = 70 + 180 = 250
-    // effectiveness = (250/300)*100 = 83.3 >= 50 → keep
+    // changeup: primary=deception, secondary=control
+    // Need effectiveness >= 50, so boost deception and control
+    const boostedStats = { velocity: 800, control: 900, stuff: 400, deception: 700 };
+    // raw = 700*0.7 + 900*0.3 = 490 + 270 = 760
+    // effectiveness = (760/1000)*100 = 76 >= 50 → keep
     const advice = optimizePitchArsenal(
-      highStats,
+      boostedStats,
       ["fastball", "changeup"],
       archetype,
       pitchTypes

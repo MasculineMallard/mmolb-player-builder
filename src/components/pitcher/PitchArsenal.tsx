@@ -10,6 +10,12 @@ interface PitchArsenalProps {
   inline?: boolean;
 }
 
+const PITCH_NAMES: Record<string, string> = {
+  ff: "Fastball", si: "Sinker", fc: "Cutter",
+  ch: "Changeup", fs: "Splitter",
+  cu: "Curveball", kc: "Knuckle Curve", sl: "Slider", st: "Sweeper",
+};
+
 const PITCH_COLORS = [
   "var(--chart-1)",
   "var(--chart-2)",
@@ -104,7 +110,7 @@ export function PitchArsenal({ pitches, advice, inline }: PitchArsenalProps) {
                 className="w-2 h-2 rounded-full shrink-0"
                 style={{ backgroundColor: s.color }}
               />
-              <span className="text-muted-foreground">{s.pitch.name}</span>
+              <span className="text-muted-foreground">{PITCH_NAMES[s.pitch.name] ?? s.pitch.name.toUpperCase()}</span>
               <span className="ml-auto text-muted-foreground tabular-nums">
                 {s.displayPct}%
               </span>
@@ -199,7 +205,7 @@ export function PitchArsenal({ pitches, advice, inline }: PitchArsenalProps) {
               className="w-2 h-2 rounded-full shrink-0"
               style={{ backgroundColor: s.color }}
             />
-            <span>{s.pitch.name}</span>
+            <span>{PITCH_NAMES[s.pitch.name] ?? s.pitch.name.toUpperCase()}</span>
             <span className="ml-auto text-muted-foreground text-sm tabular-nums">
               {s.displayPct}%
             </span>

@@ -191,12 +191,6 @@ export function triggerRefresh(): { status: number; message: string } {
   return { status: 202, message: "Refresh started" };
 }
 
-// Auto-refresh on server startup in production.
-// Ensures live percentiles available within ~3 min of deploy.
-if (typeof window === "undefined" && process.env.NODE_ENV === "production" && !cached) {
-  console.log("[percentiles] Auto-refresh on startup...");
-  triggerRefresh();
-}
 
 export function getCachedPercentiles(): {
   batting: Record<string, PercentileEntry[]>;

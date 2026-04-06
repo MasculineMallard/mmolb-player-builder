@@ -1,23 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 
-// Mock the queries module
+// Search routes import from queries; player/roster routes import from player-data
 vi.mock("@/lib/queries", () => ({
   searchPlayers: vi.fn(),
-  getPlayerFull: vi.fn(),
   searchTeams: vi.fn(),
+}));
+vi.mock("@/lib/player-data", () => ({
+  getPlayer: vi.fn(),
   getTeamRoster: vi.fn(),
 }));
 
-import { searchPlayers, getPlayerFull, searchTeams, getTeamRoster } from "@/lib/queries";
+import { searchPlayers, searchTeams } from "@/lib/queries";
+import { getPlayer, getTeamRoster } from "@/lib/player-data";
 import { GET as playerSearchGET } from "../players/search/route";
 import { GET as playerGetGET } from "../players/[id]/route";
 import { GET as teamSearchGET } from "../teams/search/route";
 import { GET as teamRosterGET } from "../teams/[id]/roster/route";
 
 const mockSearchPlayers = vi.mocked(searchPlayers);
-const mockGetPlayerFull = vi.mocked(getPlayerFull);
 const mockSearchTeams = vi.mocked(searchTeams);
+const mockGetPlayer = vi.mocked(getPlayer);
 const mockGetTeamRoster = vi.mocked(getTeamRoster);
 
 function makeRequest(url: string): NextRequest {
@@ -117,7 +120,7 @@ describe("GET /api/players/[id]", () => {
   });
 
   it("returns 404 when player not found", async () => {
-    mockGetPlayerFull.mockResolvedValue(null);
+    mockGetPlayer.mockResolvedValue(null);
     const res = await playerGetGET(makeRequest("/api/players/p1"), makeParams("p1"));
     expect(res.status).toBe(404);
     const body = await res.json();
@@ -125,7 +128,7 @@ describe("GET /api/players/[id]", () => {
   });
 
   it("returns player data with Cache-Control", async () => {
-    mockGetPlayerFull.mockResolvedValue({
+    mockGetPlayer.mockResolvedValue({
       name: "Test Player",
       firstName: "Test",
       lastName: "Player",
@@ -133,22 +136,24 @@ describe("GET /api/players/[id]", () => {
       teamName: "Hawks",
       teamEmoji: null,
       position: "SP",
+      durability: 5,
       stats: { velocity: 300 },
       lesserBoons: [],
       greaterBoons: [],
       mmolbPlayerId: "p1",
       pitches: [],
+      gameStats: null,
     });
 
     const res = await playerGetGET(makeRequest("/api/players/p1"), makeParams("p1"));
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.name).toBe("Test Player");
-    expect(res.headers.get("Cache-Control")).toContain("max-age=300");
+    expect(res.headers.get("Cache-Control")).toContain("no-cache");
   });
 
   it("returns 500 on query error", async () => {
-    mockGetPlayerFull.mockRejectedValue(new Error("DB down"));
+    mockGetPlayer.mockRejectedValue(new Error("DB down"));
     const res = await playerGetGET(makeRequest("/api/players/p1"), makeParams("p1"));
     expect(res.status).toBe(500);
   });
