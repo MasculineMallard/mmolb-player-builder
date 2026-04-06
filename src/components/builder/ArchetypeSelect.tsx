@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { usePlayerStore } from "@/store/player-store";
 import { isAbortError } from "@/lib/utils";
 import { createJsonCache, isNonArrayObject } from "@/lib/json-cache";
@@ -26,6 +26,17 @@ function getArchetypeLoader(playerType: string): () => Promise<ArchetypeMap> {
     );
   }
   return archetypeLoaders[playerType];
+}
+
+/** Compute fit % of a player's stats against an archetype's stat_weights */
+function computeFitPct(stats: Record<string, number>, arch: Archetype): number {
+  let matchScore = 0;
+  let maxPossible = 0;
+  for (const [stat, weight] of Object.entries(arch.stat_weights)) {
+    matchScore += (stats[stat] ?? 0) * weight;
+    maxPossible += 1000 * weight;
+  }
+  return maxPossible > 0 ? Math.round((matchScore / maxPossible) * 100) : 0;
 }
 
 /** Get all stat names relevant for a player type */
@@ -129,6 +140,7 @@ export function ArchetypeSelect({
   const [showCustom, setShowCustom] = useState(false);
   const archetypeId = usePlayerStore((s) => s.archetypeId);
   const setArchetypeId = usePlayerStore((s) => s.setArchetypeId);
+  const player = usePlayerStore((s) => s.player);
 
   useEffect(() => {
     setLoadError(false);
@@ -174,12 +186,28 @@ export function ArchetypeSelect({
 
   const entries = Object.entries(archetypes);
   const selectedArch = archetypeId && archetypeId !== "__custom" ? archetypes[archetypeId] : null;
+  const selectedFitPct = selectedArch && player ? computeFitPct(player.stats, selectedArch) : null;
+
+  // Compute fit % for each archetype for dropdown display
+  const fitPcts = useMemo(() => {
+    if (!player || Object.keys(archetypes).length === 0) return new Map<string, number>();
+    const map = new Map<string, number>();
+    for (const [key, arch] of Object.entries(archetypes)) {
+      map.set(key, computeFitPct(player.stats, arch));
+    }
+    return map;
+  }, [player, archetypes]);
 
   return (
     <div className="bg-card border border-border rounded-lg px-3 py-2">
       <label className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1 flex items-center gap-2">
         <span className="w-0.5 h-3 bg-primary/40 rounded-full" />
         Archetype
+        {selectedArch && selectedFitPct != null && player && (
+          <span className="normal-case tracking-normal font-normal text-muted-foreground">
+            {selectedFitPct}% fit <span className="opacity-60">(for Lv. {player.level})</span>
+          </span>
+        )}
       </label>
       {loadError && (
         <p className="text-sm text-destructive mb-2">Failed to load archetypes.</p>
@@ -190,11 +218,14 @@ export function ArchetypeSelect({
         className="w-full bg-muted border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
       >
         <option value="">Select an archetype...</option>
-        {entries.map(([key, arch]) => (
-          <option key={key} value={key}>
-            {arch.emoji ? `${arch.emoji} ` : ""}{arch.name}
-          </option>
-        ))}
+        {entries.map(([key, arch]) => {
+          const pct = fitPcts.get(key);
+          return (
+            <option key={key} value={key}>
+              {arch.emoji ? `${arch.emoji} ` : ""}{arch.name}{pct != null ? ` — ${pct}% fit` : ""}
+            </option>
+          );
+        })}
         <option value="__custom">🔧 Custom Build...</option>
       </select>
 
