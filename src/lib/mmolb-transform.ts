@@ -70,6 +70,24 @@ function normalizeDurability(value: number | undefined): number {
 }
 
 /**
+ * Filter out playerrecord entries that belong to a previous incarnation.
+ *
+ * Between-season Recomps: any record from a season before Birthseason
+ * belongs to a previous incarnation and should be excluded.
+ *
+ * Mid-season Recomps (Birthday > 1): the Birthseason record itself has
+ * merged stats from both incarnations. We can't split those, so we keep
+ * the record but flag the player as recomped via wasRecompedThisSeason.
+ */
+function filterPreRecompRecords(
+  raw: MmolbApiPlayer,
+  records: MmolbApiPlayerRecord[],
+): MmolbApiPlayerRecord[] {
+  if (raw.Birthseason == null || records.length === 0) return records;
+  return records.filter((r) => r.Season >= raw.Birthseason!);
+}
+
+/**
  * Check if a player was recomposed mid-season.
  * Recomped players have Birthseason = current season AND Birthday > 1 (not there from the start).
  * Their season stats are from a different build and shouldn't be used.
@@ -101,6 +119,11 @@ export function transformPlayer(
 ): PlayerData {
   const stats = buildStatMap(raw);
 
+  // Filter out records from previous incarnations (between-season Recomps)
+  const filteredRecords = playerRecords
+    ? filterPreRecompRecords(raw, playerRecords)
+    : undefined;
+
   const lesserBoons = (raw.LesserBoon ?? raw.LesserBoons ?? []).map(
     (b) => b.Name
   );
@@ -121,9 +144,9 @@ export function transformPlayer(
   // Suppress stats for players recomped mid-season: their season stats
   // are from a different build and don't reflect the current player.
   let gameStats: GameStats | null = null;
-  const recompedThisSeason = wasRecompedThisSeason(raw, playerRecords, currentSeasonId);
+  const recompedThisSeason = wasRecompedThisSeason(raw, filteredRecords, currentSeasonId);
   if (!recompedThisSeason) {
-    gameStats = extractGameStats(raw.Stats, role, playerRecords, currentSeasonId);
+    gameStats = extractGameStats(raw.Stats, role, filteredRecords, currentSeasonId);
   }
 
   return {

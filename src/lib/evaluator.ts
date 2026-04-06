@@ -22,7 +22,7 @@ import {
   PITCHING_STAT_WEIGHTS,
   type PositionDefenseMap,
 } from "./evaluator-data";
-import { calculatePrimaryPointsAtLevel, TOTAL_PRIMARY_POINTS, S11 } from "./mechanics";
+import { calculatePrimaryPointsAtLevel, TOTAL_PRIMARY_POINTS, S11, calculateFitTargets } from "./mechanics";
 import { generateStructuredReasoning } from "./evaluator-reasoning";
 import { PITCHER_POSITIONS } from "./constants";
 
@@ -257,39 +257,41 @@ export function detectArchetype(
   archetypes: Record<string, Archetype>,
 ): { key: string; name: string; emoji: string; fitPct: number } {
   let bestKey = "";
-  let bestScore = -1;
+  let bestFitPct = -1;
   let bestArch: Archetype | null = null;
 
+  const level = player.level ?? 1;
+
   for (const [key, arch] of Object.entries(archetypes)) {
+    const prioritySet = new Set(arch.priority_stats ?? []);
+    const nCore = (arch.priority_stats ?? []).length;
+    const nSupport = (arch.secondary_stats ?? []).length;
+    const { coreTarget, supportTarget } = calculateFitTargets(level, nCore, nSupport);
+
     let matchScore = 0;
     let maxPossible = 0;
 
     for (const [stat, weight] of Object.entries(arch.stat_weights)) {
       const value = player.stats[stat] ?? 0;
-      matchScore += value * weight;
-      maxPossible += 1000 * weight; // max attribute value is 1000
+      const target = prioritySet.has(stat) ? coreTarget : supportTarget;
+      matchScore += Math.min(value, target) * weight;
+      maxPossible += target * weight;
     }
 
-    if (matchScore > bestScore) {
-      bestScore = matchScore;
+    const fitPct = maxPossible > 0 ? Math.round((matchScore / maxPossible) * 100) : 0;
+
+    if (fitPct > bestFitPct) {
+      bestFitPct = fitPct;
       bestKey = key;
       bestArch = arch;
     }
   }
 
-  const fitPct = bestArch
-    ? Math.round(
-        (bestScore /
-          Object.values(bestArch.stat_weights).reduce((sum, w) => sum + 1000 * w, 0)) *
-          100,
-      )
-    : 0;
-
   return {
     key: bestKey,
     name: bestArch?.name ?? "Unknown",
     emoji: bestArch?.emoji ?? "",
-    fitPct,
+    fitPct: bestFitPct,
   };
 }
 

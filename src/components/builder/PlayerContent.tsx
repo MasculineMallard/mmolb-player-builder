@@ -125,6 +125,10 @@ export function PlayerContent({ player, playerType, onChangePlayer, searchOpen }
         : null,
     [isPitcher, hasArchetype, pitchTypes, player.stats, player.pitches, effectiveArchetype]
   );
+  const priorityStatsList = useMemo(
+    () => hasArchetype ? (effectiveArchetype.priority_stats ?? []) : [],
+    [hasArchetype, effectiveArchetype]
+  );
   const highlightStats = useMemo(
     () => {
       const stats = hasArchetype
@@ -268,6 +272,7 @@ export function PlayerContent({ player, playerType, onChangePlayer, searchOpen }
         <StatGridInteractive
           stats={player.stats}
           highlightStats={highlightStats}
+          priorityStats={priorityStatsList}
           level={player.level}
           isPitcher={isPitcher}
           recommendations={hasArchetype ? recommendations : undefined}

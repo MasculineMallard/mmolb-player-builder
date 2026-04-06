@@ -5,6 +5,7 @@ import { usePlayerStore } from "@/store/player-store";
 import { isAbortError } from "@/lib/utils";
 import { createJsonCache, isNonArrayObject } from "@/lib/json-cache";
 import { STAT_CATEGORIES } from "@/lib/constants";
+import { calculateFitTargets } from "@/lib/mechanics";
 import type { Archetype } from "@/lib/types";
 
 interface ArchetypeSelectProps {
@@ -28,13 +29,20 @@ function getArchetypeLoader(playerType: string): () => Promise<ArchetypeMap> {
   return archetypeLoaders[playerType];
 }
 
-/** Compute fit % of a player's stats against an archetype's stat_weights */
-function computeFitPct(stats: Record<string, number>, arch: Archetype): number {
+/** Compute level-normalized fit % of a player's stats against an archetype */
+function computeFitPct(stats: Record<string, number>, arch: Archetype, level: number): number {
+  const prioritySet = new Set(arch.priority_stats ?? []);
+  const nCore = (arch.priority_stats ?? []).length;
+  const nSupport = (arch.secondary_stats ?? []).length;
+  const { coreTarget, supportTarget } = calculateFitTargets(level, nCore, nSupport);
+
   let matchScore = 0;
   let maxPossible = 0;
   for (const [stat, weight] of Object.entries(arch.stat_weights)) {
-    matchScore += (stats[stat] ?? 0) * weight;
-    maxPossible += 1000 * weight;
+    const value = stats[stat] ?? 0;
+    const target = prioritySet.has(stat) ? coreTarget : supportTarget;
+    matchScore += Math.min(value, target) * weight;
+    maxPossible += target * weight;
   }
   return maxPossible > 0 ? Math.round((matchScore / maxPossible) * 100) : 0;
 }
@@ -186,14 +194,14 @@ export function ArchetypeSelect({
 
   const entries = Object.entries(archetypes);
   const selectedArch = archetypeId && archetypeId !== "__custom" ? archetypes[archetypeId] : null;
-  const selectedFitPct = selectedArch && player ? computeFitPct(player.stats, selectedArch) : null;
+  const selectedFitPct = selectedArch && player ? computeFitPct(player.stats, selectedArch, player.level) : null;
 
   // Compute fit % for each archetype for dropdown display
   const fitPcts = useMemo(() => {
     if (!player || Object.keys(archetypes).length === 0) return new Map<string, number>();
     const map = new Map<string, number>();
     for (const [key, arch] of Object.entries(archetypes)) {
-      map.set(key, computeFitPct(player.stats, arch));
+      map.set(key, computeFitPct(player.stats, arch, player.level));
     }
     return map;
   }, [player, archetypes]);
@@ -222,7 +230,7 @@ export function ArchetypeSelect({
           const pct = fitPcts.get(key);
           return (
             <option key={key} value={key}>
-              {arch.emoji ? `${arch.emoji} ` : ""}{arch.name}{pct != null ? ` — ${pct}% fit` : ""}
+              {arch.emoji ? `${arch.emoji} ` : ""}{arch.name}{pct != null ? ` ${pct}%` : ""}
             </option>
           );
         })}

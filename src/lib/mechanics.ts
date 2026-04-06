@@ -51,6 +51,25 @@ export function calculatePrimaryPointsAtLevel(level: number): number {
 /** Pre-computed total primary points at max level. */
 export const TOTAL_PRIMARY_POINTS = _pointsAtLevel[S11.maxLevel];
 
+/** Average initial stat points per attribute (1000 total / 12 stats). */
+export const INITIAL_PER_STAT = Math.floor(1000 / 12); // 83
+
+/**
+ * Compute level-scaled stat targets for archetype fit scoring.
+ * Uses points earned at the given level to set realistic expectations.
+ * At level 30 with 3/3 archetypes: core=274, support=198.
+ */
+export function calculateFitTargets(
+  level: number,
+  nCore: number,
+  nSupport: number,
+): { coreTarget: number; supportTarget: number } {
+  const pts = calculatePrimaryPointsAtLevel(level);
+  const coreTarget = Math.floor(pts * 0.5 / Math.max(nCore, 1)) + INITIAL_PER_STAT;
+  const supportTarget = Math.floor(pts * 0.3 / Math.max(nSupport, 1)) + INITIAL_PER_STAT;
+  return { coreTarget, supportTarget };
+}
+
 if (process.env.NODE_ENV === "development") {
   console.warn(
     "[mechanics] UNCONFIRMED: defenseLevelsGivePrimary=%s, totalPrimaryPoints=%d. " +

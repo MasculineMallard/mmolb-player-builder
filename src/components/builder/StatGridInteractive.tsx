@@ -14,6 +14,7 @@ import {
 interface StatGridInteractiveProps {
   stats: Record<string, number>;
   highlightStats?: string[];
+  priorityStats?: string[];
   level: number;
   isPitcher: boolean;
   recommendations?: StatRecommendation[];
@@ -30,6 +31,7 @@ const HIDDEN_CATEGORIES: Record<string, string[]> = {
 export function StatGridInteractive({
   stats,
   highlightStats = [],
+  priorityStats = [],
   level,
   isPitcher,
   recommendations = [],
@@ -41,6 +43,7 @@ export function StatGridInteractive({
   const [editValue, setEditValue] = useState("");
 
   const highlightSet = useMemo(() => new Set(highlightStats), [highlightStats]);
+  const prioritySet = useMemo(() => new Set(priorityStats), [priorityStats]);
 
   // Build a lookup from stat name to recommendation
   const recMap = useMemo(() => {
@@ -141,7 +144,10 @@ export function StatGridInteractive({
                       <Tooltip>
                         <TooltipTrigger className="text-sm capitalize text-muted-foreground text-left flex items-center gap-1">
                           {isHighlighted && (
-                            <span className="text-sm text-primary" aria-label="Priority stat">★</span>
+                            <span
+                              className={`text-sm ${prioritySet.has(statName) ? 'text-primary' : 'text-foreground/60'}`}
+                              aria-label={prioritySet.has(statName) ? "Priority stat" : "Secondary stat"}
+                            >★</span>
                           )}
                           {statName}
                         </TooltipTrigger>
