@@ -69,6 +69,29 @@ function normalizeDurability(value: number | undefined): number {
   return Math.min(Math.max(Math.round(d), 0), 5);
 }
 
+/**
+ * Check if a player was recomposed mid-season.
+ * Recomped players have Birthseason = current season AND Birthday > 1 (not there from the start).
+ * Their season stats are from a different build and shouldn't be used.
+ */
+function wasRecompedThisSeason(
+  raw: MmolbApiPlayer,
+  playerRecords?: MmolbApiPlayerRecord[],
+  currentSeasonId?: string,
+): boolean {
+  if (raw.Birthseason == null || raw.Birthday == null) return false;
+  if (!currentSeasonId || !playerRecords?.length) return false;
+
+  // Find the season number for the current SeasonID
+  const currentRecord = playerRecords.find(
+    (r) => r.SeasonID === currentSeasonId && r.SeasonStatus === "Regular Season"
+  );
+  if (!currentRecord) return false;
+
+  // If born this season after day 1, they were recomped mid-season
+  return raw.Birthseason === currentRecord.Season && raw.Birthday > 1;
+}
+
 export function transformPlayer(
   raw: MmolbApiPlayer,
   teamName: string | null,
@@ -94,7 +117,14 @@ export function transformPlayer(
   const position = raw.Position ?? null;
   const role = position && ["SP", "RP", "CL", "P"].includes(position.replace(/\d+$/, ""))
     ? "pitcher" as const : "batter" as const;
-  const gameStats = extractGameStats(raw.Stats, role, playerRecords, currentSeasonId);
+
+  // Suppress stats for players recomped mid-season: their season stats
+  // are from a different build and don't reflect the current player.
+  let gameStats: GameStats | null = null;
+  const recompedThisSeason = wasRecompedThisSeason(raw, playerRecords, currentSeasonId);
+  if (!recompedThisSeason) {
+    gameStats = extractGameStats(raw.Stats, role, playerRecords, currentSeasonId);
+  }
 
   return {
     name: `${raw.FirstName} ${raw.LastName}`,
@@ -111,6 +141,7 @@ export function transformPlayer(
     mmolbPlayerId: raw._id,
     pitches,
     gameStats,
+    ...(recompedThisSeason ? { recomped: true } : {}),
   };
 }
 

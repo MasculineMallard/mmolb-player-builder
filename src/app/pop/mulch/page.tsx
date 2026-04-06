@@ -267,6 +267,11 @@ export default function EvaluatePage() {
               {evaluated.length} players evaluated
             </span>
           </div>
+          {evaluated.some(ev => ev.player.recomped) && (
+            <div className="text-xs text-yellow-500 bg-yellow-500/10 border border-yellow-500/20 rounded-md px-3 py-1.5 mb-3">
+              ⚠ {evaluated.filter(ev => ev.player.recomped).length} player(s) recently recomposed. Season stats suppressed (from previous build).
+            </div>
+          )}
           <RosterTable players={evaluated} onPositionChange={handlePositionChange} />
         </>
       )}

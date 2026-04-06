@@ -31,6 +31,7 @@ export interface PlayerData {
   mmolbPlayerId: string;
   pitches: PitchData[];
   gameStats?: import("./evaluator-types").GameStats | null;
+  recomped?: boolean;
 }
 
 export interface PlayerSearchResult {

@@ -64,6 +64,8 @@ export interface MmolbApiPlayer {
   LesserDurability: number;
   GreaterDurability: number;
   Stats?: Record<string, Record<string, number>>;
+  Birthseason?: number;
+  Birthday?: number;
 }
 
 export interface MmolbApiTeamPlayer {

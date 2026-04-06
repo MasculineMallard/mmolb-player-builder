@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { usePlayerStore } from "@/store/player-store";
@@ -24,53 +24,49 @@ interface ExportShareProps {
   archetype: Archetype | null;
 }
 
+type BtnState = "idle" | "ok" | "fail" | "busy";
+
+function ActionButton({
+  label,
+  onClick,
+  state,
+}: {
+  label: string;
+  onClick: () => void;
+  state: BtnState;
+}) {
+  const text =
+    state === "ok" ? "Done!" :
+    state === "fail" ? "Failed" :
+    state === "busy" ? "..." :
+    label;
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={state === "busy"}
+      className="text-sm bg-secondary text-secondary-foreground px-2.5 py-1 rounded-md border border-border hover:bg-secondary/80 active:scale-[0.98] transition-all disabled:opacity-50"
+    >
+      {text}
+    </button>
+  );
+}
+
 export function ExportShare({ player, archetype }: ExportShareProps) {
-  const [copied, setCopied] = useState<string | null>(null);
+  const [linkState, setLinkState] = useState<BtnState>("idle");
+  const [discordState, setDiscordState] = useState<BtnState>("idle");
+  const [imageState, setImageState] = useState<BtnState>("idle");
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
   const pathname = usePathname();
   const archetypeId = usePlayerStore((s) => s.archetypeId);
-  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setPortalTarget(document.getElementById("share-slot"));
   }, []);
 
-  const handleSaveImage = useCallback(async () => {
-    const el = document.querySelector("[data-player-content]") as HTMLElement | null;
-    if (!el) {
-      setCopied("error");
-      setTimeout(() => setCopied(null), 2000);
-      return;
-    }
-    setSaving(true);
-    try {
-      // html-to-image needs multiple passes for fonts/images to load
-      const opts = { backgroundColor: "#0a0e17", pixelRatio: 2 };
-      await toPng(el, opts); // warm-up pass (loads fonts/images)
-      const dataUrl = await toPng(el, opts);
-      const link = document.createElement("a");
-      link.download = `${player.name.replace(/\s+/g, "-")}-Lv${player.level}.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch (err) {
-      console.error("Image save failed:", err);
-      setCopied("error");
-      setTimeout(() => setCopied(null), 2000);
-    } finally {
-      setSaving(false);
-    }
-  }, [player.name, player.level]);
-
-  const copyToClipboard = async (text: string, label: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(label);
-      setTimeout(() => setCopied(null), 2000);
-    } catch (err) {
-      console.error("Clipboard write failed:", err);
-      setCopied("error");
-      setTimeout(() => setCopied(null), 2000);
-    }
+  const flash = (setter: (s: BtnState) => void, state: BtnState) => {
+    setter(state);
+    setTimeout(() => setter("idle"), 2000);
   };
 
   const buildShareUrl = () => {
@@ -86,13 +82,11 @@ export function ExportShare({ player, archetype }: ExportShareProps) {
     const pos = player.position ?? "?";
     const isPitcher = PITCHER_POSITIONS.has(pos.replace(/\d+$/, ""));
 
-    // Header
     lines.push(`**${player.name}** | Lv ${player.level} | ${pos} | Dur ${player.durability}/5`);
     if (player.teamName) {
       lines.push(`${player.teamEmoji ?? ""} ${player.teamName}`);
     }
 
-    // Top 5 stats
     const sorted = Object.entries(player.stats)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
@@ -105,7 +99,6 @@ export function ExportShare({ player, archetype }: ExportShareProps) {
       lines.push("```");
     }
 
-    // Defense stats (batters only)
     if (!isPitcher) {
       const basePos = pos.replace(/\d+$/, "");
       const defStats = POSITION_DEFENSE[basePos];
@@ -122,28 +115,51 @@ export function ExportShare({ player, archetype }: ExportShareProps) {
     return lines.join("\n");
   };
 
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(buildShareUrl());
+      flash(setLinkState, "ok");
+    } catch {
+      flash(setLinkState, "fail");
+    }
+  };
+
+  const handleCopyDiscord = async () => {
+    try {
+      await navigator.clipboard.writeText(buildDiscordSummary());
+      flash(setDiscordState, "ok");
+    } catch {
+      flash(setDiscordState, "fail");
+    }
+  };
+
+  const handleSaveImage = useCallback(async () => {
+    const el = document.querySelector("[data-player-content]") as HTMLElement | null;
+    if (!el) {
+      flash(setImageState, "fail");
+      return;
+    }
+    setImageState("busy");
+    try {
+      const opts = { backgroundColor: "#0a0e17", pixelRatio: 2 };
+      await toPng(el, opts); // warm-up pass
+      const dataUrl = await toPng(el, opts);
+      const link = document.createElement("a");
+      link.download = `${player.name.replace(/\s+/g, "-")}-Lv${player.level}.png`;
+      link.href = dataUrl;
+      link.click();
+      flash(setImageState, "ok");
+    } catch (err) {
+      console.error("Image save failed:", err);
+      flash(setImageState, "fail");
+    }
+  }, [player.name, player.level]);
+
   const buttons = (
     <>
-      <button
-        onClick={() => copyToClipboard(buildShareUrl(), "url")}
-        className="text-sm text-primary-foreground px-2.5 py-1 rounded-md hover:brightness-110 active:scale-[0.98] transition-all duration-150"
-        style={{ background: 'linear-gradient(180deg, #4B8DF7 0%, #3B82F6 100%)' }}
-      >
-        {copied === "url" ? "Copied!" : copied === "error" ? "Failed" : "Copy Link"}
-      </button>
-      <button
-        onClick={() => copyToClipboard(buildDiscordSummary(), "discord")}
-        className="text-sm bg-secondary text-secondary-foreground px-2.5 py-1 rounded-md border border-border hover:bg-secondary/80 transition-colors"
-      >
-        {copied === "discord" ? "Copied!" : "Discord"}
-      </button>
-      <button
-        onClick={handleSaveImage}
-        disabled={saving}
-        className="text-sm bg-secondary text-secondary-foreground px-2.5 py-1 rounded-md border border-border hover:bg-secondary/80 transition-colors disabled:opacity-50"
-      >
-        {saving ? "..." : "Image"}
-      </button>
+      <ActionButton label="Copy Link" onClick={handleCopyLink} state={linkState} />
+      <ActionButton label="Discord" onClick={handleCopyDiscord} state={discordState} />
+      <ActionButton label="Image" onClick={handleSaveImage} state={imageState} />
     </>
   );
 
@@ -151,6 +167,5 @@ export function ExportShare({ player, archetype }: ExportShareProps) {
     return createPortal(buttons, portalTarget);
   }
 
-  // Fallback: render inline if portal target not found
   return <div className="flex items-center gap-2">{buttons}</div>;
 }
