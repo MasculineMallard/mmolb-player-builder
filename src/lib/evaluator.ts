@@ -382,21 +382,21 @@ function computeComposite(
   const hasStats = statsScore != null;
 
   if (hasStats && hasFit) {
-    // All 4 scores: Attr 25%, Stats 30%, Fit 20%, Growth 25%
+    // All 4 scores: equal 25% each
     return Math.round(
-      attributeScore * 0.25 + statsScore * 0.30 + positionFitScore * 0.20 + growthScore * 0.25,
+      attributeScore * 0.25 + statsScore * 0.25 + positionFitScore * 0.25 + growthScore * 0.25,
     );
   }
   if (hasStats && !hasFit) {
-    // No fit (pitcher/DH): Attr 30%, Stats 40%, Growth 30%
+    // No fit (pitcher/DH): Attr 30%, Stats 35%, Growth 35%
     return Math.round(
-      attributeScore * 0.30 + statsScore * 0.40 + growthScore * 0.30,
+      attributeScore * 0.30 + statsScore * 0.35 + growthScore * 0.35,
     );
   }
   if (!hasStats && hasFit) {
-    // No game stats: Attr 35%, Fit 30%, Growth 35%
+    // No game stats: Attr 30%, Fit 35%, Growth 35%
     return Math.round(
-      attributeScore * 0.35 + positionFitScore * 0.30 + growthScore * 0.35,
+      attributeScore * 0.30 + positionFitScore * 0.35 + growthScore * 0.35,
     );
   }
   // No stats, no fit (pitcher/DH without game stats): Attr 50%, Growth 50%

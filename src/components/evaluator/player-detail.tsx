@@ -34,11 +34,11 @@ function WeightedBreakdown({ ev }: { eval?: never; ev: EvaluatedPlayer }) {
 
   let weights: Record<string, number>;
   if (hasStats && hasFit) {
-    weights = { Attributes: 0.25, Stats: 0.30, Fit: 0.20, Growth: 0.25 };
+    weights = { Attributes: 0.25, Stats: 0.25, Fit: 0.25, Growth: 0.25 };
   } else if (hasStats && !hasFit) {
-    weights = { Attributes: 0.30, Stats: 0.40, Fit: 0, Growth: 0.30 };
+    weights = { Attributes: 0.30, Stats: 0.35, Fit: 0, Growth: 0.35 };
   } else if (!hasStats && hasFit) {
-    weights = { Attributes: 0.35, Stats: 0, Fit: 0.30, Growth: 0.35 };
+    weights = { Attributes: 0.30, Stats: 0, Fit: 0.35, Growth: 0.35 };
   } else {
     weights = { Attributes: 0.50, Stats: 0, Fit: 0, Growth: 0.50 };
   }
@@ -149,6 +149,21 @@ function StatsTable({ gameStats, role }: { gameStats: GameStats | null; role: "b
         </tr>
       </thead>
       <tbody>
+        {(() => {
+          const sampleKey = role === "pitcher" ? "IP" : "PA";
+          const sampleVal = gameStats[sampleKey as keyof GameStats] as number | undefined;
+          const sigThreshold = role === "pitcher" ? 20 : 50;
+          const isSig = sampleVal != null && sampleVal >= sigThreshold;
+          return (
+            <tr className="border-b border-border/30">
+              <td className="text-muted-foreground py-0.5 font-medium">{sampleKey}</td>
+              <td className="text-right font-mono tabular-nums py-0.5">{sampleVal != null ? Math.round(sampleVal) : "—"}</td>
+              <td className="text-right text-[11px] py-0.5" style={{ color: isSig ? "var(--scale-good)" : "var(--scale-poor)" }}>
+                {sampleVal != null ? (isSig ? "Sig" : "Small") : "—"}
+              </td>
+            </tr>
+          );
+        })()}
         {Object.keys(weights).map((key) => {
           const value = gameStats[key as keyof GameStats] as number | undefined;
           const table = tables[key];

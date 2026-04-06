@@ -6,6 +6,18 @@ import { usePathname } from "next/navigation";
 import { usePlayerStore } from "@/store/player-store";
 import { toPng } from "html-to-image";
 import type { Archetype, PlayerData } from "@/lib/types";
+import { PITCHER_POSITIONS } from "@/lib/constants";
+
+const POSITION_DEFENSE: Record<string, string[]> = {
+  C: ["awareness", "reaction", "composure"],
+  "1B": ["reaction", "composure", "dexterity"],
+  "2B": ["reaction", "composure", "acrobatics"],
+  "3B": ["reaction", "arm", "composure"],
+  SS: ["reaction", "arm", "acrobatics"],
+  LF: ["acrobatics", "agility", "arm"],
+  CF: ["acrobatics", "agility", "arm"],
+  RF: ["acrobatics", "agility", "arm"],
+};
 
 interface ExportShareProps {
   player: PlayerData;
@@ -25,19 +37,25 @@ export function ExportShare({ player, archetype }: ExportShareProps) {
 
   const handleSaveImage = useCallback(async () => {
     const el = document.querySelector("[data-player-content]") as HTMLElement | null;
-    if (!el) return;
+    if (!el) {
+      setCopied("error");
+      setTimeout(() => setCopied(null), 2000);
+      return;
+    }
     setSaving(true);
     try {
-      const dataUrl = await toPng(el, {
-        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue("--background").trim() || "#0a0a0b",
-        pixelRatio: 2,
-      });
+      // html-to-image needs multiple passes for fonts/images to load
+      const opts = { backgroundColor: "#0a0e17", pixelRatio: 2 };
+      await toPng(el, opts); // warm-up pass (loads fonts/images)
+      const dataUrl = await toPng(el, opts);
       const link = document.createElement("a");
       link.download = `${player.name.replace(/\s+/g, "-")}-Lv${player.level}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
       console.error("Image save failed:", err);
+      setCopied("error");
+      setTimeout(() => setCopied(null), 2000);
     } finally {
       setSaving(false);
     }
@@ -65,34 +83,41 @@ export function ExportShare({ player, archetype }: ExportShareProps) {
 
   const buildDiscordSummary = () => {
     const lines: string[] = [];
-    lines.push(`**${player.name}** (Lv.${player.level})`);
+    const pos = player.position ?? "?";
+    const isPitcher = PITCHER_POSITIONS.has(pos.replace(/\d+$/, ""));
+
+    // Header
+    lines.push(`**${player.name}** | Lv ${player.level} | ${pos} | Dur ${player.durability}/5`);
     if (player.teamName) {
-      lines.push(`${player.teamEmoji ?? ""} ${player.teamName} | ${player.position ?? "?"}`);
+      lines.push(`${player.teamEmoji ?? ""} ${player.teamName}`);
     }
-    if (archetype) {
-      lines.push(`Archetype: **${archetype.name}**`);
-      if (archetype.priority_stats?.length) {
-        lines.push(`Core stats: ${archetype.priority_stats.slice(0, 4).join(", ")}`);
-      }
-    }
-    if (player.lesserBoons.length) {
-      lines.push(`Boons: ${player.lesserBoons.join(", ")}`);
-    }
-    if (player.greaterBoons.length) {
-      lines.push(`Greater: ${player.greaterBoons.join(", ")}`);
-    }
+
+    // Top 5 stats
     const sorted = Object.entries(player.stats)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
     if (sorted.length) {
-      const maxNameLen = Math.max(...sorted.map(([k]) => k.length));
-      const statLines = sorted.map(
-        ([k, v]) => `${k.padEnd(maxNameLen)}  ${String(v).padStart(4)}`
-      );
+      lines.push("");
+      lines.push("**Top Stats**");
+      const maxLen = Math.max(...sorted.map(([k]) => k.length));
       lines.push("```");
-      lines.push(...statLines);
+      lines.push(...sorted.map(([k, v]) => `${k.padEnd(maxLen)}  ${String(v).padStart(4)}`));
       lines.push("```");
     }
+
+    // Defense stats (batters only)
+    if (!isPitcher) {
+      const basePos = pos.replace(/\d+$/, "");
+      const defStats = POSITION_DEFENSE[basePos];
+      if (defStats) {
+        lines.push(`**${basePos} Defense**`);
+        const maxLen = Math.max(...defStats.map(s => s.length));
+        lines.push("```");
+        lines.push(...defStats.map(s => `${s.padEnd(maxLen)}  ${String(player.stats[s] ?? 0).padStart(4)}`));
+        lines.push("```");
+      }
+    }
+
     lines.push(buildShareUrl());
     return lines.join("\n");
   };
