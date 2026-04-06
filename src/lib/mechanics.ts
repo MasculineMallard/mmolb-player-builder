@@ -11,15 +11,11 @@ export const S11 = {
   boonLevels: [10, 20, 30] as const, // all Lesser, no Greater in S11
   defenseBonusLevels: [5, 15, 25] as const,
   defenseBonusAmount: 100,
-  baseStatsTotal: 1500, // ~30 x 50 at level 1
-
   // UNCONFIRMED: do levels 5/15/25 give primary points IN ADDITION to defense?
   // Conservative: they do NOT (23 primary levels). If they do: 26 primary levels.
   defenseLevelsGivePrimary: false,
 
   totalPrimaryPoints: 1150, // 23 x 50 (conservative)
-  totalDefensePoints: 300, // 3 x 100
-  statCap: 300, // placeholder; 500 is unreachable in S11
 } as const;
 
 /**
@@ -30,31 +26,36 @@ export const S11 = {
  * - Defense levels (5, 15, 25): +100 defense bonus, no primary (conservative)
  * - All other levels: +50 primary
  */
-export function calculatePrimaryPointsAtLevel(level: number): number {
-  const boonSet = new Set(S11.boonLevels);
-  const defenseSet = new Set(S11.defenseBonusLevels);
-  let total = 0;
+const boonSet = new Set<number>(S11.boonLevels);
+const defenseSet = new Set<number>(S11.defenseBonusLevels);
 
-  for (let lvl = 2; lvl <= level; lvl++) {
-    if (boonSet.has(lvl as 10 | 20 | 30)) continue;
-    if (!S11.defenseLevelsGivePrimary && defenseSet.has(lvl as 5 | 15 | 25))
-      continue;
-    total += S11.pointsPerLevel;
-  }
-
-  return total;
+// Pre-compute points at each level (0..maxLevel) for O(1) lookup
+const _pointsAtLevel: number[] = [0, 0]; // level 0 and 1 both 0
+for (let lvl = 2; lvl <= S11.maxLevel; lvl++) {
+  const skip = boonSet.has(lvl) || (!S11.defenseLevelsGivePrimary && defenseSet.has(lvl));
+  _pointsAtLevel[lvl] = _pointsAtLevel[lvl - 1] + (skip ? 0 : S11.pointsPerLevel);
 }
 
-/**
- * Calculate total defense bonus points earned by a given level.
- */
-export function calculateDefensePointsAtLevel(level: number): number {
+export function calculatePrimaryPointsAtLevel(level: number): number {
+  if (level >= 0 && level <= S11.maxLevel) return _pointsAtLevel[level];
+  // Fallback for out-of-range (shouldn't happen in practice)
   let total = 0;
-  for (const defLevel of S11.defenseBonusLevels) {
-    if (level >= defLevel) total += S11.defenseBonusAmount;
+  for (let lvl = 2; lvl <= level; lvl++) {
+    if (boonSet.has(lvl)) continue;
+    if (!S11.defenseLevelsGivePrimary && defenseSet.has(lvl)) continue;
+    total += S11.pointsPerLevel;
   }
   return total;
 }
 
 /** Pre-computed total primary points at max level. */
-export const TOTAL_PRIMARY_POINTS = calculatePrimaryPointsAtLevel(S11.maxLevel);
+export const TOTAL_PRIMARY_POINTS = _pointsAtLevel[S11.maxLevel];
+
+if (process.env.NODE_ENV === "development") {
+  console.warn(
+    "[mechanics] UNCONFIRMED: defenseLevelsGivePrimary=%s, totalPrimaryPoints=%d. " +
+    "Verify against actual S11 data when available.",
+    S11.defenseLevelsGivePrimary,
+    TOTAL_PRIMARY_POINTS
+  );
+}

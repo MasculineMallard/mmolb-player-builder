@@ -1,54 +1,29 @@
-"use client";
-
 import { Suspense } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import Image from "next/image";
+import { NavLinks } from "@/components/builder/NavLinks";
 
 export default function BuilderLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-
   return (
     <div className="flex flex-col flex-1">
       <header className="border-b border-border bg-card">
-        <div className="max-w-5xl mx-auto px-4 flex items-center h-14 gap-6">
-          <Link href="/" className="font-bold text-lg">
-            ⚾ MMOLB
+        <div className="px-4 sm:px-6 lg:px-8 flex items-center h-11 gap-6">
+          <Link href="/" className="font-bold text-lg flex items-center gap-0.5">
+            <Image src="/pop-can.png" alt="POP" width={20} height={28} />
+            POP
           </Link>
-          <nav className="flex gap-1">
-            <Link
-              href="/pitcher"
-              className={cn(
-                "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-                pathname === "/pitcher"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              )}
-            >
-              Pitcher
-            </Link>
-            <Link
-              href="/batter"
-              className={cn(
-                "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-                pathname === "/batter"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              )}
-            >
-              Batter
-            </Link>
-          </nav>
-          <div className="ml-auto text-xs text-muted-foreground">
-            Season 11
+          <NavLinks />
+          <div className="ml-auto flex items-center gap-3">
+            <div id="share-slot" className="flex items-center gap-2" />
+            <span className="text-sm text-muted-foreground">Season 11</span>
           </div>
         </div>
       </header>
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6">
+      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-2">
         <Suspense>{children}</Suspense>
       </main>
     </div>

@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import {
   S11,
   calculatePrimaryPointsAtLevel,
-  calculateDefensePointsAtLevel,
   TOTAL_PRIMARY_POINTS,
 } from "../mechanics";
 
@@ -64,21 +63,3 @@ describe("calculatePrimaryPointsAtLevel", () => {
   });
 });
 
-describe("calculateDefensePointsAtLevel", () => {
-  it("returns 0 before first defense level", () => {
-    expect(calculateDefensePointsAtLevel(4)).toBe(0);
-  });
-
-  it("returns 100 at level 5", () => {
-    expect(calculateDefensePointsAtLevel(5)).toBe(100);
-  });
-
-  it("returns 200 at level 15", () => {
-    expect(calculateDefensePointsAtLevel(15)).toBe(200);
-  });
-
-  it("returns 300 at level 25+", () => {
-    expect(calculateDefensePointsAtLevel(25)).toBe(300);
-    expect(calculateDefensePointsAtLevel(30)).toBe(300);
-  });
-});

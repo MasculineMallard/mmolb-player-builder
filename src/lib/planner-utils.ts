@@ -4,7 +4,8 @@
  */
 
 import { S11, calculatePrimaryPointsAtLevel, TOTAL_PRIMARY_POINTS } from "./mechanics";
-import type { Archetype } from "./optimizer";
+import { MILESTONE_LEVELS } from "./constants";
+import type { Archetype } from "./types";
 
 export interface ProgressSummary {
   progressPercent: number;
@@ -23,7 +24,7 @@ export function calculateProgress(
   currentLevel: number
 ): ProgressSummary {
   const statWeights = archetype.stat_weights ?? {};
-  const priorityStats = archetype.priority_stats?.slice(0, 3) ?? [];
+  const priorityStats = archetype.priority_stats ?? [];
 
   const pointsAtCurrent = calculatePrimaryPointsAtLevel(currentLevel);
 
@@ -39,21 +40,29 @@ export function calculateProgress(
   let maxProgress = 0;
   let statsOnTrack = 0;
   let statsBehind = 0;
+  let evaluatedStats = 0;
 
-  for (const statName of priorityStats) {
-    if (!(statName in stats)) continue;
-    const current = stats[statName];
-    const ratio = (topWeights[statName] ?? 0) / (totalWeight || 1);
-    const expectedAtCurrent = Math.min(
-      Math.floor(pointsAtCurrent * ratio),
-      1000
-    );
+  // At level 1 no points have been earned yet; skip on-track/behind tracking
+  if (pointsAtCurrent > 0) {
+    for (const statName of priorityStats) {
+      if (!(statName in stats)) continue;
+      const current = stats[statName];
+      const ratio = (topWeights[statName] ?? 0) / (totalWeight || 1);
+      const expectedAtCurrent = Math.min(
+        Math.floor(pointsAtCurrent * ratio),
+        1000
+      );
 
-    totalProgress += Math.min(current, expectedAtCurrent);
-    maxProgress += expectedAtCurrent || 1;
+      // Skip stats with zero expected allocation (avoid inflating denominator)
+      if (expectedAtCurrent === 0) continue;
 
-    if (current >= expectedAtCurrent) statsOnTrack++;
-    else statsBehind++;
+      evaluatedStats++;
+      totalProgress += Math.min(current, expectedAtCurrent);
+      maxProgress += expectedAtCurrent;
+
+      if (current >= expectedAtCurrent) statsOnTrack++;
+      else statsBehind++;
+    }
   }
 
   const progressPercent =
@@ -65,10 +74,36 @@ export function calculateProgress(
     progressPercent,
     statsOnTrack,
     statsBehind,
-    totalStats: Object.keys(statWeights).length,
+    totalStats: evaluatedStats,
     currentLevel,
     levelsRemaining: S11.maxLevel - currentLevel,
     expectedPointsAtLevel: pointsAtCurrent,
     maxPoints: TOTAL_PRIMARY_POINTS,
   };
+}
+
+export interface Milestone {
+  level: number;
+  name: string;
+  status: "completed" | "upcoming";
+}
+
+const boonLevelSet = new Set<number>(S11.boonLevels);
+const defenseLevelSet = new Set<number>(S11.defenseBonusLevels);
+
+export function getMilestoneName(level: number): string {
+  if (level === 1) return "Start";
+  if (boonLevelSet.has(level)) return "Lesser Boon";
+  if (defenseLevelSet.has(level)) return "Defense Bonus";
+  return `Level ${level}`;
+}
+
+export function generateMilestones(currentLevel: number): Milestone[] {
+  return MILESTONE_LEVELS.map((level) => ({
+    level,
+    name: getMilestoneName(level),
+    status: (currentLevel >= level ? "completed" : "upcoming") as
+      | "completed"
+      | "upcoming",
+  }));
 }

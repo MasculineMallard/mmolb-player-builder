@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPlayerFull } from "@/lib/queries";
+import { getPlayer } from "@/lib/player-data";
+import { NoStatsError } from "@/lib/errors";
+import { validateId } from "@/lib/validation";
 
 export async function GET(
   _request: NextRequest,
@@ -7,14 +9,22 @@ export async function GET(
 ) {
   const { id } = await params;
 
+  const invalid = validateId(id);
+  if (invalid) return invalid;
+
   try {
-    const player = await getPlayerFull(id);
+    const player = await getPlayer(id);
     if (!player) {
       return NextResponse.json({ error: "Player not found" }, { status: 404 });
     }
-    return NextResponse.json(player);
+    return NextResponse.json(player, {
+      headers: { "Cache-Control": "no-cache" },
+    });
   } catch (error) {
-    console.error("Get player error:", error);
+    if (error instanceof NoStatsError) {
+      return NextResponse.json({ error: "Player exists but has no stats yet" }, { status: 422 });
+    }
+    console.error("Get player error:", error instanceof Error ? error.message : String(error));
     return NextResponse.json(
       { error: "Failed to fetch player" },
       { status: 500 }

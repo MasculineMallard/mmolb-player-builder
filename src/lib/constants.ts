@@ -1,3 +1,5 @@
+import type { Archetype } from "./types";
+
 /** Stat categories matching attributes.json structure. */
 export const STAT_CATEGORIES = {
   batting: [
@@ -9,8 +11,11 @@ export const STAT_CATEGORIES = {
     "insight",
     "vision",
     "intimidation",
+    "cunning",
+    "determination",
+    "wisdom",
+    "selflessness",
   ],
-  baserunning: ["cunning", "stealth", "greed", "performance", "speed"],
   pitching: [
     "velocity",
     "control",
@@ -20,9 +25,12 @@ export const STAT_CATEGORIES = {
     "presence",
     "persuasion",
     "stamina",
+    "guts",
+    "defiance",
     "deception",
     "intuition",
   ],
+  baserunning: ["speed", "stealth", "greed", "performance"],
   defense: [
     "acrobatics",
     "agility",
@@ -33,27 +41,8 @@ export const STAT_CATEGORIES = {
     "patience",
     "reaction",
   ],
-  mental: ["determination", "wisdom", "selflessness", "guts", "defiance"],
-  misc: ["luck"],
+  luck: ["luck"],
 } as const;
-
-/** Display order for stat grid (flat list). */
-export const STAT_DISPLAY_ORDER = [
-  ...STAT_CATEGORIES.batting,
-  ...STAT_CATEGORIES.baserunning,
-  ...STAT_CATEGORIES.pitching,
-  ...STAT_CATEGORIES.defense,
-  ...STAT_CATEGORIES.mental,
-  ...STAT_CATEGORIES.misc,
-];
-
-/** Color thresholds for stat values (0-1000 scale). */
-export function getStatColor(value: number): string {
-  if (value >= 400) return "var(--chart-3)"; // green
-  if (value >= 250) return "var(--chart-2)"; // gold
-  if (value >= 100) return "var(--foreground)"; // neutral
-  return "var(--chart-4)"; // red
-}
 
 /** Slot-to-position mapping (from MMOLDB slot names). */
 export const SLOT_TO_POSITION: Record<string, string> = {
@@ -89,11 +78,29 @@ export const SLOT_TO_POSITION: Record<string, string> = {
   benchpitcher3: "Bench",
 };
 
+/** Human-readable labels for stat categories. */
+export const CATEGORY_LABELS: Record<string, string> = {
+  batting: "Batting",
+  pitching: "Pitching",
+  baserunning: "Baserunning",
+  defense: "Defense",
+  luck: "Luck",
+};
+
 /** Pitcher positions for determining player type. */
 export const PITCHER_POSITIONS = new Set(["SP", "RP", "CL", "P"]);
 
 /** S11 milestone levels for progression timeline. */
 export const MILESTONE_LEVELS = [1, 5, 10, 15, 20, 25, 30] as const;
+
+/** Default archetype used when none is selected. */
+export const EMPTY_ARCHETYPE: Archetype = {
+  name: "No archetype",
+  description: "",
+  priority_stats: [],
+  secondary_stats: [],
+  stat_weights: {},
+};
 
 /** Position sort order for roster display. */
 export const POSITION_ORDER: Record<string, number> = {
@@ -113,15 +120,3 @@ export const POSITION_ORDER: Record<string, number> = {
   Bench: 99,
 };
 
-/** Stat distribution ratios. */
-export const BATTER_DISTRIBUTION = {
-  core: 0.5,
-  defense: 0.2,
-  flex: 0.3,
-} as const;
-
-export const PITCHER_DISTRIBUTION = {
-  core: 0.5,
-  supporting: 0.3,
-  flex: 0.2,
-} as const;

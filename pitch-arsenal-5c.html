@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pitch Arsenal 5C: 10 Tall/Narrow Variants</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0b; color: #e4e4e7; font-family: -apple-system, system-ui, sans-serif; padding: 32px; }
+  h1 { font-size: 18px; color: #71717a; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .subtitle { font-size: 13px; color: #52525b; margin-bottom: 24px; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; max-width: 1600px; }
+  .label { font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 600; }
+
+  :root {
+    --card: #18181b;
+    --muted: #27272a;
+    --border: #3f3f46;
+    --primary: #3b82f6;
+    --fg: #e4e4e7;
+    --muted-fg: #a1a1aa;
+    --c1: #e06c75;
+    --c2: #e5c07b;
+    --c3: #98c379;
+    --c4: #61afef;
+    --add-fg: #3b82f6;
+    --add-bg: rgba(59,130,246,0.1);
+    --add-border: rgba(59,130,246,0.3);
+    --drop-fg: #e5c07b;
+    --drop-bg: rgba(229,192,123,0.1);
+    --drop-border: rgba(229,192,123,0.3);
+  }
+
+  .col { display: flex; flex-direction: column; }
+  .card-header { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-fg); margin-bottom: 6px; border-bottom: 1px solid var(--border); padding-bottom: 4px; font-weight: 500; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .chip-a { font-size: 11px; font-weight: 500; color: var(--add-fg); background: var(--add-bg); border: 1px solid var(--add-border); padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+  .chip-d { font-size: 11px; font-weight: 500; color: var(--drop-fg); background: var(--drop-bg); border: 1px solid var(--drop-border); padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+  .sec-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-fg); margin-bottom: 3px; }
+</style>
+</head>
+<body>
+<h1>5C: Tall Narrow Variants (~200px wide, fills column height)</h1>
+<div class="subtitle">These sit as a column inside the stat grid, same height as pitching/batting stat columns. 5 per row.</div>
+<div class="grid">
+
+<!-- 5C-1: Vertical bars (like a bar chart rotated) -->
+<div class="col">
+  <div class="label">5C-1. Vertical bars</div>
+  <div class="card-header">Pitch Arsenal</div>
+  <!-- Vertical bar chart -->
+  <div style="display:flex;align-items:flex-end;gap:8px;height:120px;margin-bottom:8px;padding:0 8px">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+      <span style="font-size:10px;color:var(--muted-fg)">42%</span>
+      <div style="width:100%;height:84%;background:var(--c2);border-radius:3px 3px 0 0"></div>
+      <span style="font-size:9px;color:var(--muted-fg)">CH</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+      <span style="font-size:10px;color:var(--muted-fg)">30%</span>
+      <div style="width:100%;height:60%;background:var(--c1);border-radius:3px 3px 0 0"></div>
+      <span style="font-size:9px;color:var(--muted-fg)">FB</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+      <span style="font-size:10px;color:var(--muted-fg)">18%</span>
+      <div style="width:100%;height:36%;background:var(--c3);border-radius:3px 3px 0 0"></div>
+      <span style="font-size:9px;color:var(--muted-fg)">SL</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+      <span style="font-size:10px;color:var(--muted-fg)">10%</span>
+      <div style="width:100%;height:20%;background:var(--c4);border-radius:3px 3px 0 0"></div>
+      <span style="font-size:9px;color:var(--muted-fg)">CT</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px">
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c2)"></div>Changeup</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c1)"></div>Fastball</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c3)"></div>Slider</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c4)"></div>Cutter</div>
+  </div>
+  <div style="border-top:1px solid var(--border);padding-top:6px;display:flex;flex-direction:column;gap:3px">
+    <span class="chip-a">+ Fastball</span>
+    <span class="chip-a">+ Slider</span>
+    <span class="chip-a">+ Cutter</span>
+    <span class="chip-d">- Changeup</span>
+  </div>
+</div>
+
+<!-- 5C-2: Donut small top + pitch list + advice stacked vertically -->
+<div class="col">
+  <div class="label">5C-2. Small donut + list + advice (all stacked)</div>
+  <div class="card-header">Pitch Arsenal</div>
+  <div style="display:flex;justify-content:center;margin-bottom:8px">
+    <svg width="100" height="100" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="42" fill="none" stroke="var(--c2)" stroke-width="14" stroke-dasharray="110.8 153.2" stroke-dashoffset="66" />
+      <circle cx="50" cy="50" r="42" fill="none" stroke="var(--c1)" stroke-width="14" stroke-dasharray="79.2 184.8" stroke-dashoffset="-44.8" />
+      <circle cx="50" cy="50" r="42" fill="none" stroke="var(--c3)" stroke-width="14" stroke-dasharray="47.5 216.5" stroke-dashoffset="-124" />
+      <circle cx="50" cy="50" r="42" fill="none" stroke="var(--c4)" stroke-width="14" stroke-dasharray="26.4 237.6" stroke-dashoffset="-171.5" />
+    </svg>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px">
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c2)"></div><span>Changeup</span><span style="margin-left:auto;color:var(--muted-fg);font-size:11px">42%</span></div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c1)"></div><span>Fastball</span><span style="margin-left:auto;color:var(--muted-fg);font-size:11px">30%</span></div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c3)"></div><span>Slider</span><span style="margin-left:auto;color:var(--muted-fg);font-size:11px">18%</span></div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c4)"></div><span>Cutter</span><span style="margin-left:auto;color:var(--muted-fg);font-size:11px">10%</span></div>
+  </div>
+  <div style="border-top:1px solid var(--border);padding-top:6px;display:flex;flex-direction:column;gap:3px">
+    <div class="sec-label">Add</div>
+    <span class="chip-a">+ Fastball</span>
+    <span class="chip-a">+ Slider</span>
+    <span class="chip-a">+ Cutter</span>
+    <div class="sec-label" style="margin-top:4px">Drop</div>
+    <span class="chip-d">- Changeup</span>
+  </div>
+</div>
+
+<!-- 5C-3: Horizontal bars full width, each with colored left accent, advice at bottom -->
+<div class="col">
+  <div class="label">5C-3. Full-width bars with left accent</div>
+  <div class="card-header">Pitch Arsenal</div>
+  <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:0">
+      <div style="width:3px;height:28px;background:var(--c2);border-radius:2px;margin-right:8px"></div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span>Changeup</span><span style="color:var(--muted-fg)">42%</span></div>
+        <div style="height:4px;background:var(--muted);border-radius:2px;overflow:hidden"><div style="width:42%;height:100%;background:var(--c2);border-radius:2px"></div></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0">
+      <div style="width:3px;height:28px;background:var(--c1);border-radius:2px;margin-right:8px"></div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span>Fastball</span><span style="color:var(--muted-fg)">30%</span></div>
+        <div style="height:4px;background:var(--muted);border-radius:2px;overflow:hidden"><div style="width:30%;height:100%;background:var(--c1);border-radius:2px"></div></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0">
+      <div style="width:3px;height:28px;background:var(--c3);border-radius:2px;margin-right:8px"></div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span>Slider</span><span style="color:var(--muted-fg)">18%</span></div>
+        <div style="height:4px;background:var(--muted);border-radius:2px;overflow:hidden"><div style="width:18%;height:100%;background:var(--c3);border-radius:2px"></div></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0">
+      <div style="width:3px;height:28px;background:var(--c4);border-radius:2px;margin-right:8px"></div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span>Cutter</span><span style="color:var(--muted-fg)">10%</span></div>
+        <div style="height:4px;background:var(--muted);border-radius:2px;overflow:hidden"><div style="width:10%;height:100%;background:var(--c4);border-radius:2px"></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="border-top:1px solid var(--border);padding-top:6px;display:flex;flex-direction:column;gap:3px">
+    <span class="chip-a">+ Fastball</span>
+    <span class="chip-a">+ Slider</span>
+    <span class="chip-a">+ Cutter</span>
+    <span class="chip-d">- Changeup</span>
+  </div>
+</div>
+
+<!-- 5C-4: Pitch rows mirroring the stat grid style (name left, value right, bar below) -->
+<div class="col">
+  <div class="label">5C-4. Stat-grid mirror (name/pct + bar per row)</div>
+  <div class="card-header">Pitch Arsenal</div>
+  <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:10px">
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:1px">
+        <span style="color:var(--muted-fg)">Changeup</span><span style="font-family:monospace;font-weight:500;color:var(--c2)">42%</span>
+      </div>
+      <div style="height:8px;background:var(--muted);border-radius:99px;overflow:hidden"><div style="width:42%;height:100%;background:var(--c2);border-radius:99px"></div></div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:1px">
+        <span style="color:var(--muted-fg)">Fastball</span><span style="font-family:monospace;font-weight:500;color:var(--c1)">30%</span>
+      </div>
+      <div style="height:8px;background:var(--muted);border-radius:99px;overflow:hidden"><div style="width:30%;height:100%;background:var(--c1);border-radius:99px"></div></div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:1px">
+        <span style="color:var(--muted-fg)">Slider</span><span style="font-family:monospace;font-weight:500;color:var(--c3)">18%</span>
+      </div>
+      <div style="height:8px;background:var(--muted);border-radius:99px;overflow:hidden"><div style="width:18%;height:100%;background:var(--c3);border-radius:99px"></div></div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:1px">
+        <span style="color:var(--muted-fg)">Cutter</span><span style="font-family:monospace;font-weight:500;color:var(--c4)">10%</span>
+      </div>
+      <div style="height:8px;background:var(--muted);border-radius:99px;overflow:hidden"><div style="width:10%;height:100%;background:var(--c4);border-radius:99px"></div></div>
+    </div>
+  </div>
+  <div style="border-top:1px solid var(--border);padding-top:6px">
+    <div class="sec-label">Add</div>
+    <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px">
+      <span class="chip-a">+ Fastball</span><span class="chip-a">+ Slider</span><span class="chip-a">+ Cutter</span>
+    </div>
+    <div class="sec-label">Drop</div>
+    <div style="display:flex;flex-wrap:wrap;gap:3px">
+      <span class="chip-d">- Changeup</span>
+    </div>
+  </div>
+</div>
+
+<!-- 5C-5: Inline chips per row (add/drop woven into each pitch) -->
+<div class="col">
+  <div class="label">5C-5. Each pitch row has inline action chip</div>
+  <div class="card-header">Pitch Arsenal</div>
+  <div style="display:flex;flex-direction:column;gap:4px">
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+      <div class="dot" style="background:var(--c2)"></div>
+      <span style="flex:1">Changeup</span>
+      <span style="color:var(--muted-fg);font-size:11px;width:28px;text-align:right">42%</span>
+      <span class="chip-d" style="font-size:10px;padding:1px 6px">drop</span>
+    </div>
+    <div style="height:6px;background:var(--muted);border-radius:3px;overflow:hidden;margin:-1px 0 2px 0"><div style="width:42%;height:100%;background:var(--c2);border-radius:3px"></div></div>
+
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+      <div class="dot" style="background:var(--c1)"></div>
+      <span style="flex:1">Fastball</span>
+      <span style="color:var(--muted-fg);font-size:11px;width:28px;text-align:right">30%</span>
+      <span class="chip-a" style="font-size:10px;padding:1px 6px">add</span>
+    </div>
+    <div style="height:6px;background:var(--muted);border-radius:3px;overflow:hidden;margin:-1px 0 2px 0"><div style="width:30%;height:100%;background:var(--c1);border-radius:3px"></div></div>
+
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+      <div class="dot" style="background:var(--c3)"></div>
+      <span style="flex:1">Slider</span>
+      <span style="color:var(--muted-fg);font-size:11px;width:28px;text-align:right">18%</span>
+      <span class="chip-a" style="font-size:10px;padding:1px 6px">add</span>
+    </div>
+    <div style="height:6px;background:var(--muted);border-radius:3px;overflow:hidden;margin:-1px 0 2px 0"><div style="width:18%;height:100%;background:var(--c3);border-radius:3px"></div></div>
+
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+      <div class="dot" style="background:var(--c4)"></div>
+      <span style="flex:1">Cutter</span>
+      <span style="color:var(--muted-fg);font-size:11px;width:28px;text-align:right">10%</span>
+      <span class="chip-a" style="font-size:10px;padding:1px 6px">add</span>
+    </div>
+    <div style="height:6px;background:var(--muted);border-radius:3px;overflow:hidden;margin:-1px 0 2px 0"><div style="width:10%;height:100%;background:var(--c4);border-radius:3px"></div></div>
+  </div>
+</div>
+
+<!-- Row 2 -->
+
+<!-- 5C-6: Big stacked bar (tall, vertical) + legend + advice -->
+<div class="col">
+  <div class="label">5C-6. Tall vertical stacked bar</div>
+  <div class="card-header">Pitch Arsenal</div>
+  <div style="display:flex;gap:10px;margin-bottom:10px">
+    <div style="width:32px;height:180px;display:flex;flex-direction:column;border-radius:4px;overflow:hidden">
+      <div style="flex:42;background:var(--c2)"></div>
+      <div style="flex:30;background:var(--c1)"></div>
+      <div style="flex:18;background:var(--c3)"></div>
+      <div style="flex:10;background:var(--c4)"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;justify-content:center">
+      <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c2)"></div>Changeup <span style="color:var(--muted-fg);font-size:11px">42%</span></div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c1)"></div>Fastball <span style="color:var(--muted-fg);font-size:11px">30%</span></div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c3)"></div>Slider <span style="color:var(--muted-fg);font-size:11px">18%</span></div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c4)"></div>Cutter <span style="color:var(--muted-fg);font-size:11px">10%</span></div>
+    </div>
+  </div>
+  <div style="border-top:1px solid var(--border);padding-top:6px;display:flex;flex-direction:column;gap:3px">
+    <span class="chip-a">+ Fastball</span>
+    <span class="chip-a">+ Slider</span>
+    <span class="chip-a">+ Cutter</span>
+    <span class="chip-d">- Changeup</span>
+  </div>
+</div>
+
+<!-- 5C-7: Colored blocks stacked vertically (proportional height) + advice -->
+<div class="col">
+  <div class="label">5C-7. Proportional color blocks (vertical treemap)</div>
+  <div class="card-header">Pitch Arsenal</div>
+  <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:10px">
+    <div style="height:72px;background:var(--c2);border-radius:4px;display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:500;justify-content:space-between">
+      <span>Changeup</span><span style="opacity:0.7">42%</span>
+    </div>
+    <div style="height:52px;background:var(--c1);border-radius:4px;display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:500;justify-content:space-between">
+      <span>Fastball</span><span style="opacity:0.7">30%</span>
+    </div>
+    <div style="height:32px;background:var(--c3);border-radius:4px;display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:500;justify-content:space-between">
+      <span>Slider</span><span style="opacity:0.7">18%</span>
+    </div>
+    <div style="height:20px;background:var(--c4);border-radius:4px;display:flex;align-items:center;padding:0 10px;font-size:11px;font-weight:500;justify-content:space-between">
+      <span>Cutter</span><span style="opacity:0.7">10%</span>
+    </div>
+  </div>
+  <div style="border-top:1px solid var(--border);padding-top:6px;display:flex;flex-direction:column;gap:3px">
+    <span class="chip-a">+ Fastball</span>
+    <span class="chip-a">+ Slider</span>
+    <span class="chip-a">+ Cutter</span>
+    <span class="chip-d">- Changeup</span>
+  </div>
+</div>
+
+<!-- 5C-8: Radial gauge arcs (each pitch is a concentric arc) + advice -->
+<div class="col">
+  <div class="label">5C-8. Concentric arcs (radial gauge)</div>
+  <div class="card-header">Pitch Arsenal</div>
+  <div style="display:flex;justify-content:center;margin-bottom:8px">
+    <svg width="140" height="80" viewBox="0 0 140 80">
+      <!-- Background arcs -->
+      <path d="M 10 75 A 60 60 0 0 1 130 75" fill="none" stroke="var(--muted)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M 20 75 A 50 50 0 0 1 120 75" fill="none" stroke="var(--muted)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M 30 75 A 40 40 0 0 1 110 75" fill="none" stroke="var(--muted)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M 40 75 A 30 30 0 0 1 100 75" fill="none" stroke="var(--muted)" stroke-width="8" stroke-linecap="round"/>
+      <!-- Filled arcs (proportional) -->
+      <path d="M 10 75 A 60 60 0 0 1 130 75" fill="none" stroke="var(--c2)" stroke-width="8" stroke-linecap="round" stroke-dasharray="188.5 188.5" stroke-dashoffset="109.3"/>
+      <path d="M 20 75 A 50 50 0 0 1 120 75" fill="none" stroke="var(--c1)" stroke-width="8" stroke-linecap="round" stroke-dasharray="157.1 157.1" stroke-dashoffset="110"/>
+      <path d="M 30 75 A 40 40 0 0 1 110 75" fill="none" stroke="var(--c3)" stroke-width="8" stroke-linecap="round" stroke-dasharray="125.7 125.7" stroke-dashoffset="103"/>
+      <path d="M 40 75 A 30 30 0 0 1 100 75" fill="none" stroke="var(--c4)" stroke-width="8" stroke-linecap="round" stroke-dasharray="94.2 94.2" stroke-dashoffset="84.8"/>
+    </svg>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px">
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c2)"></div><span>Changeup</span><span style="margin-left:auto;color:var(--muted-fg);font-size:11px">42%</span></div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c1)"></div><span>Fastball</span><span style="margin-left:auto;color:var(--muted-fg);font-size:11px">30%</span></div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c3)"></div><span>Slider</span><span style="margin-left:auto;color:var(--muted-fg);font-size:11px">18%</span></div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div class="dot" style="background:var(--c4)"></div><span>Cutter</span><span style="margin-left:auto;color:var(--muted-fg);font-size:11px">10%</span></div>
+  </div>
+  <div style="border-top:1px solid var(--border);padding-top:6px;display:flex;flex-direction:column;gap:3px">
+    <span class="chip-a">+ Fastball</span>
+    <span class="chip-a">+ Slider</span>
+    <span class="chip-a">+ Cutter</span>
+    <span class="chip-d">- Changeup</span>
+  </div>
+</div>
+
+<!-- 5C-9: Horizontal stacked bar thin + each pitch a "card row" with bg tint -->
+<div class="col">
+  <div class="label">5C-9. Tinted card rows + thin bar top</div>
+  <div class="card-header">Pitch Arsenal</div>
+  <div style="display:flex;border-radius:4px;overflow:hidden;height:16px;margin-bottom:8px">
+    <div style="flex:42;background:var(--c2)"></div>
+    <div style="flex:30;background:var(--c1)"></div>
+    <div style="flex:18;background:var(--c3)"></div>
+    <div style="flex:10;background:var(--c4)"></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;background:rgba(229,192,123,0.08);border-radius:4px;padding:5px 8px">
+      <div class="dot" style="background:var(--c2)"></div><span>Changeup</span><span style="margin-left:auto;color:var(--muted-fg);font-size:11px">42%</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;background:rgba(224,108,117,0.08);border-radius:4px;padding:5px 8px">
+      <div class="dot" style="background:var(--c1)"></div><span>Fastball</span><span style="margin-left:auto;color:var(--muted-fg);font-size:11px">30%</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;background:rgba(152,195,121,0.08);border-radius:4px;padding:5px 8px">
+      <div class="dot" style="background:var(--c3)"></div><span>Slider</span><span style="margin-left:auto;color:var(--muted-fg);font-size:11px">18%</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;background:rgba(97,175,239,0.08);border-radius:4px;padding:5px 8px">
+      <div class="dot" style="background:var(--c4)"></div><span>Cutter</span><span style="margin-left:auto;color:var(--muted-fg);font-size:11px">10%</span>
+    </div>
+  </div>
+  <div style="border-top:1px solid var(--border);padding-top:6px;display:flex;flex-direction:column;gap:3px">
+    <span class="chip-a">+ Fastball</span>
+    <span class="chip-a">+ Slider</span>
+    <span class="chip-a">+ Cutter</span>
+    <span class="chip-d">- Changeup</span>
+  </div>
+</div>
+
+<!-- 5C-10: Minimal bars + advice side by side in two halves -->
+<div class="col">
+  <div class="label">5C-10. Two halves: pitches top, advice bottom (equal weight)</div>
+  <div class="card-header">Pitch Arsenal</div>
+  <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+      <div class="dot" style="background:var(--c2)"></div><span style="width:60px">Changeup</span>
+      <div style="flex:1;height:8px;background:var(--muted);border-radius:4px;overflow:hidden"><div style="width:42%;height:100%;background:var(--c2);border-radius:4px"></div></div>
+      <span style="color:var(--muted-fg);font-size:11px;width:28px;text-align:right">42%</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+      <div class="dot" style="background:var(--c1)"></div><span style="width:60px">Fastball</span>
+      <div style="flex:1;height:8px;background:var(--muted);border-radius:4px;overflow:hidden"><div style="width:30%;height:100%;background:var(--c1);border-radius:4px"></div></div>
+      <span style="color:var(--muted-fg);font-size:11px;width:28px;text-align:right">30%</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+      <div class="dot" style="background:var(--c3)"></div><span style="width:60px">Slider</span>
+      <div style="flex:1;height:8px;background:var(--muted);border-radius:4px;overflow:hidden"><div style="width:18%;height:100%;background:var(--c3);border-radius:4px"></div></div>
+      <span style="color:var(--muted-fg);font-size:11px;width:28px;text-align:right">18%</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+      <div class="dot" style="background:var(--c4)"></div><span style="width:60px">Cutter</span>
+      <div style="flex:1;height:8px;background:var(--muted);border-radius:4px;overflow:hidden"><div style="width:10%;height:100%;background:var(--c4);border-radius:4px"></div></div>
+      <span style="color:var(--muted-fg);font-size:11px;width:28px;text-align:right">10%</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:4px">
+    <div class="sec-label">Consider Adding</div>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <span class="chip-a">+ Fastball</span>
+      <span class="chip-a">+ Slider</span>
+      <span class="chip-a">+ Cutter</span>
+    </div>
+    <div class="sec-label" style="margin-top:4px">Consider Dropping</div>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <span class="chip-d">- Changeup</span>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

@@ -3,7 +3,7 @@
     "name": "Power Pitcher",
     "emoji": "🔥",
     "tagline": "Blow it past them",
-    "description": "High velocity generates strikeouts. Blows fastballs past hitters with elite whiff rates.",
+    "description": "High velocity generates strikeouts. Blows fastballs past hitters with elite spin and whiff rates.",
     "priority_stats": ["velocity", "rotation", "control"],
     "secondary_stats": ["stuff", "stamina", "presence"],
     "stat_weights": {
@@ -14,21 +14,19 @@
       "stamina": 0.08,
       "presence": 0.08
     },
-    "recommended_pitches": ["ff", "fs", "sl"],
-    "pitch_reasoning": "Fastball (velocity+presence) as zone anchor. Splitter (velocity+stuff+presence) as elite chase/whiff pitch. Slider (velocity+control) as breaking putaway.",
+    "recommended_pitches": ["sl", "fs", "ch"],
+    "pitch_reasoning": "Slider (control primary, rotation secondary) as T1 chase pitch. Splitter (stuff+presence primary, control+rotation secondary) as T1 elite whiff pitch. Changeup (rotation primary) for lowest BABIP and speed differential.",
     "recommended_greater_boons": ["First Strike", "Strong Starter"],
-    "recommended_lesser_boons": ["Draconic", "Fire Elemental", "Charger"],
+    "recommended_lesser_boons": ["Afterburner", "Cyclone", "Stormrider"],
     "equipment_priority": ["head", "body"],
     "equipment_affixes": ["velocity", "rotation", "control"],
-    "build_axis": "control_rotation",
-    "dump_stats": ["accuracy", "stuff", "intuition"],
-    "guide_notes": "Community guide maps this to Control/Rotation axis. Velocity pairs well with Control builds. Splitter and Slider are strong Control/Rotation pitches."
+    "dump_stats": ["accuracy", "intuition", "defiance"]
   },
   "control_artist": {
     "name": "Control Artist",
     "emoji": "🎯",
     "tagline": "Pinpoint command, no walks",
-    "description": "Elite command keeps runners off base. Minimizes walks and hit batters with pinpoint accuracy.",
+    "description": "Elite command keeps runners off base. Minimizes walks and hit batters with pinpoint accuracy and persuasion.",
     "priority_stats": ["control", "accuracy", "persuasion"],
     "secondary_stats": ["rotation", "presence", "guts"],
     "stat_weights": {
@@ -39,10 +37,10 @@
       "presence": 0.08,
       "guts": 0.08
     },
-    "recommended_pitches": ["ff", "fc", "sl", "ch"],
-    "pitch_reasoning": "Fastball and cutter for high zone rates (command pitches). Slider and changeup as breaking/offspeed mix. 4-pitch arsenal for sequencing variety.",
+    "recommended_pitches": ["sl", "fc", "kc", "ch"],
+    "pitch_reasoning": "Slider (control primary, persuasion secondary) as T1 chase pitch hitting two priority stats. Cutter (persuasion primary) for weak contact. Knuckle-curve (accuracy primary, persuasion secondary) as T1 pitch hitting two priority stats. Changeup for BABIP suppression.",
     "recommended_greater_boons": ["Iron Will", "Unwavering"],
-    "recommended_lesser_boons": ["Tireless", "Loyal", "Guardian"],
+    "recommended_lesser_boons": ["Angelic", "Director", "Clockwork"],
     "equipment_priority": ["head", "body"],
     "equipment_affixes": ["control", "accuracy", "persuasion"],
     "dump_stats": ["stuff", "deception", "intuition"]
@@ -65,43 +63,41 @@
     "recommended_pitches": ["si", "kc", "ch", "fs"],
     "pitch_reasoning": "Sinker (highest GB rate) and knuckle-curve (high GB + stuff pitch) as primary. Changeup (lowest BABIP) and splitter (2nd highest GB) for variety. All are strong Stuff pitches.",
     "recommended_greater_boons": ["Strong Starter", "Clutch"],
-    "recommended_lesser_boons": ["Earth Elemental", "Tenacious Badger", "Guardian"],
+    "recommended_lesser_boons": ["Hextouch", "Venomous", "Miasma"],
     "equipment_priority": ["body", "head"],
     "equipment_affixes": ["stuff", "accuracy", "presence"],
-    "build_axis": "accuracy_stuff",
-    "dump_stats": ["control", "persuasion", "rotation", "intuition"],
-    "guide_notes": "Community guide maps this to Accuracy/Stuff axis. Knuckle Curve and Sinker are primary Accuracy/Stuff pitches with high GB rates."
+    "dump_stats": ["deception", "intuition", "defiance"]
   },
   "deception_master": {
     "name": "Deception Master",
     "emoji": "🎭",
     "tagline": "Freeze hitters looking",
-    "description": "Freezes batters with elite deception. Gets called strikes as hitters watch pitches go by.",
+    "description": "Freezes batters with elite deception. Gets called strikes as hitters watch pitches go by. Reads and adapts.",
     "priority_stats": ["deception", "rotation", "control"],
-    "secondary_stats": ["velocity", "presence", "guts"],
+    "secondary_stats": ["velocity", "presence", "intuition"],
     "stat_weights": {
       "deception": 0.12,
       "rotation": 0.12,
       "control": 0.12,
       "velocity": 0.08,
       "presence": 0.08,
-      "guts": 0.08
+      "intuition": 0.08
     },
-    "recommended_pitches": ["ch", "cu", "sl", "ff"],
-    "pitch_reasoning": "Changeup and curveball freeze hitters (breaking). Slider for chase. Fastball as fast-pitch contrast to make offspeed more deceptive. Speed differential is key.",
+    "recommended_pitches": ["st", "ch", "sl", "cu"],
+    "pitch_reasoning": "Sweeper (rotation+deception primary) hitting two priority stats. Changeup (rotation primary) for lowest BABIP. Slider (control primary, rotation secondary) as T1 chase pitch. Curveball for highest CSW rate.",
     "recommended_greater_boons": ["Creative", "Logical"],
-    "recommended_lesser_boons": ["Fae", "Sneaky", "Wise"],
+    "recommended_lesser_boons": ["Confused", "Disguised", "Weaver"],
     "equipment_priority": ["head", "body"],
     "equipment_affixes": ["deception", "rotation", "control"],
-    "dump_stats": ["accuracy", "stuff", "intuition"]
+    "dump_stats": ["accuracy", "stuff", "defiance"]
   },
-  "workhorse_starter": {
-    "name": "Workhorse Starter",
+  "workhorse": {
+    "name": "Workhorse",
     "emoji": "🐴",
     "tagline": "Go deep into games",
-    "description": "Innings eater with stamina and guts. Goes deep into games and stays effective late.",
+    "description": "Innings eater with stamina and guts. Goes deep into games, stays effective late, and refuses to leave the mound.",
     "priority_stats": ["stamina", "guts", "control"],
-    "secondary_stats": ["rotation", "velocity", "presence", "defiance"],
+    "secondary_stats": ["rotation", "velocity", "defiance"],
     "stat_weights": {
       "stamina": 0.12,
       "guts": 0.12,
@@ -110,16 +106,16 @@
       "velocity": 0.08,
       "defiance": 0.08
     },
-    "recommended_pitches": ["ff", "fc", "sl", "ch"],
-    "pitch_reasoning": "Fastball as fast-pitch anchor. Cutter (rotation+control) for weak contact. Slider and changeup as breaking/offspeed variety. 4-pitch mix conserves stamina through variety.",
+    "recommended_pitches": ["sl", "fc", "ch", "fs"],
+    "pitch_reasoning": "Slider (control primary) as T1 pitch. Cutter for weak contact. Changeup for BABIP suppression. Splitter as T1 elite whiff pitch. Stamina/guts/defiance are role stats; pitches chosen for control+rotation alignment.",
     "recommended_greater_boons": ["Unwavering", "Iron Will"],
-    "recommended_lesser_boons": ["Tireless", "Giant", "Thoroughbred"],
+    "recommended_lesser_boons": ["Tireless", "Hardy", "Lionheart"],
     "equipment_priority": ["body", "head"],
     "equipment_affixes": ["stamina", "guts", "control"],
-    "dump_stats": ["accuracy", "deception", "intuition", "stuff"]
+    "dump_stats": ["accuracy", "deception", "intuition"]
   },
   "damage_control": {
-    "name": "Damage Control Pitcher",
+    "name": "Damage Control",
     "emoji": "🛡️",
     "tagline": "Limit hard contact",
     "description": "Control and stuff limit extra base hits. When contact happens, it goes nowhere.",
@@ -134,66 +130,64 @@
       "guts": 0.08
     },
     "recommended_pitches": ["fs", "ch", "fc", "sl"],
-    "pitch_reasoning": "Splitter (elite chase rate + GB) and changeup (lowest BABIP) as primary Control/Stuff pitches. Cutter and slider as secondary options. All generate weak contact.",
+    "pitch_reasoning": "Splitter (stuff+presence primary, elite chase rate + GB). Changeup (lowest BABIP). Cutter and slider for weak contact. All generate weak contact.",
     "recommended_greater_boons": ["Creative", "Strong Starter"],
-    "recommended_lesser_boons": ["Earth Elemental", "Guardian", "Tenacious Badger"],
+    "recommended_lesser_boons": ["Miasma", "Venomous", "Spotlight"],
     "equipment_priority": ["body", "head"],
     "equipment_affixes": ["control", "stuff", "presence"],
-    "build_axis": "control_stuff",
-    "dump_stats": ["accuracy", "rotation", "intuition"],
-    "guide_notes": "Community guide maps this to Control/Stuff axis. Splitter and Changeup are primary Control/Stuff pitches. Cutter, Slider, and KC are secondary options."
+    "dump_stats": ["accuracy", "intuition", "defiance"]
   },
   "chase_specialist": {
-    "name": "Chase Rate Specialist",
+    "name": "Chase Specialist",
     "emoji": "🎣",
     "tagline": "Make them fish",
     "description": "Gets batters to fish with persuasion and guts. Expands the zone effectively.",
     "priority_stats": ["persuasion", "guts", "control"],
-    "secondary_stats": ["rotation", "stuff", "deception", "presence"],
+    "secondary_stats": ["rotation", "stuff", "presence"],
     "stat_weights": {
       "persuasion": 0.12,
       "guts": 0.12,
       "control": 0.12,
       "rotation": 0.08,
       "stuff": 0.08,
-      "deception": 0.08
+      "presence": 0.08
     },
-    "recommended_pitches": ["sl", "fc", "ch", "ff"],
-    "pitch_reasoning": "Slider (control+persuasion secondary) and cutter (persuasion primary) as zone-expansion pitches. Changeup as offspeed chase pitch. Fastball sets up the breaking/offspeed chase pitches.",
+    "recommended_pitches": ["sl", "fc", "fs", "kc"],
+    "pitch_reasoning": "Slider (control primary, persuasion secondary) hitting two priority stats. Cutter (persuasion primary) for weak contact. Splitter as T1 elite chase/whiff pitch. Knuckle-curve with persuasion secondary for chase upside.",
     "recommended_greater_boons": ["Creative", "First Strike"],
-    "recommended_lesser_boons": ["Fae", "Sneaky", "Wise"],
+    "recommended_lesser_boons": ["Ambassador", "Courier", "Ill"],
     "equipment_priority": ["head", "body"],
     "equipment_affixes": ["persuasion", "guts", "control"],
-    "dump_stats": ["accuracy", "velocity", "intuition"]
+    "dump_stats": ["accuracy", "deception", "intuition"]
   },
   "elite_reliever": {
     "name": "Elite Reliever",
     "emoji": "⚡",
     "tagline": "Short-stint dominance",
-    "description": "Maximum dominance over short stints. Velocity and stuff for 1-2 inning dominance.",
+    "description": "Maximum dominance over short stints. Velocity, stuff, and deception for 1-2 inning dominance. Skip stamina entirely.",
     "priority_stats": ["velocity", "stuff", "deception"],
-    "secondary_stats": ["control", "rotation", "presence", "guts"],
+    "secondary_stats": ["control", "rotation", "presence"],
     "stat_weights": {
       "velocity": 0.12,
       "stuff": 0.12,
       "deception": 0.12,
       "control": 0.08,
       "rotation": 0.08,
-      "guts": 0.08
+      "presence": 0.08
     },
-    "recommended_pitches": ["ff", "fs", "st"],
-    "pitch_reasoning": "Fastball (velocity+presence) for velocity dominance. Splitter (velocity+stuff) for elite whiff rate. Sweeper (velocity+rotation+deception) leverages deception stat for weak contact. Tight 3-pitch mix maximizes short-stint dominance.",
+    "recommended_pitches": ["fs", "st", "sl"],
+    "pitch_reasoning": "Splitter (stuff+presence primary) as T1 elite whiff pitch. Sweeper (rotation+deception primary) for weak contact. Slider as T1 chase pitch. Tight 3-pitch mix for short stints.",
     "recommended_greater_boons": ["First Strike", "Clutch"],
-    "recommended_lesser_boons": ["Draconic", "Fire Elemental", "Charger"],
+    "recommended_lesser_boons": ["Afterburner", "Hextouch", "Confused"],
     "equipment_priority": ["head", "body"],
     "equipment_affixes": ["velocity", "stuff", "deception"],
-    "dump_stats": ["accuracy", "persuasion", "intuition"]
+    "dump_stats": ["stamina", "accuracy", "intuition"]
   },
   "breaking_ball_specialist": {
     "name": "Breaking Ball Specialist",
     "emoji": "🌀",
     "tagline": "Spin to win",
-    "description": "Masters curveball and slider with elite rotation. Spin dominates hitters.",
+    "description": "Masters curveball and slider with elite rotation. Spin dominates hitters with movement and deception.",
     "priority_stats": ["rotation", "control", "presence"],
     "secondary_stats": ["deception", "guts", "accuracy"],
     "stat_weights": {
@@ -204,59 +198,13 @@
       "guts": 0.08,
       "accuracy": 0.08
     },
-    "recommended_pitches": ["cu", "sl", "st", "ff"],
-    "pitch_reasoning": "Curveball, slider, and sweeper as breaking ball trio. Fastball as necessary fast-pitch contrast — speed differential makes breaking balls more effective.",
+    "recommended_pitches": ["sl", "ch", "cu", "st"],
+    "pitch_reasoning": "Slider (control primary, rotation secondary) hitting two priority stats. Changeup (rotation primary, presence secondary) for lowest BABIP. Curveball (presence primary) for highest CSW. Sweeper (rotation primary) for weak contact.",
     "recommended_greater_boons": ["Creative", "Strong Starter"],
-    "recommended_lesser_boons": ["Air Elemental", "Geometry Expert", "Sneaky"],
+    "recommended_lesser_boons": ["Cyclone", "Shopper", "Geometry Expert"],
     "equipment_priority": ["head", "body"],
     "equipment_affixes": ["rotation", "control", "presence"],
     "dump_stats": ["stuff", "persuasion", "intuition"]
-  },
-  "iron_man": {
-    "name": "Iron Man",
-    "emoji": "🦾",
-    "tagline": "Refuse to leave the game",
-    "description": "Defiance and guts keep you in games. Refuses to be knocked out.",
-    "priority_stats": ["defiance", "guts", "stamina"],
-    "secondary_stats": ["control", "velocity", "presence", "rotation"],
-    "stat_weights": {
-      "defiance": 0.12,
-      "guts": 0.12,
-      "stamina": 0.12,
-      "control": 0.08,
-      "velocity": 0.08,
-      "rotation": 0.08
-    },
-    "recommended_pitches": ["ff", "si", "sl", "ch"],
-    "pitch_reasoning": "Fastball and sinker for fast-pitch base. Slider and changeup for breaking/offspeed. 4-pitch arsenal spreads workload across pitch types for durability.",
-    "recommended_greater_boons": ["Unwavering", "Iron Will"],
-    "recommended_lesser_boons": ["Tireless", "Giant", "Thoroughbred"],
-    "equipment_priority": ["body", "head"],
-    "equipment_affixes": ["defiance", "guts", "stamina"],
-    "dump_stats": ["accuracy", "deception", "intuition", "stuff"]
-  },
-  "balanced_starter": {
-    "name": "Balanced Starter",
-    "emoji": "⚖️",
-    "tagline": "No weaknesses, all-around",
-    "description": "Well-rounded pitcher with no major weaknesses. Adapts to any situation.",
-    "priority_stats": ["velocity", "control", "rotation"],
-    "secondary_stats": ["stuff", "guts", "presence", "stamina"],
-    "stat_weights": {
-      "velocity": 0.12,
-      "control": 0.12,
-      "rotation": 0.12,
-      "stuff": 0.08,
-      "guts": 0.08,
-      "stamina": 0.08
-    },
-    "recommended_pitches": ["ff", "sl", "ch", "cu"],
-    "pitch_reasoning": "Fastball (fast, zone). Slider and changeup (breaking/offspeed, whiffs). Curveball for additional breaking variety. Balanced 4-pitch mix adapts to any lineup.",
-    "recommended_greater_boons": ["Strong Starter", "Clutch"],
-    "recommended_lesser_boons": ["One With All", "Majestic", "Loyal"],
-    "equipment_priority": ["head", "body"],
-    "equipment_affixes": ["velocity", "control", "rotation"],
-    "dump_stats": ["accuracy", "deception", "intuition"]
   },
   "knuckleball_artist": {
     "name": "Knuckleball Artist",
@@ -273,159 +221,19 @@
       "presence": 0.08,
       "accuracy": 0.08
     },
-    "recommended_pitches": ["kc", "ch", "st", "si"],
-    "pitch_reasoning": "Knuckle-curve as primary (high GB rate + unique movement). Changeup for lowest BABIP. Sweeper for breaking variety. Sinker as fast-pitch contrast with GB upside.",
+    "recommended_pitches": ["kc", "st", "ch", "fs"],
+    "pitch_reasoning": "Knuckle-curve (stuff primary, rotation secondary) hitting two priority stats. Sweeper (rotation+deception primary) hitting two priority stats. Changeup for lowest BABIP. Splitter (stuff primary) as T1 elite whiff pitch.",
     "recommended_greater_boons": ["Lucky", "Creative"],
-    "recommended_lesser_boons": ["Fae", "Sneaky", "Chaos"],
+    "recommended_lesser_boons": ["Hextouch", "Weaver", "Confused"],
     "equipment_priority": ["head", "body"],
     "equipment_affixes": ["stuff", "rotation", "deception"],
     "dump_stats": ["velocity", "persuasion", "intuition"]
-  },
-  "analytical_pitcher": {
-    "name": "Analytical Pitcher",
-    "emoji": "🧠",
-    "tagline": "Outsmart the lineup",
-    "description": "Intuition-based approach with smart pitch sequencing. For future meta when intuition is buffed.",
-    "priority_stats": ["control", "deception", "intuition"],
-    "secondary_stats": ["rotation", "presence", "accuracy"],
-    "stat_weights": {
-      "control": 0.12,
-      "deception": 0.12,
-      "intuition": 0.12,
-      "rotation": 0.08,
-      "presence": 0.08,
-      "accuracy": 0.08
-    },
-    "recommended_pitches": ["ch", "cu", "st", "sl"],
-    "pitch_reasoning": "Changeup and curveball for deception. Sweeper (rotation+deception) as breaking ball that leverages deception stat. Slider for chase variety. Sequencing-heavy approach relies on speed changes.",
-    "recommended_greater_boons": ["Logical", "All Knowing"],
-    "recommended_lesser_boons": ["Wise", "Observer", "Majestic"],
-    "equipment_priority": ["head", "body"],
-    "equipment_affixes": ["control", "deception", "intuition"],
-    "dump_stats": ["velocity", "stuff", "persuasion"]
-  },
-  "six_pitch_arsenal": {
-    "name": "Six-Pitch Arsenal",
-    "emoji": "🎰",
-    "tagline": "Maximum pitch variety",
-    "description": "Masters many pitches with balanced stats. Unpredictable and versatile.",
-    "priority_stats": ["control", "rotation", "stuff"],
-    "secondary_stats": ["velocity", "presence", "guts"],
-    "stat_weights": {
-      "control": 0.12,
-      "rotation": 0.12,
-      "stuff": 0.12,
-      "velocity": 0.08,
-      "presence": 0.08,
-      "guts": 0.08
-    },
-    "recommended_pitches": ["ff", "si", "sl", "ch", "cu", "fc"],
-    "pitch_reasoning": "Full 6-pitch arsenal: FF and SI as fast base. SL, CH, CU as breaking/offspeed trio. FC bridges fast and breaking. Maximum unpredictability through variety.",
-    "recommended_greater_boons": ["Logical", "Strong Starter"],
-    "recommended_lesser_boons": ["One With All", "Majestic", "Wise"],
-    "equipment_priority": ["head", "body"],
-    "equipment_affixes": ["control", "rotation", "stuff"],
-    "dump_stats": ["accuracy", "deception", "intuition"]
-  },
-  "zone_commander": {
-    "name": "Zone Commander",
-    "emoji": "📍",
-    "tagline": "Pound the strike zone",
-    "description": "Accuracy and rotation focus with elite zone rate. Pounds the strike zone with deceptive breaking balls.",
-    "priority_stats": ["accuracy", "rotation", "deception"],
-    "secondary_stats": ["velocity", "presence", "guts"],
-    "stat_weights": {
-      "accuracy": 0.12,
-      "rotation": 0.12,
-      "deception": 0.12,
-      "velocity": 0.08,
-      "presence": 0.08,
-      "guts": 0.08
-    },
-    "recommended_pitches": ["st", "kc", "sl", "cu"],
-    "pitch_reasoning": "Sweeper (low zone contact, deception synergy) as primary. Knuckle-curve (accuracy+stuff) for GB/breaking variety. Slider and curveball complete the breaking ball arsenal. All are Accuracy/Rotation pitches.",
-    "recommended_greater_boons": ["Strong Starter", "Iron Will"],
-    "recommended_lesser_boons": ["Archer's Mark", "Geometry Expert", "Sneaky"],
-    "equipment_priority": ["head", "body"],
-    "equipment_affixes": ["accuracy", "rotation", "deception"],
-    "build_axis": "accuracy_rotation",
-    "dump_stats": ["control", "persuasion", "intuition", "stuff"],
-    "guide_notes": "Community guide maps this to Accuracy/Rotation axis. Deception pairs well with Accuracy builds. Sweeper, Knuckle Curve, Slider, Curveball are primary Accuracy/Rotation pitches."
-  },
-  "deception_junkballer": {
-    "name": "Deception Junkballer",
-    "emoji": "🎩",
-    "tagline": "No velocity, all trickery",
-    "description": "Wins with elite deception and control despite minimal velocity. Based on S10's Agnes Kose (Velocity 90, Deception 445, 0.19 ERA).",
-    "priority_stats": ["deception", "rotation", "control"],
-    "secondary_stats": ["stuff", "persuasion", "presence"],
-    "stat_weights": {
-      "deception": 0.12,
-      "rotation": 0.12,
-      "control": 0.12,
-      "stuff": 0.08,
-      "persuasion": 0.08,
-      "presence": 0.08
-    },
-    "recommended_pitches": ["ch", "cu", "sl", "kc"],
-    "pitch_reasoning": "Changeup (rotation, lowest BABIP) and curveball (presence, highest CSW) maximize deception without velocity. Slider adds chase rate. Knuckle-curve (stuff+accuracy) as movement pitch. No fastball needed.",
-    "recommended_greater_boons": ["All Knowing", "Iron Will"],
-    "recommended_lesser_boons": ["Crafty", "Sneaky", "Observer"],
-    "equipment_priority": ["head", "body"],
-    "equipment_affixes": ["deception", "rotation", "control"],
-    "dump_stats": ["accuracy", "velocity", "intuition"]
-  },
-  "fastball_command": {
-    "name": "Fastball Command",
-    "emoji": "🎯",
-    "tagline": "Pure gas, perfect spots",
-    "description": "Elite velocity paired with pinpoint accuracy. Blows fastballs by hitters with precise location. Based on S10 velocity leaders like Penelope Holder (Velocity 665, Control 330).",
-    "priority_stats": ["velocity", "control", "accuracy"],
-    "secondary_stats": ["presence", "stamina", "guts"],
-    "stat_weights": {
-      "velocity": 0.12,
-      "control": 0.12,
-      "accuracy": 0.12,
-      "presence": 0.08,
-      "stamina": 0.08,
-      "guts": 0.08
-    },
-    "recommended_pitches": ["ff", "fc", "si"],
-    "pitch_reasoning": "All fastball variants — four-seam for velocity, cutter for lateral movement, sinker for downward action. Pure fastball arsenal located precisely.",
-    "recommended_greater_boons": ["First Strike", "Strong Starter"],
-    "recommended_lesser_boons": ["Archer's Mark", "Fire Elemental", "Charger"],
-    "equipment_priority": ["head", "body"],
-    "equipment_affixes": ["velocity", "control", "accuracy"],
-    "dump_stats": ["deception", "stuff", "intuition"]
-  },
-  "persuasion_specialist": {
-    "name": "Persuasion Specialist",
-    "emoji": "🗣️",
-    "tagline": "Expand the zone, fool the ump",
-    "description": "Elite persuasion gets borderline calls and expands the zone. Combined with accuracy for untouchable command. Based on S10 pitchers like Yara Laurent (Persuasion 265, Accuracy 360).",
-    "priority_stats": ["persuasion", "control", "accuracy"],
-    "secondary_stats": ["rotation", "presence", "deception"],
-    "stat_weights": {
-      "persuasion": 0.12,
-      "control": 0.12,
-      "accuracy": 0.12,
-      "rotation": 0.08,
-      "presence": 0.08,
-      "deception": 0.08
-    },
-    "recommended_pitches": ["ff", "fc", "sl", "ch"],
-    "pitch_reasoning": "Fastball and cutter paint corners. Slider and changeup as offspeed options that look like strikes but aren't. 4-pitch mix maximizes zone deception.",
-    "recommended_greater_boons": ["All Knowing", "Strong Starter"],
-    "recommended_lesser_boons": ["Crafty", "Observer", "Geometry Expert"],
-    "equipment_priority": ["head", "body"],
-    "equipment_affixes": ["persuasion", "control", "accuracy"],
-    "dump_stats": ["stuff", "velocity", "intuition"]
   },
   "guts_monster": {
     "name": "Guts Monster",
     "emoji": "💪",
     "tagline": "Sheer willpower dominance",
-    "description": "Extreme guts investment overpowers hitters through pure mental toughness. Based on S10 players like Patrick Park (Guts 955).",
+    "description": "Extreme guts investment overpowers hitters through pure mental toughness. Guts multiplies everything else.",
     "priority_stats": ["guts", "rotation", "velocity"],
     "secondary_stats": ["control", "stamina", "presence"],
     "stat_weights": {
@@ -436,35 +244,35 @@
       "stamina": 0.08,
       "presence": 0.08
     },
-    "recommended_pitches": ["ff", "sl", "fs"],
-    "pitch_reasoning": "Fastball as primary with guts boosting effectiveness. Slider and splitter as putaway pitches. Simple arsenal maximized by raw guts.",
+    "recommended_pitches": ["sl", "ch", "st"],
+    "pitch_reasoning": "Slider (rotation secondary) as T1 chase pitch. Changeup (rotation primary) for lowest BABIP. Sweeper (rotation primary) for weak contact. Guts is a multiplier stat; pitches chosen for rotation alignment.",
     "recommended_greater_boons": ["Iron Will", "Unwavering"],
-    "recommended_lesser_boons": ["Tenacious Badger", "Draconic", "Charger"],
+    "recommended_lesser_boons": ["Tenacious Badger", "Ill", "Lionheart"],
     "equipment_priority": ["head", "body"],
     "equipment_affixes": ["guts", "rotation", "velocity"],
-    "dump_stats": ["accuracy", "deception", "stuff", "intuition"]
+    "dump_stats": ["accuracy", "deception", "intuition"]
   },
-  "intuition_reader": {
-    "name": "Intuition Reader",
-    "emoji": "🧠",
-    "tagline": "Reads batters like a book",
-    "description": "Uses Season 10 intuition and deception to outsmart hitters. Anticipates batter tendencies and exploits weaknesses with pitch sequencing.",
-    "priority_stats": ["intuition", "deception", "accuracy"],
-    "secondary_stats": ["control", "rotation", "presence"],
+  "fastball_command": {
+    "name": "Fastball Command",
+    "emoji": "🎯",
+    "tagline": "Pure gas, perfect spots",
+    "description": "Elite velocity paired with pinpoint command. Blows fastballs by hitters with precise location.",
+    "priority_stats": ["velocity", "control", "accuracy"],
+    "secondary_stats": ["presence", "stamina", "guts"],
     "stat_weights": {
-      "intuition": 0.12,
-      "deception": 0.12,
+      "velocity": 0.12,
+      "control": 0.12,
       "accuracy": 0.12,
-      "control": 0.08,
-      "rotation": 0.08,
-      "presence": 0.08
+      "presence": 0.08,
+      "stamina": 0.08,
+      "guts": 0.08
     },
-    "recommended_pitches": ["ch", "kc", "sl", "ff"],
-    "pitch_reasoning": "Changeup and knuckle curve exploit deception. Slider for breaking sequence. Fastball to establish timing that deception disrupts.",
-    "recommended_greater_boons": ["All Knowing", "Analytical"],
-    "recommended_lesser_boons": ["Fae", "Wise", "Sneaky"],
+    "recommended_pitches": ["sl", "fc", "ff", "kc"],
+    "pitch_reasoning": "Slider (control primary) as T1 pitch. Cutter for weak contact. Fastball (presence primary, control+accuracy secondary) as zone anchor. Knuckle-curve (accuracy primary) as T1 pitch hitting accuracy priority.",
+    "recommended_greater_boons": ["First Strike", "Strong Starter"],
+    "recommended_lesser_boons": ["Afterburner", "Meteor", "Stormrider"],
     "equipment_priority": ["head", "body"],
-    "equipment_affixes": ["intuition", "deception", "accuracy"],
-    "dump_stats": ["stuff", "persuasion", "velocity"]
+    "equipment_affixes": ["velocity", "control", "accuracy"],
+    "dump_stats": ["deception", "intuition", "defiance"]
   }
 }

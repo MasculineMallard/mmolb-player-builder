@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { usePlayerStore } from "@/store/player-store";
-import type { PlayerData } from "@/lib/types";
-import type { Archetype } from "@/lib/optimizer";
+import { toPng } from "html-to-image";
+import type { Archetype, PlayerData } from "@/lib/types";
 
 interface ExportShareProps {
   player: PlayerData;
@@ -13,13 +14,45 @@ interface ExportShareProps {
 
 export function ExportShare({ player, archetype }: ExportShareProps) {
   const [copied, setCopied] = useState<string | null>(null);
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
   const pathname = usePathname();
   const archetypeId = usePlayerStore((s) => s.archetypeId);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setPortalTarget(document.getElementById("share-slot"));
+  }, []);
+
+  const handleSaveImage = useCallback(async () => {
+    const el = document.querySelector("[data-player-content]") as HTMLElement | null;
+    if (!el) return;
+    setSaving(true);
+    try {
+      const dataUrl = await toPng(el, {
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue("--background").trim() || "#0a0a0b",
+        pixelRatio: 2,
+      });
+      const link = document.createElement("a");
+      link.download = `${player.name.replace(/\s+/g, "-")}-Lv${player.level}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error("Image save failed:", err);
+    } finally {
+      setSaving(false);
+    }
+  }, [player.name, player.level]);
 
   const copyToClipboard = async (text: string, label: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopied(label);
-    setTimeout(() => setCopied(null), 2000);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(label);
+      setTimeout(() => setCopied(null), 2000);
+    } catch (err) {
+      console.error("Clipboard write failed:", err);
+      setCopied("error");
+      setTimeout(() => setCopied(null), 2000);
+    }
   };
 
   const buildShareUrl = () => {
@@ -36,51 +69,63 @@ export function ExportShare({ player, archetype }: ExportShareProps) {
     if (player.teamName) {
       lines.push(`${player.teamEmoji ?? ""} ${player.teamName} | ${player.position ?? "?"}`);
     }
-
     if (archetype) {
-      lines.push(`Archetype: ${archetype.name}`);
+      lines.push(`Archetype: **${archetype.name}**`);
       if (archetype.priority_stats?.length) {
-        lines.push(
-          `Core: ${archetype.priority_stats.slice(0, 3).join(", ")}`
-        );
+        lines.push(`Core stats: ${archetype.priority_stats.slice(0, 4).join(", ")}`);
       }
     }
-
     if (player.lesserBoons.length) {
       lines.push(`Boons: ${player.lesserBoons.join(", ")}`);
     }
-
-    // Top 5 stats
+    if (player.greaterBoons.length) {
+      lines.push(`Greater: ${player.greaterBoons.join(", ")}`);
+    }
     const sorted = Object.entries(player.stats)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
     if (sorted.length) {
-      lines.push(
-        `Top stats: ${sorted.map(([k, v]) => `${k} ${v}`).join(" | ")}`
+      const maxNameLen = Math.max(...sorted.map(([k]) => k.length));
+      const statLines = sorted.map(
+        ([k, v]) => `${k.padEnd(maxNameLen)}  ${String(v).padStart(4)}`
       );
+      lines.push("```");
+      lines.push(...statLines);
+      lines.push("```");
     }
-
-    lines.push(`\n${buildShareUrl()}`);
+    lines.push(buildShareUrl());
     return lines.join("\n");
   };
 
-  return (
-    <div className="bg-card border border-border rounded-lg p-4">
-      <h3 className="text-sm font-medium mb-3">Share</h3>
-      <div className="flex gap-2 flex-wrap">
-        <button
-          onClick={() => copyToClipboard(buildShareUrl(), "url")}
-          className="text-xs bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:bg-primary/90 transition-colors"
-        >
-          {copied === "url" ? "Copied!" : "Copy Link"}
-        </button>
-        <button
-          onClick={() => copyToClipboard(buildDiscordSummary(), "discord")}
-          className="text-xs bg-secondary text-secondary-foreground px-3 py-1.5 rounded-md border border-border hover:bg-secondary/80 transition-colors"
-        >
-          {copied === "discord" ? "Copied!" : "Copy for Discord"}
-        </button>
-      </div>
-    </div>
+  const buttons = (
+    <>
+      <button
+        onClick={() => copyToClipboard(buildShareUrl(), "url")}
+        className="text-sm text-primary-foreground px-2.5 py-1 rounded-md hover:brightness-110 active:scale-[0.98] transition-all duration-150"
+        style={{ background: 'linear-gradient(180deg, #4B8DF7 0%, #3B82F6 100%)' }}
+      >
+        {copied === "url" ? "Copied!" : copied === "error" ? "Failed" : "Copy Link"}
+      </button>
+      <button
+        onClick={() => copyToClipboard(buildDiscordSummary(), "discord")}
+        className="text-sm bg-secondary text-secondary-foreground px-2.5 py-1 rounded-md border border-border hover:bg-secondary/80 transition-colors"
+      >
+        {copied === "discord" ? "Copied!" : "Discord"}
+      </button>
+      <button
+        onClick={handleSaveImage}
+        disabled={saving}
+        className="text-sm bg-secondary text-secondary-foreground px-2.5 py-1 rounded-md border border-border hover:bg-secondary/80 transition-colors disabled:opacity-50"
+      >
+        {saving ? "..." : "Image"}
+      </button>
+    </>
   );
+
+  if (portalTarget) {
+    return createPortal(buttons, portalTarget);
+  }
+
+  // Fallback: render inline if portal target not found
+  return <div className="flex items-center gap-2">{buttons}</div>;
 }

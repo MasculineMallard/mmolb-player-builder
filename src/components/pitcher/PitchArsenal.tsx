@@ -1,11 +1,13 @@
 "use client";
 
+import { useMemo } from "react";
 import type { PitchData } from "@/lib/types";
 import type { PitchArsenalAdvice } from "@/lib/optimizer";
 
 interface PitchArsenalProps {
   pitches: PitchData[];
   advice?: PitchArsenalAdvice | null;
+  inline?: boolean;
 }
 
 const PITCH_COLORS = [
@@ -17,107 +19,220 @@ const PITCH_COLORS = [
   "var(--muted-foreground)",
 ];
 
-export function PitchArsenal({ pitches, advice }: PitchArsenalProps) {
+export function PitchArsenal({ pitches, advice, inline }: PitchArsenalProps) {
+  const slices = useMemo(() => {
+    if (!pitches.length) return [];
+
+    const rawTotal = pitches.reduce((sum, p) => sum + p.frequency, 0);
+    const total = rawTotal || 1;
+
+    // Largest-remainder rounding so percentages sum to exactly 100
+    const rawPcts = pitches.map((p) => (p.frequency / total) * 100);
+    const floored = rawPcts.map(Math.floor);
+    let remainder = 100 - floored.reduce((a, b) => a + b, 0);
+    const remainders = rawPcts.map((v, i) => ({ i, r: v - floored[i] }));
+    remainders.sort((a, b) => b.r - a.r);
+    for (let j = 0; j < remainder; j++) floored[remainders[j].i]++;
+
+    return pitches.map((p, i) => ({
+      color: PITCH_COLORS[i % PITCH_COLORS.length],
+      pitch: p,
+      displayPct: floored[i],
+    }));
+  }, [pitches]);
+
   if (!pitches.length) return null;
 
-  const total = pitches.reduce((sum, p) => sum + p.frequency, 0);
-  const size = 120;
-  const cx = size / 2;
-  const cy = size / 2;
-  const outerR = 50;
-  const innerR = 30;
+  const hasAdvice = advice && (advice.add.length > 0 || advice.remove.length > 0);
 
-  // Build donut slices
-  let cumulative = 0;
-  const slices = pitches.map((p, i) => {
-    const pct = total > 0 ? p.frequency / total : 1 / pitches.length;
-    const startAngle = cumulative * 2 * Math.PI - Math.PI / 2;
-    cumulative += pct;
-    const endAngle = cumulative * 2 * Math.PI - Math.PI / 2;
+  if (inline) {
+    // 8a layout: semicircle concentric arcs → dot legend → recommendations
+    const svgW = 180;
+    const svgH = 100;
+    const baseY = 90;
+    const outermost = 75;
+    const arcSpacing = 11;
+    const strokeW = 7;
 
-    const x1o = cx + outerR * Math.cos(startAngle);
-    const y1o = cy + outerR * Math.sin(startAngle);
-    const x2o = cx + outerR * Math.cos(endAngle);
-    const y2o = cy + outerR * Math.sin(endAngle);
-    const x1i = cx + innerR * Math.cos(endAngle);
-    const y1i = cy + innerR * Math.sin(endAngle);
-    const x2i = cx + innerR * Math.cos(startAngle);
-    const y2i = cy + innerR * Math.sin(startAngle);
+    return (
+      <div>
+        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1.5 border-b border-border pb-0.5">
+          Pitch Arsenal
+        </h3>
 
-    const largeArc = pct > 0.5 ? 1 : 0;
+        {/* Concentric semicircle arcs */}
+        <div className="flex justify-center mb-2.5">
+          <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`}>
+            {slices.map((s, i) => {
+              const r = outermost - i * arcSpacing;
+              if (r <= 0) return null;
+              const x1 = svgW / 2 - r;
+              const x2 = svgW / 2 + r;
+              const arcLen = Math.PI * r;
+              const filled = (s.displayPct / 100) * arcLen;
+              return (
+                <g key={i}>
+                  {/* Background track */}
+                  <path
+                    d={`M ${x1} ${baseY} A ${r} ${r} 0 0 1 ${x2} ${baseY}`}
+                    fill="none"
+                    stroke="var(--muted)"
+                    strokeWidth={strokeW}
+                    strokeLinecap="round"
+                  />
+                  {/* Filled arc */}
+                  <path
+                    d={`M ${x1} ${baseY} A ${r} ${r} 0 0 1 ${x2} ${baseY}`}
+                    fill="none"
+                    stroke={s.color}
+                    strokeWidth={strokeW}
+                    strokeLinecap="round"
+                    strokeDasharray={`${filled} ${arcLen}`}
+                    strokeDashoffset="0"
+                  />
+                </g>
+              );
+            })}
+          </svg>
+        </div>
 
-    const d = [
-      `M ${x1o} ${y1o}`,
-      `A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2o} ${y2o}`,
-      `L ${x1i} ${y1i}`,
-      `A ${innerR} ${innerR} 0 ${largeArc} 0 ${x2i} ${y2i}`,
-      "Z",
-    ].join(" ");
-
-    return { d, color: PITCH_COLORS[i % PITCH_COLORS.length], pitch: p, pct };
-  });
-
-  return (
-    <div className="bg-card border border-border rounded-lg p-4">
-      <h3 className="text-sm font-medium mb-3">Pitch Arsenal</h3>
-      <div className="flex items-start gap-4">
-        {/* SVG Donut */}
-        <svg
-          width={size}
-          height={size}
-          viewBox={`0 0 ${size} ${size}`}
-          className="shrink-0"
-        >
+        {/* Dot legend */}
+        <div className="flex flex-col gap-0.5 mb-2.5">
           {slices.map((s, i) => (
-            <path key={i} d={s.d} fill={s.color} />
-          ))}
-        </svg>
-
-        {/* Legend + Advice */}
-        <div className="space-y-1 flex-1 min-w-0">
-          {slices.map((s, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm">
+            <div key={i} className="flex items-center gap-1.5 text-sm">
               <div
-                className="w-2.5 h-2.5 rounded-sm shrink-0"
+                className="w-2 h-2 rounded-full shrink-0"
                 style={{ backgroundColor: s.color }}
               />
-              <span className="truncate">{s.pitch.name}</span>
-              <span className="text-xs text-muted-foreground ml-auto tabular-nums">
-                {Math.round(s.pct * 100)}%
+              <span className="text-muted-foreground">{s.pitch.name}</span>
+              <span className="ml-auto text-muted-foreground tabular-nums">
+                {s.displayPct}%
               </span>
             </div>
           ))}
+        </div>
 
-          {advice && advice.add.length > 0 && (
-            <div className="border-t border-border pt-2 mt-2">
-              <div className="text-xs text-muted-foreground mb-1">
-                Consider adding:
-              </div>
+        {/* Recommendations */}
+        {hasAdvice && (
+          <div className="border-t border-border pt-2">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+              Recommendations
+            </div>
+            <div className="flex flex-col gap-1">
               {advice.add.map((a) => (
-                <div
+                <span
                   key={a.pitchType}
-                  className="text-xs text-[var(--chart-3)]"
+                  className="text-sm font-medium text-primary bg-primary/10 border border-primary/30 px-2 py-0.5 rounded-full w-fit"
                 >
                   + {a.name}
-                </div>
+                </span>
               ))}
-            </div>
-          )}
-
-          {advice && advice.remove.length > 0 && (
-            <div className="border-t border-border pt-1 mt-1">
-              <div className="text-xs text-muted-foreground mb-1">
-                Consider dropping:
-              </div>
               {advice.remove.map((r) => (
-                <div key={r} className="text-xs text-[var(--chart-4)]">
+                <span
+                  key={r}
+                  className="text-sm font-medium text-[var(--chart-2)] bg-[var(--chart-2)]/10 border border-[var(--chart-2)]/30 px-2 py-0.5 rounded-full w-fit"
+                >
                   - {r}
-                </div>
+                </span>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
+    );
+  }
+
+  // Standalone card mode — same 8a layout but wrapped in a card
+  const svgW = 200;
+  const svgH = 110;
+  const baseY = 100;
+  const outermost = 85;
+  const arcSpacing = 12;
+  const strokeW = 8;
+
+  return (
+    <div className="bg-card border border-border rounded-lg px-3 py-2">
+      <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-2">
+        <span className="w-0.5 h-3 bg-primary/40 rounded-full" />
+        Pitch Arsenal
+      </h3>
+
+      {/* Concentric semicircle arcs */}
+      <div className="flex justify-center mb-3">
+        <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`}>
+          {slices.map((s, i) => {
+            const r = outermost - i * arcSpacing;
+            if (r <= 0) return null;
+            const x1 = svgW / 2 - r;
+            const x2 = svgW / 2 + r;
+            const arcLen = Math.PI * r;
+            const filled = (s.displayPct / 100) * arcLen;
+            return (
+              <g key={i}>
+                <path
+                  d={`M ${x1} ${baseY} A ${r} ${r} 0 0 1 ${x2} ${baseY}`}
+                  fill="none"
+                  stroke="var(--muted)"
+                  strokeWidth={strokeW}
+                  strokeLinecap="round"
+                />
+                <path
+                  d={`M ${x1} ${baseY} A ${r} ${r} 0 0 1 ${x2} ${baseY}`}
+                  fill="none"
+                  stroke={s.color}
+                  strokeWidth={strokeW}
+                  strokeLinecap="round"
+                  strokeDasharray={`${filled} ${arcLen}`}
+                  strokeDashoffset="0"
+                />
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+
+      {/* Dot legend */}
+      <div className="flex flex-col gap-1 mb-3">
+        {slices.map((s, i) => (
+          <div key={i} className="flex items-center gap-1.5 text-sm">
+            <div
+              className="w-2 h-2 rounded-full shrink-0"
+              style={{ backgroundColor: s.color }}
+            />
+            <span>{s.pitch.name}</span>
+            <span className="ml-auto text-muted-foreground text-sm tabular-nums">
+              {s.displayPct}%
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Recommendations */}
+      {hasAdvice && (
+        <div className="border-t border-border pt-2">
+          <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1.5">
+            Recommendations
+          </div>
+          <div className="flex flex-col gap-1">
+            {advice.add.map((a) => (
+              <span
+                key={a.pitchType}
+                className="text-sm font-medium text-primary bg-primary/10 border border-primary/30 px-2.5 py-0.5 rounded-full w-fit"
+              >
+                + {a.name}
+              </span>
+            ))}
+            {advice.remove.map((r) => (
+              <span
+                key={r}
+                className="text-sm font-medium text-[var(--chart-2)] bg-[var(--chart-2)]/10 border border-[var(--chart-2)]/30 px-2.5 py-0.5 rounded-full w-fit"
+              >
+                - {r}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

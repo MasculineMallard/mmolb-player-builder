@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>POP Soda Can Asset Finder</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0F1419; color: #e0e0e0; font-family: system-ui, sans-serif; padding: 40px; max-width: 900px; margin: 0 auto; }
+  h1 { color: #3B82F6; font-size: 24px; margin-bottom: 8px; }
+  .subtitle { color: #8B949E; margin-bottom: 32px; font-size: 14px; }
+  h2 { color: #A855F7; font-size: 16px; margin: 24px 0 12px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; }
+  .card {
+    background: #161B22; border: 1px solid #30363D; border-radius: 8px;
+    padding: 16px; transition: all 0.2s;
+  }
+  .card:hover { border-color: #3B82F6; }
+  .card a { color: #3B82F6; text-decoration: none; font-weight: 600; font-size: 14px; }
+  .card a:hover { text-decoration: underline; }
+  .card .desc { font-size: 12px; color: #8B949E; margin-top: 4px; line-height: 1.5; }
+  .card .license { font-size: 11px; color: #3FB950; margin-top: 6px; }
+  .tag { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
+  .tag-90s { background: rgba(168,85,247,0.2); color: #A855F7; }
+  .tag-3d { background: rgba(59,130,246,0.2); color: #3B82F6; }
+  .tag-flat { background: rgba(63,185,80,0.2); color: #3FB950; }
+  .tag-photo { background: rgba(248,81,73,0.2); color: #F85149; }
+  .instructions { background: #1e293b; border: 1px solid #30363D; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+  .instructions li { font-size: 13px; color: #8B949E; margin: 4px 0; line-height: 1.5; }
+  .instructions strong { color: #e0e0e0; }
+  .search-tip { font-size: 12px; color: #8B949E; background: #1a1a2e; padding: 8px 12px; border-radius: 6px; margin-top: 6px; }
+  .search-tip code { color: #A855F7; background: rgba(168,85,247,0.1); padding: 1px 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<h1>POP Soda Can Asset Finder</h1>
+<p class="subtitle">Real assets from free image sites. Browse, download the one you like, and drop it in the project.</p>
+
+<div class="instructions">
+  <strong>How to pick:</strong>
+  <ol>
+    <li>Click any link below to browse soda can assets on that site</li>
+    <li>Download your favorite as PNG (transparent background preferred)</li>
+    <li>Save it to <code>mmolb-player-builder-next/public/pop-can.png</code></li>
+    <li>Tell me which one you picked and I'll wire it up</li>
+  </ol>
+</div>
+
+<h2>90s / Retro Aesthetic</h2>
+<div class="grid">
+  <div class="card">
+    <a href="https://pixabay.com/vectors/search/soda%20can%20retro/" target="_blank">Pixabay: Retro Soda Can Vectors</a>
+    <div class="desc">Search "soda can retro" on Pixabay. Lots of flat color illustrated cans. Filter by "Vectors" for clean scalable art.</div>
+    <div class="search-tip">Try: <code>soda can retro</code> or <code>pop can vintage</code></div>
+    <div class="license">Pixabay License (free commercial use)</div>
+    <span class="tag tag-90s">90s</span><span class="tag tag-flat">Vector</span>
+  </div>
+  <div class="card">
+    <a href="https://www.vecteezy.com/free-vector/retro-soda" target="_blank">Vecteezy: Retro Soda Vectors</a>
+    <div class="desc">Retro-styled soda can illustrations. Lots of 50s-90s aesthetic options. Can download as PNG or vector.</div>
+    <div class="search-tip">Try: <code>retro soda can</code> or <code>vintage pop can</code></div>
+    <div class="license">Vecteezy Free License (attribution required)</div>
+    <span class="tag tag-90s">90s</span><span class="tag tag-flat">Vector</span>
+  </div>
+  <div class="card">
+    <a href="https://www.vecteezy.com/free-png/soda-can" target="_blank">Vecteezy: Soda Can PNGs (2,491)</a>
+    <div class="desc">Huge library of soda can PNGs with transparent backgrounds. Filter by style. Many colorful, retro options.</div>
+    <div class="search-tip">Try: <code>soda can colorful</code> or <code>soda can neon</code></div>
+    <div class="license">Vecteezy Free License</div>
+    <span class="tag tag-90s">90s</span><span class="tag tag-3d">PNG</span>
+  </div>
+  <div class="card">
+    <a href="https://www.freepik.com/search?format=search&last_filter=query&last_value=retro+soda+can&query=retro+soda+can&type=vector" target="_blank">Freepik: Retro Soda Can Vectors</a>
+    <div class="desc">Freepik has excellent retro/vintage soda can illustrations. Memphis, 80s, 90s pop art styles.</div>
+    <div class="search-tip">Try: <code>retro soda can</code> or <code>90s beverage can</code></div>
+    <div class="license">Freepik Free (attribution required)</div>
+    <span class="tag tag-90s">90s</span><span class="tag tag-flat">Vector</span>
+  </div>
+</div>
+
+<h2>3D Renders / Realistic</h2>
+<div class="grid">
+  <div class="card">
+    <a href="https://www.vecteezy.com/free-png/3d-soda-can" target="_blank">Vecteezy: 3D Soda Can PNGs (570)</a>
+    <div class="desc">3D rendered soda cans with transparent backgrounds. Glossy, metallic finishes. Good for a premium look.</div>
+    <div class="license">Vecteezy Free License</div>
+    <span class="tag tag-3d">3D</span><span class="tag tag-3d">PNG</span>
+  </div>
+  <div class="card">
+    <a href="https://pixabay.com/illustrations/search/soda%20can/" target="_blank">Pixabay: Soda Can Illustrations (1,000+)</a>
+    <div class="desc">Mix of 3D renders and flat illustrations. Pixabay license means no attribution needed.</div>
+    <div class="license">Pixabay License (free, no attribution)</div>
+    <span class="tag tag-3d">3D</span><span class="tag tag-flat">Illustration</span>
+  </div>
+  <div class="card">
+    <a href="https://pngtree.com/free-png-vectors/soda-can" target="_blank">PNGTree: Soda Can Assets (612)</a>
+    <div class="desc">Large collection including 3D mockups, flat icons, and stylized cans. Preview before download.</div>
+    <div class="license">PNGTree Free (2 free downloads/day)</div>
+    <span class="tag tag-3d">3D</span><span class="tag tag-3d">PNG</span>
+  </div>
+</div>
+
+<h2>Icons / Minimal</h2>
+<div class="grid">
+  <div class="card">
+    <a href="https://game-icons.net/1x1/guard13007/soda-can.html" target="_blank">Game-Icons: Soda Can</a>
+    <div class="desc">Bold white-on-black soda can icon. Perfect for dark backgrounds. Customize colors on-site before downloading SVG.</div>
+    <div class="license">CC BY 3.0 (attribution required)</div>
+    <span class="tag tag-flat">Icon</span>
+  </div>
+  <div class="card">
+    <a href="https://www.svgrepo.com/vectors/soda-can/" target="_blank">SVG Repo: Soda Can Vectors</a>
+    <div class="desc">Collection of SVG soda can icons. Simple silhouettes and detailed illustrations. All CC0 (public domain).</div>
+    <div class="license">CC0 (no attribution, public domain)</div>
+    <span class="tag tag-flat">SVG</span>
+  </div>
+  <div class="card">
+    <a href="https://www.rawpixel.com/search/soda%20can%20mockup?page=1&sort=curated&topic_group=_topics" target="_blank">Rawpixel: Soda Can Mockups</a>
+    <div class="desc">Mockup-style cans. Good if you want a blank can template to brand with POP colors.</div>
+    <div class="license">Rawpixel Free (varies by asset)</div>
+    <span class="tag tag-3d">Mockup</span>
+  </div>
+</div>
+
+<h2>Recommended Search Strategy</h2>
+<div class="instructions">
+  <ol>
+    <li><strong>For 90s aesthetic:</strong> Start with <a href="https://www.freepik.com/search?format=search&last_filter=query&last_value=retro+soda+can&query=retro+soda+can&type=vector" style="color:#3B82F6">Freepik retro soda can</a> or <a href="https://www.vecteezy.com/free-png/soda-can" style="color:#3B82F6">Vecteezy soda can PNGs</a></li>
+    <li><strong>For clean/modern:</strong> Start with <a href="https://pixabay.com/vectors/search/soda%20can/" style="color:#3B82F6">Pixabay vectors</a> (no attribution needed)</li>
+    <li><strong>For game-style icon:</strong> <a href="https://game-icons.net/1x1/guard13007/soda-can.html" style="color:#3B82F6">Game-Icons</a> is the fastest (customize and download in 10 seconds)</li>
+    <li>Download as PNG with transparent background, ideally 512px+ for quality</li>
+    <li>Save to <code>public/pop-can.png</code> and tell me</li>
+  </ol>
+</div>
+
+</body>
+</html>

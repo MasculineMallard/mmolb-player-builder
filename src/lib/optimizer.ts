@@ -5,102 +5,28 @@
  * Operates on plain objects (no class instances).
  */
 
-import { S11, TOTAL_PRIMARY_POINTS } from "./mechanics";
+import { TOTAL_PRIMARY_POINTS } from "./mechanics";
+import type { Archetype, PitchTypesMap } from "./types";
 
-export interface StatPriority {
-  statName: string;
-  currentValue: number;
-  targetValue: number;
-  gap: number;
-  priority: "high" | "medium" | "low" | "maintain";
-  reasoning: string;
-}
-
-export interface Archetype {
-  name: string;
-  emoji?: string;
-  description: string;
-  priority_stats: string[];
-  secondary_stats: string[];
-  stat_weights: Record<string, number>;
-  recommended_pitches?: string[];
-  recommended_lesser_boons?: string[];
-  recommended_greater_boons?: string[];
-  stat_targets?: Record<string, number>;
-  [key: string]: unknown;
-}
+/** Max stat value in the display scale (DB stores 0-10, we display 0-1000). */
+const STAT_SCALE_MAX = 1000;
 
 /**
- * Calculate priority stats based on archetype and current values.
- * Uses S11 50/30/20 distribution model.
+ * Compute per-stat point targets using the S11 50/30 distribution model.
+ * Single source of truth for target allocation math.
+ * No stat cap in S11; targets are bounded only by TOTAL_PRIMARY_POINTS.
  */
-export function calculatePriorityStats(
-  stats: Record<string, number>,
-  archetype: Archetype
-): StatPriority[] {
-  const statWeights = archetype.stat_weights ?? {};
-  const priorityStats = archetype.priority_stats?.slice(0, 3) ?? [];
-  const secondaryStats = archetype.secondary_stats?.slice(0, 3) ?? [];
+export function calculateStatTargets(archetype: Archetype): {
+  corePer: number;
+  supportPer: number;
+} {
+  const nCore = Math.max((archetype.priority_stats ?? []).length, 1);
+  const nSupport = Math.max((archetype.secondary_stats ?? []).length, 1);
 
-  const nCore = Math.max(priorityStats.length, 1);
-  const nSupport = Math.max(secondaryStats.length, 1);
+  const corePer = Math.floor((TOTAL_PRIMARY_POINTS * 0.5) / nCore);
+  const supportPer = Math.floor((TOTAL_PRIMARY_POINTS * 0.3) / nSupport);
 
-  const corePer = Math.min(
-    Math.floor((TOTAL_PRIMARY_POINTS * 0.5) / nCore),
-    S11.statCap
-  );
-  const coreOverflow =
-    Math.max(
-      0,
-      Math.floor((TOTAL_PRIMARY_POINTS * 0.5) / nCore) - S11.statCap
-    ) * nCore;
-  const supportPer = Math.min(
-    Math.floor((TOTAL_PRIMARY_POINTS * 0.3 + coreOverflow) / nSupport),
-    S11.statCap
-  );
-
-  const results: StatPriority[] = [];
-
-  for (const [statName, weight] of Object.entries(statWeights)) {
-    if (!(statName in stats)) continue;
-
-    const current = stats[statName];
-    let target: number;
-
-    if (priorityStats.includes(statName)) {
-      target = corePer;
-    } else if (secondaryStats.includes(statName)) {
-      target = supportPer;
-    } else {
-      target = 100;
-    }
-
-    const gap = target - current;
-
-    let priority: StatPriority["priority"];
-    if (gap > 200) priority = "high";
-    else if (gap > 100) priority = "medium";
-    else if (gap > 0) priority = "low";
-    else priority = "maintain";
-
-    const importance = priorityStats.includes(statName)
-      ? "core stat"
-      : secondaryStats.includes(statName)
-        ? "supporting stat"
-        : "flex stat";
-
-    results.push({
-      statName,
-      currentValue: current,
-      targetValue: target,
-      gap,
-      priority,
-      reasoning: `${importance} (weight: ${weight}x)`,
-    });
-  }
-
-  results.sort((a, b) => b.gap - a.gap);
-  return results;
+  return { corePer, supportPer };
 }
 
 export interface PitchEffectiveness {
@@ -135,7 +61,7 @@ export function calculatePitchEffectiveness(
   if (secondaryStatsList.length) secondaryScore /= secondaryStatsList.length;
 
   const raw = primaryScore * 0.7 + secondaryScore * 0.3;
-  return Math.min(100, raw / 10);
+  return Math.min(100, (raw / STAT_SCALE_MAX) * 100);
 }
 
 export interface PitchArsenalAdvice {
@@ -151,10 +77,7 @@ export function optimizePitchArsenal(
   stats: Record<string, number>,
   currentPitches: string[],
   archetype: Archetype,
-  pitchTypesData: Record<
-    string,
-    { name: string; priority_stats?: string[]; secondary_stats?: string[] }
-  >
+  pitchTypesData: PitchTypesMap
 ): PitchArsenalAdvice {
   const recommended = archetype.recommended_pitches ?? [];
 

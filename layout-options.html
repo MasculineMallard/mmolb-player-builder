@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MMOLB Layout Options</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d1117;
+    color: #c9d1d9;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    padding: 24px 32px;
+  }
+  h1 { color: #f0f6fc; font-size: 22px; margin-bottom: 4px; }
+  .subtitle { color: #8b949e; font-size: 13px; margin-bottom: 24px; line-height: 1.5; }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .option {
+    border: 2px solid #30363d;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #161b22;
+  }
+  .option:hover { border-color: #58a6ff; box-shadow: 0 0 16px rgba(88,166,255,0.08); }
+  .option.selected { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59,130,246,0.15); }
+
+  .option-header {
+    padding: 14px 16px 8px;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .option-number {
+    font-size: 12px; font-weight: 700;
+    color: #3b82f6; background: rgba(59,130,246,0.15);
+    padding: 2px 7px; border-radius: 4px;
+  }
+  .option-name { font-size: 15px; font-weight: 600; color: #f0f6fc; }
+  .option-desc { padding: 0 16px 12px; font-size: 12px; color: #8b949e; line-height: 1.5; }
+
+  .tag { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-left: 8px; }
+  .tag.rec { background: rgba(63,185,80,0.15); color: #3fb950; }
+
+  /* ── Mockup viewport: 16:9, dark bg ── */
+  .mockup {
+    margin: 0 12px 12px;
+    border-radius: 5px;
+    border: 1px solid #30363d;
+    background: #0F1419;
+    aspect-ratio: 16 / 9;
+    padding: 3px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Shared mockup primitives ── */
+  .mk { font-family: -apple-system, system-ui, sans-serif; }
+  .mk-nav {
+    background: #161B22; height: 16px; border-radius: 2px; margin-bottom: 2px;
+    display: flex; align-items: center; padding: 0 6px; gap: 4px;
+    border-bottom: 1px solid #30363d;
+  }
+  .mk-nav .brand { font-size: 5.5px; font-weight: 700; color: #f0f6fc; }
+  .mk-nav .tab { font-size: 4.5px; color: #8b949e; padding: 1px 4px; border-radius: 2px; }
+  .mk-nav .tab.on { background: #3b82f6; color: white; }
+  .mk-nav .right { margin-left: auto; font-size: 4px; color: #8b949e; }
+
+  /* Stat cell colors matching the real app */
+  .sc-great { color: #3B82F6; }
+  .sc-good { color: #60A5FA; }
+  .sc-mid { color: #8B949E; }
+  .sc-poor { color: #D4A843; }
+  .sc-bad { color: #E8A735; }
+  .sc-zero { color: #E8A735; }
+
+  /* Heatmap cell backgrounds */
+  .hm-great { background: rgba(59,130,246,0.25); color: #93c5fd; }
+  .hm-good { background: rgba(96,165,250,0.18); color: #93c5fd; }
+  .hm-mid { background: rgba(139,148,158,0.15); color: #c9d1d9; }
+  .hm-poor { background: rgba(212,168,67,0.15); color: #D4A843; }
+  .hm-bad { background: rgba(232,167,53,0.2); color: #E8A735; }
+  .hm-zero { background: rgba(232,167,53,0.25); color: #E8A735; }
+
+  .mk-card {
+    background: #161B22; border: 1px solid #30363d; border-radius: 3px;
+    padding: 3px 5px;
+  }
+  .mk-label { font-size: 4.5px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.3px; }
+  .mk-h { font-size: 6px; font-weight: 700; color: #f0f6fc; }
+  .mk-sub { font-size: 4.5px; color: #8b949e; }
+  .mk-blue { color: #3b82f6; }
+  .mk-gold { color: #E8A735; }
+
+  .mk-bar { height: 3px; background: #21262d; border-radius: 2px; overflow: hidden; }
+  .mk-bar .fill { height: 100%; border-radius: 2px; }
+  .mk-bar .fill.warn { background: linear-gradient(90deg, #E8A735, #D4A843); }
+  .mk-bar .fill.good { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+  .mk-bar .fill.prog { background: linear-gradient(90deg, #3b82f6, #22d3ee); }
+
+  .mk-stat { display: flex; justify-content: space-between; font-size: 5px; padding: 0.5px 0; }
+  .mk-stat .n { color: #8b949e; }
+  .mk-stat .v { font-weight: 600; }
+
+  .mk-cat { font-size: 4px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid #21262d; padding-bottom: 0.5px; margin-bottom: 1px; }
+
+  .mk-chip { font-size: 3.5px; background: rgba(59,130,246,0.15); color: #3b82f6; padding: 1px 3px; border-radius: 2px; display: inline-block; }
+  .mk-boon { font-size: 3.5px; background: #21262d; color: #8b949e; padding: 1px 3px; border-radius: 2px; display: inline-block; }
+
+  .mk-btn { font-size: 4px; padding: 2px 5px; border-radius: 2px; display: inline-block; }
+  .mk-btn.primary { background: #3b82f6; color: white; }
+  .mk-btn.secondary { background: #21262d; color: #c9d1d9; }
+
+  .mk-track { height: 3px; background: #21262d; border-radius: 2px; position: relative; }
+  .mk-track .fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #3b82f6, #22d3ee); width: 66%; }
+
+  .mk-sep { width: 1px; background: #30363d; align-self: stretch; margin: 0 2px; flex-shrink: 0; }
+  .mk-hsep { height: 1px; background: #30363d; margin: 2px 0; }
+
+  /* Heatmap grid cells */
+  .hm-grid { display: grid; gap: 1px; }
+  .hm-cell {
+    border-radius: 2px; padding: 1px 2px;
+    font-size: 4px; text-align: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 12px;
+  }
+  .hm-cell .hm-name { font-size: 3.5px; opacity: 0.7; margin-bottom: 0.5px; text-transform: capitalize; }
+  .hm-cell .hm-val { font-size: 5px; font-weight: 700; }
+
+  /* Inline bar within stat row */
+  .inline-bar {
+    flex: 1; height: 3px; background: #21262d; border-radius: 2px;
+    margin: 0 3px; overflow: hidden; max-width: 40px;
+  }
+  .inline-bar .fill { height: 100%; border-radius: 2px; }
+
+  /* ── Actions ── */
+  .actions {
+    margin-top: 24px;
+    display: flex; gap: 14px; align-items: center;
+  }
+  .copy-btn {
+    background: linear-gradient(180deg, #4B8DF7, #3B82F6);
+    color: white; border: none; padding: 9px 22px;
+    border-radius: 6px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: filter 0.15s;
+  }
+  .copy-btn:hover { filter: brightness(1.1); }
+  .copy-btn:active { transform: scale(0.98); }
+  .copy-status { font-size: 12px; color: #3fb950; display: none; }
+</style>
+</head>
+<body>
+
+<h1>Layout Options (Round 2)</h1>
+<p class="subtitle">Each mockup is a 16:9 laptop viewport with Princess Solano Lv.21 batter, Clutch Performer archetype. Focus: information density, data visualization, zero scroll.</p>
+
+<div class="options-grid">
+
+<!-- ═══════════════════════ OPTION 1: Heatmap + Action Strip ═══════════════════════ -->
+<div class="option" data-choice="1" onclick="select(this)">
+  <div class="option-header">
+    <span class="option-number">1</span>
+    <span class="option-name">Heatmap Grid + Action Strip</span>
+  </div>
+  <div class="option-desc">
+    Replace the stat table with a color-coded heatmap grid. Each stat is a colored cell (yellow=low, blue=high). You read the player at a glance. Top strip: identity + archetype + next action all in one line. Center: stat heatmap (left) + stat dev bars (right). Progression is a thin bar pinned to the bottom.
+  </div>
+  <div class="mockup mk">
+    <div class="mk-nav">
+      <span class="brand">MMOLB</span>
+      <span class="tab">Pitcher</span><span class="tab on">Batter</span>
+      <span class="right">Season 11</span>
+    </div>
+    <!-- Action strip: identity | archetype | next action -->
+    <div style="display:flex;gap:2px;margin-bottom:2px">
+      <div class="mk-card" style="flex:0 0 auto;display:flex;align-items:center;gap:4px;padding:3px 6px">
+        <span class="mk-h" style="font-size:7px">Princess Solano</span>
+        <span class="mk-sub">Lv.21</span>
+        <span class="mk-sub">Frozen Green Chilies | 1B</span>
+        <span class="mk-boon" style="margin-left:2px">Boon1</span>
+      </div>
+      <div class="mk-card" style="flex:1;padding:3px 6px;display:flex;align-items:center;gap:4px">
+        <span class="mk-label" style="flex-shrink:0">Archetype:</span>
+        <span style="font-size:5px;color:#f0f6fc;font-weight:600">Clutch Performer</span>
+        <span class="mk-chip">Perf</span><span class="mk-chip">Contact</span><span class="mk-chip">Muscle</span>
+      </div>
+      <div class="mk-card" style="flex:1;border-color:#3b82f650;padding:3px 6px">
+        <div style="display:flex;align-items:baseline;gap:4px">
+          <span class="mk-blue" style="font-size:4.5px">Next Lv.22</span>
+          <span class="mk-h">+50 Performance</span>
+          <span class="mk-sub" style="margin-left:auto">0/191 target</span>
+        </div>
+      </div>
+    </div>
+    <!-- Main: heatmap left, stat dev right -->
+    <div style="display:flex;gap:2px;flex:1;min-height:0">
+      <!-- Heatmap -->
+      <div class="mk-card" style="flex:3;overflow:hidden;display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+          <span class="mk-label">All Stats</span>
+          <span class="mk-btn secondary" style="font-size:3.5px">What-If</span>
+        </div>
+        <div style="display:flex;gap:4px;flex:1">
+          <!-- Batting column -->
+          <div style="flex:3">
+            <div class="mk-cat">Batting</div>
+            <div class="hm-grid" style="grid-template-columns:repeat(4,1fr);">
+              <div class="hm-cell hm-zero"><span class="hm-name">contact</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">discipline</span><span class="hm-val">25</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">muscle</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">lift</span><span class="hm-val">25</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">aiming</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">insight</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">vision</span><span class="hm-val">25</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">intimidation</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">cunning</span><span class="hm-val">25</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">determn.</span><span class="hm-val">30</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">wisdom</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">selfless</span><span class="hm-val">0</span></div>
+            </div>
+          </div>
+          <!-- Baserunning + defense + luck -->
+          <div style="flex:2">
+            <div class="mk-cat">Baserunning</div>
+            <div class="hm-grid" style="grid-template-columns:repeat(4,1fr);">
+              <div class="hm-cell hm-zero"><span class="hm-name">speed</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">stealth</span><span class="hm-val">55</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">greed</span><span class="hm-val">60</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">perf</span><span class="hm-val">0</span></div>
+            </div>
+            <div class="mk-cat" style="margin-top:3px">Defense</div>
+            <div class="hm-grid" style="grid-template-columns:repeat(4,1fr);">
+              <div class="hm-cell hm-zero"><span class="hm-name">acro</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">agility</span><span class="hm-val">30</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">arm</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">aware</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">compo</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">dex</span><span class="hm-val">25</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">patience</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">reaction</span><span class="hm-val">25</span></div>
+            </div>
+            <div class="mk-cat" style="margin-top:3px">Luck</div>
+            <div class="hm-grid" style="grid-template-columns:repeat(4,1fr);">
+              <div class="hm-cell hm-mid"><span class="hm-name">luck</span><span class="hm-val">102</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Stat dev -->
+      <div class="mk-card" style="flex:2;overflow:hidden;display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+          <span class="mk-label">Development</span>
+          <span class="mk-sub"><span class="mk-gold">6 behind</span> | 9 left</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px;flex:1">
+          <div style="border-left:2px solid #E8A735;background:rgba(232,167,53,0.08);border-radius:2px;padding:2px 4px">
+            <div style="display:flex;justify-content:space-between;font-size:5px"><span style="color:#f0f6fc;font-weight:600">Performance</span><span class="mk-gold">-191</span><span class="mk-sub">0 / 191</span></div>
+            <div class="mk-bar" style="margin-top:1px"><div class="fill warn" style="width:0%"></div></div>
+            <div style="font-size:3.5px;color:#8b949e;margin-top:0.5px">Significant gap, core stat</div>
+          </div>
+          <div style="border-left:2px solid #E8A735;background:rgba(232,167,53,0.08);border-radius:2px;padding:2px 4px">
+            <div style="display:flex;justify-content:space-between;font-size:5px"><span style="color:#f0f6fc;font-weight:600">Contact</span><span class="mk-gold">-191</span><span class="mk-sub">0 / 191</span></div>
+            <div class="mk-bar" style="margin-top:1px"><div class="fill warn" style="width:0%"></div></div>
+            <div style="font-size:3.5px;color:#8b949e;margin-top:0.5px">Significant gap, core stat</div>
+          </div>
+          <div style="border-left:2px solid #E8A735;background:rgba(232,167,53,0.08);border-radius:2px;padding:2px 4px">
+            <div style="display:flex;justify-content:space-between;font-size:5px"><span style="color:#f0f6fc;font-weight:600">Muscle</span><span class="mk-gold">-191</span><span class="mk-sub">0 / 191</span></div>
+            <div class="mk-bar" style="margin-top:1px"><div class="fill warn" style="width:0%"></div></div>
+          </div>
+          <div style="border-left:2px solid #D4A843;background:rgba(212,168,67,0.06);border-radius:2px;padding:2px 4px">
+            <div style="display:flex;justify-content:space-between;font-size:5px"><span style="color:#f0f6fc">Aiming</span><span class="mk-gold">-115</span><span class="mk-sub">0 / 115</span></div>
+            <div class="mk-bar" style="margin-top:1px"><div class="fill warn" style="width:0%"></div></div>
+          </div>
+          <div style="border-left:2px solid #D4A843;background:rgba(212,168,67,0.06);border-radius:2px;padding:2px 4px">
+            <div style="display:flex;justify-content:space-between;font-size:5px"><span style="color:#f0f6fc">Speed</span><span class="mk-gold">-115</span><span class="mk-sub">0 / 115</span></div>
+            <div class="mk-bar" style="margin-top:1px"><div class="fill warn" style="width:0%"></div></div>
+          </div>
+          <div style="border-left:2px solid #D4A843;background:rgba(212,168,67,0.06);border-radius:2px;padding:2px 4px">
+            <div style="display:flex;justify-content:space-between;font-size:5px"><span style="color:#f0f6fc">Insight</span><span class="mk-gold">-115</span><span class="mk-sub">0 / 115</span></div>
+            <div class="mk-bar" style="margin-top:1px"><div class="fill warn" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="mk-hsep"></div>
+        <div style="display:flex;gap:3px;align-items:center">
+          <span class="mk-btn primary">Copy Link</span><span class="mk-btn secondary">Discord</span>
+        </div>
+      </div>
+    </div>
+    <!-- Bottom: progression thin strip -->
+    <div style="padding:2px 4px;margin-top:2px">
+      <div class="mk-track"><div class="fill" style="height:100%;border-radius:2px;background:linear-gradient(90deg,#3b82f6,#22d3ee);width:66%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ OPTION 2: Merged Stats + Inline Targets ═══════════════════════ -->
+<div class="option" data-choice="2" onclick="select(this)">
+  <div class="option-header">
+    <span class="option-number">2</span>
+    <span class="option-name">Unified Stats with Inline Targets</span>
+    <span class="tag rec">recommended</span>
+  </div>
+  <div class="option-desc">
+    Kill the stat grid and stat development as separate panels. ONE stat panel shows every stat, and tracked stats get a target bar + gap badge inline. You see everything in one place. Archetype + next action in a compact top bar. Saves massive vertical space by eliminating duplication.
+  </div>
+  <div class="mockup mk">
+    <div class="mk-nav">
+      <span class="brand">MMOLB</span>
+      <span class="tab">Pitcher</span><span class="tab on">Batter</span>
+      <span class="right">Season 11</span>
+    </div>
+    <!-- Compact header bar -->
+    <div style="display:flex;gap:2px;margin-bottom:2px">
+      <div class="mk-card" style="flex:0 0 auto;padding:3px 6px;display:flex;align-items:center;gap:4px">
+        <span class="mk-h" style="font-size:7px">Princess Solano</span>
+        <span class="mk-sub">Lv.21 | 1B</span>
+        <span class="mk-boon">Boon</span>
+      </div>
+      <div class="mk-card" style="flex:1;padding:3px 6px;display:flex;align-items:center;gap:4px">
+        <span style="font-size:5px;color:#f0f6fc;font-weight:600">Clutch Performer</span>
+        <span class="mk-chip">Perf</span><span class="mk-chip">Contact</span><span class="mk-chip">Muscle</span>
+        <span class="mk-sub" style="font-size:4px">Elite performance, all hit types</span>
+      </div>
+      <div class="mk-card" style="flex:0 0 auto;border-color:#3b82f650;padding:3px 8px;display:flex;align-items:center;gap:4px">
+        <span class="mk-blue" style="font-size:4.5px">Lv.22:</span>
+        <span class="mk-h">+50 Performance</span>
+        <span class="mk-sub">0/191</span>
+      </div>
+    </div>
+    <!-- Single unified stat panel -->
+    <div class="mk-card" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+      <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+        <span class="mk-label">Stats &amp; Development</span>
+        <div style="display:flex;gap:6px">
+          <span class="mk-sub"><span style="color:#3b82f6;font-weight:600">0</span> on track</span>
+          <span class="mk-sub"><span class="mk-gold" style="font-weight:600">6</span> behind</span>
+          <span class="mk-sub"><span style="font-weight:600;color:#c9d1d9">9</span> levels left</span>
+          <span class="mk-btn secondary" style="font-size:3.5px">What-If</span>
+          <span class="mk-btn secondary" style="font-size:3.5px">Edit Targets</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex:1">
+        <!-- Batting col -->
+        <div style="flex:3">
+          <div class="mk-cat">Batting</div>
+          <!-- Tracked stat: highlighted row with bar -->
+          <div style="background:rgba(232,167,53,0.1);border-radius:2px;padding:1px 3px;margin:1px 0;border-left:2px solid #E8A735">
+            <div class="mk-stat"><span class="n" style="color:#f0f6fc;font-weight:600">Contact</span><span style="font-size:4px;color:#E8A735">-191</span><span class="v sc-zero">0</span><span class="mk-sub">/191</span></div>
+            <div class="mk-bar" style="height:2px"><div class="fill warn" style="width:0%"></div></div>
+          </div>
+          <div class="mk-stat"><span class="n">Discipline</span><span class="v sc-bad">25</span></div>
+          <div style="background:rgba(232,167,53,0.1);border-radius:2px;padding:1px 3px;margin:1px 0;border-left:2px solid #E8A735">
+            <div class="mk-stat"><span class="n" style="color:#f0f6fc;font-weight:600">Muscle</span><span style="font-size:4px;color:#E8A735">-191</span><span class="v sc-zero">0</span><span class="mk-sub">/191</span></div>
+            <div class="mk-bar" style="height:2px"><div class="fill warn" style="width:0%"></div></div>
+          </div>
+          <div class="mk-stat"><span class="n">Lift</span><span class="v sc-bad">25</span></div>
+          <div style="background:rgba(232,167,53,0.1);border-radius:2px;padding:1px 3px;margin:1px 0;border-left:2px solid #E8A735">
+            <div class="mk-stat"><span class="n" style="color:#f0f6fc;font-weight:600">Aiming</span><span style="font-size:4px;color:#E8A735">-115</span><span class="v sc-zero">0</span><span class="mk-sub">/115</span></div>
+            <div class="mk-bar" style="height:2px"><div class="fill warn" style="width:0%"></div></div>
+          </div>
+          <div style="background:rgba(232,167,53,0.1);border-radius:2px;padding:1px 3px;margin:1px 0;border-left:2px solid #E8A735">
+            <div class="mk-stat"><span class="n" style="color:#f0f6fc;font-weight:600">Insight</span><span style="font-size:4px;color:#E8A735">-115</span><span class="v sc-zero">0</span><span class="mk-sub">/115</span></div>
+            <div class="mk-bar" style="height:2px"><div class="fill warn" style="width:0%"></div></div>
+          </div>
+          <div class="mk-stat"><span class="n">Vision</span><span class="v sc-bad">25</span></div>
+          <div class="mk-stat"><span class="n">Intimidation</span><span class="v sc-zero">0</span></div>
+          <div class="mk-stat"><span class="n">Cunning</span><span class="v sc-bad">25</span></div>
+          <div class="mk-stat"><span class="n">Determination</span><span class="v sc-bad">30</span></div>
+          <div class="mk-stat"><span class="n">Wisdom</span><span class="v sc-zero">0</span></div>
+          <div class="mk-stat"><span class="n">Selflessness</span><span class="v sc-zero">0</span></div>
+        </div>
+        <!-- Baserunning col -->
+        <div style="flex:1">
+          <div class="mk-cat">Baserunning</div>
+          <div style="background:rgba(232,167,53,0.1);border-radius:2px;padding:1px 3px;margin:1px 0;border-left:2px solid #D4A843">
+            <div class="mk-stat"><span class="n" style="color:#f0f6fc;font-weight:600">Speed</span><span style="font-size:4px;color:#D4A843">-115</span><span class="v sc-zero">0</span><span class="mk-sub">/115</span></div>
+            <div class="mk-bar" style="height:2px"><div class="fill warn" style="width:0%"></div></div>
+          </div>
+          <div class="mk-stat"><span class="n">Stealth</span><span class="v sc-bad">55</span></div>
+          <div class="mk-stat"><span class="n">Greed</span><span class="v sc-bad">60</span></div>
+          <div class="mk-stat"><span class="n">Performance</span><span class="v sc-zero">0</span></div>
+          <div class="mk-cat" style="margin-top:4px">Luck</div>
+          <div class="mk-stat"><span class="n">Luck</span><span class="v sc-mid">102</span></div>
+        </div>
+        <!-- Defense col -->
+        <div style="flex:2">
+          <div class="mk-cat">Defense</div>
+          <div class="mk-stat"><span class="n">Acrobatics</span><span class="v sc-zero">0</span></div>
+          <div class="mk-stat"><span class="n">Agility</span><span class="v sc-bad">30</span></div>
+          <div class="mk-stat"><span class="n">Arm</span><span class="v sc-zero">0</span></div>
+          <div class="mk-stat"><span class="n">Awareness</span><span class="v sc-zero">0</span></div>
+          <div class="mk-stat"><span class="n">Composure</span><span class="v sc-zero">0</span></div>
+          <div class="mk-stat"><span class="n">Dexterity</span><span class="v sc-bad">25</span></div>
+          <div class="mk-stat"><span class="n">Patience</span><span class="v sc-zero">0</span></div>
+          <div class="mk-stat"><span class="n">Reaction</span><span class="v sc-bad">25</span></div>
+        </div>
+      </div>
+    </div>
+    <!-- Bottom strip: progression + share -->
+    <div style="display:flex;gap:3px;margin-top:2px;align-items:center">
+      <div style="flex:1"><div class="mk-track"><div class="fill" style="height:100%;border-radius:2px;background:linear-gradient(90deg,#3b82f6,#22d3ee);width:66%"></div></div></div>
+      <span class="mk-btn primary">Link</span><span class="mk-btn secondary">Discord</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ OPTION 3: Heatmap-Only + Sidebar Panel ═══════════════════════ -->
+<div class="option" data-choice="3" onclick="select(this)">
+  <div class="option-header">
+    <span class="option-number">3</span>
+    <span class="option-name">Dense Heatmap + Slide-Out Detail</span>
+  </div>
+  <div class="option-desc">
+    The heatmap IS the main view: a big colored grid fills the screen. Tracked stats get a pulsing border. Clicking a cell could slide out a detail panel. Archetype and next action in a slim top bar. Maximum visual density: 25 stats readable in 1 second flat.
+  </div>
+  <div class="mockup mk">
+    <div class="mk-nav">
+      <span class="brand">MMOLB</span>
+      <span class="tab">Pitcher</span><span class="tab on">Batter</span>
+      <span class="right">Season 11</span>
+    </div>
+    <div style="display:flex;gap:2px;margin-bottom:2px">
+      <div class="mk-card" style="flex:0 0 auto;padding:2px 6px;display:flex;align-items:center;gap:4px">
+        <span class="mk-h" style="font-size:7px">Princess Solano</span>
+        <span class="mk-sub">Lv.21 | 1B</span>
+      </div>
+      <div class="mk-card" style="flex:1;padding:2px 6px;display:flex;align-items:center;gap:3px">
+        <span style="font-size:5px;color:#f0f6fc;font-weight:600">Clutch Performer</span>
+        <span class="mk-chip">Perf</span><span class="mk-chip">Contact</span><span class="mk-chip">Muscle</span>
+      </div>
+      <div class="mk-card" style="flex:0 0 auto;border-color:#3b82f650;padding:2px 8px;display:flex;align-items:center;gap:3px">
+        <span class="mk-blue" style="font-size:4.5px">Next:</span>
+        <span class="mk-h">+50 Performance</span>
+        <span class="mk-sub">0/191</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:2px"><span class="mk-btn primary">Link</span><span class="mk-btn secondary">Disc</span></div>
+    </div>
+    <!-- GIANT HEATMAP -->
+    <div class="mk-card" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+      <div style="display:flex;gap:4px;flex:1">
+        <!-- Batting 4x3 grid -->
+        <div style="flex:3;display:flex;flex-direction:column">
+          <div class="mk-cat">Batting</div>
+          <div class="hm-grid" style="grid-template-columns:repeat(4,1fr);flex:1;gap:2px">
+            <div class="hm-cell hm-zero" style="border:1px solid #E8A73580;min-height:18px"><span class="hm-name">contact</span><span class="hm-val" style="font-size:7px">0</span><div class="mk-bar" style="width:80%;height:2px;margin-top:1px"><div class="fill warn" style="width:0%"></div></div></div>
+            <div class="hm-cell hm-poor" style="min-height:18px"><span class="hm-name">discipline</span><span class="hm-val" style="font-size:7px">25</span></div>
+            <div class="hm-cell hm-zero" style="border:1px solid #E8A73580;min-height:18px"><span class="hm-name">muscle</span><span class="hm-val" style="font-size:7px">0</span><div class="mk-bar" style="width:80%;height:2px;margin-top:1px"><div class="fill warn" style="width:0%"></div></div></div>
+            <div class="hm-cell hm-poor" style="min-height:18px"><span class="hm-name">lift</span><span class="hm-val" style="font-size:7px">25</span></div>
+            <div class="hm-cell hm-zero" style="border:1px solid #D4A84380;min-height:18px"><span class="hm-name">aiming</span><span class="hm-val" style="font-size:7px">0</span><div class="mk-bar" style="width:80%;height:2px;margin-top:1px"><div class="fill warn" style="width:0%"></div></div></div>
+            <div class="hm-cell hm-zero" style="border:1px solid #D4A84380;min-height:18px"><span class="hm-name">insight</span><span class="hm-val" style="font-size:7px">0</span><div class="mk-bar" style="width:80%;height:2px;margin-top:1px"><div class="fill warn" style="width:0%"></div></div></div>
+            <div class="hm-cell hm-poor" style="min-height:18px"><span class="hm-name">vision</span><span class="hm-val" style="font-size:7px">25</span></div>
+            <div class="hm-cell hm-zero" style="min-height:18px"><span class="hm-name">intimidation</span><span class="hm-val" style="font-size:7px">0</span></div>
+            <div class="hm-cell hm-poor" style="min-height:18px"><span class="hm-name">cunning</span><span class="hm-val" style="font-size:7px">25</span></div>
+            <div class="hm-cell hm-poor" style="min-height:18px"><span class="hm-name">determn.</span><span class="hm-val" style="font-size:7px">30</span></div>
+            <div class="hm-cell hm-zero" style="min-height:18px"><span class="hm-name">wisdom</span><span class="hm-val" style="font-size:7px">0</span></div>
+            <div class="hm-cell hm-zero" style="min-height:18px"><span class="hm-name">selfless</span><span class="hm-val" style="font-size:7px">0</span></div>
+          </div>
+        </div>
+        <!-- Right: baserunning, defense, luck -->
+        <div style="flex:2;display:flex;flex-direction:column;gap:3px">
+          <div style="flex:1">
+            <div class="mk-cat">Baserunning</div>
+            <div class="hm-grid" style="grid-template-columns:repeat(2,1fr);gap:2px">
+              <div class="hm-cell hm-zero" style="border:1px solid #D4A84380;min-height:18px"><span class="hm-name">speed</span><span class="hm-val" style="font-size:7px">0</span><div class="mk-bar" style="width:80%;height:2px;margin-top:1px"><div class="fill warn" style="width:0%"></div></div></div>
+              <div class="hm-cell hm-poor" style="min-height:18px"><span class="hm-name">stealth</span><span class="hm-val" style="font-size:7px">55</span></div>
+              <div class="hm-cell hm-poor" style="min-height:18px"><span class="hm-name">greed</span><span class="hm-val" style="font-size:7px">60</span></div>
+              <div class="hm-cell hm-zero" style="min-height:18px"><span class="hm-name">perf</span><span class="hm-val" style="font-size:7px">0</span></div>
+            </div>
+          </div>
+          <div style="flex:2">
+            <div class="mk-cat">Defense</div>
+            <div class="hm-grid" style="grid-template-columns:repeat(4,1fr);gap:2px">
+              <div class="hm-cell hm-zero" style="min-height:18px"><span class="hm-name">acro</span><span class="hm-val" style="font-size:7px">0</span></div>
+              <div class="hm-cell hm-poor" style="min-height:18px"><span class="hm-name">agility</span><span class="hm-val" style="font-size:7px">30</span></div>
+              <div class="hm-cell hm-zero" style="min-height:18px"><span class="hm-name">arm</span><span class="hm-val" style="font-size:7px">0</span></div>
+              <div class="hm-cell hm-zero" style="min-height:18px"><span class="hm-name">aware</span><span class="hm-val" style="font-size:7px">0</span></div>
+              <div class="hm-cell hm-zero" style="min-height:18px"><span class="hm-name">compo</span><span class="hm-val" style="font-size:7px">0</span></div>
+              <div class="hm-cell hm-poor" style="min-height:18px"><span class="hm-name">dex</span><span class="hm-val" style="font-size:7px">25</span></div>
+              <div class="hm-cell hm-zero" style="min-height:18px"><span class="hm-name">patience</span><span class="hm-val" style="font-size:7px">0</span></div>
+              <div class="hm-cell hm-poor" style="min-height:18px"><span class="hm-name">reaction</span><span class="hm-val" style="font-size:7px">25</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="mk-cat">Luck</div>
+            <div class="hm-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;gap:2px">
+              <div class="hm-cell hm-mid" style="min-height:18px"><span class="hm-name">luck</span><span class="hm-val" style="font-size:7px">102</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:2px 4px;margin-top:2px">
+      <div class="mk-track"><div class="fill" style="height:100%;border-radius:2px;background:linear-gradient(90deg,#3b82f6,#22d3ee);width:66%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ OPTION 4: Wide Stat Rows with Inline Bars ═══════════════════════ -->
+<div class="option" data-choice="4" onclick="select(this)">
+  <div class="option-header">
+    <span class="option-number">4</span>
+    <span class="option-name">Full-Width Stat Bars</span>
+  </div>
+  <div class="option-desc">
+    Every stat gets a horizontal bar showing 0-1000 progress, like a loading bar. Tracked stats show a target marker on the bar. Bars are color-coded. Compact rows use the full width. Archetype + action in a slim header. The bars make it intuitive: "how full is this stat?"
+  </div>
+  <div class="mockup mk">
+    <div class="mk-nav">
+      <span class="brand">MMOLB</span>
+      <span class="tab">Pitcher</span><span class="tab on">Batter</span>
+      <span class="right">Season 11</span>
+    </div>
+    <div style="display:flex;gap:2px;margin-bottom:2px">
+      <div class="mk-card" style="flex:0 0 auto;padding:2px 6px;display:flex;align-items:center;gap:4px">
+        <span class="mk-h" style="font-size:7px">Princess Solano</span>
+        <span class="mk-sub">Lv.21 | 1B</span>
+      </div>
+      <div class="mk-card" style="flex:1;padding:2px 6px;display:flex;align-items:center;gap:3px">
+        <span style="font-size:5px;color:#f0f6fc;font-weight:600">Clutch Performer</span>
+        <span class="mk-chip">Perf</span><span class="mk-chip">Contact</span><span class="mk-chip">Muscle</span>
+      </div>
+      <div class="mk-card" style="border-color:#3b82f650;padding:2px 8px;display:flex;align-items:center;gap:3px">
+        <span class="mk-blue" style="font-size:4.5px">Lv.22:</span>
+        <span class="mk-h">+50 Performance</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:2px"><span class="mk-btn primary">Link</span><span class="mk-btn secondary">Disc</span></div>
+    </div>
+    <!-- Stat bar rows in columns -->
+    <div class="mk-card" style="flex:1;display:flex;gap:6px;overflow:hidden">
+      <div style="flex:3;display:flex;flex-direction:column">
+        <div class="mk-cat">Batting</div>
+        <!-- Each row: name, bar, value -->
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;background:rgba(232,167,53,0.08);border-radius:2px;padding-left:3px;border-left:2px solid #E8A735;margin:0.5px 0">
+          <span style="width:40px;color:#f0f6fc;font-weight:600">Contact</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px;position:relative"><div style="position:absolute;left:19.1%;top:-1px;bottom:-1px;width:1px;background:#E8A735;opacity:0.5"></div></div>
+          <span class="sc-zero" style="width:20px;text-align:right;font-weight:600">0</span>
+          <span class="mk-sub" style="width:16px;text-align:right">/191</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;padding-left:3px;margin:0.5px 0">
+          <span style="width:40px;color:#8b949e">Discipline</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px"><div style="width:2.5%;height:100%;background:#E8A735;border-radius:2px"></div></div>
+          <span class="sc-bad" style="width:20px;text-align:right;font-weight:600">25</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;background:rgba(232,167,53,0.08);border-radius:2px;padding-left:3px;border-left:2px solid #E8A735;margin:0.5px 0">
+          <span style="width:40px;color:#f0f6fc;font-weight:600">Muscle</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px;position:relative"><div style="position:absolute;left:19.1%;top:-1px;bottom:-1px;width:1px;background:#E8A735;opacity:0.5"></div></div>
+          <span class="sc-zero" style="width:20px;text-align:right;font-weight:600">0</span>
+          <span class="mk-sub" style="width:16px;text-align:right">/191</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;padding-left:3px;margin:0.5px 0">
+          <span style="width:40px;color:#8b949e">Lift</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px"><div style="width:2.5%;height:100%;background:#E8A735;border-radius:2px"></div></div>
+          <span class="sc-bad" style="width:20px;text-align:right;font-weight:600">25</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;background:rgba(232,167,53,0.08);border-radius:2px;padding-left:3px;border-left:2px solid #D4A843;margin:0.5px 0">
+          <span style="width:40px;color:#f0f6fc;font-weight:600">Aiming</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px;position:relative"><div style="position:absolute;left:11.5%;top:-1px;bottom:-1px;width:1px;background:#D4A843;opacity:0.5"></div></div>
+          <span class="sc-zero" style="width:20px;text-align:right;font-weight:600">0</span>
+          <span class="mk-sub" style="width:16px;text-align:right">/115</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;background:rgba(232,167,53,0.08);border-radius:2px;padding-left:3px;border-left:2px solid #D4A843;margin:0.5px 0">
+          <span style="width:40px;color:#f0f6fc;font-weight:600">Insight</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px;position:relative"><div style="position:absolute;left:11.5%;top:-1px;bottom:-1px;width:1px;background:#D4A843;opacity:0.5"></div></div>
+          <span class="sc-zero" style="width:20px;text-align:right;font-weight:600">0</span>
+          <span class="mk-sub" style="width:16px;text-align:right">/115</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;padding-left:3px;margin:0.5px 0">
+          <span style="width:40px;color:#8b949e">Vision</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px"><div style="width:2.5%;height:100%;background:#E8A735;border-radius:2px"></div></div>
+          <span class="sc-bad" style="width:20px;text-align:right;font-weight:600">25</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;padding-left:3px;margin:0.5px 0">
+          <span style="width:40px;color:#8b949e">Intimidation</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px"></div>
+          <span class="sc-zero" style="width:20px;text-align:right;font-weight:600">0</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;padding-left:3px;margin:0.5px 0">
+          <span style="width:40px;color:#8b949e">Cunning</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px"><div style="width:2.5%;height:100%;background:#E8A735;border-radius:2px"></div></div>
+          <span class="sc-bad" style="width:20px;text-align:right;font-weight:600">25</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;padding-left:3px;margin:0.5px 0">
+          <span style="width:40px;color:#8b949e">Determination</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px"><div style="width:3%;height:100%;background:#E8A735;border-radius:2px"></div></div>
+          <span class="sc-bad" style="width:20px;text-align:right;font-weight:600">30</span>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column">
+        <div class="mk-cat">Baserunning</div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;background:rgba(212,168,67,0.08);border-radius:2px;padding-left:3px;border-left:2px solid #D4A843;margin:0.5px 0">
+          <span style="width:32px;color:#f0f6fc;font-weight:600">Speed</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px;position:relative"><div style="position:absolute;left:11.5%;top:-1px;bottom:-1px;width:1px;background:#D4A843;opacity:0.5"></div></div>
+          <span class="sc-zero" style="width:16px;text-align:right;font-weight:600">0</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;padding-left:3px;margin:0.5px 0">
+          <span style="width:32px;color:#8b949e">Stealth</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px"><div style="width:5.5%;height:100%;background:#E8A735;border-radius:2px"></div></div>
+          <span class="sc-bad" style="width:16px;text-align:right;font-weight:600">55</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;padding-left:3px;margin:0.5px 0">
+          <span style="width:32px;color:#8b949e">Greed</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px"><div style="width:6%;height:100%;background:#E8A735;border-radius:2px"></div></div>
+          <span class="sc-bad" style="width:16px;text-align:right;font-weight:600">60</span>
+        </div>
+        <div class="mk-cat" style="margin-top:3px">Defense</div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;padding-left:3px;margin:0.5px 0">
+          <span style="width:32px;color:#8b949e">Agility</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px"><div style="width:3%;height:100%;background:#E8A735;border-radius:2px"></div></div>
+          <span class="sc-bad" style="width:16px;text-align:right;font-weight:600">30</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;padding-left:3px;margin:0.5px 0">
+          <span style="width:32px;color:#8b949e">Dexterity</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px"><div style="width:2.5%;height:100%;background:#E8A735;border-radius:2px"></div></div>
+          <span class="sc-bad" style="width:16px;text-align:right;font-weight:600">25</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;padding-left:3px;margin:0.5px 0">
+          <span style="width:32px;color:#8b949e">Reaction</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px"><div style="width:2.5%;height:100%;background:#E8A735;border-radius:2px"></div></div>
+          <span class="sc-bad" style="width:16px;text-align:right;font-weight:600">25</span>
+        </div>
+        <div class="mk-cat" style="margin-top:3px">Luck</div>
+        <div style="display:flex;align-items:center;gap:2px;font-size:4.5px;padding:1.5px 0;padding-left:3px;margin:0.5px 0">
+          <span style="width:32px;color:#8b949e">Luck</span>
+          <div style="flex:1;height:4px;background:#21262d;border-radius:2px"><div style="width:10.2%;height:100%;background:#8B949E;border-radius:2px"></div></div>
+          <span class="sc-mid" style="width:16px;text-align:right;font-weight:600">102</span>
+        </div>
+      </div>
+    </div>
+    <div style="padding:2px 4px;margin-top:2px"><div class="mk-track"><div class="fill" style="height:100%;border-radius:2px;background:linear-gradient(90deg,#3b82f6,#22d3ee);width:66%"></div></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ OPTION 5: Compact Dashboard ═══════════════════════ -->
+<div class="option" data-choice="5" onclick="select(this)">
+  <div class="option-header">
+    <span class="option-number">5</span>
+    <span class="option-name">Compact Dashboard: Dev Left, Heatmap Right</span>
+  </div>
+  <div class="option-desc">
+    Two equal panels. Left: archetype selector, next action card, and stat dev cards (the stuff you interact with). Right: heatmap grid of all stats (glanceable reference). Progression bar at the bottom. Share buttons in the header. Fonts are normal size. Cards have breathing room.
+  </div>
+  <div class="mockup mk">
+    <div class="mk-nav">
+      <span class="brand">MMOLB</span>
+      <span class="tab">Pitcher</span><span class="tab on">Batter</span>
+      <span class="right">Season 11</span>
+    </div>
+    <!-- Header with identity + share -->
+    <div style="display:flex;gap:2px;margin-bottom:2px">
+      <div class="mk-card" style="flex:1;padding:3px 6px;display:flex;align-items:center;gap:4px">
+        <span class="mk-h" style="font-size:8px">Princess Solano</span>
+        <span class="mk-sub">Lv.21</span>
+        <span class="mk-sub">Frozen Green Chilies | 1B</span>
+        <span class="mk-boon" style="margin-left:2px">Boon1</span>
+        <span class="mk-boon">Boon2</span>
+        <div style="margin-left:auto;display:flex;gap:2px"><span class="mk-btn primary">Copy Link</span><span class="mk-btn secondary">Discord</span></div>
+      </div>
+    </div>
+    <!-- Two panels -->
+    <div style="display:flex;gap:3px;flex:1;min-height:0">
+      <!-- Left: action -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+        <!-- Archetype + Next Action side by side -->
+        <div style="display:flex;gap:2px">
+          <div class="mk-card" style="flex:1;padding:3px 6px">
+            <div class="mk-label">Archetype</div>
+            <div style="font-size:5.5px;color:#f0f6fc;font-weight:600;margin-top:1px">Clutch Performer</div>
+            <div style="display:flex;gap:2px;margin-top:2px"><span class="mk-chip">Perf</span><span class="mk-chip">Contact</span><span class="mk-chip">Muscle</span></div>
+            <div style="font-size:4px;color:#8b949e;margin-top:1px">Elite performance boosts all hit types.</div>
+          </div>
+          <div class="mk-card" style="flex:1;border-color:#3b82f650;padding:3px 6px">
+            <div class="mk-blue" style="font-size:4.5px">Next: Level 22</div>
+            <div class="mk-h" style="margin-top:1px">+50 Performance</div>
+            <div class="mk-sub" style="margin-top:1px">0 / 191 target. 191 behind.</div>
+            <div class="mk-sub">0% overall progress</div>
+          </div>
+        </div>
+        <!-- Stat dev -->
+        <div class="mk-card" style="flex:1;display:flex;flex-direction:column">
+          <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+            <span class="mk-label">Development</span>
+            <span class="mk-sub"><span class="mk-gold" style="font-weight:600">6</span> behind | <span style="color:#c9d1d9;font-weight:600">9</span> left</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;flex:1">
+            <div style="border-left:2px solid #E8A735;background:rgba(232,167,53,0.08);border-radius:2px;padding:3px 5px">
+              <div style="display:flex;justify-content:space-between;font-size:5.5px"><span style="color:#f0f6fc;font-weight:600">Performance</span><span class="mk-gold">-191</span></div>
+              <div class="mk-bar" style="margin-top:2px"><div class="fill warn" style="width:0%"></div></div>
+              <div style="font-size:4px;color:#8b949e;margin-top:1px">Core stat, significant gap</div>
+            </div>
+            <div style="border-left:2px solid #E8A735;background:rgba(232,167,53,0.08);border-radius:2px;padding:3px 5px">
+              <div style="display:flex;justify-content:space-between;font-size:5.5px"><span style="color:#f0f6fc;font-weight:600">Contact</span><span class="mk-gold">-191</span></div>
+              <div class="mk-bar" style="margin-top:2px"><div class="fill warn" style="width:0%"></div></div>
+              <div style="font-size:4px;color:#8b949e;margin-top:1px">Core stat, significant gap</div>
+            </div>
+            <div style="border-left:2px solid #E8A735;background:rgba(232,167,53,0.08);border-radius:2px;padding:3px 5px">
+              <div style="display:flex;justify-content:space-between;font-size:5.5px"><span style="color:#f0f6fc;font-weight:600">Muscle</span><span class="mk-gold">-191</span></div>
+              <div class="mk-bar" style="margin-top:2px"><div class="fill warn" style="width:0%"></div></div>
+            </div>
+            <div style="border-left:2px solid #D4A843;background:rgba(212,168,67,0.06);border-radius:2px;padding:3px 5px">
+              <div style="display:flex;justify-content:space-between;font-size:5.5px"><span style="color:#f0f6fc">Aiming</span><span class="mk-gold">-115</span></div>
+              <div class="mk-bar" style="margin-top:2px"><div class="fill warn" style="width:0%"></div></div>
+            </div>
+            <div style="border-left:2px solid #D4A843;background:rgba(212,168,67,0.06);border-radius:2px;padding:3px 5px">
+              <div style="display:flex;justify-content:space-between;font-size:5.5px"><span style="color:#f0f6fc">Speed</span><span class="mk-gold">-115</span></div>
+              <div class="mk-bar" style="margin-top:2px"><div class="fill warn" style="width:0%"></div></div>
+            </div>
+            <div style="border-left:2px solid #D4A843;background:rgba(212,168,67,0.06);border-radius:2px;padding:3px 5px">
+              <div style="display:flex;justify-content:space-between;font-size:5.5px"><span style="color:#f0f6fc">Insight</span><span class="mk-gold">-115</span></div>
+              <div class="mk-bar" style="margin-top:2px"><div class="fill warn" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Right: heatmap -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+        <div class="mk-card" style="flex:1;display:flex;flex-direction:column">
+          <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+            <span class="mk-label">All Stats</span>
+            <span class="mk-btn secondary" style="font-size:3.5px">What-If</span>
+          </div>
+          <div style="display:flex;gap:3px;flex:1">
+            <div style="flex:3">
+              <div class="mk-cat">Batting</div>
+              <div class="hm-grid" style="grid-template-columns:repeat(3,1fr);gap:2px">
+                <div class="hm-cell hm-zero" style="border:1px solid #E8A73560"><span class="hm-name">contact</span><span class="hm-val" style="font-size:6px">0</span></div>
+                <div class="hm-cell hm-poor"><span class="hm-name">discipline</span><span class="hm-val" style="font-size:6px">25</span></div>
+                <div class="hm-cell hm-zero" style="border:1px solid #E8A73560"><span class="hm-name">muscle</span><span class="hm-val" style="font-size:6px">0</span></div>
+                <div class="hm-cell hm-poor"><span class="hm-name">lift</span><span class="hm-val" style="font-size:6px">25</span></div>
+                <div class="hm-cell hm-zero" style="border:1px solid #D4A84360"><span class="hm-name">aiming</span><span class="hm-val" style="font-size:6px">0</span></div>
+                <div class="hm-cell hm-zero" style="border:1px solid #D4A84360"><span class="hm-name">insight</span><span class="hm-val" style="font-size:6px">0</span></div>
+                <div class="hm-cell hm-poor"><span class="hm-name">vision</span><span class="hm-val" style="font-size:6px">25</span></div>
+                <div class="hm-cell hm-zero"><span class="hm-name">intimid.</span><span class="hm-val" style="font-size:6px">0</span></div>
+                <div class="hm-cell hm-poor"><span class="hm-name">cunning</span><span class="hm-val" style="font-size:6px">25</span></div>
+                <div class="hm-cell hm-poor"><span class="hm-name">determ.</span><span class="hm-val" style="font-size:6px">30</span></div>
+                <div class="hm-cell hm-zero"><span class="hm-name">wisdom</span><span class="hm-val" style="font-size:6px">0</span></div>
+                <div class="hm-cell hm-zero"><span class="hm-name">selfless</span><span class="hm-val" style="font-size:6px">0</span></div>
+              </div>
+            </div>
+            <div style="flex:2;display:flex;flex-direction:column;gap:2px">
+              <div>
+                <div class="mk-cat">Baserunning</div>
+                <div class="hm-grid" style="grid-template-columns:repeat(2,1fr);gap:2px">
+                  <div class="hm-cell hm-zero" style="border:1px solid #D4A84360"><span class="hm-name">speed</span><span class="hm-val" style="font-size:6px">0</span></div>
+                  <div class="hm-cell hm-poor"><span class="hm-name">stealth</span><span class="hm-val" style="font-size:6px">55</span></div>
+                  <div class="hm-cell hm-poor"><span class="hm-name">greed</span><span class="hm-val" style="font-size:6px">60</span></div>
+                  <div class="hm-cell hm-zero"><span class="hm-name">perf</span><span class="hm-val" style="font-size:6px">0</span></div>
+                </div>
+              </div>
+              <div>
+                <div class="mk-cat">Defense</div>
+                <div class="hm-grid" style="grid-template-columns:repeat(2,1fr);gap:2px">
+                  <div class="hm-cell hm-zero"><span class="hm-name">acro</span><span class="hm-val" style="font-size:6px">0</span></div>
+                  <div class="hm-cell hm-poor"><span class="hm-name">agility</span><span class="hm-val" style="font-size:6px">30</span></div>
+                  <div class="hm-cell hm-zero"><span class="hm-name">arm</span><span class="hm-val" style="font-size:6px">0</span></div>
+                  <div class="hm-cell hm-zero"><span class="hm-name">aware</span><span class="hm-val" style="font-size:6px">0</span></div>
+                  <div class="hm-cell hm-zero"><span class="hm-name">compo</span><span class="hm-val" style="font-size:6px">0</span></div>
+                  <div class="hm-cell hm-poor"><span class="hm-name">dex</span><span class="hm-val" style="font-size:6px">25</span></div>
+                  <div class="hm-cell hm-zero"><span class="hm-name">patience</span><span class="hm-val" style="font-size:6px">0</span></div>
+                  <div class="hm-cell hm-poor"><span class="hm-name">reaction</span><span class="hm-val" style="font-size:6px">25</span></div>
+                </div>
+              </div>
+              <div>
+                <div class="mk-cat">Luck</div>
+                <div class="hm-grid" style="grid-template-columns:repeat(2,1fr);gap:2px">
+                  <div class="hm-cell hm-mid"><span class="hm-name">luck</span><span class="hm-val" style="font-size:6px">102</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:2px 4px;margin-top:2px"><div class="mk-track"><div class="fill" style="height:100%;border-radius:2px;background:linear-gradient(90deg,#3b82f6,#22d3ee);width:66%"></div></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ OPTION 6: Hybrid Bars + Heatmap ═══════════════════════ -->
+<div class="option" data-choice="6" onclick="select(this)">
+  <div class="option-header">
+    <span class="option-number">6</span>
+    <span class="option-name">Bar Rows for Tracked, Heatmap for Rest</span>
+  </div>
+  <div class="option-desc">
+    Best of both worlds: tracked stats (6-10) get full bar rows with targets on the left side. All other stats are a compact heatmap grid on the right. You focus on what matters (the bars), and glance at the rest (the colors). Top bar has identity + archetype + action merged.
+  </div>
+  <div class="mockup mk">
+    <div class="mk-nav">
+      <span class="brand">MMOLB</span>
+      <span class="tab">Pitcher</span><span class="tab on">Batter</span>
+      <span class="right">Season 11</span>
+    </div>
+    <div style="display:flex;gap:2px;margin-bottom:2px">
+      <div class="mk-card" style="flex:0 0 auto;padding:3px 6px;display:flex;align-items:center;gap:4px">
+        <span class="mk-h" style="font-size:7px">Princess Solano</span>
+        <span class="mk-sub">Lv.21 | 1B</span>
+        <span class="mk-boon">Boon</span>
+      </div>
+      <div class="mk-card" style="flex:1;padding:3px 6px;display:flex;align-items:center;gap:3px">
+        <span style="font-size:5px;color:#f0f6fc;font-weight:600">Clutch Performer</span>
+        <span class="mk-chip">Perf</span><span class="mk-chip">Contact</span><span class="mk-chip">Muscle</span>
+        <span class="mk-sub" style="font-size:4px">Elite performance, all hit types</span>
+      </div>
+      <div class="mk-card" style="border-color:#3b82f650;padding:3px 8px;display:flex;align-items:center;gap:3px">
+        <span class="mk-blue" style="font-size:4.5px">Lv.22:</span>
+        <span class="mk-h">+50 Performance</span>
+        <span class="mk-sub">191 behind</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:2px"><span class="mk-btn primary">Link</span><span class="mk-btn secondary">Disc</span></div>
+    </div>
+    <!-- Main split: tracked bars left, heatmap right -->
+    <div style="display:flex;gap:3px;flex:1;min-height:0">
+      <!-- Left: tracked stat bars -->
+      <div class="mk-card" style="flex:3;display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <span class="mk-label">Tracked Stats</span>
+          <span class="mk-sub"><span class="mk-gold" style="font-weight:600">6</span> behind | <span style="font-weight:600;color:#c9d1d9">9</span> left | <span class="mk-btn secondary" style="font-size:3.5px">Edit Targets</span></span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;flex:1">
+          <!-- Each tracked stat: big bar row -->
+          <div style="display:flex;align-items:center;gap:4px;background:rgba(232,167,53,0.08);border-radius:3px;padding:3px 6px;border-left:2px solid #E8A735">
+            <span style="width:55px;font-size:6px;color:#f0f6fc;font-weight:600">Performance</span>
+            <div style="flex:1;height:6px;background:#21262d;border-radius:3px;position:relative">
+              <div style="position:absolute;left:19.1%;top:-2px;bottom:-2px;width:1.5px;background:#E8A735;opacity:0.6;border-radius:1px"></div>
+            </div>
+            <span style="font-size:6px;color:#E8A735;font-weight:700;width:18px;text-align:right">0</span>
+            <span style="font-size:5px;color:#8b949e">/191</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;background:rgba(232,167,53,0.08);border-radius:3px;padding:3px 6px;border-left:2px solid #E8A735">
+            <span style="width:55px;font-size:6px;color:#f0f6fc;font-weight:600">Contact</span>
+            <div style="flex:1;height:6px;background:#21262d;border-radius:3px;position:relative">
+              <div style="position:absolute;left:19.1%;top:-2px;bottom:-2px;width:1.5px;background:#E8A735;opacity:0.6;border-radius:1px"></div>
+            </div>
+            <span style="font-size:6px;color:#E8A735;font-weight:700;width:18px;text-align:right">0</span>
+            <span style="font-size:5px;color:#8b949e">/191</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;background:rgba(232,167,53,0.08);border-radius:3px;padding:3px 6px;border-left:2px solid #E8A735">
+            <span style="width:55px;font-size:6px;color:#f0f6fc;font-weight:600">Muscle</span>
+            <div style="flex:1;height:6px;background:#21262d;border-radius:3px;position:relative">
+              <div style="position:absolute;left:19.1%;top:-2px;bottom:-2px;width:1.5px;background:#E8A735;opacity:0.6;border-radius:1px"></div>
+            </div>
+            <span style="font-size:6px;color:#E8A735;font-weight:700;width:18px;text-align:right">0</span>
+            <span style="font-size:5px;color:#8b949e">/191</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;background:rgba(212,168,67,0.06);border-radius:3px;padding:3px 6px;border-left:2px solid #D4A843">
+            <span style="width:55px;font-size:6px;color:#f0f6fc">Aiming</span>
+            <div style="flex:1;height:6px;background:#21262d;border-radius:3px;position:relative">
+              <div style="position:absolute;left:11.5%;top:-2px;bottom:-2px;width:1.5px;background:#D4A843;opacity:0.6;border-radius:1px"></div>
+            </div>
+            <span style="font-size:6px;color:#E8A735;font-weight:700;width:18px;text-align:right">0</span>
+            <span style="font-size:5px;color:#8b949e">/115</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;background:rgba(212,168,67,0.06);border-radius:3px;padding:3px 6px;border-left:2px solid #D4A843">
+            <span style="width:55px;font-size:6px;color:#f0f6fc">Speed</span>
+            <div style="flex:1;height:6px;background:#21262d;border-radius:3px;position:relative">
+              <div style="position:absolute;left:11.5%;top:-2px;bottom:-2px;width:1.5px;background:#D4A843;opacity:0.6;border-radius:1px"></div>
+            </div>
+            <span style="font-size:6px;color:#E8A735;font-weight:700;width:18px;text-align:right">0</span>
+            <span style="font-size:5px;color:#8b949e">/115</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;background:rgba(212,168,67,0.06);border-radius:3px;padding:3px 6px;border-left:2px solid #D4A843">
+            <span style="width:55px;font-size:6px;color:#f0f6fc">Insight</span>
+            <div style="flex:1;height:6px;background:#21262d;border-radius:3px;position:relative">
+              <div style="position:absolute;left:11.5%;top:-2px;bottom:-2px;width:1.5px;background:#D4A843;opacity:0.6;border-radius:1px"></div>
+            </div>
+            <span style="font-size:6px;color:#E8A735;font-weight:700;width:18px;text-align:right">0</span>
+            <span style="font-size:5px;color:#8b949e">/115</span>
+          </div>
+        </div>
+      </div>
+      <!-- Right: heatmap for everything -->
+      <div class="mk-card" style="flex:2;display:flex;flex-direction:column;overflow:hidden">
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+          <span class="mk-label">All Stats</span>
+          <span class="mk-btn secondary" style="font-size:3.5px">What-If</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;flex:1">
+          <div>
+            <div class="mk-cat">Batting</div>
+            <div class="hm-grid" style="grid-template-columns:repeat(4,1fr);gap:2px">
+              <div class="hm-cell hm-zero" style="border:1px solid #E8A73560"><span class="hm-name">contact</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">disc</span><span class="hm-val">25</span></div>
+              <div class="hm-cell hm-zero" style="border:1px solid #E8A73560"><span class="hm-name">muscle</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">lift</span><span class="hm-val">25</span></div>
+              <div class="hm-cell hm-zero" style="border:1px solid #D4A84360"><span class="hm-name">aim</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-zero" style="border:1px solid #D4A84360"><span class="hm-name">insight</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">vision</span><span class="hm-val">25</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">intim</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">cunn</span><span class="hm-val">25</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">det</span><span class="hm-val">30</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">wis</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">self</span><span class="hm-val">0</span></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:3px">
+            <div style="flex:1">
+              <div class="mk-cat">Baserunning</div>
+              <div class="hm-grid" style="grid-template-columns:repeat(2,1fr);gap:2px">
+                <div class="hm-cell hm-zero" style="border:1px solid #D4A84360"><span class="hm-name">speed</span><span class="hm-val">0</span></div>
+                <div class="hm-cell hm-poor"><span class="hm-name">stealth</span><span class="hm-val">55</span></div>
+                <div class="hm-cell hm-poor"><span class="hm-name">greed</span><span class="hm-val">60</span></div>
+                <div class="hm-cell hm-zero"><span class="hm-name">perf</span><span class="hm-val">0</span></div>
+              </div>
+            </div>
+            <div style="flex:1">
+              <div class="mk-cat">Luck</div>
+              <div class="hm-grid" style="grid-template-columns:1fr;gap:2px">
+                <div class="hm-cell hm-mid"><span class="hm-name">luck</span><span class="hm-val">102</span></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="mk-cat">Defense</div>
+            <div class="hm-grid" style="grid-template-columns:repeat(4,1fr);gap:2px">
+              <div class="hm-cell hm-zero"><span class="hm-name">acro</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">agil</span><span class="hm-val">30</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">arm</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">aware</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">comp</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">dex</span><span class="hm-val">25</span></div>
+              <div class="hm-cell hm-zero"><span class="hm-name">pat</span><span class="hm-val">0</span></div>
+              <div class="hm-cell hm-poor"><span class="hm-name">react</span><span class="hm-val">25</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:2px 4px;margin-top:2px"><div class="mk-track"><div class="fill" style="height:100%;border-radius:2px;background:linear-gradient(90deg,#3b82f6,#22d3ee);width:66%"></div></div></div>
+  </div>
+</div>
+
+</div>
+
+<div class="actions">
+  <button class="copy-btn" onclick="copyChoice()">Copy Selection</button>
+  <span class="copy-status" id="status">Copied!</span>
+  <span style="font-size:13px;color:#8b949e" id="selection-label">No selection</span>
+</div>
+
+<script>
+let selectedChoice = null;
+
+function select(el) {
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedChoice = el.dataset.choice;
+  const name = el.querySelector('.option-name').textContent;
+  document.getElementById('selection-label').textContent = `Selected: Option ${selectedChoice} — ${name}`;
+}
+
+function copyChoice() {
+  if (!selectedChoice) { alert('Pick a layout first'); return; }
+  const el = document.querySelector(`.option[data-choice="${selectedChoice}"]`);
+  const name = el.querySelector('.option-name').textContent;
+  const desc = el.querySelector('.option-desc').textContent.trim();
+  const text = `Layout choice: Option ${selectedChoice} — ${name}\n\n${desc}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const s = document.getElementById('status');
+    s.style.display = 'inline';
+    setTimeout(() => s.style.display = 'none', 2000);
+  });
+}
+</script>
+</body>
+</html>

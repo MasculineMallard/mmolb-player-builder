@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getTeamRoster } from "@/lib/queries";
+import { getTeamRoster } from "@/lib/player-data";
+import { validateId } from "@/lib/validation";
 
 export async function GET(
   _request: NextRequest,
@@ -7,11 +8,16 @@ export async function GET(
 ) {
   const { id } = await params;
 
+  const invalid = validateId(id);
+  if (invalid) return invalid;
+
   try {
     const roster = await getTeamRoster(id);
-    return NextResponse.json(roster);
+    return NextResponse.json(roster, {
+      headers: { "Cache-Control": "public, max-age=300, stale-while-revalidate=60" },
+    });
   } catch (error) {
-    console.error("Get roster error:", error);
+    console.error("Get roster error:", error instanceof Error ? error.message : String(error));
     return NextResponse.json(
       { error: "Failed to fetch roster" },
       { status: 500 }
