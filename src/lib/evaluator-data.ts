@@ -7,6 +7,7 @@
 import type { PercentileEntry, PlayerRole } from "./evaluator-types";
 import type { Archetype } from "./types";
 import { createJsonCache, isNonArrayObject } from "./json-cache";
+import { BASE_PATH } from "./constants";
 
 // ---------------------------------------------------------------------------
 // Stat Tiers (from S10 regression — which stats actually matter)
@@ -267,7 +268,7 @@ export interface LivePercentileTables {
  */
 export async function loadLivePercentiles(): Promise<LivePercentileTables | null> {
   try {
-    const res = await fetch("/api/percentiles", {
+    const res = await fetch(`${BASE_PATH}/api/percentiles`, {
       signal: AbortSignal.timeout(5000),
       cache: "no-store",
     });

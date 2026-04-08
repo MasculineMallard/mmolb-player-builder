@@ -6,6 +6,7 @@ import { useTeamSearch } from "@/hooks/use-team-search";
 import { usePlayerStore } from "@/store/player-store";
 import { isAbortError } from "@/lib/utils";
 import type { TeamSearchResult, RosterPlayer, PlayerSearchResult } from "@/lib/types";
+import { BASE_PATH } from "@/lib/constants";
 
 function useKeyboardNav(itemCount: number, onSelect: (index: number) => void) {
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -171,7 +172,7 @@ function TeamBrowser({
     setLoadingRoster(true);
     setRosterError(false);
     try {
-      const res = await fetch(`/api/teams/${team.mmolbTeamId}/roster`, {
+      const res = await fetch(`${BASE_PATH}/api/teams/${team.mmolbTeamId}/roster`, {
         signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]),
       });
       if (!res.ok) throw new Error(`Roster load failed: ${res.status}`);

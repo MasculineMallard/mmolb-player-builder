@@ -41,7 +41,7 @@ export function PlayerRow({ eval: ev, onPositionChange, percentileTables }: {
         className="hover:bg-[#111827] cursor-pointer transition-colors"
         onClick={() => setExpanded(!expanded)}
       >
-        <td className="px-3 py-2">
+        <td className="px-3 py-2.5">
           <select
             value={p.position ?? ""}
             onChange={(e) => {
@@ -49,14 +49,14 @@ export function PlayerRow({ eval: ev, onPositionChange, percentileTables }: {
               onPositionChange?.(p.mmolbPlayerId, e.target.value);
             }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#1a2332] text-[#00e5ff] px-1 py-0.5 rounded text-[13px] font-bold text-center min-w-[28px] border-none cursor-pointer appearance-none hover:bg-[#243044]"
+            className="bg-[#1a2332] text-[#00e5ff] px-1.5 py-1 rounded text-[13px] font-bold text-center min-w-[36px] border-none cursor-pointer appearance-none hover:bg-[#243044]"
           >
             {POSITIONS.map(pos => (
               <option key={pos} value={pos}>{pos}</option>
             ))}
           </select>
         </td>
-        <td className="px-3 py-2">
+        <td className="px-3 py-2.5">
           <div className="font-semibold text-sm text-foreground whitespace-nowrap">
             {p.teamEmoji && <span className="mr-1">{p.teamEmoji}</span>}
             {p.name}
@@ -68,19 +68,19 @@ export function PlayerRow({ eval: ev, onPositionChange, percentileTables }: {
         <td className="px-3 py-2 text-center text-sm text-muted-foreground">
           {p.level}
         </td>
-        <td className="px-3 py-2">
+        <td className="px-3 py-2.5">
           <ScoreBadge score={ev.attributeScore} />
         </td>
-        <td className="px-3 py-2">
+        <td className="px-3 py-2.5">
           <ScoreBadge score={ev.statsScore} />
         </td>
-        <td className="px-3 py-2">
+        <td className="px-3 py-2.5">
           <ScoreBadge score={ev.positionFitScore} />
         </td>
-        <td className="px-3 py-2">
+        <td className="px-3 py-2.5">
           <ScoreBadge score={ev.growthScore} />
         </td>
-        <td className="px-3 py-2">
+        <td className="px-3 py-2.5">
           <ScoreBadge score={ev.compositeScore} />
         </td>
         <td className="px-3 py-2 text-center">

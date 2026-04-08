@@ -15,6 +15,7 @@ import {
 } from "@/lib/evaluator-data";
 import { getPlayerRole } from "@/lib/evaluator";
 import { RosterTable } from "@/components/evaluator/roster-table";
+import { BASE_PATH } from "@/lib/constants";
 
 interface EvalRefData {
   batterArch: Record<string, Archetype>;
@@ -56,7 +57,7 @@ export default function EvaluatePage() {
       const controller = new AbortController();
       searchAbort.current = controller;
       try {
-        const res = await fetch(`/api/teams/search?q=${encodeURIComponent(q)}`, {
+        const res = await fetch(`${BASE_PATH}/api/teams/search?q=${encodeURIComponent(q)}`, {
           signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]),
         });
         if (controller.signal.aborted) return;
@@ -87,7 +88,7 @@ export default function EvaluatePage() {
 
     try {
       // Fetch full roster (includes isBench flag for position assignment)
-      const rosterRes = await fetch(`/api/teams/${team.mmolbTeamId}/roster`, {
+      const rosterRes = await fetch(`${BASE_PATH}/api/teams/${team.mmolbTeamId}/roster`, {
         signal: AbortSignal.timeout(30000),
       });
       if (!rosterRes.ok) throw new Error(`Roster fetch failed: ${rosterRes.status}`);
@@ -97,7 +98,7 @@ export default function EvaluatePage() {
       // Fetch all player details in parallel
       const playerPromises = roster.map(async (rp) => {
         try {
-          const res = await fetch(`/api/players/${rp.mmolbPlayerId}`, {
+          const res = await fetch(`${BASE_PATH}/api/players/${rp.mmolbPlayerId}`, {
             signal: AbortSignal.timeout(30000),
           });
           if (!res.ok) return null;
@@ -183,8 +184,8 @@ export default function EvaluatePage() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <div className="mb-4">
-        <h1 className="text-xl font-bold text-foreground">Mulch-o-Meter</h1>
+      <div className="mb-2 sm:mb-4">
+        <h1 className="text-lg sm:text-xl font-bold text-foreground">Mulch-o-Meter</h1>
         <p className="text-sm text-muted-foreground">
           Search for a team to evaluate their roster. MULCH / HOLD / KEEP recommendations based on
           attributes, growth potential, and position fit.

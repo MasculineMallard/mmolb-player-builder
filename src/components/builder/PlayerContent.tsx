@@ -184,10 +184,10 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
             <span className="text-sm text-muted-foreground">
               {player.teamEmoji} {player.teamName} {player.position && `| ${player.position}`}
             </span>
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-1 shrink-0">
               <button
                 onClick={() => usePlayerStore.getState().refreshPlayer()}
-                className="text-sm bg-muted text-muted-foreground hover:text-foreground px-3 py-1 rounded-md border border-border hover:bg-muted/80 transition-colors"
+                className="text-sm bg-muted text-muted-foreground hover:text-foreground px-2 sm:px-3 py-1 rounded-md border border-border hover:bg-muted/80 transition-colors"
                 title="Refresh player data from MMOLB"
               >
                 Refresh
@@ -195,7 +195,7 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
               {onChangePlayer && !searchOpen && (
                 <button
                   onClick={onChangePlayer}
-                  className="text-sm bg-muted text-muted-foreground hover:text-foreground px-3 py-1 rounded-md border border-border hover:bg-muted/80 transition-colors"
+                  className="text-sm bg-muted text-muted-foreground hover:text-foreground px-2 sm:px-3 py-1 rounded-md border border-border hover:bg-muted/80 transition-colors"
                 >
                   Change Player
                 </button>
@@ -206,8 +206,8 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
 
         {/* Player header */}
         <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-[0_1px_3px_rgba(0,0,0,0.3)]">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center justify-between gap-1.5 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-wrap">
               <h2 className="text-lg font-bold truncate">{player.name}</h2>
               <span className="text-sm text-muted-foreground shrink-0">Lv.{player.level}</span>
               {/* Durability pips */}

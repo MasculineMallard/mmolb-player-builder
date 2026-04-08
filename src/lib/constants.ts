@@ -1,5 +1,8 @@
 import type { Archetype } from "./types";
 
+/** Base path for fetch calls (matches next.config basePath). */
+export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "/pop";
+
 /** Stat categories matching attributes.json structure. */
 export const STAT_CATEGORIES = {
   batting: [
