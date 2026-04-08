@@ -65,7 +65,8 @@ export function ProgressionPath({
         Progression
       </h3>
 
-      <div className="relative" style={{ height: 105 }}>
+      <div className="h-[74px] sm:h-[105px] overflow-hidden">
+      <div className="relative scale-[0.7] sm:scale-100 origin-top-left w-[calc(100%/0.7)] sm:w-full" style={{ height: 105 }}>
         {/* Background track */}
         <div
           className="absolute rounded-full"
@@ -206,6 +207,7 @@ export function ProgressionPath({
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );

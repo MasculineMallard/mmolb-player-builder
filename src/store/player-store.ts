@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { isAbortError } from "@/lib/utils";
+import { BASE_PATH } from "@/lib/constants";
 import type { PlayerData, RosterPlayer, TeamSearchResult } from "@/lib/types";
 
 export interface RecentPlayer {
@@ -81,8 +82,8 @@ async function fetchPlayer(
   fresh = false,
 ): Promise<PlayerData> {
   const url = fresh
-    ? `/api/players/${mmolbPlayerId}?fresh=1`
-    : `/api/players/${mmolbPlayerId}`;
+    ? `${BASE_PATH}/api/players/${mmolbPlayerId}?fresh=1`
+    : `${BASE_PATH}/api/players/${mmolbPlayerId}`;
   const res = await fetch(url, {
     signal: AbortSignal.any([signal, AbortSignal.timeout(18000)]),
   });

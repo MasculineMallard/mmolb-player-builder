@@ -95,7 +95,7 @@ export function StatGridInteractive({
         {hasTargets && (
           <button
             onClick={() => { setEditing(!editing); setEditingStatName(null); }}
-            className={`text-sm px-3 py-1 rounded-md transition-all duration-150 ${
+            className={`text-sm px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-md transition-all duration-150 ${
               editing
                 ? "text-primary-foreground hover:brightness-110 active:scale-[0.98]"
                 : "bg-muted text-muted-foreground hover:text-foreground"
@@ -107,7 +107,7 @@ export function StatGridInteractive({
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-12 gap-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-12 gap-y-4 md:gap-y-6">
         {activeCategories.map(([category, statNames]) => (
           <div key={category}>
             <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1 border-b border-border pb-0.5">

@@ -4,6 +4,9 @@ import { useState, useMemo } from "react";
 import type { EvaluatedPlayer, Recommendation } from "@/lib/evaluator-types";
 import { getPlayerRole } from "@/lib/evaluator";
 import { PlayerRow } from "./player-row";
+import { ScoreBadge } from "./score-badge";
+import { VerdictBadge } from "./verdict-badge";
+import { PlayerDetail } from "./player-detail";
 
 type SortKey = "position" | "name" | "durability" | "level" | "attributes" | "stats" | "fit" | "growth" | "total" | "verdict";
 type RoleFilter = "all" | "batter" | "pitcher";
@@ -27,6 +30,112 @@ function positionRank(pos: string | null): number {
 type SortDir = "asc" | "desc";
 
 import type { LivePercentileTables } from "@/lib/evaluator-data";
+
+const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+  { key: "total", label: "Total Score" },
+  { key: "position", label: "Position" },
+  { key: "name", label: "Name" },
+  { key: "durability", label: "Durability" },
+  { key: "level", label: "Level" },
+  { key: "attributes", label: "Attributes" },
+  { key: "stats", label: "Stats" },
+  { key: "fit", label: "Fit" },
+  { key: "growth", label: "Growth" },
+  { key: "verdict", label: "Verdict" },
+];
+
+function DurabilityPips({ durability }: { durability: number }) {
+  return (
+    <span className="flex items-center gap-0.5">
+      {Array.from({ length: 5 }, (_, i) => (
+        <span
+          key={i}
+          className="inline-block w-2 h-2 rounded-full"
+          style={{
+            backgroundColor: i < durability
+              ? durability <= 2 ? "var(--scale-bad)" : durability <= 3 ? "var(--scale-poor)" : "var(--chart-3)"
+              : "var(--muted)",
+          }}
+        />
+      ))}
+    </span>
+  );
+}
+
+function MobilePlayerCard({ ev, onPositionChange, percentileTables }: {
+  ev: EvaluatedPlayer;
+  onPositionChange?: (playerId: string, newPosition: string) => void;
+  percentileTables?: LivePercentileTables;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const p = ev.player;
+
+  return (
+    <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <button
+        className="w-full text-left px-3 py-2.5 active:bg-secondary/30 transition-colors"
+        onClick={() => setExpanded(!expanded)}
+      >
+        {/* Row 1: Position, Name, Verdict */}
+        <div className="flex items-center gap-2 mb-1.5">
+          <span
+            className="text-[13px] font-bold shrink-0 min-w-[28px] text-center"
+            style={{ color: "#00e5ff" }}
+          >
+            {p.position ?? "?"}
+          </span>
+          <span className="font-semibold text-sm text-foreground truncate flex-1">
+            {p.teamEmoji && <span className="mr-1">{p.teamEmoji}</span>}
+            {p.name}
+          </span>
+          <VerdictBadge verdict={ev.recommendation} />
+          <span className="text-muted-foreground text-sm shrink-0">
+            {expanded ? "▲" : "▼"}
+          </span>
+        </div>
+
+        {/* Row 2: Level, Durability, Composite */}
+        <div className="flex items-center gap-3 mb-1.5">
+          <span className="text-sm text-muted-foreground">Lv.{p.level}</span>
+          <DurabilityPips durability={p.durability} />
+          <span className="ml-auto text-sm font-bold" style={{ color: ev.compositeScore >= 60 ? "var(--scale-good)" : ev.compositeScore >= 40 ? "var(--scale-mid)" : "var(--scale-bad)" }}>
+            {ev.compositeScore}
+          </span>
+        </div>
+
+        {/* Row 3: Score badges */}
+        <div className="flex justify-between">
+          <ScoreBadge score={ev.attributeScore} label="Attr" />
+          <ScoreBadge score={ev.statsScore} label="Stats" />
+          <ScoreBadge score={ev.positionFitScore} label="Fit" />
+          <ScoreBadge score={ev.growthScore} label="Growth" />
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="border-t border-border">
+          {onPositionChange && (
+            <div className="px-3 py-2 border-b border-border/50 flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Position:</span>
+              <select
+                value={p.position ?? ""}
+                onChange={(e) => {
+                  onPositionChange(p.mmolbPlayerId, e.target.value);
+                }}
+                className="bg-[#1a2332] text-[#00e5ff] px-2 py-1 rounded text-[13px] font-bold border-none cursor-pointer"
+              >
+                {["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH", "SP", "RP", "CL"].map(pos => (
+                  <option key={pos} value={pos}>{pos}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          <PlayerDetail eval={ev} percentileTables={percentileTables} />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function RosterTable({ players, onPositionChange, percentileTables }: {
   players: EvaluatedPlayer[];
@@ -174,8 +283,42 @@ export function RosterTable({ players, onPositionChange, percentileTables }: {
         ))}
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
+      {/* Mobile sort control */}
+      <div className="md:hidden flex items-center gap-2 mb-3">
+        <span className="text-sm text-muted-foreground shrink-0">Sort by:</span>
+        <select
+          value={sortKey}
+          onChange={(e) => {
+            setSortKey(e.target.value as SortKey);
+          }}
+          className="flex-1 bg-muted border border-border rounded-md px-2 py-1.5 text-sm text-foreground"
+        >
+          {SORT_OPTIONS.map((opt) => (
+            <option key={opt.key} value={opt.key}>{opt.label}</option>
+          ))}
+        </select>
+        <button
+          onClick={() => setSortDir((d) => d === "asc" ? "desc" : "asc")}
+          className="text-sm bg-muted border border-border rounded-md px-2 py-1.5 text-muted-foreground hover:text-foreground"
+        >
+          {sortDir === "asc" ? "▲" : "▼"}
+        </button>
+      </div>
+
+      {/* Mobile card layout */}
+      <div className="md:hidden space-y-2">
+        {filtered.map((ev) => (
+          <MobilePlayerCard
+            key={ev.player.mmolbPlayerId}
+            ev={ev}
+            onPositionChange={onPositionChange}
+            percentileTables={percentileTables}
+          />
+        ))}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="bg-[#1a2332] select-none">

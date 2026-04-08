@@ -17,7 +17,7 @@ export function BoonOrbs({ boonTimeline, boonEmojis }: BoonOrbsProps) {
         <span className="w-0.5 h-3 bg-primary/40 rounded-full" />
         Boons
       </h3>
-      <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${boonTimeline.length}, 1fr)` }}>
+      <div className="flex flex-wrap justify-center gap-4 sm:grid sm:gap-2" style={{ gridTemplateColumns: `repeat(${boonTimeline.length}, 1fr)` }}>
         {boonTimeline.map((entry) => {
           const boonName = entry.takenBoonName;
           const emoji = boonName ? boonEmojis.get(boonName.toLowerCase()) : null;
@@ -29,10 +29,8 @@ export function BoonOrbs({ boonTimeline, boonEmojis }: BoonOrbsProps) {
             <div key={entry.level} className="flex flex-col items-center text-center">
               {/* Orb */}
               <div
-                className="rounded-full flex items-center justify-center"
+                className="rounded-full flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12"
                 style={{
-                  width: 48,
-                  height: 48,
                   background: entry.acquired
                     ? "linear-gradient(135deg, rgba(255,215,0,0.3), rgba(234,179,8,0.15))"
                     : "var(--muted)",
