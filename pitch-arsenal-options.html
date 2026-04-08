@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pitch Arsenal: 10 Layout Options</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0b; color: #e4e4e7; font-family: -apple-system, system-ui, sans-serif; padding: 32px; }
+  h1 { font-size: 20px; color: #71717a; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; max-width: 1200px; }
+  .option-label { font-size: 12px; color: #71717a; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; font-weight: 600; }
+
+  :root {
+    --card: #18181b;
+    --muted: #27272a;
+    --border: #3f3f46;
+    --primary: #3b82f6;
+    --fg: #e4e4e7;
+    --muted-fg: #a1a1aa;
+    --chart-1: #e06c75;
+    --chart-2: #e5c07b;
+    --chart-3: #98c379;
+    --chart-4: #61afef;
+    --chart-5: #c678dd;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .card h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted-fg);
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+  }
+
+  /* Donut */
+  .donut { flex-shrink: 0; }
+
+  /* Chips */
+  .chip-add {
+    font-size: 12px; font-weight: 500; color: var(--primary);
+    background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3);
+    padding: 3px 10px; border-radius: 99px; white-space: nowrap;
+  }
+  .chip-remove {
+    font-size: 12px; font-weight: 500; color: var(--chart-2);
+    background: rgba(229,192,123,0.1); border: 1px solid rgba(229,192,123,0.3);
+    padding: 3px 10px; border-radius: 99px; white-space: nowrap;
+  }
+
+  /* Bar row */
+  .bar-row { display: flex; align-items: center; gap: 8px; }
+  .bar-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .bar-name { font-size: 13px; font-weight: 500; width: 80px; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 8px; background: var(--muted); border-radius: 99px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 99px; }
+  .bar-pct { font-size: 12px; color: var(--muted-fg); width: 32px; text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+
+  /* Legend dot row */
+  .legend-row { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<h1>Pitch Arsenal: 10 Layout Options</h1>
+<div class="grid">
+
+<!-- Sample data: Changeup 42%, Fastball 30%, Slider 18%, Cutter 10% -->
+<!-- Advice: +Fastball, +Slider, +Cutter, -Changeup -->
+
+<!-- OPTION 1: Current — donut left, chips right, bars below -->
+<div>
+  <div class="option-label">1. Current: Donut left + chips right, bars below</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div style="display:flex;align-items:start;gap:16px;margin-bottom:12px">
+      <svg width="160" height="160" viewBox="0 0 160 160" class="donut">
+        <circle cx="80" cy="80" r="65" fill="none" stroke="var(--chart-2)" stroke-width="25" stroke-dasharray="163 245" stroke-dashoffset="-61" />
+        <circle cx="80" cy="80" r="65" fill="none" stroke="var(--chart-1)" stroke-width="25" stroke-dasharray="122 286" stroke-dashoffset="-224" />
+        <circle cx="80" cy="80" r="65" fill="none" stroke="var(--chart-3)" stroke-width="25" stroke-dasharray="73 335" stroke-dashoffset="-346" />
+        <circle cx="80" cy="80" r="65" fill="none" stroke="var(--chart-4)" stroke-width="25" stroke-dasharray="41 367" stroke-dashoffset="-19" />
+        <circle cx="80" cy="80" r="40" fill="var(--card)" />
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:6px;padding-top:8px">
+        <span class="chip-add">+ Fastball</span>
+        <span class="chip-add">+ Slider</span>
+        <span class="chip-add">+ Cutter</span>
+        <span class="chip-remove">- Changeup</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-2)"></div><div class="bar-name">Changeup</div><div class="bar-track"><div class="bar-fill" style="width:42%;background:var(--chart-2)"></div></div><div class="bar-pct">42%</div></div>
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-1)"></div><div class="bar-name">Fastball</div><div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--chart-1)"></div></div><div class="bar-pct">30%</div></div>
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-3)"></div><div class="bar-name">Slider</div><div class="bar-track"><div class="bar-fill" style="width:18%;background:var(--chart-3)"></div></div><div class="bar-pct">18%</div></div>
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-4)"></div><div class="bar-name">Cutter</div><div class="bar-track"><div class="bar-fill" style="width:10%;background:var(--chart-4)"></div></div><div class="bar-pct">10%</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 2: Donut centered, chips as overlay inside donut center, bars below -->
+<div>
+  <div class="option-label">2. Donut centered with advice overlay, bars below</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div style="display:flex;justify-content:center;margin-bottom:12px;position:relative">
+      <svg width="180" height="180" viewBox="0 0 180 180" class="donut">
+        <circle cx="90" cy="90" r="72" fill="none" stroke="var(--chart-2)" stroke-width="28" stroke-dasharray="181 271" stroke-dashoffset="-68" />
+        <circle cx="90" cy="90" r="72" fill="none" stroke="var(--chart-1)" stroke-width="28" stroke-dasharray="136 316" stroke-dashoffset="-249" />
+        <circle cx="90" cy="90" r="72" fill="none" stroke="var(--chart-3)" stroke-width="28" stroke-dasharray="81 371" stroke-dashoffset="-385" />
+        <circle cx="90" cy="90" r="72" fill="none" stroke="var(--chart-4)" stroke-width="28" stroke-dasharray="45 407" stroke-dashoffset="-21" />
+        <circle cx="90" cy="90" r="44" fill="var(--card)" />
+        <text x="90" y="86" text-anchor="middle" fill="var(--fg)" font-size="20" font-weight="700">4</text>
+        <text x="90" y="102" text-anchor="middle" fill="var(--muted-fg)" font-size="10">pitches</text>
+      </svg>
+      <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:4px">
+        <span class="chip-add">+ Fastball</span>
+        <span class="chip-add">+ Slider</span>
+        <span class="chip-add">+ Cutter</span>
+        <span class="chip-remove">- Changeup</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-2)"></div><div class="bar-name">Changeup</div><div class="bar-track"><div class="bar-fill" style="width:42%;background:var(--chart-2)"></div></div><div class="bar-pct">42%</div></div>
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-1)"></div><div class="bar-name">Fastball</div><div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--chart-1)"></div></div><div class="bar-pct">30%</div></div>
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-3)"></div><div class="bar-name">Slider</div><div class="bar-track"><div class="bar-fill" style="width:18%;background:var(--chart-3)"></div></div><div class="bar-pct">18%</div></div>
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-4)"></div><div class="bar-name">Cutter</div><div class="bar-track"><div class="bar-fill" style="width:10%;background:var(--chart-4)"></div></div><div class="bar-pct">10%</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 3: No donut — all bars with inline chips at top -->
+<div>
+  <div class="option-label">3. No donut, bars only + chip banner</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+      <span class="chip-add">+ Fastball</span>
+      <span class="chip-add">+ Slider</span>
+      <span class="chip-add">+ Cutter</span>
+      <span class="chip-remove">- Changeup</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-2)"></div><div class="bar-name">Changeup</div><div class="bar-track" style="height:10px"><div class="bar-fill" style="width:42%;background:var(--chart-2)"></div></div><div class="bar-pct">42%</div></div>
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-1)"></div><div class="bar-name">Fastball</div><div class="bar-track" style="height:10px"><div class="bar-fill" style="width:30%;background:var(--chart-1)"></div></div><div class="bar-pct">30%</div></div>
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-3)"></div><div class="bar-name">Slider</div><div class="bar-track" style="height:10px"><div class="bar-fill" style="width:18%;background:var(--chart-3)"></div></div><div class="bar-pct">18%</div></div>
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-4)"></div><div class="bar-name">Cutter</div><div class="bar-track" style="height:10px"><div class="bar-fill" style="width:10%;background:var(--chart-4)"></div></div><div class="bar-pct">10%</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 4: Donut left, legend + chips stacked right -->
+<div>
+  <div class="option-label">4. Donut left, legend + chips all right</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div style="display:flex;align-items:start;gap:16px">
+      <svg width="160" height="160" viewBox="0 0 160 160" class="donut">
+        <circle cx="80" cy="80" r="65" fill="none" stroke="var(--chart-2)" stroke-width="25" stroke-dasharray="163 245" stroke-dashoffset="-61" />
+        <circle cx="80" cy="80" r="65" fill="none" stroke="var(--chart-1)" stroke-width="25" stroke-dasharray="122 286" stroke-dashoffset="-224" />
+        <circle cx="80" cy="80" r="65" fill="none" stroke="var(--chart-3)" stroke-width="25" stroke-dasharray="73 335" stroke-dashoffset="-346" />
+        <circle cx="80" cy="80" r="65" fill="none" stroke="var(--chart-4)" stroke-width="25" stroke-dasharray="41 367" stroke-dashoffset="-19" />
+        <circle cx="80" cy="80" r="40" fill="var(--card)" />
+      </svg>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+          <div class="legend-row"><div class="legend-dot" style="background:var(--chart-2)"></div><span>Changeup</span><span style="margin-left:auto;color:var(--muted-fg);font-size:12px">42%</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--chart-1)"></div><span>Fastball</span><span style="margin-left:auto;color:var(--muted-fg);font-size:12px">30%</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--chart-3)"></div><span>Slider</span><span style="margin-left:auto;color:var(--muted-fg);font-size:12px">18%</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--chart-4)"></div><span>Cutter</span><span style="margin-left:auto;color:var(--muted-fg);font-size:12px">10%</span></div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:8px;display:flex;flex-wrap:wrap;gap:4px">
+          <span class="chip-add">+ Fastball</span>
+          <span class="chip-add">+ Slider</span>
+          <span class="chip-add">+ Cutter</span>
+          <span class="chip-remove">- Changeup</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 5: Horizontal stacked bars (no donut) with chips right -->
+<div>
+  <div class="option-label">5. Stacked bar chart + chips right</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div style="display:flex;align-items:start;gap:16px">
+      <div style="flex:1">
+        <!-- Stacked horizontal bar -->
+        <div style="display:flex;height:32px;border-radius:6px;overflow:hidden;margin-bottom:10px">
+          <div style="width:42%;background:var(--chart-2)"></div>
+          <div style="width:30%;background:var(--chart-1)"></div>
+          <div style="width:18%;background:var(--chart-3)"></div>
+          <div style="width:10%;background:var(--chart-4)"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div class="legend-row"><div class="legend-dot" style="background:var(--chart-2)"></div><span>Changeup 42%</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--chart-1)"></div><span>Fastball 30%</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--chart-3)"></div><span>Slider 18%</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--chart-4)"></div><span>Cutter 10%</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+        <span class="chip-add">+ Fastball</span>
+        <span class="chip-add">+ Slider</span>
+        <span class="chip-add">+ Cutter</span>
+        <span class="chip-remove">- Changeup</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 6: Compact donut (small) + horizontal bars, chips inline in bars -->
+<div>
+  <div class="option-label">6. Mini donut + bars with inline advice markers</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div style="display:flex;align-items:center;gap:16px">
+      <svg width="100" height="100" viewBox="0 0 100 100" class="donut">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--chart-2)" stroke-width="16" stroke-dasharray="101 151" stroke-dashoffset="-38" />
+        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--chart-1)" stroke-width="16" stroke-dasharray="75 177" stroke-dashoffset="-139" />
+        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--chart-3)" stroke-width="16" stroke-dasharray="45 207" stroke-dashoffset="-214" />
+        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--chart-4)" stroke-width="16" stroke-dasharray="25 227" stroke-dashoffset="-12" />
+        <circle cx="50" cy="50" r="24" fill="var(--card)" />
+      </svg>
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+        <div class="bar-row"><div class="bar-name" style="width:70px">Changeup</div><div class="bar-track"><div class="bar-fill" style="width:42%;background:var(--chart-2)"></div></div><div class="bar-pct">42%</div><span class="chip-remove" style="font-size:10px;padding:1px 6px">drop</span></div>
+        <div class="bar-row"><div class="bar-name" style="width:70px">Fastball</div><div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--chart-1)"></div></div><div class="bar-pct">30%</div><span class="chip-add" style="font-size:10px;padding:1px 6px">add</span></div>
+        <div class="bar-row"><div class="bar-name" style="width:70px">Slider</div><div class="bar-track"><div class="bar-fill" style="width:18%;background:var(--chart-3)"></div></div><div class="bar-pct">18%</div><span class="chip-add" style="font-size:10px;padding:1px 6px">add</span></div>
+        <div class="bar-row"><div class="bar-name" style="width:70px">Cutter</div><div class="bar-track"><div class="bar-fill" style="width:10%;background:var(--chart-4)"></div></div><div class="bar-pct">10%</div><span class="chip-add" style="font-size:10px;padding:1px 6px">add</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 7: Vertical donut top, everything below -->
+<div>
+  <div class="option-label">7. Donut top center, bars + chips below</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div style="display:flex;justify-content:center;margin-bottom:12px">
+      <svg width="140" height="140" viewBox="0 0 140 140" class="donut">
+        <circle cx="70" cy="70" r="56" fill="none" stroke="var(--chart-2)" stroke-width="22" stroke-dasharray="141 211" stroke-dashoffset="-53" />
+        <circle cx="70" cy="70" r="56" fill="none" stroke="var(--chart-1)" stroke-width="22" stroke-dasharray="106 246" stroke-dashoffset="-194" />
+        <circle cx="70" cy="70" r="56" fill="none" stroke="var(--chart-3)" stroke-width="22" stroke-dasharray="63 289" stroke-dashoffset="-300" />
+        <circle cx="70" cy="70" r="56" fill="none" stroke="var(--chart-4)" stroke-width="22" stroke-dasharray="35 317" stroke-dashoffset="-15" />
+        <circle cx="70" cy="70" r="34" fill="var(--card)" />
+      </svg>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-2)"></div><div class="bar-name">Changeup</div><div class="bar-track"><div class="bar-fill" style="width:42%;background:var(--chart-2)"></div></div><div class="bar-pct">42%</div></div>
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-1)"></div><div class="bar-name">Fastball</div><div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--chart-1)"></div></div><div class="bar-pct">30%</div></div>
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-3)"></div><div class="bar-name">Slider</div><div class="bar-track"><div class="bar-fill" style="width:18%;background:var(--chart-3)"></div></div><div class="bar-pct">18%</div></div>
+      <div class="bar-row"><div class="bar-swatch" style="background:var(--chart-4)"></div><div class="bar-name">Cutter</div><div class="bar-track"><div class="bar-fill" style="width:10%;background:var(--chart-4)"></div></div><div class="bar-pct">10%</div></div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:8px;display:flex;flex-wrap:wrap;gap:6px">
+      <span class="chip-add">+ Fastball</span><span class="chip-add">+ Slider</span><span class="chip-add">+ Cutter</span><span class="chip-remove">- Changeup</span>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 8: Two-column split — donut + legend left, bars + chips right -->
+<div>
+  <div class="option-label">8. Two-column: donut+legend | bars+chips</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <svg width="140" height="140" viewBox="0 0 140 140" class="donut">
+          <circle cx="70" cy="70" r="56" fill="none" stroke="var(--chart-2)" stroke-width="22" stroke-dasharray="141 211" stroke-dashoffset="-53" />
+          <circle cx="70" cy="70" r="56" fill="none" stroke="var(--chart-1)" stroke-width="22" stroke-dasharray="106 246" stroke-dashoffset="-194" />
+          <circle cx="70" cy="70" r="56" fill="none" stroke="var(--chart-3)" stroke-width="22" stroke-dasharray="63 289" stroke-dashoffset="-300" />
+          <circle cx="70" cy="70" r="56" fill="none" stroke="var(--chart-4)" stroke-width="22" stroke-dasharray="35 317" stroke-dashoffset="-15" />
+          <circle cx="70" cy="70" r="34" fill="var(--card)" />
+        </svg>
+        <div style="display:flex;flex-direction:column;gap:4px;width:100%">
+          <div class="legend-row"><div class="legend-dot" style="background:var(--chart-2)"></div><span>Changeup 42%</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--chart-1)"></div><span>Fastball 30%</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--chart-3)"></div><span>Slider 18%</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--chart-4)"></div><span>Cutter 10%</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+          <div class="bar-row"><div class="bar-name" style="width:70px">Changeup</div><div class="bar-track"><div class="bar-fill" style="width:42%;background:var(--chart-2)"></div></div><div class="bar-pct">42%</div></div>
+          <div class="bar-row"><div class="bar-name" style="width:70px">Fastball</div><div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--chart-1)"></div></div><div class="bar-pct">30%</div></div>
+          <div class="bar-row"><div class="bar-name" style="width:70px">Slider</div><div class="bar-track"><div class="bar-fill" style="width:18%;background:var(--chart-3)"></div></div><div class="bar-pct">18%</div></div>
+          <div class="bar-row"><div class="bar-name" style="width:70px">Cutter</div><div class="bar-track"><div class="bar-fill" style="width:10%;background:var(--chart-4)"></div></div><div class="bar-pct">10%</div></div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">
+          <span class="chip-add">+ Fastball</span><span class="chip-add">+ Slider</span><span class="chip-add">+ Cutter</span><span class="chip-remove">- Changeup</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 9: Compact cards grid — each pitch is a mini card -->
+<div>
+  <div class="option-label">9. Pitch cards grid (2x2) + chips</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+      <div style="background:var(--muted);border-radius:6px;padding:8px 10px;border-left:3px solid var(--chart-2)">
+        <div style="font-size:13px;font-weight:600">Changeup</div>
+        <div style="font-size:20px;font-weight:700;color:var(--chart-2)">42%</div>
+      </div>
+      <div style="background:var(--muted);border-radius:6px;padding:8px 10px;border-left:3px solid var(--chart-1)">
+        <div style="font-size:13px;font-weight:600">Fastball</div>
+        <div style="font-size:20px;font-weight:700;color:var(--chart-1)">30%</div>
+      </div>
+      <div style="background:var(--muted);border-radius:6px;padding:8px 10px;border-left:3px solid var(--chart-3)">
+        <div style="font-size:13px;font-weight:600;color:var(--muted-fg)">Slider</div>
+        <div style="font-size:20px;font-weight:700;color:var(--chart-3)">18%</div>
+      </div>
+      <div style="background:var(--muted);border-radius:6px;padding:8px 10px;border-left:3px solid var(--chart-4)">
+        <div style="font-size:13px;font-weight:600;color:var(--muted-fg)">Cutter</div>
+        <div style="font-size:20px;font-weight:700;color:var(--chart-4)">10%</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <span class="chip-add">+ Fastball</span><span class="chip-add">+ Slider</span><span class="chip-add">+ Cutter</span><span class="chip-remove">- Changeup</span>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 10: Treemap-style blocks -->
+<div>
+  <div class="option-label">10. Treemap blocks + chip row</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div style="display:flex;height:100px;border-radius:6px;overflow:hidden;gap:2px;margin-bottom:10px">
+      <div style="flex:42;background:var(--chart-2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px">
+        <span style="font-size:11px;font-weight:600;color:#fff">Changeup</span>
+        <span style="font-size:18px;font-weight:700;color:#fff">42%</span>
+      </div>
+      <div style="flex:30;background:var(--chart-1);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px">
+        <span style="font-size:11px;font-weight:600;color:#fff">Fastball</span>
+        <span style="font-size:18px;font-weight:700;color:#fff">30%</span>
+      </div>
+      <div style="flex:18;background:var(--chart-3);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px">
+        <span style="font-size:10px;font-weight:600;color:#fff">Slider</span>
+        <span style="font-size:16px;font-weight:700;color:#fff">18%</span>
+      </div>
+      <div style="flex:10;background:var(--chart-4);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px">
+        <span style="font-size:9px;font-weight:600;color:#fff">Cut</span>
+        <span style="font-size:14px;font-weight:700;color:#fff">10%</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <span class="chip-add">+ Fastball</span><span class="chip-add">+ Slider</span><span class="chip-add">+ Cutter</span><span class="chip-remove">- Changeup</span>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

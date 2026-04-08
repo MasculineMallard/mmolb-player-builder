@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boon Display Options</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d1117;
+    color: #c9d1d9;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    padding: 32px;
+  }
+  h1 { color: #f0f6fc; font-size: 18px; margin-bottom: 4px; }
+  .subtitle { color: #8b949e; font-size: 12px; margin-bottom: 24px; }
+
+  .option {
+    border: 2px solid #30363d;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .option:hover { border-color: #58a6ff; }
+  .option.selected { border-color: #3b82f6; box-shadow: 0 0 16px rgba(59,130,246,0.15); }
+  .option-header {
+    padding: 10px 14px;
+    background: #161b22;
+    border-bottom: 1px solid #21262d;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .option-num {
+    font-size: 11px; font-weight: 700; color: #3b82f6;
+    background: rgba(59,130,246,0.15); padding: 1px 6px; border-radius: 3px;
+  }
+  .option-name { font-size: 14px; font-weight: 600; color: #f0f6fc; }
+  .option-desc { padding: 8px 14px; font-size: 11px; color: #8b949e; background: #0d1117; }
+  .option-mockup { padding: 16px; background: #161b22; }
+
+  .copy-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #161b22; border-top: 1px solid #30363d;
+    padding: 10px 32px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .copy-bar .sel-label { font-size: 12px; color: #8b949e; }
+  .copy-bar .sel-label strong { color: #f0f6fc; }
+  .copy-btn {
+    background: linear-gradient(180deg, #4B8DF7, #3B82F6);
+    color: white; border: none; padding: 6px 16px; border-radius: 6px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .copy-btn:hover { filter: brightness(1.1); }
+
+  .notes-area { padding: 8px 14px; background: #0d1117; border-top: 1px solid #21262d; display: none; }
+  .notes-area.show { display: block; }
+  .notes-area textarea {
+    width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px;
+    color: #c9d1d9; font-family: inherit; font-size: 11px; padding: 6px 8px;
+    resize: vertical; min-height: 32px; max-height: 80px;
+  }
+  .notes-area textarea::placeholder { color: #484f58; }
+  .notes-area textarea:focus { outline: none; border-color: #58a6ff; }
+</style>
+</head>
+<body>
+
+<h1>Boon Display Options</h1>
+<p class="subtitle">Pick one. "None" is also an option. Click to select.</p>
+
+<div class="option" onclick="select('a')">
+  <div class="option-header">
+    <span class="option-num">A</span>
+    <span class="option-name">Boon Slots</span>
+  </div>
+  <div class="option-desc">Three fixed "slot" cards for boon levels (10, 20, 30). Filled slots show acquired boon with emoji. Empty slots show recommendation or "?".</div>
+  <div class="option-mockup">
+    <div style="display:flex;gap:8px;">
+      <div style="flex:1;text-align:center;padding:10px 6px;border-radius:6px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);">
+        <div style="font-size:9px;color:#484f58;margin-bottom:3px;">LV.10</div>
+        <div style="font-size:20px;margin-bottom:2px;">🎯</div>
+        <div style="font-size:10px;color:#e3b341;font-weight:600;">Focused</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:10px 6px;border-radius:6px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);">
+        <div style="font-size:9px;color:#484f58;margin-bottom:3px;">LV.20</div>
+        <div style="font-size:20px;margin-bottom:2px;">💪</div>
+        <div style="font-size:10px;color:#e3b341;font-weight:600;">Strong</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:10px 6px;border-radius:6px;border:1px dashed #30363d;">
+        <div style="font-size:9px;color:#484f58;margin-bottom:3px;">LV.30</div>
+        <div style="font-size:20px;margin-bottom:2px;opacity:0.3;">?</div>
+        <div style="font-size:9px;color:#58a6ff;">Rec: Lucky</div>
+      </div>
+    </div>
+  </div>
+  <div class="notes-area" id="notes-a"><textarea placeholder="Notes..." oninput="noteVal.a=this.value"></textarea></div>
+</div>
+
+<div class="option" onclick="select('b')">
+  <div class="option-header">
+    <span class="option-num">B</span>
+    <span class="option-name">Boon Orbs</span>
+  </div>
+  <div class="option-desc">Circular orbs connected by lines, like a skill tree. Acquired orbs glow gold. Future orbs dim with recommendation inside.</div>
+  <div class="option-mockup">
+    <div style="display:flex;align-items:center;gap:0;justify-content:center;">
+      <div style="text-align:center;">
+        <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,rgba(255,215,0,0.3),rgba(234,179,8,0.15));border:2px solid rgba(255,215,0,0.5);display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(255,215,0,0.25),inset 0 1px 2px rgba(255,255,255,0.1);">
+          <span style="font-size:20px;">🎯</span>
+        </div>
+        <div style="font-size:8px;color:#e3b341;margin-top:3px;font-weight:500;">Focused</div>
+        <div style="font-size:7px;color:#484f58;">Lv.10</div>
+      </div>
+      <div style="width:32px;height:2px;background:linear-gradient(to right,rgba(255,215,0,0.4),rgba(255,215,0,0.3));margin:0 -2px;margin-bottom:18px;"></div>
+      <div style="text-align:center;">
+        <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,rgba(255,215,0,0.3),rgba(234,179,8,0.15));border:2px solid rgba(255,215,0,0.5);display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(255,215,0,0.25),inset 0 1px 2px rgba(255,255,255,0.1);">
+          <span style="font-size:20px;">💪</span>
+        </div>
+        <div style="font-size:8px;color:#e3b341;margin-top:3px;font-weight:500;">Strong</div>
+        <div style="font-size:7px;color:#484f58;">Lv.20</div>
+      </div>
+      <div style="width:32px;height:2px;background:linear-gradient(to right,rgba(255,215,0,0.2),#21262d);margin:0 -2px;margin-bottom:18px;"></div>
+      <div style="text-align:center;">
+        <div style="width:44px;height:44px;border-radius:50%;background:#161b22;border:2px dashed #30363d;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:12px;color:#484f58;">?</span>
+        </div>
+        <div style="font-size:8px;color:#58a6ff;margin-top:3px;">Rec: Lucky</div>
+        <div style="font-size:7px;color:#484f58;">Lv.30</div>
+      </div>
+    </div>
+  </div>
+  <div class="notes-area" id="notes-b"><textarea placeholder="Notes..." oninput="noteVal.b=this.value"></textarea></div>
+</div>
+
+<div class="option" onclick="select('c')">
+  <div class="option-header">
+    <span class="option-num">C</span>
+    <span class="option-name">Inline Gem Icons</span>
+  </div>
+  <div class="option-desc">Diamond-shaped gems in a compact row. Gold = acquired, outline = upcoming. Tightest footprint.</div>
+  <div class="option-mockup">
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="font-size:9px;color:#484f58;margin-right:2px;">Boons:</span>
+      <div style="width:26px;height:26px;transform:rotate(45deg);background:linear-gradient(135deg,#EAB308,#F59E0B);border-radius:4px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(234,179,8,0.3);">
+        <span style="font-size:13px;transform:rotate(-45deg);">🎯</span>
+      </div>
+      <div style="width:26px;height:26px;transform:rotate(45deg);background:linear-gradient(135deg,#EAB308,#F59E0B);border-radius:4px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(234,179,8,0.3);">
+        <span style="font-size:13px;transform:rotate(-45deg);">💪</span>
+      </div>
+      <div style="width:26px;height:26px;transform:rotate(45deg);background:#161b22;border:1.5px dashed #484f58;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:9px;color:#484f58;transform:rotate(-45deg);">?</span>
+      </div>
+      <span style="font-size:9px;color:#58a6ff;margin-left:4px;">Next: Lucky</span>
+    </div>
+  </div>
+  <div class="notes-area" id="notes-c"><textarea placeholder="Notes..." oninput="noteVal.c=this.value"></textarea></div>
+</div>
+
+<div class="option" onclick="select('none')">
+  <div class="option-header">
+    <span class="option-num">—</span>
+    <span class="option-name">None</span>
+  </div>
+  <div class="option-desc">No separate boon display. Boon info folded elsewhere (e.g., player header or progression path).</div>
+  <div class="option-mockup" style="display:flex;align-items:center;justify-content:center;min-height:40px;color:#484f58;font-size:12px;">
+    ∅ Not included
+  </div>
+  <div class="notes-area" id="notes-none"><textarea placeholder="Notes..." oninput="noteVal.none=this.value"></textarea></div>
+</div>
+
+<div style="height:60px;"></div>
+
+<div class="copy-bar">
+  <div class="sel-label">Selected: <strong id="sel-display">Undecided</strong></div>
+  <button class="copy-btn" onclick="copyResult()">Copy Selection</button>
+</div>
+
+<script>
+let selected = null;
+const noteVal = { a: '', b: '', c: '', none: '' };
+
+function select(opt) {
+  selected = opt;
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  // Show notes for selected
+  document.querySelectorAll('.notes-area').forEach(el => el.classList.remove('show'));
+  document.getElementById('notes-' + opt).classList.add('show');
+  const labels = { a: 'A: Boon Slots', b: 'B: Boon Orbs', c: 'C: Inline Gem Icons', none: 'None' };
+  document.getElementById('sel-display').textContent = labels[opt] || opt;
+}
+
+function copyResult() {
+  if (!selected) return;
+  const labels = { a: 'A: Boon Slots', b: 'B: Boon Orbs', c: 'C: Inline Gem Icons', none: 'None' };
+  let text = `Boon Display: ${labels[selected]}`;
+  const note = noteVal[selected];
+  if (note && note.trim()) text += `\n  Notes: ${note.trim()}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy Selection', 2000);
+  });
+}
+</script>
+</body>
+</html>

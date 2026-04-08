@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NextAction Card: 10 Layout Options</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0b; color: #e4e4e7; font-family: -apple-system, system-ui, sans-serif; padding: 32px; }
+  h1 { font-size: 20px; color: #71717a; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .grid { display: grid; grid-template-columns: repeat(2, 420px); gap: 24px; }
+  .option-label { font-size: 12px; color: #71717a; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+
+  /* Shared card tokens */
+  :root {
+    --card: #18181b;
+    --muted: #27272a;
+    --border: #3f3f46;
+    --primary: #3b82f6;
+    --primary-light: #60a5fa;
+    --fg: #e4e4e7;
+    --muted-fg: #a1a1aa;
+    --bar-1: #E8A735;
+    --bar-2: #D4A843;
+    --bar-3: #8B949E;
+    --bar-4: #60A5FA;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(59,130,246,0.5);
+    border-radius: 8px;
+    overflow: hidden;
+    width: 420px;
+  }
+  .card-inner { padding: 16px; }
+
+  /* Progress bar shared */
+  .prog-track { height: 6px; background: var(--muted); border-radius: 99px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+
+  /* Stat row shared */
+  .stat-row { display: flex; align-items: center; gap: 8px; }
+  .stat-name { font-size: 14px; font-weight: 600; text-transform: capitalize; width: 90px; flex-shrink: 0; }
+  .stat-bar-track { flex: 1; height: 6px; background: var(--muted); border-radius: 99px; overflow: hidden; }
+  .stat-bar-fill { height: 100%; border-radius: 99px; }
+  .stat-nums { font-size: 12px; color: var(--muted-fg); font-variant-numeric: tabular-nums; width: 56px; text-align: right; flex-shrink: 0; }
+  .stat-name.top { color: var(--fg); }
+  .stat-name.dim { color: var(--muted-fg); }
+
+  /* Label styles */
+  .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .lv { font-size: 14px; font-weight: 600; color: var(--primary); }
+  .pct { font-size: 12px; color: var(--muted-fg); font-variant-numeric: tabular-nums; }
+  .section-label { font-size: 11px; color: var(--muted-fg); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+
+  /* Sample data */
+  .stats-list { display: flex; flex-direction: column; gap: 6px; }
+</style>
+</head>
+<body>
+
+<h1>NextAction Card: 10 Layout Options</h1>
+
+<div class="grid">
+
+<!-- OPTION 1: Current (inline progress bar + stat list) -->
+<div>
+  <div class="option-label">1. Current: Inline bar + vertical stat list</div>
+  <div class="card">
+    <div class="card-inner">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <span class="lv">Lv.22</span>
+        <div class="prog-track" style="flex:1"><div class="prog-fill" style="width:3%"></div></div>
+        <span class="pct">3%</span>
+      </div>
+      <div class="section-label">Allocate +50 points</div>
+      <div class="stats-list">
+        <div class="stat-row"><span class="stat-name top">presence</span><div class="stat-bar-track"><div class="stat-bar-fill" style="width:0%;background:var(--bar-1)"></div></div><span class="stat-nums">0/86</span></div>
+        <div class="stat-row"><span class="stat-name dim">velocity</span><div class="stat-bar-track"><div class="stat-bar-fill" style="width:0%;background:var(--bar-1);opacity:0.6"></div></div><span class="stat-nums">0/191</span></div>
+        <div class="stat-row"><span class="stat-name dim">stuff</span><div class="stat-bar-track"><div class="stat-bar-fill" style="width:0%;background:var(--bar-1);opacity:0.6"></div></div><span class="stat-nums">0/191</span></div>
+        <div class="stat-row"><span class="stat-name dim">deception</span><div class="stat-bar-track"><div class="stat-bar-fill" style="width:13%;background:var(--bar-2);opacity:0.6"></div></div><span class="stat-nums">25/191</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 2: Big number callout + grid of 4 -->
+<div>
+  <div class="option-label">2. Big stat callout + 2x2 grid</div>
+  <div class="card">
+    <div class="card-inner">
+      <div class="header-row">
+        <span class="lv">Lv.22</span>
+        <span class="pct">3% to archetype</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px">
+        <span style="font-size:28px;font-weight:800;color:var(--fg)">+50</span>
+        <span style="font-size:14px;color:var(--muted-fg)">points to allocate</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--muted);border-radius:6px;padding:8px 10px;border-left:3px solid var(--primary)">
+          <div style="font-size:13px;font-weight:600;text-transform:capitalize;margin-bottom:2px">presence</div>
+          <div style="font-size:11px;color:var(--muted-fg)">0 / 86 <span style="color:var(--bar-1)">(-86)</span></div>
+        </div>
+        <div style="background:var(--muted);border-radius:6px;padding:8px 10px;border-left:3px solid var(--border)">
+          <div style="font-size:13px;font-weight:600;text-transform:capitalize;color:var(--muted-fg);margin-bottom:2px">velocity</div>
+          <div style="font-size:11px;color:var(--muted-fg)">0 / 191 <span style="color:var(--bar-1)">(-191)</span></div>
+        </div>
+        <div style="background:var(--muted);border-radius:6px;padding:8px 10px;border-left:3px solid var(--border)">
+          <div style="font-size:13px;font-weight:600;text-transform:capitalize;color:var(--muted-fg);margin-bottom:2px">stuff</div>
+          <div style="font-size:11px;color:var(--muted-fg)">0 / 191 <span style="color:var(--bar-1)">(-191)</span></div>
+        </div>
+        <div style="background:var(--muted);border-radius:6px;padding:8px 10px;border-left:3px solid var(--border)">
+          <div style="font-size:13px;font-weight:600;text-transform:capitalize;color:var(--muted-fg);margin-bottom:2px">deception</div>
+          <div style="font-size:11px;color:var(--muted-fg)">25 / 191 <span style="color:var(--bar-2)">(-166)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 3: Ranked list with rank badges -->
+<div>
+  <div class="option-label">3. Ranked list with priority badges</div>
+  <div class="card">
+    <div class="card-inner">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <span class="lv">Lv.22</span>
+        <div class="prog-track" style="flex:1"><div class="prog-fill" style="width:3%"></div></div>
+        <span class="pct">3%</span>
+      </div>
+      <div class="section-label">Best picks for +50</div>
+      <div class="stats-list">
+        <div class="stat-row">
+          <span style="font-size:11px;font-weight:700;color:#fff;background:var(--primary);width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</span>
+          <span class="stat-name top">presence</span>
+          <div class="stat-bar-track"><div class="stat-bar-fill" style="width:0%;background:var(--bar-1)"></div></div>
+          <span class="stat-nums">0/86</span>
+        </div>
+        <div class="stat-row">
+          <span style="font-size:11px;font-weight:700;color:var(--muted-fg);background:var(--muted);width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border)">2</span>
+          <span class="stat-name dim">velocity</span>
+          <div class="stat-bar-track"><div class="stat-bar-fill" style="width:0%;background:var(--bar-1);opacity:0.5"></div></div>
+          <span class="stat-nums">0/191</span>
+        </div>
+        <div class="stat-row">
+          <span style="font-size:11px;font-weight:700;color:var(--muted-fg);background:var(--muted);width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border)">3</span>
+          <span class="stat-name dim">stuff</span>
+          <div class="stat-bar-track"><div class="stat-bar-fill" style="width:0%;background:var(--bar-1);opacity:0.5"></div></div>
+          <span class="stat-nums">0/191</span>
+        </div>
+        <div class="stat-row">
+          <span style="font-size:11px;font-weight:700;color:var(--muted-fg);background:var(--muted);width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border)">4</span>
+          <span class="stat-name dim">deception</span>
+          <div class="stat-bar-track"><div class="stat-bar-fill" style="width:13%;background:var(--bar-2);opacity:0.5"></div></div>
+          <span class="stat-nums">25/191</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 4: Horizontal chips -->
+<div>
+  <div class="option-label">4. Horizontal stat chips</div>
+  <div class="card">
+    <div class="card-inner">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <span class="lv">Lv.22</span>
+        <div class="prog-track" style="flex:1"><div class="prog-fill" style="width:3%"></div></div>
+        <span class="pct">3%</span>
+      </div>
+      <div class="section-label">Allocate +50 points</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <div style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.4);border-radius:99px;padding:6px 14px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:14px;font-weight:600;text-transform:capitalize">presence</span>
+          <span style="font-size:12px;color:var(--bar-1)">-86</span>
+        </div>
+        <div style="background:var(--muted);border:1px solid var(--border);border-radius:99px;padding:6px 14px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:14px;font-weight:500;text-transform:capitalize;color:var(--muted-fg)">velocity</span>
+          <span style="font-size:12px;color:var(--bar-1)">-191</span>
+        </div>
+        <div style="background:var(--muted);border:1px solid var(--border);border-radius:99px;padding:6px 14px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:14px;font-weight:500;text-transform:capitalize;color:var(--muted-fg)">stuff</span>
+          <span style="font-size:12px;color:var(--bar-1)">-191</span>
+        </div>
+        <div style="background:var(--muted);border:1px solid var(--border);border-radius:99px;padding:6px 14px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:14px;font-weight:500;text-transform:capitalize;color:var(--muted-fg)">deception</span>
+          <span style="font-size:12px;color:var(--bar-2)">-166</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 5: Single hero stat + alternatives -->
+<div>
+  <div class="option-label">5. Hero stat with alternatives below</div>
+  <div class="card">
+    <div class="card-inner">
+      <div class="header-row">
+        <span class="lv">Lv.22</span>
+        <span class="pct">3%</span>
+      </div>
+      <div style="text-align:center;padding:8px 0 12px">
+        <div style="font-size:11px;color:var(--muted-fg);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Recommended</div>
+        <div style="font-size:24px;font-weight:800;text-transform:capitalize">presence</div>
+        <div style="font-size:13px;color:var(--muted-fg);margin-top:2px">0 / 86 target <span style="color:var(--bar-1)">(-86)</span></div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:8px">
+        <div style="font-size:11px;color:var(--muted-fg);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Also consider</div>
+        <div style="display:flex;gap:6px">
+          <span style="font-size:13px;background:var(--muted);border:1px solid var(--border);border-radius:99px;padding:3px 12px;text-transform:capitalize">velocity</span>
+          <span style="font-size:13px;background:var(--muted);border:1px solid var(--border);border-radius:99px;padding:3px 12px;text-transform:capitalize">stuff</span>
+          <span style="font-size:13px;background:var(--muted);border:1px solid var(--border);border-radius:99px;padding:3px 12px;text-transform:capitalize">deception</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 6: Compact bars with gap numbers -->
+<div>
+  <div class="option-label">6. Compact bars: gap-first</div>
+  <div class="card">
+    <div class="card-inner">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <span class="lv">Lv.22</span>
+        <div class="prog-track" style="flex:1"><div class="prog-fill" style="width:3%"></div></div>
+        <span class="pct">3%</span>
+      </div>
+      <div class="section-label">Allocate +50 points</div>
+      <div class="stats-list">
+        <div class="stat-row"><span style="font-size:13px;font-weight:700;color:var(--bar-1);width:40px;text-align:right;flex-shrink:0">-86</span><span class="stat-name top">presence</span><div class="stat-bar-track"><div class="stat-bar-fill" style="width:0%;background:var(--bar-1)"></div></div></div>
+        <div class="stat-row"><span style="font-size:13px;font-weight:700;color:var(--bar-1);width:40px;text-align:right;flex-shrink:0;opacity:0.6">-191</span><span class="stat-name dim">velocity</span><div class="stat-bar-track"><div class="stat-bar-fill" style="width:0%;background:var(--bar-1);opacity:0.5"></div></div></div>
+        <div class="stat-row"><span style="font-size:13px;font-weight:700;color:var(--bar-1);width:40px;text-align:right;flex-shrink:0;opacity:0.6">-191</span><span class="stat-name dim">stuff</span><div class="stat-bar-track"><div class="stat-bar-fill" style="width:0%;background:var(--bar-1);opacity:0.5"></div></div></div>
+        <div class="stat-row"><span style="font-size:13px;font-weight:700;color:var(--bar-2);width:40px;text-align:right;flex-shrink:0;opacity:0.6">-166</span><span class="stat-name dim">deception</span><div class="stat-bar-track"><div class="stat-bar-fill" style="width:13%;background:var(--bar-2);opacity:0.5"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 7: Stacked blocks with fill indication -->
+<div>
+  <div class="option-label">7. Stacked blocks with colored fill</div>
+  <div class="card">
+    <div class="card-inner">
+      <div class="header-row">
+        <span class="lv">Lv.22</span>
+        <span class="pct">3%</span>
+      </div>
+      <div class="section-label">Allocate +50 points</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="background:var(--muted);border-radius:6px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-left:3px solid var(--primary)">
+          <span style="font-size:14px;font-weight:700;text-transform:capitalize">presence</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:80px;height:6px;background:#1a1a1e;border-radius:99px;overflow:hidden"><div style="width:0%;height:100%;background:var(--bar-1);border-radius:99px"></div></div>
+            <span style="font-size:12px;color:var(--muted-fg);width:48px;text-align:right">0/86</span>
+          </div>
+        </div>
+        <div style="background:var(--muted);border-radius:6px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;opacity:0.7">
+          <span style="font-size:14px;font-weight:500;text-transform:capitalize;color:var(--muted-fg)">velocity</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:80px;height:6px;background:#1a1a1e;border-radius:99px;overflow:hidden"><div style="width:0%;height:100%;background:var(--bar-1);border-radius:99px"></div></div>
+            <span style="font-size:12px;color:var(--muted-fg);width:48px;text-align:right">0/191</span>
+          </div>
+        </div>
+        <div style="background:var(--muted);border-radius:6px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;opacity:0.7">
+          <span style="font-size:14px;font-weight:500;text-transform:capitalize;color:var(--muted-fg)">stuff</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:80px;height:6px;background:#1a1a1e;border-radius:99px;overflow:hidden"><div style="width:0%;height:100%;background:var(--bar-1);border-radius:99px"></div></div>
+            <span style="font-size:12px;color:var(--muted-fg);width:48px;text-align:right">0/191</span>
+          </div>
+        </div>
+        <div style="background:var(--muted);border-radius:6px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;opacity:0.7">
+          <span style="font-size:14px;font-weight:500;text-transform:capitalize;color:var(--muted-fg)">deception</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:80px;height:6px;background:#1a1a1e;border-radius:99px;overflow:hidden"><div style="width:13%;height:100%;background:var(--bar-2);border-radius:99px"></div></div>
+            <span style="font-size:12px;color:var(--muted-fg);width:48px;text-align:right">25/191</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 8: Two-column split: recommended + progress -->
+<div>
+  <div class="option-label">8. Two-column: big rec + progress sidebar</div>
+  <div class="card">
+    <div class="card-inner">
+      <div class="header-row">
+        <span class="lv">Lv.22</span>
+        <span class="pct">3%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--muted-fg);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Top pick</div>
+          <div style="font-size:22px;font-weight:800;text-transform:capitalize;margin-bottom:2px">presence</div>
+          <div style="font-size:13px;color:var(--muted-fg)">0 / 86</div>
+          <div style="margin-top:8px">
+            <div class="prog-track"><div class="prog-fill" style="width:0%;background:var(--bar-1)"></div></div>
+          </div>
+        </div>
+        <div style="border-left:1px solid var(--border);padding-left:12px">
+          <div style="font-size:11px;color:var(--muted-fg);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Others behind</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div><span style="font-size:13px;font-weight:500;text-transform:capitalize;color:var(--muted-fg)">velocity</span> <span style="font-size:11px;color:var(--bar-1)">-191</span></div>
+            <div><span style="font-size:13px;font-weight:500;text-transform:capitalize;color:var(--muted-fg)">stuff</span> <span style="font-size:11px;color:var(--bar-1)">-191</span></div>
+            <div><span style="font-size:13px;font-weight:500;text-transform:capitalize;color:var(--muted-fg)">deception</span> <span style="font-size:11px;color:var(--bar-2)">-166</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 9: Minimal table -->
+<div>
+  <div class="option-label">9. Clean table layout</div>
+  <div class="card">
+    <div class="card-inner">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <span class="lv">Lv.22</span>
+        <div class="prog-track" style="flex:1"><div class="prog-fill" style="width:3%"></div></div>
+        <span class="pct">3%</span>
+      </div>
+      <div class="section-label">Allocate +50 points</div>
+      <table style="width:100%;border-collapse:collapse">
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:6px 0;font-size:14px;font-weight:700;text-transform:capitalize">presence</td>
+          <td style="padding:6px 8px;width:100%"><div class="stat-bar-track"><div class="stat-bar-fill" style="width:0%;background:var(--bar-1)"></div></div></td>
+          <td style="padding:6px 0;font-size:12px;color:var(--muted-fg);text-align:right;white-space:nowrap">0 / 86</td>
+          <td style="padding:6px 0 6px 8px;font-size:12px;color:var(--bar-1);text-align:right;white-space:nowrap">-86</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);opacity:0.7">
+          <td style="padding:6px 0;font-size:14px;font-weight:500;text-transform:capitalize;color:var(--muted-fg)">velocity</td>
+          <td style="padding:6px 8px"><div class="stat-bar-track"><div class="stat-bar-fill" style="width:0%;background:var(--bar-1)"></div></div></td>
+          <td style="padding:6px 0;font-size:12px;color:var(--muted-fg);text-align:right;white-space:nowrap">0 / 191</td>
+          <td style="padding:6px 0 6px 8px;font-size:12px;color:var(--bar-1);text-align:right;white-space:nowrap">-191</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);opacity:0.7">
+          <td style="padding:6px 0;font-size:14px;font-weight:500;text-transform:capitalize;color:var(--muted-fg)">stuff</td>
+          <td style="padding:6px 8px"><div class="stat-bar-track"><div class="stat-bar-fill" style="width:0%;background:var(--bar-1)"></div></div></td>
+          <td style="padding:6px 0;font-size:12px;color:var(--muted-fg);text-align:right;white-space:nowrap">0 / 191</td>
+          <td style="padding:6px 0 6px 8px;font-size:12px;color:var(--bar-1);text-align:right;white-space:nowrap">-191</td>
+        </tr>
+        <tr style="opacity:0.7">
+          <td style="padding:6px 0;font-size:14px;font-weight:500;text-transform:capitalize;color:var(--muted-fg)">deception</td>
+          <td style="padding:6px 8px"><div class="stat-bar-track"><div class="stat-bar-fill" style="width:13%;background:var(--bar-2)"></div></div></td>
+          <td style="padding:6px 0;font-size:12px;color:var(--muted-fg);text-align:right;white-space:nowrap">25 / 191</td>
+          <td style="padding:6px 0 6px 8px;font-size:12px;color:var(--bar-2);text-align:right;white-space:nowrap">-166</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION 10: Gradient accent bar top + condensed -->
+<div>
+  <div class="option-label">10. Accent bar header + condensed rows</div>
+  <div class="card" style="border-top:none">
+    <div style="height:3px;background:linear-gradient(90deg,#3b82f6 3%,var(--muted) 3%)"></div>
+    <div class="card-inner">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <span class="lv">Level 22</span>
+          <span style="font-size:12px;color:var(--muted-fg);margin-left:8px">+50 pts</span>
+        </div>
+        <span class="pct">3% complete</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <div style="display:flex;align-items:center;gap:6px;background:rgba(59,130,246,0.08);border-radius:4px;padding:5px 8px">
+          <span style="font-size:8px;color:var(--primary)">&#9650;</span>
+          <span style="font-size:13px;font-weight:700;text-transform:capitalize;flex:1">presence</span>
+          <span style="font-size:12px;color:var(--muted-fg)">0</span>
+          <span style="font-size:10px;color:var(--muted-fg)">/</span>
+          <span style="font-size:12px;color:var(--muted-fg)">86</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:5px 8px">
+          <span style="font-size:8px;color:var(--muted-fg)">&#9650;</span>
+          <span style="font-size:13px;font-weight:500;text-transform:capitalize;color:var(--muted-fg);flex:1">velocity</span>
+          <span style="font-size:12px;color:var(--muted-fg)">0</span>
+          <span style="font-size:10px;color:var(--muted-fg)">/</span>
+          <span style="font-size:12px;color:var(--muted-fg)">191</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:5px 8px">
+          <span style="font-size:8px;color:var(--muted-fg)">&#9650;</span>
+          <span style="font-size:13px;font-weight:500;text-transform:capitalize;color:var(--muted-fg);flex:1">stuff</span>
+          <span style="font-size:12px;color:var(--muted-fg)">0</span>
+          <span style="font-size:10px;color:var(--muted-fg)">/</span>
+          <span style="font-size:12px;color:var(--muted-fg)">191</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:5px 8px">
+          <span style="font-size:8px;color:var(--muted-fg)">&#9650;</span>
+          <span style="font-size:13px;font-weight:500;text-transform:capitalize;color:var(--muted-fg);flex:1">deception</span>
+          <span style="font-size:12px;color:var(--muted-fg)">25</span>
+          <span style="font-size:10px;color:var(--muted-fg)">/</span>
+          <span style="font-size:12px;color:var(--muted-fg)">191</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+</body>
+</html>

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MMOLB Player Builder",
-  description: "Plan your MMOLB player progression for Season 11",
+  title: "POP - Player Optimization Planner",
+  description: "MMOLB Season 11 player builder, stat planner, and roster evaluator",
 };
 
 export default function RootLayout({

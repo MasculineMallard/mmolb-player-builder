@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pitch Arsenal 5B: 6 Spacing/Position Variants</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0b; color: #e4e4e7; font-family: -apple-system, system-ui, sans-serif; padding: 32px; }
+  h1 { font-size: 18px; color: #71717a; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; max-width: 1200px; }
+  .label { font-size: 12px; color: #71717a; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; font-weight: 600; }
+
+  :root {
+    --card: #18181b;
+    --muted: #27272a;
+    --border: #3f3f46;
+    --primary: #3b82f6;
+    --fg: #e4e4e7;
+    --muted-fg: #a1a1aa;
+    --c1: #e06c75;
+    --c2: #e5c07b;
+    --c3: #98c379;
+    --c4: #61afef;
+    --add-fg: #3b82f6;
+    --add-bg: rgba(59,130,246,0.1);
+    --add-border: rgba(59,130,246,0.3);
+    --drop-fg: #e5c07b;
+    --drop-bg: rgba(229,192,123,0.1);
+    --drop-border: rgba(229,192,123,0.3);
+  }
+
+  .card { background: var(--card); border-radius: 8px; padding: 12px; }
+  .card h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-fg); margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+  .stacked { display: flex; border-radius: 6px; overflow: hidden; }
+  .legend { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .chip-a { font-size: 12px; font-weight: 500; color: var(--add-fg); background: var(--add-bg); border: 1px solid var(--add-border); padding: 3px 10px; border-radius: 99px; white-space: nowrap; }
+  .chip-d { font-size: 12px; font-weight: 500; color: var(--drop-fg); background: var(--drop-bg); border: 1px solid var(--drop-border); padding: 3px 10px; border-radius: 99px; white-space: nowrap; }
+  .sec-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-fg); margin-bottom: 4px; }
+  .pct { margin-left: auto; color: var(--muted-fg); font-size: 12px; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<h1>5B Variants: Stacked Bar + Add/Drop Columns</h1>
+<div class="grid">
+
+<!-- 5B-1: Original — bar, legend, then add/drop columns side by side -->
+<div>
+  <div class="label">5B-1. Bar → legend → add/drop split (baseline)</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div class="stacked" style="height:32px;margin-bottom:10px">
+      <div style="flex:42;background:var(--c2)"></div>
+      <div style="flex:30;background:var(--c1)"></div>
+      <div style="flex:18;background:var(--c3)"></div>
+      <div style="flex:10;background:var(--c4)"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
+      <div class="legend"><div class="dot" style="background:var(--c2)"></div><span>Changeup</span><span class="pct">42%</span></div>
+      <div class="legend"><div class="dot" style="background:var(--c1)"></div><span>Fastball</span><span class="pct">30%</span></div>
+      <div class="legend"><div class="dot" style="background:var(--c3)"></div><span>Slider</span><span class="pct">18%</span></div>
+      <div class="legend"><div class="dot" style="background:var(--c4)"></div><span>Cutter</span><span class="pct">10%</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;border-top:1px solid var(--border);padding-top:8px">
+      <div>
+        <div class="sec-label">Consider adding</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span class="chip-a">+ Fastball</span>
+          <span class="chip-a">+ Slider</span>
+          <span class="chip-a">+ Cutter</span>
+        </div>
+      </div>
+      <div>
+        <div class="sec-label">Consider dropping</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span class="chip-d">- Changeup</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5B-2: Bar + legend side by side, add/drop below full width -->
+<div>
+  <div class="label">5B-2. Bar left + legend right, add/drop full-width row</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div style="display:flex;gap:16px;align-items:center;margin-bottom:10px">
+      <div class="stacked" style="height:28px;flex:1">
+        <div style="flex:42;background:var(--c2)"></div>
+        <div style="flex:30;background:var(--c1)"></div>
+        <div style="flex:18;background:var(--c3)"></div>
+        <div style="flex:10;background:var(--c4)"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;width:120px">
+        <div class="legend" style="font-size:12px"><div class="dot" style="background:var(--c2);width:8px;height:8px"></div><span>Changeup</span><span class="pct" style="font-size:11px">42%</span></div>
+        <div class="legend" style="font-size:12px"><div class="dot" style="background:var(--c1);width:8px;height:8px"></div><span>Fastball</span><span class="pct" style="font-size:11px">30%</span></div>
+        <div class="legend" style="font-size:12px"><div class="dot" style="background:var(--c3);width:8px;height:8px"></div><span>Slider</span><span class="pct" style="font-size:11px">18%</span></div>
+        <div class="legend" style="font-size:12px"><div class="dot" style="background:var(--c4);width:8px;height:8px"></div><span>Cutter</span><span class="pct" style="font-size:11px">10%</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;border-top:1px solid var(--border);padding-top:8px">
+      <div style="flex:1">
+        <div class="sec-label">Consider adding</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px"><span class="chip-a">+ Fastball</span><span class="chip-a">+ Slider</span><span class="chip-a">+ Cutter</span></div>
+      </div>
+      <div style="flex:1">
+        <div class="sec-label">Consider dropping</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px"><span class="chip-d">- Changeup</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5B-3: Tighter — bar with legend inline (dots under bar), chips below -->
+<div>
+  <div class="label">5B-3. Bar with inline labels below segments, chips at bottom</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div class="stacked" style="height:28px;margin-bottom:4px">
+      <div style="flex:42;background:var(--c2)"></div>
+      <div style="flex:30;background:var(--c1)"></div>
+      <div style="flex:18;background:var(--c3)"></div>
+      <div style="flex:10;background:var(--c4)"></div>
+    </div>
+    <!-- Segment labels aligned under bar -->
+    <div style="display:flex;margin-bottom:12px;font-size:11px;color:var(--muted-fg)">
+      <div style="flex:42;text-align:center">Changeup<br><span style="color:var(--fg);font-weight:600">42%</span></div>
+      <div style="flex:30;text-align:center">Fastball<br><span style="color:var(--fg);font-weight:600">30%</span></div>
+      <div style="flex:18;text-align:center">Slider<br><span style="color:var(--fg);font-weight:600">18%</span></div>
+      <div style="flex:10;text-align:center">Cut<br><span style="color:var(--fg);font-weight:600">10%</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;border-top:1px solid var(--border);padding-top:8px">
+      <div>
+        <div class="sec-label">Consider adding</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span class="chip-a">+ Fastball</span>
+          <span class="chip-a">+ Slider</span>
+          <span class="chip-a">+ Cutter</span>
+        </div>
+      </div>
+      <div>
+        <div class="sec-label">Consider dropping</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span class="chip-d">- Changeup</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5B-4: Three rows — bar, then add/drop in one row, legend in another -->
+<div>
+  <div class="label">5B-4. Add/drop row first, bar second, legend third</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <!-- Advice first, prominent -->
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <div style="flex:1">
+        <div class="sec-label">Add</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px"><span class="chip-a">+ Fastball</span><span class="chip-a">+ Slider</span><span class="chip-a">+ Cutter</span></div>
+      </div>
+      <div style="flex:1">
+        <div class="sec-label">Drop</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px"><span class="chip-d">- Changeup</span></div>
+      </div>
+    </div>
+    <div class="stacked" style="height:28px;margin-bottom:8px">
+      <div style="flex:42;background:var(--c2)"></div>
+      <div style="flex:30;background:var(--c1)"></div>
+      <div style="flex:18;background:var(--c3)"></div>
+      <div style="flex:10;background:var(--c4)"></div>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div class="legend" style="font-size:12px"><div class="dot" style="background:var(--c2);width:8px;height:8px"></div>Changeup 42%</div>
+      <div class="legend" style="font-size:12px"><div class="dot" style="background:var(--c1);width:8px;height:8px"></div>Fastball 30%</div>
+      <div class="legend" style="font-size:12px"><div class="dot" style="background:var(--c3);width:8px;height:8px"></div>Slider 18%</div>
+      <div class="legend" style="font-size:12px"><div class="dot" style="background:var(--c4);width:8px;height:8px"></div>Cutter 10%</div>
+    </div>
+  </div>
+</div>
+
+<!-- 5B-5: Dense grid — bar spans full, 3-col grid: legend, add, drop -->
+<div>
+  <div class="label">5B-5. Bar full width, then 3-col: pitches | add | drop</div>
+  <div class="card">
+    <h3>Pitch Arsenal</h3>
+    <div class="stacked" style="height:28px;margin-bottom:12px">
+      <div style="flex:42;background:var(--c2)"></div>
+      <div style="flex:30;background:var(--c1)"></div>
+      <div style="flex:18;background:var(--c3)"></div>
+      <div style="flex:10;background:var(--c4)"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px">
+      <div>
+        <div class="sec-label">Current Mix</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div class="legend"><div class="dot" style="background:var(--c2)"></div><span>Changeup</span><span class="pct">42%</span></div>
+          <div class="legend"><div class="dot" style="background:var(--c1)"></div><span>Fastball</span><span class="pct">30%</span></div>
+          <div class="legend"><div class="dot" style="background:var(--c3)"></div><span>Slider</span><span class="pct">18%</span></div>
+          <div class="legend"><div class="dot" style="background:var(--c4)"></div><span>Cutter</span><span class="pct">10%</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-label">Add</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span class="chip-a">+ Fastball</span>
+          <span class="chip-a">+ Slider</span>
+          <span class="chip-a">+ Cutter</span>
+        </div>
+      </div>
+      <div>
+        <div class="sec-label">Drop</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span class="chip-d">- Changeup</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5B-6: Maximal breathing room — bar tall, generous spacing throughout -->
+<div>
+  <div class="label">5B-6. Spacious: tall bar, generous gaps, airy layout</div>
+  <div class="card" style="padding:16px">
+    <h3 style="margin-bottom:12px">Pitch Arsenal</h3>
+    <div class="stacked" style="height:36px;margin-bottom:14px;gap:2px">
+      <div style="flex:42;background:var(--c2);border-radius:4px"></div>
+      <div style="flex:30;background:var(--c1);border-radius:4px"></div>
+      <div style="flex:18;background:var(--c3);border-radius:4px"></div>
+      <div style="flex:10;background:var(--c4);border-radius:4px"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">
+      <div class="legend"><div class="dot" style="background:var(--c2)"></div><span>Changeup</span><span class="pct">42%</span></div>
+      <div class="legend"><div class="dot" style="background:var(--c1)"></div><span>Fastball</span><span class="pct">30%</span></div>
+      <div class="legend"><div class="dot" style="background:var(--c3)"></div><span>Slider</span><span class="pct">18%</span></div>
+      <div class="legend"><div class="dot" style="background:var(--c4)"></div><span>Cutter</span><span class="pct">10%</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;border-top:1px solid var(--border);padding-top:12px">
+      <div>
+        <div class="sec-label" style="margin-bottom:6px">Consider adding</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span class="chip-a">+ Fastball</span>
+          <span class="chip-a">+ Slider</span>
+          <span class="chip-a">+ Cutter</span>
+        </div>
+      </div>
+      <div>
+        <div class="sec-label" style="margin-bottom:6px">Consider dropping</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span class="chip-d">- Changeup</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

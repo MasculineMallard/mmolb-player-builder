@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MMOLB Player Builder - Layout Arranger</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #010409;
+    color: #c9d1d9;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+  }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    height: 44px;
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 10px;
+    flex-shrink: 0;
+    z-index: 100;
+  }
+  .toolbar h1 { font-size: 13px; font-weight: 600; color: #e6edf3; margin-right: 16px; }
+  .toolbar-group { display: flex; align-items: center; gap: 6px; }
+  .toolbar-group label { font-size: 11px; color: #8b949e; }
+  .btn {
+    padding: 4px 10px; font-size: 11px; font-weight: 500; border-radius: 5px;
+    border: 1px solid #30363d; background: #21262d; color: #c9d1d9;
+    cursor: pointer; white-space: nowrap; transition: background 0.15s;
+  }
+  .btn:hover { background: #30363d; }
+  .btn-primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+  .btn-primary:hover { background: #388bfd; }
+  .btn-preset { background: #1c2128; }
+  .btn-preset:hover { background: #30363d; }
+  .btn-preset.active { border-color: #1f6feb; background: #1f6feb22; }
+  .toolbar-sep { width: 1px; height: 20px; background: #30363d; margin: 0 2px; }
+
+  /* ── Main ── */
+  .main { flex: 1; display: flex; overflow: hidden; }
+
+  /* ── Viewport ── */
+  .viewport-wrapper {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    background: #010409; position: relative; overflow: hidden;
+  }
+  .viewport {
+    width: 1400px; height: 900px; background: #0d1117;
+    border: 2px solid #30363d; border-radius: 8px;
+    position: relative; overflow: hidden; transform-origin: center center;
+  }
+  .viewport::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(48,54,61,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(48,54,61,0.2) 1px, transparent 1px);
+    background-size: 20px 20px; pointer-events: none; z-index: 0;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 260px; background: #161b22; border-left: 1px solid #30363d;
+    display: flex; flex-direction: column; flex-shrink: 0;
+  }
+  .sidebar-header {
+    padding: 10px 14px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px; color: #8b949e;
+    border-bottom: 1px solid #30363d;
+  }
+  .sidebar-list { flex: 1; overflow-y: auto; padding: 6px; }
+  .sidebar-list::-webkit-scrollbar { width: 5px; }
+  .sidebar-list::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+  .tray-item {
+    padding: 6px 8px; margin-bottom: 3px; border-radius: 5px;
+    border: 1px solid #30363d; background: #21262d; cursor: grab;
+    font-size: 11px; display: flex; align-items: center; gap: 6px;
+    transition: background 0.15s;
+  }
+  .tray-item:hover { background: #30363d; }
+  .tray-item.placed { opacity: 0.3; pointer-events: none; }
+  .tray-item .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .tray-item .name { flex: 1; line-height: 1.2; }
+  .tray-item .size-hint { font-size: 9px; color: #484f58; }
+
+  /* ── Placed Elements ── */
+  .element {
+    position: absolute; border-radius: 6px; border: 1px solid;
+    cursor: move; display: flex; flex-direction: column; overflow: hidden; z-index: 10;
+  }
+  .element:hover { z-index: 20; }
+  .element.selected { z-index: 30; box-shadow: 0 0 0 2px #1f6feb; }
+  .element .el-header {
+    padding: 2px 6px; font-size: 8px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.3px;
+    display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    opacity: 0.7;
+  }
+  .element .el-body {
+    flex: 1; overflow: hidden; font-size: 11px; color: #c9d1d9;
+  }
+  .element .el-close {
+    width: 14px; height: 14px; border-radius: 3px; border: none;
+    background: transparent; color: inherit; cursor: pointer; font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .element:hover .el-close { opacity: 0.6; }
+  .element .el-close:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+
+  .element .resize-handle { position: absolute; z-index: 5; }
+  .element .resize-handle.rh-right { top: 0; right: -3px; width: 6px; height: 100%; cursor: ew-resize; }
+  .element .resize-handle.rh-bottom { bottom: -3px; left: 0; width: 100%; height: 6px; cursor: ns-resize; }
+  .element .resize-handle.rh-corner { bottom: -4px; right: -4px; width: 12px; height: 12px; cursor: nwse-resize; }
+
+  /* Category colors */
+  .element.cat-stat { background: #0d1117; border-color: #1f6feb44; }
+  .element.cat-stat .el-header { background: #1f6feb18; color: #58a6ff; }
+  .element.cat-action { background: #0d1117; border-color: #2ea04344; }
+  .element.cat-action .el-header { background: #2ea04318; color: #3fb950; }
+  .element.cat-meta { background: #0d1117; border-color: #8b5cf644; }
+  .element.cat-meta .el-header { background: #8b5cf618; color: #a78bfa; }
+  .cat-stat-dot { background: #1f6feb; }
+  .cat-action-dot { background: #2ea043; }
+  .cat-meta-dot { background: #8b5cf6; }
+
+  /* ── Guide lines ── */
+  .guide-line { position: absolute; background: #f0883e; z-index: 50; pointer-events: none; }
+  .guide-line.horizontal { height: 1px; left: 0; right: 0; }
+  .guide-line.vertical { width: 1px; top: 0; bottom: 0; }
+
+  /* ── Modal ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #161b22; border: 1px solid #30363d; border-radius: 10px; width: 600px; max-height: 80vh; display: flex; flex-direction: column; }
+  .modal-header { padding: 14px 18px; border-bottom: 1px solid #30363d; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 13px; }
+  .modal-body { padding: 14px 18px; flex: 1; overflow-y: auto; }
+  .modal-body textarea { width: 100%; height: 300px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-family: 'SF Mono', monospace; font-size: 11px; padding: 10px; resize: none; }
+  .modal-footer { padding: 10px 18px; border-top: 1px solid #30363d; display: flex; justify-content: flex-end; gap: 8px; }
+
+  .pos-tooltip { position: absolute; background: #1c2128; border: 1px solid #30363d; border-radius: 4px; padding: 2px 6px; font-size: 10px; color: #8b949e; pointer-events: none; z-index: 60; white-space: nowrap; }
+
+  .zoom-controls { position: absolute; bottom: 10px; left: 10px; display: flex; gap: 4px; align-items: center; z-index: 50; }
+  .zoom-controls .btn { padding: 3px 7px; font-size: 10px; }
+  .zoom-label { font-size: 10px; color: #8b949e; padding: 0 3px; min-width: 32px; text-align: center; }
+
+  /* ── Mockup styles inside element bodies ── */
+  .m { padding: 6px 8px; height: 100%; overflow: hidden; }
+  .m-row { display: flex; align-items: center; gap: 6px; }
+  .m-col { display: flex; flex-direction: column; gap: 3px; }
+  .m-label { font-size: 9px; color: #484f58; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+  .m-val { font-family: 'SF Mono', monospace; font-weight: 600; }
+  .m-muted { color: #8b949e; }
+  .m-bar-track { height: 5px; background: #21262d; border-radius: 3px; overflow: hidden; flex: 1; min-width: 40px; }
+  .m-bar-fill { height: 100%; border-radius: 3px; }
+  .m-pill { display: inline-block; font-size: 9px; padding: 1px 5px; border-radius: 3px; font-weight: 500; }
+  .m-divider { height: 1px; background: linear-gradient(to right, #30363d, transparent); margin: 3px 0; }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>Layout Arranger</h1>
+  <div class="toolbar-sep"></div>
+  <div class="toolbar-group">
+    <label>Presets:</label>
+    <button class="btn btn-preset" onclick="applyPreset('wide')">Wide 3-Col</button>
+    <button class="btn btn-preset" onclick="applyPreset('two')">Two Panel</button>
+    <button class="btn btn-preset" onclick="applyPreset('compact')">Single Col</button>
+  </div>
+  <div class="toolbar-sep"></div>
+  <div class="toolbar-group">
+    <button class="btn" onclick="clearAll()">Clear</button>
+    <button class="btn" onclick="returnSelected()">Remove Selected</button>
+  </div>
+  <div class="toolbar-sep"></div>
+  <div class="toolbar-group">
+    <label>Grid:</label>
+    <button class="btn btn-preset" id="gridBtn10" onclick="setGrid(10)">10</button>
+    <button class="btn btn-preset active" id="gridBtn20" onclick="setGrid(20)">20</button>
+  </div>
+  <div style="flex:1"></div>
+  <button class="btn btn-primary" onclick="copyLayout()">Copy Layout</button>
+</div>
+
+<div class="main">
+  <div class="viewport-wrapper" id="viewportWrapper">
+    <div class="viewport" id="viewport"></div>
+    <div class="zoom-controls">
+      <button class="btn" onclick="zoom(-0.1)">−</button>
+      <span class="zoom-label" id="zoomLabel">100%</span>
+      <button class="btn" onclick="zoom(0.1)">+</button>
+      <button class="btn" onclick="zoomFit()">Fit</button>
+    </div>
+  </div>
+  <div class="sidebar">
+    <div class="sidebar-header">Elements (<span id="placedCount">0</span>/14 placed)</div>
+    <div class="sidebar-list" id="sidebarList"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header"><span>Layout Export</span><button class="btn" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body"><textarea id="exportText" readonly></textarea></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal()">Close</button><button class="btn btn-primary" onclick="copyToClipboard()">Copy to Clipboard</button></div>
+  </div>
+</div>
+<div class="pos-tooltip" id="posTooltip" style="display:none;"></div>
+
+<script>
+// ── Color helpers ──
+function sC(v) {
+  if (v >= 500) return '#3B82F6';
+  if (v >= 350) return '#60A5FA';
+  if (v >= 200) return '#8B949E';
+  if (v >= 80)  return '#D4A843';
+  return '#E8A735';
+}
+function bar(val, max, color, w) {
+  const pct = Math.min(val / max * 100, 100);
+  return `<div class="m-bar-track" style="${w ? 'width:'+w+'px;flex:none;' : ''}"><div class="m-bar-fill" style="width:${pct}%;background:${color};"></div></div>`;
+}
+function gauge(val, tgt, color, sz) {
+  const r = (sz-4)/2, circ = 2*Math.PI*r, pct = Math.min(val/tgt,1);
+  return `<div style="position:relative;width:${sz}px;height:${sz}px;">
+    <svg width="${sz}" height="${sz}"><circle cx="${sz/2}" cy="${sz/2}" r="${r}" fill="none" stroke="#21262d" stroke-width="3.5"/>
+    <circle cx="${sz/2}" cy="${sz/2}" r="${r}" fill="none" stroke="${color}" stroke-width="3.5" stroke-dasharray="${circ*pct} ${circ*(1-pct)}" stroke-linecap="round" transform="rotate(-90 ${sz/2} ${sz/2})"/></svg>
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:${sz < 36 ? 8 : 9}px;font-weight:700;color:#c9d1d9;">${val}</div>
+  </div>`;
+}
+
+// ── Sample data ──
+const stats = {contact:380,discipline:290,muscle:450,lift:320,aiming:410,insight:260,vision:340,intimidation:180,cunning:220,determination:390,wisdom:310,selflessness:150,
+  acrobatics:280,agility:340,arm:310,awareness:290,composure:260,dexterity:370,patience:220,reaction:350,speed:420,stealth:280,greed:190,performance:360,luck:270};
+const cats = {BATTING:['contact','discipline','muscle','lift','aiming','insight','vision','intimidation','cunning','determination','wisdom','selflessness'],DEFENSE:['acrobatics','agility','arm','awareness','composure','dexterity','patience','reaction'],BASERUNNING:['speed','stealth','greed','performance'],LUCK:['luck']};
+const devStats = [{n:'contact',c:380,t:500,g:120},{n:'discipline',c:290,t:400,g:110},{n:'aiming',c:410,t:450,g:40},{n:'muscle',c:450,t:400,g:-50}];
+
+// ── Mockup generators ──
+function mockPlayerIdentity(w,h) {
+  return `<div class="m" style="display:flex;align-items:center;gap:10px;">
+    <div style="width:38px;height:38px;border-radius:7px;background:linear-gradient(135deg,#3B82F6,#60A5FA);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:white;text-shadow:0 1px 2px rgba(0,0,0,0.3);flex-shrink:0;">21</div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:13px;font-weight:700;color:#f0f6fc;">Princess Solano</div>
+      <div style="font-size:10px;color:#8b949e;">🏇 Lexington Lancers · RF</div>
+    </div>
+    <div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;">
+      <span class="m-pill" style="background:rgba(255,215,0,0.15);color:#e3b341;border:1px solid rgba(255,215,0,0.25);">🎯 Focused</span>
+      <span class="m-pill" style="background:rgba(255,215,0,0.15);color:#e3b341;border:1px solid rgba(255,215,0,0.25);">💪 Strong</span>
+      <span class="m-pill" style="background:rgba(255,215,0,0.15);color:#e3b341;border:1px solid rgba(255,215,0,0.3);font-weight:600;">✨ Grand Slam</span>
+    </div>
+  </div>`;
+}
+
+function mockArchetype(w,h) {
+  return `<div class="m">
+    <select style="width:100%;background:#21262d;border:1px solid #30363d;border-radius:4px;padding:4px 6px;color:#c9d1d9;font-size:10px;margin-bottom:4px;">
+      <option>⚡ Contact Specialist</option>
+    </select>
+    <div style="display:flex;gap:3px;margin-bottom:3px;flex-wrap:wrap;">
+      <span class="m-pill" style="background:rgba(59,130,246,0.15);color:#58a6ff;">contact</span>
+      <span class="m-pill" style="background:rgba(59,130,246,0.15);color:#58a6ff;">discipline</span>
+      <span class="m-pill" style="background:rgba(59,130,246,0.15);color:#58a6ff;">aiming</span>
+      <span class="m-pill" style="background:rgba(59,130,246,0.15);color:#58a6ff;">vision</span>
+    </div>
+    <div style="font-size:9px;color:#8b949e;">Prioritizes contact and plate discipline for consistent base hits.</div>
+  </div>`;
+}
+
+function mockNextAction(w,h) {
+  return `<div class="m" style="border-left:2px solid rgba(59,130,246,0.5);">
+    <div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:2px;">
+      <span style="color:#58a6ff;font-weight:600;">Next: Level 22</span>
+      <span style="font-size:12px;font-weight:700;color:#f0f6fc;">73%<span style="font-size:9px;color:#8b949e;font-weight:400;"> to target</span></span>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:#f0f6fc;">Put +50 into <span style="color:#58a6ff;">Contact</span></div>
+    <div style="font-size:9px;color:#8b949e;margin-top:1px;">Currently 380 / 500 target. 120 points behind.</div>
+  </div>`;
+}
+
+function mockStatBars(w,h) {
+  const colW = w > 500 ? Math.floor((w - 40) / 3) : w > 300 ? Math.floor((w - 24) / 2) : w - 16;
+  const cols = w > 500 ? 3 : w > 300 ? 2 : 1;
+  let html = '<div class="m" style="overflow-y:auto;overflow-x:hidden;"><div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:6px 12px;">';
+  for (const [cat, names] of Object.entries(cats)) {
+    html += `<div><div class="m-label" style="border-bottom:1px solid #21262d;padding-bottom:1px;margin-bottom:2px;">${cat}</div>`;
+    for (const s of names) {
+      const v = stats[s], c = sC(v);
+      const isPriority = ['contact','discipline','aiming','vision'].includes(s);
+      html += `<div style="display:flex;align-items:center;gap:4px;padding:1px 0;">
+        ${isPriority ? '<span style="color:#3b82f6;font-size:8px;">★</span>' : '<span style="width:8px;"></span>'}
+        <span style="font-size:9px;color:#8b949e;text-transform:capitalize;width:${colW > 200 ? 72 : 56}px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s}</span>
+        ${bar(v, 1000, c)}
+        <span class="m-val" style="font-size:9px;color:${c};width:24px;text-align:right;">${v}</span>
+      </div>`;
+    }
+    html += '</div>';
+  }
+  return html + '</div></div>';
+}
+
+function mockRadialGauges(w,h) {
+  const sz = Math.min(40, Math.floor((h - 30) * 0.8));
+  let html = '<div class="m"><div class="m-label" style="margin-bottom:3px;">Tracked Stats</div><div style="display:flex;gap:10px;flex-wrap:wrap;">';
+  for (const s of devStats) {
+    const gap = s.t - s.c;
+    const color = gap <= 0 ? '#60A5FA' : (gap > 100 ? '#E8A735' : '#D4A843');
+    html += `<div style="text-align:center;">
+      ${gauge(s.c, s.t, color, sz)}
+      <div style="font-size:8px;color:#c9d1d9;text-transform:capitalize;margin-top:1px;">${s.n}</div>
+      <div style="font-size:7px;color:${gap > 0 ? color : '#3fb950'};">${gap > 0 ? '-'+gap : '✓'} / ${s.t}</div>
+    </div>`;
+  }
+  return html + '</div></div>';
+}
+
+function mockProgressSummary() {
+  return `<div class="m" style="display:flex;align-items:center;gap:10px;">
+    <span style="font-size:10px;"><span style="font-weight:700;color:#60A5FA;">6</span> <span style="color:#8b949e;font-size:9px;">on track</span></span>
+    <span style="font-size:10px;"><span style="font-weight:700;color:#E8A735;">4</span> <span style="color:#8b949e;font-size:9px;">behind</span></span>
+    <span style="font-size:10px;"><span style="font-weight:700;color:#c9d1d9;">9</span> <span style="color:#8b949e;font-size:9px;">levels left</span></span>
+  </div>`;
+}
+
+function mockTargetEdit() {
+  return `<div class="m" style="display:flex;align-items:center;justify-content:center;">
+    <button style="font-size:9px;padding:3px 10px;border-radius:4px;background:linear-gradient(180deg,#4B8DF7,#3B82F6);color:white;border:none;">Edit Targets</button>
+  </div>`;
+}
+
+function mockWhatIf(w,h) {
+  return `<div class="m">
+    <div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:4px;background:rgba(139,148,158,0.08);padding:3px 6px;border-radius:3px;">
+      <span style="color:#c9d1d9;">Simulating +50 at Level 22</span>
+      <span style="font-family:monospace;font-weight:600;">30 pts left</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:3px;">
+      ${['contact','discipline','aiming'].map((s,i) => {
+        const vals = [20,10,0];
+        return `<div style="display:flex;align-items:center;gap:5px;font-size:9px;">
+          <span style="width:56px;color:#8b949e;text-transform:capitalize;">${s}</span>
+          <input type="range" min="0" max="50" value="${vals[i]}" style="flex:1;accent-color:#3b82f6;height:3px;pointer-events:none;" />
+          <span style="font-family:monospace;color:${vals[i]>0?'#58a6ff':'#484f58'};width:24px;text-align:right;">+${vals[i]}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function mockProgression(w) {
+  const levels = [1,5,10,15,20,25,30];
+  const currentIdx = 4; // Lv.21 is between 20 and 25
+  let html = '<div class="m"><div style="position:relative;height:40px;margin:0 10px;">';
+  // Track
+  html += '<div style="position:absolute;top:14px;left:0;right:0;height:4px;background:#21262d;border-radius:2px;"></div>';
+  // Filled
+  html += '<div style="position:absolute;top:14px;left:0;height:4px;width:70%;background:linear-gradient(90deg,#3B82F6,#22D3EE);border-radius:2px;box-shadow:0 0 8px rgba(34,211,238,0.4);"></div>';
+  // Nodes
+  levels.forEach((lv,i) => {
+    const pct = (i / (levels.length - 1)) * 100;
+    const isPast = i < currentIdx;
+    const isCurrent = i === currentIdx;
+    const sz = isCurrent ? 18 : 12;
+    html += `<div style="position:absolute;left:calc(${pct}% - ${sz/2}px);top:${16 - sz/2}px;width:${sz}px;height:${sz}px;border-radius:50%;background:${isPast||isCurrent?'linear-gradient(135deg,#3B82F6,#60A5FA)':'#21262d'};display:flex;align-items:center;justify-content:center;font-size:${isCurrent?8:6}px;font-weight:700;color:${isPast||isCurrent?'white':'#484f58'};${isCurrent?'box-shadow:0 0 8px rgba(59,130,246,0.6);':''}${!isPast&&!isCurrent?'border:1px solid #30363d;':''}"><span>${lv}</span></div>`;
+  });
+  return html + '</div></div>';
+}
+
+function mockBoons(w, h) {
+  const orbSz = Math.min(Math.max(Math.floor((h - 30) * 0.7), 32), 56);
+  const emojiSz = Math.floor(orbSz * 0.5);
+  const boons = [
+    { lv: 10, emoji: '🎯', name: 'Focused', acquired: true },
+    { lv: 20, emoji: '💪', name: 'Strong', acquired: true },
+    { lv: 30, emoji: '?', name: 'Rec: Lucky', acquired: false },
+  ];
+  let html = '<div class="m" style="display:flex;align-items:center;justify-content:center;gap:0;">';
+  boons.forEach((b, i) => {
+    if (i > 0) {
+      const lineColor = b.acquired ? 'rgba(255,215,0,0.3)' : '#21262d';
+      const prevColor = boons[i-1].acquired ? 'rgba(255,215,0,0.4)' : '#21262d';
+      html += `<div style="width:24px;height:2px;background:linear-gradient(to right,${prevColor},${lineColor});margin:0 -2px;margin-bottom:${Math.floor(orbSz*0.4)}px;"></div>`;
+    }
+    const glow = b.acquired
+      ? `background:linear-gradient(135deg,rgba(255,215,0,0.3),rgba(234,179,8,0.15));border:2px solid rgba(255,215,0,0.5);box-shadow:0 0 12px rgba(255,215,0,0.25),inset 0 1px 2px rgba(255,255,255,0.1);`
+      : `background:#161b22;border:2px dashed #30363d;`;
+    html += `<div style="text-align:center;">
+      <div style="width:${orbSz}px;height:${orbSz}px;border-radius:50%;${glow}display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:${b.acquired ? emojiSz : Math.floor(emojiSz*0.6)}px;${b.acquired ? '' : 'color:#484f58;'}">${b.emoji}</span>
+      </div>
+      <div style="font-size:${Math.max(7, Math.floor(orbSz*0.16))}px;color:${b.acquired ? '#e3b341' : '#58a6ff'};margin-top:2px;font-weight:500;">${b.name}</div>
+      <div style="font-size:${Math.max(6, Math.floor(orbSz*0.14))}px;color:#484f58;">Lv.${b.lv}</div>
+    </div>`;
+  });
+  return html + '</div>';
+}
+
+function mockFood(w, h) {
+  const foods = [
+    { emoji: '🥐', name: 'Contact Croissant', stat: 'contact', cur: 380, tgt: 500, gap: 120 },
+    { emoji: '🌭', name: 'Discipline Dogs', stat: 'discipline', cur: 290, tgt: 400, gap: 110 },
+    { emoji: '🥐', name: 'Contact Croissant', stat: 'contact', cur: 380, tgt: 500, gap: 120, dupe: true },
+  ];
+  const emojiSz = Math.min(Math.max(Math.floor((h - 16) / 3 * 0.7), 16), 32);
+  let html = '<div class="m"><div class="m-label" style="margin-bottom:4px;">Feed Before Level-Up</div><div style="display:flex;flex-direction:column;gap:4px;">';
+  foods.forEach((f, i) => {
+    const urgency = i === 0 ? '#E8A735' : i === 1 ? '#D4A843' : 'rgba(212,168,67,0.6)';
+    html += `<div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:${emojiSz}px;">${f.emoji}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:11px;font-weight:600;color:#f0f6fc;">${f.name}${f.dupe ? ' <span style="font-size:9px;color:#8b949e;">(x2)</span>' : ''}</div>
+        <div style="font-size:9px;color:#8b949e;">${f.stat}: ${f.cur} → ${f.tgt} <span style="color:${urgency};">(-${f.gap})</span></div>
+      </div>
+    </div>`;
+  });
+  return html + '</div></div>';
+}
+
+function mockPitchArsenal(w,h) {
+  const sz = Math.min(50, h - 20);
+  return `<div class="m" style="display:flex;align-items:center;gap:10px;">
+    <div style="width:${sz}px;height:${sz}px;border-radius:50%;background:conic-gradient(#f97316 0% 40%, #3b82f6 40% 70%, #22c55e 70% 90%, #8b949e 90%);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <div style="width:${sz*0.55}px;height:${sz*0.55}px;border-radius:50%;background:#0d1117;"></div>
+    </div>
+    <div style="font-size:9px;display:flex;flex-direction:column;gap:2px;flex:1;">
+      <div><span style="color:#f97316;">■</span> Fastball <span class="m-muted">40%</span></div>
+      <div><span style="color:#3b82f6;">■</span> Slider <span class="m-muted">30%</span></div>
+      <div><span style="color:#22c55e;">■</span> Change <span class="m-muted">20%</span></div>
+      <div><span style="color:#8b949e;">■</span> Curve <span class="m-muted">10%</span></div>
+      <div style="border-top:1px solid #21262d;padding-top:2px;margin-top:1px;color:#3fb950;">+ Consider: Cutter</div>
+    </div>
+  </div>`;
+}
+
+function mockExport() {
+  return `<div class="m" style="display:flex;align-items:center;gap:4px;">
+    <button style="font-size:9px;padding:3px 8px;border-radius:3px;background:linear-gradient(180deg,#4B8DF7,#3B82F6);color:white;border:none;">Copy Link</button>
+    <button style="font-size:9px;padding:3px 8px;border-radius:3px;background:#21262d;color:#c9d1d9;border:1px solid #30363d;">Copy for Discord</button>
+  </div>`;
+}
+
+function mockCustomArchetype(w) {
+  const allStats = ['contact','discipline','muscle','lift','aiming','insight','vision','intimidation','cunning','determination'];
+  let html = '<div class="m"><div style="display:flex;gap:2px;flex-wrap:wrap;">';
+  allStats.forEach((s,i) => {
+    const isPri = i < 3;
+    const isSec = i === 3;
+    html += `<span style="font-size:8px;padding:2px 4px;border-radius:2px;text-transform:capitalize;
+      ${isPri ? 'background:rgba(59,130,246,0.2);color:#58a6ff;border:1px solid rgba(59,130,246,0.4);' :
+        isSec ? 'background:#21262d;color:#c9d1d9;border:1px solid #30363d;' :
+        'background:rgba(30,30,30,0.5);color:#484f58;border:1px solid transparent;'}">${s}</span>`;
+  });
+  return html + '<span style="font-size:8px;color:#484f58;padding:2px;">...</span></div></div>';
+}
+
+// ── Element definitions ──
+const ELEMENTS = [
+  { id: 'player-identity',   name: 'Player Identity',       cat: 'meta',   w: 1360, h: 56,  mockup: mockPlayerIdentity },
+  { id: 'archetype-selector', name: 'Archetype Selector',   cat: 'meta',   w: 320,  h: 90,  mockup: mockArchetype },
+  { id: 'next-level-action',  name: 'Next Action',          cat: 'action', w: 300,  h: 72,  mockup: mockNextAction },
+  { id: 'stat-bars',          name: 'Stat Bars',            cat: 'stat',   w: 560,  h: 380, mockup: mockStatBars },
+  { id: 'radial-gauges',      name: 'Radial Gauges',        cat: 'stat',   w: 360,  h: 100, mockup: mockRadialGauges },
+  { id: 'progress-summary',   name: 'Progress Summary',     cat: 'stat',   w: 260,  h: 32,  mockup: mockProgressSummary },
+  { id: 'target-edit',        name: 'Target Edit',          cat: 'action', w: 120,  h: 32,  mockup: mockTargetEdit },
+  { id: 'what-if',            name: 'What-If Allocator',    cat: 'action', w: 380,  h: 90,  mockup: mockWhatIf },
+  { id: 'progression-path',   name: 'Progression Path',     cat: 'meta',   w: 1360, h: 60,  mockup: mockProgression },
+  { id: 'boon-orbs',           name: 'Boon Orbs',            cat: 'meta',   w: 280,  h: 80,  mockup: mockBoons },
+  { id: 'pitch-arsenal',      name: 'Pitch Arsenal',        cat: 'stat',   w: 280,  h: 140, mockup: mockPitchArsenal },
+  { id: 'export-share',       name: 'Export / Share',       cat: 'action', w: 200,  h: 32,  mockup: mockExport },
+  { id: 'custom-archetype',   name: 'Custom Archetype',     cat: 'action', w: 340,  h: 40,  mockup: mockCustomArchetype },
+  { id: 'food-rec',           name: 'Food Recommendation',  cat: 'action', w: 280,  h: 120, mockup: mockFood },
+];
+
+// Note: section-headers, card-containers, stat-tooltips, stat-reasoning, star-markers are
+// *styling/behavior modes* that apply to the above elements, not standalone blocks.
+// They're excluded from the arranger since they don't take up independent space.
+
+// ── State ──
+let gridSize = 20;
+let currentZoom = 1;
+let placedElements = {};
+let selectedId = null;
+let dragState = null;
+
+const viewport = document.getElementById('viewport');
+const sidebarList = document.getElementById('sidebarList');
+const posTooltip = document.getElementById('posTooltip');
+
+function snap(v) { return Math.round(v / gridSize) * gridSize; }
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+// ── Sidebar ──
+function renderSidebar() {
+  sidebarList.innerHTML = '';
+  for (const el of ELEMENTS) {
+    const div = document.createElement('div');
+    div.className = 'tray-item' + (placedElements[el.id] ? ' placed' : '');
+    div.dataset.id = el.id;
+    div.draggable = true;
+    div.innerHTML = `<span class="dot cat-${el.cat}-dot"></span><span class="name">${el.name}</span><span class="size-hint">${el.w}×${el.h}</span>`;
+    div.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', el.id); e.dataTransfer.effectAllowed = 'move'; });
+    div.addEventListener('dblclick', () => placeElement(el.id));
+    sidebarList.appendChild(div);
+  }
+  document.getElementById('placedCount').textContent = Object.keys(placedElements).length;
+}
+
+// ── Place ──
+function placeElement(id, x, y, w, h) {
+  const def = ELEMENTS.find(e => e.id === id);
+  if (!def) return;
+  const ew = w || def.w, eh = h || def.h;
+  const ex = x != null ? snap(x) : snap((1400 - ew) / 2);
+  const ey = y != null ? snap(y) : snap(findOpenY(eh));
+  placedElements[id] = { x: ex, y: ey, w: ew, h: eh };
+  renderViewport();
+  renderSidebar();
+}
+
+function findOpenY(h) {
+  let maxB = 0;
+  for (const p of Object.values(placedElements)) maxB = Math.max(maxB, p.y + p.h);
+  return Math.min(maxB + 10, 900 - h);
+}
+
+function removeElement(id) {
+  delete placedElements[id];
+  if (selectedId === id) selectedId = null;
+  renderViewport(); renderSidebar();
+}
+
+function clearAll() { placedElements = {}; selectedId = null; renderViewport(); renderSidebar(); }
+function returnSelected() { if (selectedId) removeElement(selectedId); }
+
+// ── Viewport rendering ──
+function renderViewport() {
+  viewport.querySelectorAll('.element').forEach(el => el.remove());
+  for (const [id, pos] of Object.entries(placedElements)) {
+    const def = ELEMENTS.find(e => e.id === id);
+    if (!def) continue;
+    const div = document.createElement('div');
+    div.className = `element cat-${def.cat}` + (id === selectedId ? ' selected' : '');
+    div.dataset.id = id;
+    Object.assign(div.style, { left: pos.x+'px', top: pos.y+'px', width: pos.w+'px', height: pos.h+'px' });
+    div.innerHTML = `
+      <div class="el-header"><span>${def.name}</span><button class="el-close" onclick="event.stopPropagation();removeElement('${id}')">&times;</button></div>
+      <div class="el-body">${def.mockup(pos.w, pos.h)}</div>
+      <div class="resize-handle rh-right" data-handle="right"></div>
+      <div class="resize-handle rh-bottom" data-handle="bottom"></div>
+      <div class="resize-handle rh-corner" data-handle="corner"></div>`;
+    div.addEventListener('pointerdown', onElementPointerDown);
+    viewport.appendChild(div);
+  }
+}
+
+// ── Drag from sidebar ──
+viewport.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+viewport.addEventListener('drop', e => {
+  e.preventDefault();
+  const id = e.dataTransfer.getData('text/plain');
+  if (!id || placedElements[id]) return;
+  const rect = viewport.getBoundingClientRect();
+  const def = ELEMENTS.find(el => el.id === id);
+  if (!def) return;
+  const x = (e.clientX - rect.left) / currentZoom - def.w / 2;
+  const y = (e.clientY - rect.top) / currentZoom - def.h / 2;
+  placeElement(id, clamp(x, 0, 1400 - def.w), clamp(y, 0, 900 - def.h));
+});
+
+// ── Move & Resize ──
+function onElementPointerDown(e) {
+  const elDiv = e.currentTarget;
+  const id = elDiv.dataset.id;
+  const handle = e.target.dataset?.handle;
+  selectedId = id;
+  renderViewport();
+  const freshEl = viewport.querySelector(`[data-id="${id}"]`);
+  if (!freshEl) return;
+  const pos = placedElements[id];
+  if (!pos) return;
+  e.preventDefault();
+  freshEl.setPointerCapture(e.pointerId);
+  dragState = { type: handle ? 'resize' : 'move', id, handle, startX: e.clientX, startY: e.clientY, origX: pos.x, origY: pos.y, origW: pos.w, origH: pos.h };
+  if (e.target.closest('.el-close')) { dragState = null; return; }
+
+  const onMove = me => {
+    if (!dragState) return;
+    const dx = (me.clientX - dragState.startX) / currentZoom;
+    const dy = (me.clientY - dragState.startY) / currentZoom;
+    if (dragState.type === 'move') {
+      pos.x = snap(clamp(dragState.origX + dx, 0, 1400 - pos.w));
+      pos.y = snap(clamp(dragState.origY + dy, 0, 900 - pos.h));
+    } else {
+      if (dragState.handle === 'right' || dragState.handle === 'corner') pos.w = snap(clamp(dragState.origW + dx, 60, 1400 - pos.x));
+      if (dragState.handle === 'bottom' || dragState.handle === 'corner') pos.h = snap(clamp(dragState.origH + dy, 30, 900 - pos.y));
+    }
+    Object.assign(freshEl.style, { left: pos.x+'px', top: pos.y+'px', width: pos.w+'px', height: pos.h+'px' });
+    // Re-render mockup content on resize
+    const bodyEl = freshEl.querySelector('.el-body');
+    const def = ELEMENTS.find(e => e.id === dragState.id);
+    if (bodyEl && def) bodyEl.innerHTML = def.mockup(pos.w, pos.h);
+    showPosTooltip(me.clientX, me.clientY, pos);
+    showGuides(dragState.id, pos);
+  };
+  const onUp = ue => {
+    dragState = null;
+    freshEl.releasePointerCapture(ue.pointerId);
+    freshEl.removeEventListener('pointermove', onMove);
+    freshEl.removeEventListener('pointerup', onUp);
+    posTooltip.style.display = 'none';
+    clearGuides();
+    renderViewport(); // Final re-render with correct mockup
+  };
+  freshEl.addEventListener('pointermove', onMove);
+  freshEl.addEventListener('pointerup', onUp);
+}
+
+viewport.addEventListener('pointerdown', e => { if (e.target === viewport) { selectedId = null; renderViewport(); } });
+
+function showPosTooltip(cx, cy, pos) {
+  posTooltip.style.display = 'block';
+  posTooltip.textContent = `${pos.x}, ${pos.y}  (${pos.w} × ${pos.h})`;
+  posTooltip.style.left = (cx + 12) + 'px';
+  posTooltip.style.top = (cy + 12) + 'px';
+}
+
+// ── Guides ──
+function showGuides(excludeId, pos) {
+  clearGuides();
+  const edges = { left: pos.x, right: pos.x+pos.w, cx: pos.x+pos.w/2, top: pos.y, bottom: pos.y+pos.h, cy: pos.y+pos.h/2 };
+  for (const [oid, op] of Object.entries(placedElements)) {
+    if (oid === excludeId) continue;
+    const oe = { left: op.x, right: op.x+op.w, cx: op.x+op.w/2, top: op.y, bottom: op.y+op.h, cy: op.y+op.h/2 };
+    for (const my of [edges.left, edges.right, edges.cx]) for (const ot of [oe.left, oe.right, oe.cx]) if (Math.abs(my-ot)<5) addGuide('vertical', ot);
+    for (const my of [edges.top, edges.bottom, edges.cy]) for (const ot of [oe.top, oe.bottom, oe.cy]) if (Math.abs(my-ot)<5) addGuide('horizontal', ot);
+  }
+  if (Math.abs(edges.cx - 700) < 5) addGuide('vertical', 700);
+  if (Math.abs(edges.cy - 450) < 5) addGuide('horizontal', 450);
+}
+function addGuide(ori, pos) {
+  const existing = viewport.querySelectorAll('.guide-line.'+ori);
+  for (const g of existing) if (parseInt(g.style[ori==='horizontal'?'top':'left'])===Math.round(pos)) return;
+  const l = document.createElement('div');
+  l.className = 'guide-line ' + ori;
+  l.style[ori === 'horizontal' ? 'top' : 'left'] = Math.round(pos) + 'px';
+  viewport.appendChild(l);
+}
+function clearGuides() { viewport.querySelectorAll('.guide-line').forEach(g => g.remove()); }
+
+// ── Keyboard ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'Delete' || e.key === 'Backspace') { if (selectedId && document.activeElement.tagName !== 'TEXTAREA') removeElement(selectedId); }
+  if (e.key === 'Escape') { selectedId = null; renderViewport(); closeModal(); }
+  if (selectedId && ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
+    e.preventDefault();
+    const pos = placedElements[selectedId]; if (!pos) return;
+    const step = e.shiftKey ? 1 : gridSize;
+    if (e.key === 'ArrowUp') pos.y = clamp(pos.y - step, 0, 900 - pos.h);
+    if (e.key === 'ArrowDown') pos.y = clamp(pos.y + step, 0, 900 - pos.h);
+    if (e.key === 'ArrowLeft') pos.x = clamp(pos.x - step, 0, 1400 - pos.w);
+    if (e.key === 'ArrowRight') pos.x = clamp(pos.x + step, 0, 1400 - pos.w);
+    if (!e.shiftKey) { pos.x = snap(pos.x); pos.y = snap(pos.y); }
+    renderViewport();
+  }
+});
+
+// ── Grid ──
+function setGrid(size) {
+  gridSize = size;
+  document.querySelectorAll('[id^="gridBtn"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('gridBtn' + size).classList.add('active');
+}
+
+// ── Zoom ──
+function zoom(delta) { currentZoom = clamp(currentZoom + delta, 0.3, 1.5); applyZoom(); }
+function zoomFit() {
+  const wr = document.getElementById('viewportWrapper');
+  currentZoom = Math.min((wr.clientWidth - 40) / 1400, (wr.clientHeight - 40) / 900, 1);
+  applyZoom();
+}
+function applyZoom() {
+  viewport.style.transform = `scale(${currentZoom})`;
+  document.getElementById('zoomLabel').textContent = Math.round(currentZoom * 100) + '%';
+}
+
+// ── Presets ──
+function applyPreset(name) {
+  placedElements = {};
+  selectedId = null;
+  const P = 20, G = 8;
+
+  if (name === 'wide') {
+    let y = P;
+    placedElements['player-identity'] = { x: P, y, w: 1360, h: 56 }; y += 56 + G;
+    placedElements['progression-path'] = { x: P, y, w: 1360, h: 56 }; y += 56 + G;
+    const colTop = y;
+    const c1x = P, c1w = 320;
+    const c2x = c1x + c1w + G, c2w = 600;
+    const c3x = c2x + c2w + G, c3w = 1400 - c3x - P;
+    // Left col
+    y = colTop;
+    placedElements['archetype-selector'] = { x: c1x, y, w: c1w, h: 90 }; y += 90 + G;
+    placedElements['next-level-action'] = { x: c1x, y, w: c1w, h: 72 }; y += 72 + G;
+    placedElements['radial-gauges'] = { x: c1x, y, w: c1w, h: 100 }; y += 100 + G;
+    placedElements['what-if'] = { x: c1x, y, w: c1w, h: 90 }; y += 90 + G;
+    placedElements['boons-tbd'] = { x: c1x, y, w: c1w, h: 60 }; y += 60 + G;
+    placedElements['progress-summary'] = { x: c1x, y, w: 200, h: 28 };
+    placedElements['target-edit'] = { x: c1x + 208, y, w: 112, h: 28 };
+    // Center col
+    placedElements['stat-bars'] = { x: c2x, y: colTop, w: c2w, h: 900 - colTop - P };
+    // Right col
+    y = colTop;
+    placedElements['pitch-arsenal'] = { x: c3x, y, w: c3w, h: 140 }; y += 140 + G;
+    placedElements['custom-archetype'] = { x: c3x, y, w: c3w, h: 40 }; y += 40 + G;
+    placedElements['export-share'] = { x: c3x, y, w: c3w, h: 32 };
+
+  } else if (name === 'two') {
+    let y = P;
+    placedElements['player-identity'] = { x: P, y, w: 1360, h: 56 }; y += 56 + G;
+    const colTop = y;
+    const lx = P, lw = 480;
+    const rx = lx + lw + G, rw = 1400 - rx - P;
+    // Left
+    y = colTop;
+    placedElements['archetype-selector'] = { x: lx, y, w: lw, h: 90 }; y += 90 + G;
+    placedElements['next-level-action'] = { x: lx, y, w: lw, h: 72 }; y += 72 + G;
+    placedElements['radial-gauges'] = { x: lx, y, w: lw, h: 100 }; y += 100 + G;
+    placedElements['what-if'] = { x: lx, y, w: lw, h: 90 }; y += 90 + G;
+    placedElements['progression-path'] = { x: lx, y, w: lw, h: 56 }; y += 56 + G;
+    placedElements['boons-tbd'] = { x: lx, y, w: 260, h: 56 };
+    placedElements['export-share'] = { x: lx + 268, y, w: 200, h: 32 };
+    y += 56 + G;
+    placedElements['progress-summary'] = { x: lx, y, w: 240, h: 28 };
+    placedElements['target-edit'] = { x: lx + 248, y, w: 112, h: 28 };
+    // Right
+    y = colTop;
+    placedElements['stat-bars'] = { x: rx, y, w: rw, h: 560 }; y += 560 + G;
+    placedElements['pitch-arsenal'] = { x: rx, y, w: 280, h: 140 };
+    placedElements['custom-archetype'] = { x: rx + 288, y, w: rw - 288, h: 40 };
+
+  } else if (name === 'compact') {
+    const x = P, w = 1360;
+    let y = P;
+    const items = [
+      ['player-identity', w, 56],
+      ['archetype-selector', w, 76],
+      ['next-level-action', w, 60],
+      ['stat-bars', w, 340],
+      ['radial-gauges', w, 80],
+      ['progression-path', w, 56],
+      ['what-if', w, 80],
+      ['pitch-arsenal', w, 100],
+    ];
+    for (const [id, iw, ih] of items) {
+      placedElements[id] = { x, y, w: iw, h: ih }; y += ih + G;
+    }
+    // Bottom row
+    placedElements['boons-tbd'] = { x, y, w: 280, h: 48 };
+    placedElements['progress-summary'] = { x: 308, y, w: 240, h: 28 };
+    placedElements['target-edit'] = { x: 556, y, w: 112, h: 28 };
+    placedElements['export-share'] = { x: 676, y, w: 200, h: 32 };
+    placedElements['custom-archetype'] = { x: 884, y, w: 496, h: 40 };
+  }
+
+  renderViewport(); renderSidebar();
+}
+
+// ── Copy ──
+function copyLayout() {
+  const lines = ['MMOLB Layout', ''];
+  const sorted = Object.entries(placedElements).sort((a,b) => a[1].y !== b[1].y ? a[1].y - b[1].y : a[1].x - b[1].x);
+  if (!sorted.length) { lines.push('(empty)'); }
+  else {
+    let lastY = -99, row = 0;
+    for (const [id, pos] of sorted) {
+      const def = ELEMENTS.find(e => e.id === id);
+      if (pos.y - lastY > 15) { row++; if (row > 1) lines.push(''); lines.push(`--- Row ${row} (y:${pos.y}) ---`); }
+      lastY = pos.y;
+      lines.push(`  ${def.name.padEnd(24)} x:${String(pos.x).padStart(4)} y:${String(pos.y).padStart(4)} w:${String(pos.w).padStart(4)} h:${String(pos.h).padStart(4)}`);
+    }
+  }
+  lines.push('', `Viewport: 1400×900 | Grid: ${gridSize}px | Placed: ${sorted.length}/${ELEMENTS.length}`);
+  const unplaced = ELEMENTS.filter(e => !placedElements[e.id]);
+  if (unplaced.length) { lines.push('', 'Not placed:'); unplaced.forEach(e => lines.push('  - ' + e.name)); }
+  document.getElementById('exportText').value = lines.join('\n');
+  document.getElementById('modal').classList.add('open');
+}
+function copyToClipboard() {
+  navigator.clipboard.writeText(document.getElementById('exportText').value).then(() => {
+    const btn = document.querySelector('.modal-footer .btn-primary');
+    btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy to Clipboard', 1500);
+  });
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+// ── Init: load user's layout as default ──
+function loadUserLayout() {
+  placedElements = {};
+  const P = 20, G = 8;
+
+  // Row 1: Player Identity (left) + Stat Bars (right)
+  placedElements['player-identity'] = { x: 20, y: 20, w: 480, h: 56 };
+  placedElements['stat-bars'] = { x: 520, y: 20, w: 872, h: 280 };
+
+  // Row 2: Archetype below identity
+  placedElements['archetype-selector'] = { x: 20, y: 84, w: 480, h: 90 };
+
+  // Row 3: Custom archetype
+  placedElements['custom-archetype'] = { x: 20, y: 180, w: 480, h: 60 };
+
+  // Row 4: What-If left, Target Edit far right
+  placedElements['what-if'] = { x: 20, y: 248, w: 480, h: 100 };
+  placedElements['target-edit'] = { x: 1280, y: 248, w: 112, h: 60 };
+
+  // Row 5: Next Action, Radial Gauges, Pitch Arsenal (below stat bars)
+  placedElements['next-level-action'] = { x: 520, y: 308, w: 300, h: 140 };
+  placedElements['radial-gauges'] = { x: 828, y: 308, w: 280, h: 140 };
+  placedElements['pitch-arsenal'] = { x: 1116, y: 308, w: 276, h: 140 };
+
+  // Row 6: Food recommendation (left col bottom) + Progress Summary
+  placedElements['food-rec'] = { x: 20, y: 356, w: 480, h: 140 };
+  placedElements['progress-summary'] = { x: 520, y: 456, w: 240, h: 40 };
+
+  // Row 7: Boon Orbs + Progression Path
+  placedElements['boon-orbs'] = { x: 520, y: 504, w: 280, h: 88 };
+  placedElements['progression-path'] = { x: 808, y: 504, w: 584, h: 88 };
+
+  // Row 8: Export
+  placedElements['export-share'] = { x: 520, y: 600, w: 200, h: 40 };
+
+  renderViewport();
+  renderSidebar();
+}
+
+loadUserLayout();
+zoomFit();
+window.addEventListener('resize', zoomFit);
+</script>
+</body>
+</html>

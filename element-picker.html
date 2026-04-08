@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Element Picker — MMOLB Builder</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d1117;
+    color: #c9d1d9;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    padding: 20px 28px 60px;
+    line-height: 1.5;
+  }
+
+  h1 { color: #f0f6fc; font-size: 20px; margin-bottom: 2px; }
+  .subtitle { color: #8b949e; font-size: 12px; margin-bottom: 20px; }
+
+  .element-group {
+    margin-bottom: 28px;
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .element-header {
+    background: #161b22;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #21262d;
+    cursor: pointer;
+    user-select: none;
+  }
+  .element-header:hover { background: #1c2129; }
+  .element-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #f0f6fc;
+  }
+  .element-number {
+    font-size: 11px;
+    font-weight: 700;
+    color: #3b82f6;
+    background: rgba(59,130,246,0.15);
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-right: 8px;
+  }
+  .element-data {
+    font-size: 11px;
+    color: #8b949e;
+    margin-left: auto;
+    margin-right: 12px;
+  }
+  .selected-label {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 3px;
+    transition: all 0.2s;
+  }
+  .selected-label.none { background: rgba(139,148,158,0.15); color: #8b949e; }
+  .selected-label.picked { background: rgba(59,130,246,0.2); color: #58a6ff; }
+  .chevron {
+    color: #8b949e;
+    transition: transform 0.2s;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  .chevron.open { transform: rotate(180deg); }
+
+  .element-body {
+    display: none;
+    background: #0d1117;
+  }
+  .element-body.open { display: block; }
+
+  .notes-area {
+    padding: 8px 14px;
+    background: #0d1117;
+    border-top: 1px solid #21262d;
+  }
+  .notes-area textarea {
+    width: 100%;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    color: #c9d1d9;
+    font-family: inherit;
+    font-size: 11px;
+    padding: 6px 8px;
+    resize: vertical;
+    min-height: 32px;
+    max-height: 120px;
+    line-height: 1.4;
+  }
+  .notes-area textarea::placeholder { color: #484f58; }
+  .notes-area textarea:focus { outline: none; border-color: #58a6ff; }
+  .notes-label { font-size: 10px; color: #484f58; margin-bottom: 3px; }
+
+  .option-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 0;
+    border-bottom: 1px solid #21262d;
+  }
+  .option-row:last-child { border-bottom: none; }
+
+  .option {
+    padding: 12px 14px;
+    border-right: 1px solid #21262d;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .option:last-child { border-right: none; }
+  .option:hover { background: #161b22; }
+  .option.selected { background: rgba(59,130,246,0.08); }
+  .option.selected::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: #3b82f6;
+  }
+
+  .option-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .option-label .tag {
+    font-size: 9px;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+  .tag.current { background: rgba(63,185,80,0.15); color: #3fb950; }
+  .tag.new { background: rgba(59,130,246,0.15); color: #58a6ff; }
+
+  .option-desc {
+    font-size: 11px;
+    color: #8b949e;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+
+  /* Mockup area */
+  .mockup {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 10px;
+    min-height: 60px;
+  }
+
+  /* ── Scale colors ── */
+  :root {
+    --scale-bad: #E8A735;
+    --scale-poor: #D4A843;
+    --scale-mid: #8B949E;
+    --scale-good: #60A5FA;
+    --scale-great: #3B82F6;
+  }
+
+  /* ── Summary bar ── */
+  .summary-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #161b22;
+    border-top: 1px solid #30363d;
+    padding: 10px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+    gap: 12px;
+  }
+  .summary-counts { font-size: 12px; color: #8b949e; }
+  .summary-counts strong { color: #f0f6fc; }
+  .copy-btn {
+    background: linear-gradient(180deg, #4B8DF7 0%, #3B82F6 100%);
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .copy-btn:hover { filter: brightness(1.1); }
+
+  /* Mini-chart helpers */
+  .bar-track { height: 6px; background: #21262d; border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; }
+  .stat-val { font-family: 'SF Mono', 'Cascadia Code', monospace; font-size: 12px; font-weight: 600; }
+  .stat-name { font-size: 11px; color: #8b949e; text-transform: capitalize; }
+  .stat-row { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
+  .cat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; color: #484f58; font-weight: 600; }
+
+  /* Heatmap cell */
+  .heat-cell {
+    width: 28px; height: 22px; border-radius: 3px; display: flex; align-items: center; justify-content: center;
+    font-family: monospace; font-size: 9px; font-weight: 600; color: #0d1117;
+  }
+
+  /* Radial gauge */
+  .gauge { position: relative; width: 36px; height: 36px; }
+  .gauge svg { width: 36px; height: 36px; }
+  .gauge-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #c9d1d9; }
+
+  /* Tag pill */
+  .pill { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: 500; }
+  .pill-pri { background: rgba(59,130,246,0.15); color: #58a6ff; }
+  .pill-sec { background: rgba(139,148,158,0.15); color: #8b949e; }
+  .pill-boon { background: rgba(255,215,0,0.15); color: #e3b341; border: 1px solid rgba(255,215,0,0.25); }
+
+  /* Progress ring segments */
+  .ring-segment { fill: none; stroke-linecap: round; }
+
+  /* Tiny sparkline */
+  .sparkline { display: inline-block; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<h1>Element Picker</h1>
+<p class="subtitle">20 UI elements, 3 versions each + "None" option. Click to select. Current implementation is marked as the default.<br>
+After all elements are decided, we move to arranging them on screen.</p>
+
+<div id="elements"></div>
+
+<div class="summary-bar">
+  <div class="summary-counts">
+    <strong id="picked-count">0</strong> of 20 elements decided
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button class="copy-btn" onclick="copySelections()" id="copy-btn">Copy Selections</button>
+  </div>
+</div>
+
+<script>
+// ── Color scale ──
+function statColor(v) {
+  if (v >= 500) return '#3B82F6';
+  if (v >= 350) return '#60A5FA';
+  if (v >= 200) return '#8B949E';
+  if (v >= 80)  return '#D4A843';
+  return '#E8A735';
+}
+
+// ── Sample data ──
+const sampleStats = {
+  batting: { contact: 380, discipline: 290, muscle: 450, lift: 320, aiming: 410, insight: 260, vision: 340, intimidation: 180, cunning: 220, determination: 390, wisdom: 310, selflessness: 150 },
+  defense: { acrobatics: 280, agility: 340, arm: 310, awareness: 290, composure: 260, dexterity: 370, patience: 220, reaction: 350 },
+  baserunning: { speed: 420, stealth: 280, greed: 190, performance: 360 },
+  luck: { luck: 270 }
+};
+const allStats = {};
+for (const [cat, stats] of Object.entries(sampleStats)) {
+  for (const [k,v] of Object.entries(stats)) allStats[k] = v;
+}
+
+// ── SVG helpers ──
+function arcPath(cx, cy, r, startAngle, endAngle) {
+  const x1 = cx + r * Math.cos(startAngle);
+  const y1 = cy + r * Math.sin(startAngle);
+  const x2 = cx + r * Math.cos(endAngle);
+  const y2 = cy + r * Math.sin(endAngle);
+  const large = endAngle - startAngle > Math.PI ? 1 : 0;
+  return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
+}
+
+function gaugeRing(value, max, color, size=36, stroke=4) {
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const pct = Math.min(value / max, 1);
+  return `<div class="gauge" style="width:${size}px;height:${size}px;">
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#21262d" stroke-width="${stroke}"/>
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}"
+        stroke-dasharray="${circ * pct} ${circ * (1-pct)}" stroke-linecap="round"
+        transform="rotate(-90 ${size/2} ${size/2})"/>
+    </svg>
+    <div class="gauge-label" style="font-size:${size < 30 ? 8 : 9}px;">${value}</div>
+  </div>`;
+}
+
+function miniBar(value, max, color, width=80, height=6) {
+  const pct = Math.min(value / max * 100, 100);
+  return `<div class="bar-track" style="width:${width}px;height:${height}px;">
+    <div class="bar-fill" style="width:${pct}%;background:${color};"></div>
+  </div>`;
+}
+
+function heatCell(value) {
+  const c = statColor(value);
+  return `<div class="heat-cell" style="background:${c};">${value}</div>`;
+}
+
+// ── Element definitions ──
+const elements = [
+  {
+    id: 'player-identity',
+    title: 'Player Identity',
+    data: 'name, level, team, position, boons',
+    options: [
+      {
+        label: 'A: Header Bar',
+        tag: 'current',
+        desc: 'Full-width card with name, level, team, position. Boons listed as pills below a divider.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-size:15px;font-weight:700;color:#f0f6fc;">Princess Solano</span>
+            <span style="font-size:12px;color:#8b949e;">Lv.21</span>
+            <span style="font-size:12px;color:#8b949e;">🏇 Lexington Lancers | RF</span>
+          </div>
+          <div style="height:1px;background:linear-gradient(to right,#30363d,transparent);margin-bottom:6px;"></div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <span class="pill pill-boon">🎯 Focused</span>
+            <span class="pill pill-boon">💪 Strong</span>
+            <span class="pill" style="background:rgba(255,215,0,0.15);color:#e3b341;border:1px solid rgba(255,215,0,0.3);font-weight:600;">✨ Grand Slam</span>
+          </div>`
+      },
+      {
+        label: 'B: Compact Inline',
+        tag: 'new',
+        desc: 'Single line. Name bold, level/team/position as subdued text. Boons as tiny dots or abbreviated.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span style="font-size:14px;font-weight:700;color:#f0f6fc;">Princess Solano</span>
+            <span style="font-size:11px;color:#484f58;">21</span>
+            <span style="font-size:11px;color:#484f58;">·</span>
+            <span style="font-size:11px;color:#484f58;">🏇 Lexington Lancers</span>
+            <span style="font-size:11px;color:#484f58;">·</span>
+            <span style="font-size:11px;color:#484f58;">RF</span>
+            <span style="font-size:11px;color:#484f58;">·</span>
+            <span style="font-size:10px;color:#e3b341;">🎯💪✨</span>
+          </div>`
+      },
+      {
+        label: 'C: Badge Card',
+        tag: 'new',
+        desc: 'RPG-style badge: large level number left, name + team right, boons as a shimmer strip below.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#3B82F6,#60A5FA);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.3);">21</div>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:#f0f6fc;">Princess Solano</div>
+              <div style="font-size:11px;color:#8b949e;">🏇 Lexington Lancers · RF</div>
+            </div>
+          </div>
+          <div style="margin-top:6px;display:flex;gap:4px;">
+            <span class="pill pill-boon">🎯 Focused</span>
+            <span class="pill pill-boon">💪 Strong</span>
+            <span class="pill" style="background:rgba(255,215,0,0.15);color:#e3b341;border:1px solid rgba(255,215,0,0.3);font-weight:600;">✨ Grand Slam</span>
+          </div>`
+      }
+    ]
+  },
+  {
+    id: 'archetype-selector',
+    title: 'Archetype Selector',
+    data: 'archetype list, name, emoji, description, priority/secondary stats',
+    options: [
+      {
+        label: 'A: Dropdown + Detail',
+        tag: 'current',
+        desc: 'Select dropdown, then shows priority stat pills and description below.',
+        mockup: () => `
+          <div style="margin-bottom:6px;">
+            <select style="width:100%;background:#21262d;border:1px solid #30363d;border-radius:4px;padding:5px 8px;color:#c9d1d9;font-size:12px;">
+              <option>⚡ Contact Specialist</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap;">
+            <span class="pill pill-pri">contact</span>
+            <span class="pill pill-pri">discipline</span>
+            <span class="pill pill-pri">aiming</span>
+          </div>
+          <div style="font-size:11px;color:#8b949e;">Prioritizes contact and plate discipline for consistent base hits.</div>`
+      },
+      {
+        label: 'B: Dropdown Only',
+        tag: 'new',
+        desc: 'Just the dropdown, no detail panel. Saves vertical space. Stats are shown elsewhere.',
+        mockup: () => `
+          <select style="width:100%;background:#21262d;border:1px solid #30363d;border-radius:4px;padding:5px 8px;color:#c9d1d9;font-size:12px;">
+            <option>⚡ Contact Specialist — contact, discipline, aiming</option>
+          </select>`
+      },
+      {
+        label: 'C: Pill Toggle Bar',
+        tag: 'new',
+        desc: 'Horizontal scrollable pill bar. Each archetype is a clickable pill. Selected one expands to show stats.',
+        mockup: () => `
+          <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;">
+            <span style="font-size:11px;padding:4px 10px;border-radius:16px;background:rgba(59,130,246,0.2);color:#58a6ff;border:1px solid rgba(59,130,246,0.4);white-space:nowrap;cursor:pointer;font-weight:600;">⚡ Contact Specialist</span>
+            <span style="font-size:11px;padding:4px 10px;border-radius:16px;background:#21262d;color:#8b949e;border:1px solid #30363d;white-space:nowrap;cursor:pointer;">🔥 Power Hitter</span>
+            <span style="font-size:11px;padding:4px 10px;border-radius:16px;background:#21262d;color:#8b949e;border:1px solid #30363d;white-space:nowrap;cursor:pointer;">🎯 Balanced</span>
+            <span style="font-size:11px;padding:4px 10px;border-radius:16px;background:#21262d;color:#8b949e;border:1px solid #30363d;white-space:nowrap;cursor:pointer;">🔧 Custom</span>
+          </div>
+          <div style="font-size:10px;color:#8b949e;margin-top:4px;">Core: <span style="color:#58a6ff;">contact, discipline, aiming</span></div>`
+      }
+    ]
+  },
+  {
+    id: 'next-action',
+    title: 'Next Level Action',
+    data: 'next level #, what happens (stat points / boon / defense bonus), top recommendation',
+    options: [
+      {
+        label: 'A: Action Card',
+        tag: 'current',
+        desc: 'Bordered card with "Next: Level 22", bold action text, and supporting detail.',
+        mockup: () => `
+          <div style="border:1px solid rgba(59,130,246,0.5);border-radius:6px;padding:8px 10px;">
+            <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px;">
+              <span style="color:#58a6ff;font-weight:600;">Next: Level 22</span>
+              <span style="color:#8b949e;">73% to target</span>
+            </div>
+            <div style="font-size:13px;font-weight:700;color:#f0f6fc;">Put +50 into <span style="color:#58a6ff;">Contact</span></div>
+            <div style="font-size:10px;color:#8b949e;">Currently 380 / 500 target. 120 points behind.</div>
+          </div>`
+      },
+      {
+        label: 'B: Inline Banner',
+        tag: 'new',
+        desc: 'Thin horizontal banner. Arrow icon, action text, level badge. One line.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:8px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);border-radius:4px;padding:5px 10px;">
+            <span style="color:#3b82f6;font-size:14px;">→</span>
+            <span style="font-size:12px;font-weight:600;color:#f0f6fc;">Lv.22: +50 <span style="text-transform:capitalize;color:#58a6ff;">contact</span></span>
+            <span style="font-size:10px;color:#8b949e;margin-left:auto;">380→430 / 500 target</span>
+          </div>`
+      },
+      {
+        label: 'C: Pill + Tooltip',
+        tag: 'new',
+        desc: 'Tiny pill that says "Lv.22 → Contact +50". Hover/click for full detail. Minimal footprint.',
+        mockup: () => `
+          <div style="display:inline-flex;align-items:center;gap:4px;">
+            <span style="font-size:11px;padding:3px 8px;border-radius:4px;background:rgba(59,130,246,0.15);color:#58a6ff;font-weight:600;cursor:help;">Lv.22 → Contact +50</span>
+            <span style="font-size:9px;color:#484f58;">(hover for detail)</span>
+          </div>`
+      }
+    ]
+  },
+  {
+    id: 'stat-display',
+    title: 'Stat Values Display',
+    data: '25 stats (batter) grouped into 4-5 categories, each 0-1000',
+    options: [
+      {
+        label: 'A: Table Rows',
+        tag: 'current',
+        desc: 'Category headers, then stat name + colored number per row. Compact text list.',
+        mockup: () => {
+          let html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">';
+          const cats = { 'BATTING': ['contact','discipline','muscle','lift'], 'DEFENSE': ['acrobatics','agility','arm','awareness'], 'BASERUNNING': ['speed','stealth','greed','performance'] };
+          for (const [cat, stats] of Object.entries(cats)) {
+            html += `<div><div class="cat-label" style="margin-bottom:3px;border-bottom:1px solid #21262d;padding-bottom:2px;">${cat}</div>`;
+            for (const s of stats) {
+              const v = allStats[s];
+              html += `<div class="stat-row"><span class="stat-name" style="flex:1;">${s}</span><span class="stat-val" style="color:${statColor(v)};">${v}</span></div>`;
+            }
+            html += '</div>';
+          }
+          return html + '</div>';
+        }
+      },
+      {
+        label: 'B: Heatmap Grid',
+        tag: 'new',
+        desc: 'Stats as a grid of colored cells. Background color = quality tier. Compact, scannable at a glance.',
+        mockup: () => {
+          let html = '<div style="display:flex;flex-direction:column;gap:4px;">';
+          const cats = { 'BAT': ['contact','discipline','muscle','lift','aiming','insight','vision','intimidation','cunning','determination','wisdom','selflessness'], 'DEF': ['acrobatics','agility','arm','awareness','composure','dexterity','patience','reaction'], 'RUN': ['speed','stealth','greed','performance'], 'LUCK': ['luck'] };
+          for (const [cat, stats] of Object.entries(cats)) {
+            html += `<div style="display:flex;align-items:center;gap:3px;"><span class="cat-label" style="width:28px;">${cat}</span>`;
+            for (const s of stats) {
+              const v = allStats[s] || 270;
+              html += `<div class="heat-cell" title="${s}: ${v}" style="background:${statColor(v)};">${v}</div>`;
+            }
+            html += '</div>';
+          }
+          return html + '</div>';
+        }
+      },
+      {
+        label: 'C: Stat Bars',
+        tag: 'new',
+        desc: 'Each stat gets a horizontal bar (0-1000). Color encodes quality. Shows magnitude visually.',
+        mockup: () => {
+          let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;">';
+          const stats = ['contact','discipline','muscle','lift','speed','acrobatics','agility','arm'];
+          for (const s of stats) {
+            const v = allStats[s];
+            const c = statColor(v);
+            html += `<div style="display:flex;align-items:center;gap:6px;">
+              <span class="stat-name" style="width:70px;font-size:10px;">${s}</span>
+              ${miniBar(v, 1000, c, 80, 5)}
+              <span class="stat-val" style="color:${c};font-size:10px;width:28px;text-align:right;">${v}</span>
+            </div>`;
+          }
+          return html + '</div><div style="font-size:9px;color:#484f58;margin-top:4px;">Showing 8 of 25 stats</div>';
+        }
+      }
+    ]
+  },
+  {
+    id: 'stat-highlight',
+    title: 'Archetype Stat Highlighting',
+    data: 'which stats are priority vs secondary for the chosen archetype',
+    options: [
+      {
+        label: 'A: Background Tint',
+        tag: 'current',
+        desc: 'Priority/secondary stats get a blue tinted background and border in the stat list.',
+        mockup: () => `
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:3px 6px;border-radius:4px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);">
+              <span class="stat-name">contact</span>
+              <span class="stat-val" style="color:#60A5FA;">380</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:3px 6px;border-radius:4px;">
+              <span class="stat-name">muscle</span>
+              <span class="stat-val" style="color:#3B82F6;">450</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:3px 6px;border-radius:4px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);">
+              <span class="stat-name">aiming</span>
+              <span class="stat-val" style="color:#60A5FA;">410</span>
+            </div>
+          </div>`
+      },
+      {
+        label: 'B: Star Markers',
+        tag: 'new',
+        desc: 'Small star or dot icon before priority stat names. Subtle, doesn\'t change layout.',
+        mockup: () => `
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:3px 6px;">
+              <span class="stat-name"><span style="color:#3b82f6;margin-right:3px;">★</span>contact</span>
+              <span class="stat-val" style="color:#60A5FA;">380</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:3px 6px;">
+              <span class="stat-name" style="padding-left:14px;">muscle</span>
+              <span class="stat-val" style="color:#3B82F6;">450</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:3px 6px;">
+              <span class="stat-name"><span style="color:#3b82f6;margin-right:3px;">★</span>aiming</span>
+              <span class="stat-val" style="color:#60A5FA;">410</span>
+            </div>
+          </div>`
+      },
+      {
+        label: 'C: Sort to Top',
+        tag: 'new',
+        desc: 'Archetype stats float to the top of their category (or a separate "Priority" group). Others below.',
+        mockup: () => `
+          <div style="margin-bottom:4px;">
+            <div class="cat-label" style="margin-bottom:3px;color:#58a6ff;">PRIORITY</div>
+            <div class="stat-row"><span class="stat-name" style="flex:1;">contact</span><span class="stat-val" style="color:#60A5FA;">380</span></div>
+            <div class="stat-row"><span class="stat-name" style="flex:1;">discipline</span><span class="stat-val" style="color:#8B949E;">290</span></div>
+            <div class="stat-row"><span class="stat-name" style="flex:1;">aiming</span><span class="stat-val" style="color:#60A5FA;">410</span></div>
+          </div>
+          <div>
+            <div class="cat-label" style="margin-bottom:3px;">OTHER</div>
+            <div class="stat-row"><span class="stat-name" style="flex:1;">muscle</span><span class="stat-val" style="color:#3B82F6;">450</span></div>
+            <div class="stat-row"><span class="stat-name" style="flex:1;">lift</span><span class="stat-val" style="color:#60A5FA;">320</span></div>
+          </div>`
+      }
+    ]
+  },
+  {
+    id: 'stat-dev-cards',
+    title: 'Stat Development (Tracked Stats)',
+    data: 'per-stat: current, target, gap, progress bar, reasoning text',
+    options: [
+      {
+        label: 'A: Card with Bar + Reasoning',
+        tag: 'current',
+        desc: 'Each tracked stat gets a card: name + gap badge, current/target, progress bar, reasoning text.',
+        mockup: () => `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div style="border-left:3px solid rgba(232,167,53,0.45);background:rgba(232,167,53,0.12);border-radius:4px;padding:6px 8px;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">
+                <span style="font-weight:600;color:#f0f6fc;">Contact <span style="color:#E8A735;font-size:10px;">-120</span></span>
+                <span style="color:#8b949e;font-size:11px;"><span style="color:#60A5FA;">380</span> / 500</span>
+              </div>
+              ${miniBar(380, 500, 'linear-gradient(90deg,#D4A843,#60A5FA)', 999, 6).replace('width:999px;','width:100%;')}
+              <div style="font-size:10px;color:#8b949e;margin-top:3px;">Core archetype stat, needs priority investment</div>
+            </div>
+            <div style="border-left:3px solid rgba(96,165,250,0.35);background:rgba(96,165,250,0.08);border-radius:4px;padding:6px 8px;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">
+                <span style="font-weight:600;color:#f0f6fc;">Muscle</span>
+                <span style="color:#8b949e;font-size:11px;"><span style="color:#3B82F6;">450</span> / 400</span>
+              </div>
+              <div class="bar-track" style="width:100%"><div class="bar-fill" style="width:100%;background:linear-gradient(90deg,#60A5FA,#3B82F6);"></div></div>
+              <div style="font-size:10px;color:#8b949e;margin-top:3px;">On target, maintain current level</div>
+            </div>
+          </div>`
+      },
+      {
+        label: 'B: Inline Rows (No Reasoning)',
+        tag: 'new',
+        desc: 'Compact table rows. Stat name, inline bar, current/target numbers. No text reasoning. Dense.',
+        mockup: () => {
+          const devStats = [{n:'contact',c:380,t:500},{n:'discipline',c:290,t:400},{n:'aiming',c:410,t:450},{n:'muscle',c:450,t:400}];
+          let html = '<div style="display:flex;flex-direction:column;gap:3px;">';
+          for (const s of devStats) {
+            const gap = s.t - s.c;
+            const pct = Math.min(s.c / s.t * 100, 100);
+            const onTrack = gap <= 0;
+            const color = onTrack ? '#60A5FA' : (gap > 150 ? '#E8A735' : '#D4A843');
+            html += `<div style="display:flex;align-items:center;gap:6px;">
+              <span class="stat-name" style="width:70px;">${s.n}</span>
+              <div class="bar-track" style="flex:1;"><div class="bar-fill" style="width:${pct}%;background:${color};"></div></div>
+              <span style="font-family:monospace;font-size:10px;color:${statColor(s.c)};width:24px;text-align:right;">${s.c}</span>
+              <span style="font-size:10px;color:#484f58;">/</span>
+              <span style="font-family:monospace;font-size:10px;color:#8b949e;width:24px;">${s.t}</span>
+              ${gap > 0 ? `<span style="font-size:9px;color:${color};width:28px;">-${gap}</span>` : `<span style="font-size:9px;color:#3fb950;width:28px;">✓</span>`}
+            </div>`;
+          }
+          return html + '</div>';
+        }
+      },
+      {
+        label: 'C: Radial Gauges',
+        tag: 'new',
+        desc: 'Each tracked stat shown as a small circular gauge. Ring fill = progress toward target. Gap shown below.',
+        mockup: () => {
+          const devStats = [{n:'contact',c:380,t:500},{n:'discipline',c:290,t:400},{n:'aiming',c:410,t:450},{n:'muscle',c:450,t:400}];
+          let html = '<div style="display:flex;gap:12px;flex-wrap:wrap;">';
+          for (const s of devStats) {
+            const pct = Math.min(s.c / s.t, 1);
+            const gap = s.t - s.c;
+            const color = gap <= 0 ? '#60A5FA' : (gap > 150 ? '#E8A735' : '#D4A843');
+            html += `<div style="text-align:center;">
+              ${gaugeRing(s.c, s.t, color, 42, 4)}
+              <div style="font-size:10px;color:#c9d1d9;text-transform:capitalize;margin-top:2px;">${s.n}</div>
+              <div style="font-size:9px;color:${gap > 0 ? color : '#3fb950'};">${gap > 0 ? '-'+gap : '✓'}</div>
+            </div>`;
+          }
+          return html + '</div>';
+        }
+      }
+    ]
+  },
+  {
+    id: 'dev-reasoning',
+    title: 'Stat Reasoning Text',
+    data: 'per tracked stat: a sentence explaining why to invest there',
+    options: [
+      {
+        label: 'A: Inline Below Bar',
+        tag: 'current',
+        desc: 'Small gray text under each stat\'s progress bar.',
+        mockup: () => `
+          <div style="border-left:3px solid rgba(232,167,53,0.45);background:rgba(232,167,53,0.12);border-radius:4px;padding:6px 8px;">
+            <div style="font-size:12px;font-weight:600;color:#f0f6fc;margin-bottom:3px;">Contact</div>
+            <div class="bar-track" style="width:100%;margin-bottom:3px;"><div class="bar-fill" style="width:76%;background:#D4A843;"></div></div>
+            <div style="font-size:10px;color:#8b949e;">Core archetype stat, needs priority investment to reach 500 target</div>
+          </div>`
+      },
+      {
+        label: 'B: Tooltip on Hover',
+        tag: 'new',
+        desc: 'No visible reasoning text. Hover over a stat row to see reasoning in a tooltip. Saves vertical space.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:6px;padding:4px 6px;background:#161b22;border-radius:4px;cursor:help;border:1px dashed #30363d;">
+            <span class="stat-name" style="flex:1;">contact</span>
+            <div class="bar-track" style="width:80px;"><div class="bar-fill" style="width:76%;background:#D4A843;"></div></div>
+            <span class="stat-val" style="color:#60A5FA;font-size:10px;">380/500</span>
+            <span style="font-size:10px;color:#484f58;" title="Core archetype stat, needs priority investment">ⓘ</span>
+          </div>
+          <div style="font-size:9px;color:#484f58;margin-top:4px;">↑ Hover ⓘ for reasoning</div>`
+      },
+      {
+        label: 'C: None',
+        tag: 'new',
+        desc: 'Remove reasoning entirely. The bar + numbers tell the story.',
+        mockup: () => `
+          <div style="font-size:11px;color:#8b949e;">No reasoning text shown. Users read the bar + numbers to understand priority.</div>`
+      }
+    ]
+  },
+  {
+    id: 'progress-summary',
+    title: 'Overall Progress Summary',
+    data: 'progressPercent, statsOnTrack, statsBehind, levelsRemaining',
+    options: [
+      {
+        label: 'A: Inline Counters',
+        tag: 'current',
+        desc: 'Three small counters in the stat development header: "X on track", "Y behind", "Z left".',
+        mockup: () => `
+          <div style="display:flex;gap:12px;font-size:11px;">
+            <span><span style="font-weight:700;color:#60A5FA;">6</span> <span style="color:#8b949e;">on track</span></span>
+            <span><span style="font-weight:700;color:#E8A735;">4</span> <span style="color:#8b949e;">behind</span></span>
+            <span><span style="font-weight:700;color:#c9d1d9;">9</span> <span style="color:#8b949e;">levels left</span></span>
+          </div>`
+      },
+      {
+        label: 'B: Progress Ring',
+        tag: 'new',
+        desc: 'Single donut ring showing overall % toward target build. Number in center.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:10px;">
+            ${gaugeRing(73, 100, '#60A5FA', 48, 5).replace('font-size:9px','font-size:12px')}
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#f0f6fc;">73% Complete</div>
+              <div style="font-size:10px;color:#8b949e;">6 on track · 4 behind · 9 levels left</div>
+            </div>
+          </div>`
+      },
+      {
+        label: 'C: Segmented Bar',
+        tag: 'new',
+        desc: 'Horizontal bar split into green (on track) and amber (behind) segments. Quick ratio view.',
+        mockup: () => `
+          <div>
+            <div style="display:flex;height:10px;border-radius:5px;overflow:hidden;margin-bottom:4px;">
+              <div style="width:60%;background:#60A5FA;"></div>
+              <div style="width:40%;background:#E8A735;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;">
+              <span style="color:#60A5FA;">6 on track</span>
+              <span style="color:#E8A735;">4 behind</span>
+              <span style="color:#8b949e;">9 levels left</span>
+            </div>
+          </div>`
+      }
+    ]
+  },
+  {
+    id: 'target-editing',
+    title: 'Target Override / Edit',
+    data: 'ability to change the target number for any tracked stat',
+    options: [
+      {
+        label: 'A: Edit Mode Toggle',
+        tag: 'current',
+        desc: '"Edit Targets" button enters edit mode, targets become clickable/editable inline.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:12px;color:#8b949e;">380 / </span>
+            <span style="font-size:12px;color:#f0f6fc;text-decoration:underline;text-decoration-style:dotted;cursor:pointer;">500</span>
+            <span style="font-size:9px;color:#484f58;">← click to edit</span>
+          </div>
+          <div style="margin-top:4px;"><button style="font-size:10px;padding:3px 10px;border-radius:4px;background:linear-gradient(180deg,#4B8DF7,#3B82F6);color:white;border:none;cursor:pointer;">Done</button></div>`
+      },
+      {
+        label: 'B: Always-Editable Inputs',
+        tag: 'new',
+        desc: 'Target number is always a small input field. No mode toggle needed.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="stat-name">contact</span>
+            <span style="font-size:11px;color:#60A5FA;">380</span>
+            <span style="font-size:11px;color:#484f58;">/</span>
+            <input type="number" value="500" style="width:44px;background:#21262d;border:1px solid #30363d;border-radius:3px;padding:2px 4px;color:#c9d1d9;font-size:11px;text-align:right;font-family:monospace;" />
+          </div>`
+      },
+      {
+        label: 'C: None',
+        tag: 'new',
+        desc: 'Remove target editing. Archetypes set targets; users pick a different archetype or custom build instead.',
+        mockup: () => `<div style="font-size:11px;color:#8b949e;">Targets are fixed by archetype. Use Custom Build to set your own priorities.</div>`
+      }
+    ]
+  },
+  {
+    id: 'what-if',
+    title: 'What-If Point Allocator',
+    data: 'simulate distributing next level\'s +50 points across stats',
+    options: [
+      {
+        label: 'A: +/- Buttons in Stat Grid',
+        tag: 'current',
+        desc: 'Toggle "What-If Mode", then +/- buttons appear next to each stat. Shows remaining points.',
+        mockup: () => `
+          <div style="background:rgba(139,148,158,0.08);border-radius:4px;padding:5px 8px;margin-bottom:6px;display:flex;justify-content:space-between;font-size:11px;">
+            <span>Simulating +50 at Level 22</span>
+            <span style="font-family:monospace;font-weight:600;">30 pts left</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="stat-name">contact</span>
+            <span style="font-size:10px;color:#60A5FA;">+20</span>
+            <span class="stat-val" style="color:#60A5FA;">400</span>
+            <button style="width:20px;height:20px;border-radius:3px;background:#21262d;border:1px solid #30363d;color:#c9d1d9;cursor:pointer;font-size:10px;">-</button>
+            <button style="width:20px;height:20px;border-radius:3px;background:#21262d;border:1px solid #30363d;color:#c9d1d9;cursor:pointer;font-size:10px;">+</button>
+          </div>`
+      },
+      {
+        label: 'B: Slider Row',
+        tag: 'new',
+        desc: 'Each priority stat gets a slider (0 to remaining points). More intuitive than +/- clicking.',
+        mockup: () => `
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="stat-name" style="width:60px;">contact</span>
+              <input type="range" min="0" max="50" value="20" style="flex:1;accent-color:#3b82f6;height:4px;" />
+              <span style="font-family:monospace;font-size:10px;color:#58a6ff;width:28px;text-align:right;">+20</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="stat-name" style="width:60px;">discipline</span>
+              <input type="range" min="0" max="50" value="0" style="flex:1;accent-color:#3b82f6;height:4px;" />
+              <span style="font-family:monospace;font-size:10px;color:#8b949e;width:28px;text-align:right;">+0</span>
+            </div>
+          </div>`
+      },
+      {
+        label: 'C: None',
+        tag: 'new',
+        desc: 'Remove what-if mode. The next-action recommendation tells you where to invest. Simplifies UI.',
+        mockup: () => `<div style="font-size:11px;color:#8b949e;">No what-if simulation. Follow the next-action recommendation instead.</div>`
+      }
+    ]
+  },
+  {
+    id: 'progression',
+    title: 'Progression Path / Timeline',
+    data: '7 milestones [1,5,10,15,20,25,30], current level position, boon/defense markers',
+    options: [
+      {
+        label: 'A: Horizontal Track + Nodes',
+        tag: 'current',
+        desc: 'Horizontal bar with glowing nodes at each milestone. Current position highlighted with pulse animation.',
+        mockup: () => `
+          <div style="position:relative;height:40px;margin:0 10px;">
+            <div style="position:absolute;top:14px;left:0;right:0;height:4px;background:#21262d;border-radius:2px;"></div>
+            <div style="position:absolute;top:14px;left:0;height:4px;width:70%;background:linear-gradient(90deg,#3B82F6,#22D3EE);border-radius:2px;box-shadow:0 0 8px rgba(34,211,238,0.4);"></div>
+            ${[0,16,33,50,67,83,100].map((pct,i) => {
+              const lvls = [1,5,10,15,20,25,30];
+              const isCurrent = i === 4;
+              const isPast = i < 4;
+              const sz = isCurrent ? 20 : 14;
+              return `<div style="position:absolute;left:calc(${pct}% - ${sz/2}px);top:${16 - sz/2}px;width:${sz}px;height:${sz}px;border-radius:50%;background:${isPast||isCurrent?'linear-gradient(135deg,#3B82F6,#60A5FA)':'#21262d'};display:flex;align-items:center;justify-content:center;font-size:${isCurrent?9:7}px;font-weight:700;color:${isPast||isCurrent?'white':'#484f58'};${isCurrent?'box-shadow:0 0 10px rgba(59,130,246,0.6);':''}border:${isPast||isCurrent?'none':'1px solid #30363d'};"><span>${lvls[i]}</span></div>`;
+            }).join('')}
+          </div>`
+      },
+      {
+        label: 'B: Compact Step Dots',
+        tag: 'new',
+        desc: 'Just 7 small dots in a row. Filled = completed. Current one glows. Much less vertical space.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:10px;color:#8b949e;">Progress:</span>
+            ${[1,5,10,15,20,25,30].map((lv,i) => {
+              const past = i < 4;
+              const current = i === 4;
+              return `<div style="width:${current?12:8}px;height:${current?12:8}px;border-radius:50%;background:${past?'#3B82F6':current?'#22D3EE':'#21262d'};${current?'box-shadow:0 0 6px rgba(34,211,238,0.5);':''}border:${!past&&!current?'1px solid #30363d':'none'};" title="Lv.${lv}"></div>`;
+            }).join('')}
+            <span style="font-size:10px;color:#8b949e;">Lv.21/30</span>
+          </div>`
+      },
+      {
+        label: 'C: Text Steps',
+        tag: 'new',
+        desc: 'Simple text: "Lv.21 → Next: Lv.25 (Boon) → Lv.30 (Max)". Minimal, purely informational.',
+        mockup: () => `
+          <div style="font-size:11px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+            <span style="color:#22D3EE;font-weight:600;">Lv.21</span>
+            <span style="color:#484f58;">→</span>
+            <span style="color:#8b949e;">Lv.25 <span style="font-size:9px;color:#E8A735;">(Defense)</span></span>
+            <span style="color:#484f58;">→</span>
+            <span style="color:#8b949e;">Lv.30 <span style="font-size:9px;color:#e3b341;">(Boon + Max)</span></span>
+          </div>`
+      }
+    ]
+  },
+  {
+    id: 'boon-display',
+    title: 'Boon Display',
+    data: 'acquired lesser/greater boons (names), recommended future boons',
+    options: [
+      {
+        label: 'A: Pills in Header',
+        tag: 'current',
+        desc: 'Boon names as pill badges in the player identity header. Greater boons get gold styling.',
+        mockup: () => `
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <span class="pill pill-boon">🎯 Focused</span>
+            <span class="pill pill-boon">💪 Strong</span>
+            <span class="pill" style="background:rgba(255,215,0,0.15);color:#e3b341;border:1px solid rgba(255,215,0,0.3);font-weight:600;">✨ Grand Slam</span>
+          </div>`
+      },
+      {
+        label: 'B: Boon Timeline',
+        tag: 'new',
+        desc: 'Show acquired boons at the level they were earned, plus future slots with recommendations.',
+        mockup: () => `
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:10px;">
+            <div style="text-align:center;"><div style="font-size:9px;color:#484f58;">Lv.10</div><span class="pill pill-boon" style="font-size:9px;">🎯 Focused</span></div>
+            <div style="text-align:center;"><div style="font-size:9px;color:#484f58;">Lv.20</div><span class="pill pill-boon" style="font-size:9px;">💪 Strong</span></div>
+            <div style="text-align:center;"><div style="font-size:9px;color:#484f58;">Lv.30</div><span style="font-size:9px;padding:2px 6px;border-radius:3px;border:1px dashed #30363d;color:#484f58;">? Rec: Lucky</span></div>
+          </div>`
+      },
+      {
+        label: 'C: None (Inline in Progression)',
+        tag: 'new',
+        desc: 'Don\'t show boons separately. Fold them into the progression path nodes as labels.',
+        mockup: () => `<div style="font-size:11px;color:#8b949e;">Boons shown as labels on progression path milestone nodes instead of a separate element.</div>`
+      }
+    ]
+  },
+  {
+    id: 'pitch-arsenal',
+    title: 'Pitch Arsenal (Pitcher Only)',
+    data: 'pitch names + frequency %, add/remove recommendations',
+    options: [
+      {
+        label: 'A: Donut Chart + Legend',
+        tag: 'current',
+        desc: 'SVG donut ring showing pitch frequency distribution, with legend list and add/remove suggestions.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:50px;height:50px;border-radius:50%;background:conic-gradient(#f97316 0% 40%, #3b82f6 40% 70%, #22c55e 70% 90%, #8b949e 90%);display:flex;align-items:center;justify-content:center;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#161b22;"></div>
+            </div>
+            <div style="font-size:10px;display:flex;flex-direction:column;gap:2px;">
+              <div><span style="color:#f97316;">■</span> Fastball 40%</div>
+              <div><span style="color:#3b82f6;">■</span> Slider 30%</div>
+              <div><span style="color:#22c55e;">■</span> Change 20%</div>
+              <div><span style="color:#8b949e;">■</span> Curve 10%</div>
+              <div style="color:#3fb950;margin-top:2px;">+ Consider: Cutter</div>
+            </div>
+          </div>`
+      },
+      {
+        label: 'B: Horizontal Stacked Bar',
+        tag: 'new',
+        desc: 'Single horizontal bar, segments colored by pitch type. Legend below. More compact.',
+        mockup: () => `
+          <div>
+            <div style="display:flex;height:14px;border-radius:4px;overflow:hidden;margin-bottom:4px;">
+              <div style="width:40%;background:#f97316;" title="Fastball 40%"></div>
+              <div style="width:30%;background:#3b82f6;" title="Slider 30%"></div>
+              <div style="width:20%;background:#22c55e;" title="Change 20%"></div>
+              <div style="width:10%;background:#8b949e;" title="Curve 10%"></div>
+            </div>
+            <div style="display:flex;gap:8px;font-size:9px;flex-wrap:wrap;">
+              <span><span style="color:#f97316;">■</span> Fast 40%</span>
+              <span><span style="color:#3b82f6;">■</span> Slide 30%</span>
+              <span><span style="color:#22c55e;">■</span> Change 20%</span>
+              <span><span style="color:#8b949e;">■</span> Curve 10%</span>
+              <span style="color:#3fb950;">+ Cutter</span>
+            </div>
+          </div>`
+      },
+      {
+        label: 'C: Text List',
+        tag: 'new',
+        desc: 'Simple ranked list. Pitch name, percentage, inline bar. No chart.',
+        mockup: () => `
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            ${[{n:'Fastball',p:40,c:'#f97316'},{n:'Slider',p:30,c:'#3b82f6'},{n:'Changeup',p:20,c:'#22c55e'},{n:'Curve',p:10,c:'#8b949e'}].map(p =>
+              `<div style="display:flex;align-items:center;gap:6px;font-size:10px;">
+                <span style="width:60px;color:#c9d1d9;">${p.n}</span>
+                ${miniBar(p.p, 100, p.c, 60, 4)}
+                <span style="color:#8b949e;font-family:monospace;">${p.p}%</span>
+              </div>`
+            ).join('')}
+          </div>`
+      }
+    ]
+  },
+  {
+    id: 'on-track-stats',
+    title: 'On-Track Stats Section',
+    data: 'stats that have met their target (gap <= 0)',
+    options: [
+      {
+        label: 'A: Separate Section Below',
+        tag: 'current',
+        desc: 'Divider line with "On target" label, then same card format for on-track stats.',
+        mockup: () => `
+          <div style="border-top:1px solid #21262d;padding-top:4px;margin-top:4px;">
+            <span style="font-size:10px;color:#8b949e;">On target</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:4px;">
+            <div style="border-left:3px solid rgba(96,165,250,0.35);background:rgba(96,165,250,0.08);border-radius:4px;padding:4px 8px;font-size:11px;">
+              <span style="font-weight:600;color:#f0f6fc;">Muscle</span> <span style="color:#8b949e;">450/400</span> <span style="color:#3fb950;">✓</span>
+            </div>
+            <div style="border-left:3px solid rgba(96,165,250,0.35);background:rgba(96,165,250,0.08);border-radius:4px;padding:4px 8px;font-size:11px;">
+              <span style="font-weight:600;color:#f0f6fc;">Speed</span> <span style="color:#8b949e;">420/350</span> <span style="color:#3fb950;">✓</span>
+            </div>
+          </div>`
+      },
+      {
+        label: 'B: Collapsed Count',
+        tag: 'new',
+        desc: 'Just show "6 stats on track ✓" as a single line. Expand on click to see details.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:6px;padding:4px 8px;background:#161b22;border-radius:4px;cursor:pointer;">
+            <span style="color:#3fb950;font-size:12px;">✓</span>
+            <span style="font-size:11px;color:#c9d1d9;">6 stats on track</span>
+            <span style="font-size:9px;color:#484f58;margin-left:auto;">click to expand</span>
+          </div>`
+      },
+      {
+        label: 'C: None',
+        tag: 'new',
+        desc: 'Don\'t show on-track stats in development section at all. They\'re visible in the stat grid.',
+        mockup: () => `<div style="font-size:11px;color:#8b949e;">On-track stats only shown in the main stat grid. No duplication in development area.</div>`
+      }
+    ]
+  },
+  {
+    id: 'category-labels',
+    title: 'Stat Category Organization',
+    data: 'categories: batting (12), baserunning (4), defense (8), luck (1)',
+    options: [
+      {
+        label: 'A: Section Headers',
+        tag: 'current',
+        desc: 'Small uppercase labels (BATTING, DEFENSE, etc.) with underline, stats grouped below each.',
+        mockup: () => `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div>
+              <div class="cat-label" style="border-bottom:1px solid #21262d;padding-bottom:2px;margin-bottom:3px;">BATTING</div>
+              <div class="stat-row"><span class="stat-name" style="flex:1;">contact</span><span class="stat-val" style="color:#60A5FA;">380</span></div>
+              <div class="stat-row"><span class="stat-name" style="flex:1;">muscle</span><span class="stat-val" style="color:#3B82F6;">450</span></div>
+            </div>
+            <div>
+              <div class="cat-label" style="border-bottom:1px solid #21262d;padding-bottom:2px;margin-bottom:3px;">DEFENSE</div>
+              <div class="stat-row"><span class="stat-name" style="flex:1;">agility</span><span class="stat-val" style="color:#60A5FA;">340</span></div>
+              <div class="stat-row"><span class="stat-name" style="flex:1;">arm</span><span class="stat-val" style="color:#60A5FA;">310</span></div>
+            </div>
+          </div>`
+      },
+      {
+        label: 'B: Color-Coded Rows',
+        tag: 'new',
+        desc: 'No explicit labels. Each category gets a subtle left-border color. Batting=blue, Defense=green, etc.',
+        mockup: () => `
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <div style="display:flex;align-items:center;gap:6px;padding:2px 6px;border-left:3px solid #3b82f6;">
+              <span class="stat-name" style="flex:1;">contact</span><span class="stat-val" style="color:#60A5FA;">380</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;padding:2px 6px;border-left:3px solid #3b82f6;">
+              <span class="stat-name" style="flex:1;">muscle</span><span class="stat-val" style="color:#3B82F6;">450</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;padding:2px 6px;border-left:3px solid #22c55e;">
+              <span class="stat-name" style="flex:1;">agility</span><span class="stat-val" style="color:#60A5FA;">340</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;padding:2px 6px;border-left:3px solid #22c55e;">
+              <span class="stat-name" style="flex:1;">arm</span><span class="stat-val" style="color:#60A5FA;">310</span>
+            </div>
+          </div>`
+      },
+      {
+        label: 'C: Tab/Accordion Per Category',
+        tag: 'new',
+        desc: 'Each category is a collapsible section or tab. Only one expanded at a time. Saves space for 25 stats.',
+        mockup: () => `
+          <div style="display:flex;gap:2px;margin-bottom:6px;">
+            <span style="font-size:10px;padding:3px 8px;border-radius:4px 4px 0 0;background:#21262d;color:#58a6ff;font-weight:600;cursor:pointer;">Batting</span>
+            <span style="font-size:10px;padding:3px 8px;border-radius:4px 4px 0 0;background:#161b22;color:#8b949e;cursor:pointer;">Defense</span>
+            <span style="font-size:10px;padding:3px 8px;border-radius:4px 4px 0 0;background:#161b22;color:#8b949e;cursor:pointer;">Run</span>
+            <span style="font-size:10px;padding:3px 8px;border-radius:4px 4px 0 0;background:#161b22;color:#8b949e;cursor:pointer;">Luck</span>
+          </div>
+          <div style="background:#21262d;border-radius:0 4px 4px 4px;padding:6px;">
+            <div class="stat-row"><span class="stat-name" style="flex:1;">contact</span><span class="stat-val" style="color:#60A5FA;">380</span></div>
+            <div class="stat-row"><span class="stat-name" style="flex:1;">discipline</span><span class="stat-val" style="color:#8B949E;">290</span></div>
+            <div class="stat-row"><span class="stat-name" style="flex:1;">muscle</span><span class="stat-val" style="color:#3B82F6;">450</span></div>
+          </div>`
+      }
+    ]
+  },
+  {
+    id: 'export-share',
+    title: 'Export / Share',
+    data: 'share URL, Discord-formatted text summary',
+    options: [
+      {
+        label: 'A: Button Pair',
+        tag: 'current',
+        desc: 'Two buttons in a card: "Copy Link" (primary) and "Copy for Discord" (secondary).',
+        mockup: () => `
+          <div style="display:flex;gap:6px;">
+            <button style="font-size:10px;padding:4px 12px;border-radius:4px;background:linear-gradient(180deg,#4B8DF7,#3B82F6);color:white;border:none;cursor:pointer;font-weight:600;">Copy Link</button>
+            <button style="font-size:10px;padding:4px 12px;border-radius:4px;background:#21262d;color:#c9d1d9;border:1px solid #30363d;cursor:pointer;">Copy for Discord</button>
+          </div>`
+      },
+      {
+        label: 'B: Icon Buttons',
+        tag: 'new',
+        desc: 'Small icon-only buttons (link icon, Discord icon). Tooltips on hover. Minimal footprint.',
+        mockup: () => `
+          <div style="display:flex;gap:4px;">
+            <button style="width:28px;height:28px;border-radius:4px;background:#21262d;border:1px solid #30363d;color:#8b949e;cursor:pointer;font-size:12px;" title="Copy Link">🔗</button>
+            <button style="width:28px;height:28px;border-radius:4px;background:#21262d;border:1px solid #30363d;color:#8b949e;cursor:pointer;font-size:12px;" title="Copy for Discord">💬</button>
+          </div>`
+      },
+      {
+        label: 'C: None',
+        tag: 'new',
+        desc: 'Remove export/share. URL already has player ID for bookmarking.',
+        mockup: () => `<div style="font-size:11px;color:#8b949e;">No export buttons. URL contains player state for sharing.</div>`
+      }
+    ]
+  },
+  {
+    id: 'section-headers',
+    title: 'Section Headers Style',
+    data: 'titles like "All Stats", "Stat Development", "Progression", etc.',
+    options: [
+      {
+        label: 'A: Accent Bar + Uppercase',
+        tag: 'current',
+        desc: 'Small vertical blue bar left of uppercase text. Consistent across all sections.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="width:2px;height:12px;background:rgba(59,130,246,0.4);border-radius:1px;"></span>
+            <span style="font-size:10px;font-weight:500;color:#8b949e;text-transform:uppercase;letter-spacing:0.05em;">Stat Development</span>
+          </div>`
+      },
+      {
+        label: 'B: Minimal Divider',
+        tag: 'new',
+        desc: 'Just a thin line and the title text. No accent bar.',
+        mockup: () => `
+          <div style="border-bottom:1px solid #21262d;padding-bottom:3px;">
+            <span style="font-size:10px;color:#8b949e;text-transform:uppercase;letter-spacing:0.05em;">Stat Development</span>
+          </div>`
+      },
+      {
+        label: 'C: None',
+        tag: 'new',
+        desc: 'No section headers. Content sections are visually distinct enough by their own styling.',
+        mockup: () => `<div style="font-size:11px;color:#8b949e;">No explicit headers. Visual structure carries the hierarchy.</div>`
+      }
+    ]
+  },
+  {
+    id: 'card-borders',
+    title: 'Card / Container Style',
+    data: 'visual wrapping of each section (background, border, shadow)',
+    options: [
+      {
+        label: 'A: Bordered Cards',
+        tag: 'current',
+        desc: 'Each section is a card with background, border, rounded corners, and subtle shadow.',
+        mockup: () => `
+          <div style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:8px 10px;box-shadow:0 1px 3px rgba(0,0,0,0.3);">
+            <div style="font-size:11px;color:#c9d1d9;">Content inside a bordered card with shadow</div>
+          </div>`
+      },
+      {
+        label: 'B: Flat Sections',
+        tag: 'new',
+        desc: 'No visible card borders. Just spacing and divider lines between sections. Cleaner, more open feel.',
+        mockup: () => `
+          <div style="padding:6px 0;border-bottom:1px solid #21262d;">
+            <div style="font-size:11px;color:#c9d1d9;">Content in a flat section, divided by lines. No card chrome.</div>
+          </div>`
+      },
+      {
+        label: 'C: Subtle Background Only',
+        tag: 'new',
+        desc: 'Slightly different background shade per section. No borders or shadows. Soft visual grouping.',
+        mockup: () => `
+          <div style="background:rgba(22,27,34,0.6);border-radius:6px;padding:8px 10px;">
+            <div style="font-size:11px;color:#c9d1d9;">Content in a subtly tinted area. No hard borders.</div>
+          </div>`
+      }
+    ]
+  },
+  {
+    id: 'custom-archetype',
+    title: 'Custom Archetype Builder',
+    data: 'click stats to cycle: none → priority → secondary → none',
+    options: [
+      {
+        label: 'A: Chip Toggle Grid',
+        tag: 'current',
+        desc: 'All stats as clickable chips. Blue outline = priority, gray = secondary, faded = none. "Apply" button.',
+        mockup: () => `
+          <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px;">
+            <span style="font-size:10px;padding:3px 6px;border-radius:3px;background:rgba(59,130,246,0.2);color:#58a6ff;border:1px solid rgba(59,130,246,0.4);cursor:pointer;">contact</span>
+            <span style="font-size:10px;padding:3px 6px;border-radius:3px;background:#21262d;color:#c9d1d9;border:1px solid #30363d;cursor:pointer;">muscle</span>
+            <span style="font-size:10px;padding:3px 6px;border-radius:3px;background:rgba(30,30,30,0.5);color:#484f58;border:1px solid transparent;cursor:pointer;">lift</span>
+            <span style="font-size:10px;padding:3px 6px;border-radius:3px;background:rgba(59,130,246,0.2);color:#58a6ff;border:1px solid rgba(59,130,246,0.4);cursor:pointer;">aiming</span>
+          </div>
+          <div style="font-size:9px;color:#8b949e;margin-bottom:4px;">Click to cycle: none → core → secondary → none</div>
+          <button style="font-size:10px;padding:3px 10px;border-radius:4px;background:#3B82F6;color:white;border:none;cursor:pointer;">Apply Custom Build</button>`
+      },
+      {
+        label: 'B: Drag Ranking',
+        tag: 'new',
+        desc: 'Two columns: "Available" and "Prioritized". Drag stats between them. Order = priority.',
+        mockup: () => `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:10px;">
+            <div>
+              <div class="cat-label" style="margin-bottom:3px;">Available</div>
+              <div style="background:#161b22;border:1px dashed #30363d;border-radius:4px;padding:4px;">
+                <div style="padding:2px 4px;color:#8b949e;cursor:grab;">muscle</div>
+                <div style="padding:2px 4px;color:#8b949e;cursor:grab;">lift</div>
+              </div>
+            </div>
+            <div>
+              <div class="cat-label" style="margin-bottom:3px;color:#58a6ff;">Prioritized</div>
+              <div style="background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.3);border-radius:4px;padding:4px;">
+                <div style="padding:2px 4px;color:#58a6ff;cursor:grab;">1. contact</div>
+                <div style="padding:2px 4px;color:#58a6ff;cursor:grab;">2. aiming</div>
+              </div>
+            </div>
+          </div>`
+      },
+      {
+        label: 'C: None',
+        tag: 'new',
+        desc: 'Remove custom archetype builder entirely. Pre-built archetypes are sufficient.',
+        mockup: () => `<div style="font-size:11px;color:#8b949e;">No custom archetype. Select from pre-built archetypes only.</div>`
+      }
+    ]
+  },
+  {
+    id: 'stat-tooltips',
+    title: 'Stat Tooltips / Detail',
+    data: 'hovering a stat shows: name, base value, allocated bonus, /1000 context',
+    options: [
+      {
+        label: 'A: Hover Tooltip Card',
+        tag: 'current',
+        desc: 'Hovering a stat shows a small floating tooltip with name, base value, and context.',
+        mockup: () => `
+          <div style="position:relative;display:inline-block;">
+            <div class="stat-row" style="cursor:help;padding:3px 6px;background:#161b22;border-radius:4px;">
+              <span class="stat-name">contact</span>
+              <span class="stat-val" style="color:#60A5FA;margin-left:8px;">380</span>
+            </div>
+            <div style="position:absolute;top:-40px;left:0;background:#21262d;border:1px solid #30363d;border-radius:4px;padding:4px 8px;font-size:10px;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.4);z-index:10;">
+              <div style="font-weight:600;color:#f0f6fc;text-transform:capitalize;">Contact</div>
+              <div style="color:#8b949e;">Base: 380/1000</div>
+            </div>
+          </div>`
+      },
+      {
+        label: 'B: Click to Expand',
+        tag: 'new',
+        desc: 'Click a stat row to expand an inline detail panel below it. Shows more context without hovering.',
+        mockup: () => `
+          <div style="background:#161b22;border-radius:4px;overflow:hidden;">
+            <div class="stat-row" style="padding:3px 6px;cursor:pointer;">
+              <span class="stat-name" style="flex:1;">contact</span>
+              <span class="stat-val" style="color:#60A5FA;">380</span>
+              <span style="font-size:9px;color:#484f58;margin-left:4px;">▼</span>
+            </div>
+            <div style="padding:4px 8px;background:#0d1117;font-size:10px;color:#8b949e;border-top:1px solid #21262d;">
+              Base: 380/1000 · Category: Batting · Archetype priority: Core
+            </div>
+          </div>`
+      },
+      {
+        label: 'C: None',
+        tag: 'new',
+        desc: 'No tooltips or expandable details. Stats are self-explanatory at a glance.',
+        mockup: () => `<div style="font-size:11px;color:#8b949e;">No tooltips. Name + number is enough context.</div>`
+      }
+    ]
+  },
+  {
+    id: 'food-recommendation',
+    title: 'Food Recommendation',
+    data: '37 foods (1 per stat), archetype priority stats, current gaps',
+    options: [
+      {
+        label: 'A: Ranked Food List',
+        tag: 'new',
+        desc: 'Top 3-5 foods ranked by stat gap. Emoji + food name + stat + gap. Biggest need first.',
+        mockup: () => `
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            <div style="display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:4px;background:rgba(232,167,53,0.1);border-left:3px solid #E8A735;">
+              <span style="font-size:14px;">🥐</span>
+              <div style="flex:1;">
+                <div style="font-size:11px;font-weight:600;color:#f0f6fc;">Contact Croissant</div>
+                <div style="font-size:9px;color:#8b949e;">contact: 380 → 500 <span style="color:#E8A735;">(-120)</span></div>
+              </div>
+              <span style="font-size:9px;color:#E8A735;font-weight:600;">#1</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:4px;background:rgba(212,168,67,0.06);border-left:3px solid #D4A843;">
+              <span style="font-size:14px;">🌭</span>
+              <div style="flex:1;">
+                <div style="font-size:11px;font-weight:600;color:#f0f6fc;">Discipline Dogs</div>
+                <div style="font-size:9px;color:#8b949e;">discipline: 290 → 400 <span style="color:#D4A843;">(-110)</span></div>
+              </div>
+              <span style="font-size:9px;color:#D4A843;font-weight:600;">#2</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:4px;background:rgba(212,168,67,0.04);border-left:3px solid rgba(212,168,67,0.3);">
+              <span style="font-size:14px;">🍑</span>
+              <div style="flex:1;">
+                <div style="font-size:11px;font-weight:600;color:#f0f6fc;">Aiming Apricot</div>
+                <div style="font-size:9px;color:#8b949e;">aiming: 410 → 450 <span style="color:#D4A843;">(-40)</span></div>
+              </div>
+              <span style="font-size:9px;color:#484f58;font-weight:600;">#3</span>
+            </div>
+          </div>`
+      },
+      {
+        label: 'B: Top Food Spotlight',
+        tag: 'new',
+        desc: 'Single big recommendation: the #1 most needed food. Large emoji, food name, why. Compact.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:10px;padding:4px;">
+            <span style="font-size:28px;">🥐</span>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#f0f6fc;">Feed: Contact Croissant</div>
+              <div style="font-size:10px;color:#8b949e;">Biggest gap: contact needs 120 pts to reach 500 target</div>
+            </div>
+          </div>`
+      },
+      {
+        label: 'C: Emoji Strip',
+        tag: 'new',
+        desc: 'Horizontal row of food emojis, ordered by priority. Hover for detail. Extremely compact.',
+        mockup: () => `
+          <div>
+            <div style="display:flex;gap:2px;align-items:center;margin-bottom:3px;">
+              <span style="font-size:9px;color:#484f58;margin-right:4px;">Feed:</span>
+              <span style="font-size:16px;cursor:help;filter:saturate(1.2);" title="Contact Croissant (-120)">🥐</span>
+              <span style="font-size:14px;cursor:help;opacity:0.8;" title="Discipline Dogs (-110)">🌭</span>
+              <span style="font-size:12px;cursor:help;opacity:0.6;" title="Aiming Apricot (-40)">🍑</span>
+              <span style="font-size:11px;cursor:help;opacity:0.4;" title="Vision Vidalia (-10)">🧅</span>
+            </div>
+            <div style="font-size:9px;color:#484f58;">Hover for detail · Sized by priority</div>
+          </div>`
+      }
+    ]
+  },
+  {
+    id: 'boon-display',
+    title: 'Boon Display (Unique)',
+    data: 'acquired lesser/greater boons, recommended future boons at Lv.10/20/30',
+    options: [
+      {
+        label: 'A: Boon Slots',
+        tag: 'new',
+        desc: 'Three fixed "slots" for boon levels (10, 20, 30). Filled slots show the acquired boon, empty slots show recommended or "?".',
+        mockup: () => `
+          <div style="display:flex;gap:6px;">
+            <div style="flex:1;text-align:center;padding:6px 4px;border-radius:4px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);">
+              <div style="font-size:8px;color:#484f58;margin-bottom:2px;">LV.10</div>
+              <div style="font-size:14px;margin-bottom:1px;">🎯</div>
+              <div style="font-size:9px;color:#e3b341;font-weight:500;">Focused</div>
+            </div>
+            <div style="flex:1;text-align:center;padding:6px 4px;border-radius:4px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);">
+              <div style="font-size:8px;color:#484f58;margin-bottom:2px;">LV.20</div>
+              <div style="font-size:14px;margin-bottom:1px;">💪</div>
+              <div style="font-size:9px;color:#e3b341;font-weight:500;">Strong</div>
+            </div>
+            <div style="flex:1;text-align:center;padding:6px 4px;border-radius:4px;border:1px dashed #30363d;">
+              <div style="font-size:8px;color:#484f58;margin-bottom:2px;">LV.30</div>
+              <div style="font-size:14px;margin-bottom:1px;opacity:0.4;">?</div>
+              <div style="font-size:9px;color:#58a6ff;">Rec: Lucky</div>
+            </div>
+          </div>`
+      },
+      {
+        label: 'B: Boon Orbs',
+        tag: 'new',
+        desc: 'Circular orbs in a row, like a skill tree. Acquired orbs glow gold. Future orbs dim with recommendation inside.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:4px;justify-content:center;">
+            <div style="position:relative;">
+              <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(255,215,0,0.3),rgba(234,179,8,0.15));border:1.5px solid rgba(255,215,0,0.5);display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(255,215,0,0.2);">
+                <span style="font-size:16px;">🎯</span>
+              </div>
+              <div style="font-size:7px;color:#e3b341;text-align:center;margin-top:1px;">Lv.10</div>
+            </div>
+            <div style="width:20px;height:1px;background:linear-gradient(to right,rgba(255,215,0,0.3),rgba(255,215,0,0.1));"></div>
+            <div style="position:relative;">
+              <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(255,215,0,0.3),rgba(234,179,8,0.15));border:1.5px solid rgba(255,215,0,0.5);display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(255,215,0,0.2);">
+                <span style="font-size:16px;">💪</span>
+              </div>
+              <div style="font-size:7px;color:#e3b341;text-align:center;margin-top:1px;">Lv.20</div>
+            </div>
+            <div style="width:20px;height:1px;background:linear-gradient(to right,rgba(255,215,0,0.1),#21262d);"></div>
+            <div style="position:relative;">
+              <div style="width:36px;height:36px;border-radius:50%;background:#161b22;border:1.5px dashed #30363d;display:flex;align-items:center;justify-content:center;">
+                <span style="font-size:10px;color:#484f58;">?</span>
+              </div>
+              <div style="font-size:7px;color:#484f58;text-align:center;margin-top:1px;">Lv.30</div>
+            </div>
+          </div>`
+      },
+      {
+        label: 'C: Inline Gem Icons',
+        tag: 'new',
+        desc: 'Boons as gem-shaped icons in a compact row. Gold = acquired, blue outline = recommended. Fits in very tight space.',
+        mockup: () => `
+          <div style="display:flex;align-items:center;gap:3px;">
+            <span style="font-size:9px;color:#484f58;margin-right:2px;">Boons:</span>
+            <div style="width:22px;height:22px;background:linear-gradient(135deg,#EAB308,#F59E0B);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:10px;">🎯</span>
+            </div>
+            <div style="width:22px;height:22px;background:linear-gradient(135deg,#EAB308,#F59E0B);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:10px;">💪</span>
+            </div>
+            <div style="width:22px;height:22px;background:#21262d;border:1px dashed #484f58;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:8px;color:#484f58;">?</span>
+            </div>
+            <span style="font-size:9px;color:#58a6ff;margin-left:4px;">Next: Lucky</span>
+          </div>`
+      }
+    ]
+  }
+];
+
+// ── Render ──
+const selections = {};
+const notes = {};
+const container = document.getElementById('elements');
+
+function render() {
+  container.innerHTML = '';
+  elements.forEach((el, ei) => {
+    const sel = selections[el.id];
+    const selLabel = sel === undefined ? 'Undecided' : sel === 'none' ? 'None' : sel.toUpperCase();
+    const isDecided = sel !== undefined;
+
+    const group = document.createElement('div');
+    group.className = 'element-group';
+    group.innerHTML = `
+      <div class="element-header" onclick="toggleBody('${el.id}')">
+        <div style="display:flex;align-items:center;">
+          <span class="element-number">${ei + 1}</span>
+          <span class="element-title">${el.title}</span>
+        </div>
+        <div style="display:flex;align-items:center;">
+          <span class="element-data">${el.data}</span>
+          <span class="selected-label ${isDecided ? 'picked' : 'none'}">${selLabel}</span>
+          <span class="chevron" id="chev-${el.id}">▼</span>
+        </div>
+      </div>
+      <div class="element-body" id="body-${el.id}">
+        <div class="option-row">
+          ${el.options.map((opt, oi) => {
+            const letter = String.fromCharCode(97 + oi); // a, b, c
+            const isSelected = sel === letter;
+            return `
+              <div class="option ${isSelected ? 'selected' : ''}" onclick="selectOption('${el.id}','${letter}')">
+                <div class="option-label">
+                  ${opt.label}
+                  ${opt.tag === 'current' ? '<span class="tag current">DEFAULT</span>' : '<span class="tag new">NEW</span>'}
+                </div>
+                <div class="option-desc">${opt.desc}</div>
+                <div class="mockup">${typeof opt.mockup === 'function' ? opt.mockup() : opt.mockup}</div>
+              </div>`;
+          }).join('')}
+          <div class="option ${sel === 'none' ? 'selected' : ''}" onclick="selectOption('${el.id}','none')">
+            <div class="option-label">None</div>
+            <div class="option-desc">Remove this element entirely from the UI.</div>
+            <div class="mockup" style="display:flex;align-items:center;justify-content:center;color:#484f58;font-size:12px;min-height:40px;">
+              ∅ Not included
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="notes-area" id="notes-area-${el.id}" style="display:${sel !== undefined ? 'block' : 'none'};">
+        <div class="notes-label">Notes</div>
+        <textarea
+          id="notes-${el.id}"
+          placeholder="Any notes on this choice..."
+          oninput="saveNote('${el.id}', this.value)"
+          onclick="event.stopPropagation()"
+        >${notes[el.id] || ''}</textarea>
+      </div>`;
+    container.appendChild(group);
+  });
+  updateCount();
+}
+
+function toggleBody(id) {
+  const body = document.getElementById('body-' + id);
+  const chev = document.getElementById('chev-' + id);
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function selectOption(elementId, option) {
+  selections[elementId] = option;
+  render();
+  // Re-open the one we just selected
+  const body = document.getElementById('body-' + elementId);
+  const chev = document.getElementById('chev-' + elementId);
+  if (body) { body.classList.add('open'); chev.classList.add('open'); }
+  // Show notes area
+  const notesArea = document.getElementById('notes-area-' + elementId);
+  if (notesArea) notesArea.style.display = 'block';
+}
+
+function saveNote(elementId, value) {
+  notes[elementId] = value;
+}
+
+function updateCount() {
+  const decided = Object.keys(selections).length;
+  document.getElementById('picked-count').textContent = decided;
+}
+
+function copySelections() {
+  const lines = elements.map(el => {
+    const sel = selections[el.id];
+    let line;
+    if (sel === undefined) line = `${el.title}: UNDECIDED`;
+    else if (sel === 'none') line = `${el.title}: NONE`;
+    else {
+      const opt = el.options[sel.charCodeAt(0) - 97];
+      line = `${el.title}: ${opt.label}`;
+    }
+    const note = notes[el.id];
+    if (note && note.trim()) line += `\n  Notes: ${note.trim()}`;
+    return line;
+  });
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy Selections', 2000);
+  });
+}
+
+render();
+</script>
+</body>
+</html>

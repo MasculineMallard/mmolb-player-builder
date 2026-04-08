@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MMOLB Player Builder UI Configurator</title>
+<style>
+  :root {
+    --bg: #0F1419;
+    --card: #161B22;
+    --card-hover: #1C2129;
+    --border: #30363D;
+    --fg: #E8F1F2;
+    --fg-muted: #8B949E;
+    --primary: #3B82F6;
+    --primary-soft: #60A5FA;
+    --muted-bg: #1E2832;
+    --gold: #FFD700;
+    --radius: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font-family: 'Segoe UI', -apple-system, system-ui, sans-serif;
+    line-height: 1.5; padding: 24px; max-width: 1200px; margin: 0 auto;
+  }
+  h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: var(--fg-muted); font-size: 0.85rem; margin-bottom: 32px; }
+
+  .section {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 24px; margin-bottom: 20px;
+  }
+  .section-title {
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--fg-muted); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::before {
+    content: ''; width: 3px; height: 14px;
+    background: var(--primary); border-radius: 2px; opacity: 0.5;
+  }
+  .option-group { margin-bottom: 24px; }
+  .option-group:last-child { margin-bottom: 0; }
+  .option-label { font-size: 0.9rem; font-weight: 600; margin-bottom: 3px; }
+  .option-desc { font-size: 0.8rem; color: var(--fg-muted); margin-bottom: 12px; }
+
+  /* Option cards arranged horizontally */
+  .options-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .opt-card {
+    background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; cursor: pointer; transition: all 0.15s;
+    user-select: none; flex: 1; min-width: 200px; max-width: 360px;
+  }
+  .opt-card:hover { border-color: var(--fg-muted); background: var(--card-hover); }
+  .opt-card.selected {
+    border-color: var(--primary); background: rgba(59,130,246,0.06);
+    box-shadow: 0 0 0 1px var(--primary);
+  }
+  .opt-name { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+  .opt-detail { font-size: 0.7rem; color: var(--fg-muted); margin-bottom: 10px; }
+
+  /* Visual preview boxes inside option cards */
+  .preview {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px; margin-top: 8px; min-height: 40px;
+    font-size: 0.8rem;
+  }
+
+  /* Two-column layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 800px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* Bottom bar */
+  .bottom-bar {
+    position: sticky; bottom: 0; background: var(--card);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 20px; display: flex; justify-content: space-between;
+    align-items: center; margin-top: 28px; z-index: 10;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+  }
+  .copy-btn {
+    background: linear-gradient(180deg, #4B8DF7 0%, #3B82F6 100%);
+    color: white; border: none; padding: 10px 24px; border-radius: 6px;
+    font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
+  }
+  .copy-btn:hover { filter: brightness(1.1); }
+  .copy-btn:active { transform: scale(0.98); }
+  .copy-btn.copied { background: #3FB950; }
+  .reset-btn {
+    background: none; border: 1px solid var(--border); color: var(--fg-muted);
+    padding: 10px 16px; border-radius: 6px; font-size: 0.8rem;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .reset-btn:hover { color: var(--fg); border-color: var(--fg-muted); }
+  .choice-count { font-size: 0.8rem; color: var(--fg-muted); }
+
+  /* Reusable preview elements */
+  .p-stat-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 3px 6px; border-radius: 4px; font-size: 0.78rem;
+  }
+  .p-stat-name { color: var(--fg-muted); text-transform: capitalize; }
+  .p-stat-val { font-family: 'Courier New', monospace; font-weight: 700; }
+  .p-bar-track { height: 8px; background: var(--muted-bg); border-radius: 4px; overflow: hidden; margin-top: 3px; }
+  .p-bar-fill { height: 100%; border-radius: 4px; }
+  .p-badge {
+    display: inline-block; font-size: 0.7rem; font-weight: 700;
+    padding: 1px 7px; border-radius: 4px; font-family: 'Courier New', monospace;
+  }
+  .p-pill {
+    display: inline-block; font-size: 0.68rem; padding: 2px 8px;
+    border-radius: 4px; margin: 2px;
+  }
+  .p-node {
+    width: 28px; height: 28px; border-radius: 50%; display: inline-flex;
+    align-items: center; justify-content: center; font-size: 0.65rem;
+    font-weight: 700; flex-shrink: 0;
+  }
+  .p-timeline-row { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-size: 0.78rem; }
+  .p-track-line {
+    position: absolute; left: 13px; top: 18px; bottom: 18px;
+    width: 2px; background: var(--border);
+  }
+  .p-donut { display: flex; align-items: center; gap: 12px; }
+
+  /* Keyframes for previews */
+  @keyframes pulse-ring {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.12); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes num-pop {
+    0% { opacity: 0; transform: translateY(3px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .anim-shimmer {
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-out infinite;
+  }
+  .anim-pulse { animation: pulse-ring 2.5s ease-in-out infinite; }
+  .anim-pop { animation: num-pop 0.6s ease-out infinite alternate; }
+</style>
+</head>
+<body>
+
+<h1>MMOLB Player Builder UI Configurator</h1>
+<p class="subtitle">Every option has a live preview. Pick what looks best, then copy your choices at the bottom.</p>
+
+<!-- ========== 1. STAT SCALE COLORS ========== -->
+<div class="section">
+  <div class="section-title">Stat Scale Colors (bad to good)</div>
+  <div class="option-group">
+    <div class="option-label">5-Tier Color Gradient</div>
+    <div class="option-desc">Applied to all stat values (0-1000), progress bars, delta indicators, and gap numbers.</div>
+    <div class="options-row" data-group="statScale">
+
+      <div class="opt-card selected" data-value="yellow-blue" onclick="select(this)">
+        <div class="opt-name">Yellow to Blue (current)</div>
+        <div class="opt-detail">Gold amber, tan, gray, soft blue, bright blue</div>
+        <div class="preview">
+          <div style="display:flex;gap:3px;height:14px;border-radius:3px;overflow:hidden;margin-bottom:8px">
+            <span style="flex:1;background:#E8A735"></span>
+            <span style="flex:1;background:#D4A843"></span>
+            <span style="flex:1;background:#8B949E"></span>
+            <span style="flex:1;background:#60A5FA"></span>
+            <span style="flex:1;background:#3B82F6"></span>
+          </div>
+          <div class="p-stat-row"><span class="p-stat-name">ruthlessness</span><span class="p-stat-val" style="color:#E8A735">45</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">patheticism</span><span class="p-stat-val" style="color:#D4A843">120</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">thwackability</span><span class="p-stat-val" style="color:#8B949E">280</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">divinity</span><span class="p-stat-val" style="color:#60A5FA">410</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">musclitude</span><span class="p-stat-val" style="color:#3B82F6">620</span></div>
+          <div style="margin-top:6px">
+            <div class="p-bar-track"><div class="p-bar-fill" style="width:35%;background:linear-gradient(90deg,#D4A843,#60A5FA)"></div></div>
+            <div class="p-bar-track" style="margin-top:4px"><div class="p-bar-fill" style="width:80%;background:linear-gradient(90deg,#60A5FA,#3B82F6)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="red-blue" onclick="select(this)">
+        <div class="opt-name">Red to Blue</div>
+        <div class="opt-detail">Coral red, gold, gray, soft blue, bright blue</div>
+        <div class="preview">
+          <div style="display:flex;gap:3px;height:14px;border-radius:3px;overflow:hidden;margin-bottom:8px">
+            <span style="flex:1;background:#F87171"></span>
+            <span style="flex:1;background:#E8A735"></span>
+            <span style="flex:1;background:#8B949E"></span>
+            <span style="flex:1;background:#60A5FA"></span>
+            <span style="flex:1;background:#3B82F6"></span>
+          </div>
+          <div class="p-stat-row"><span class="p-stat-name">ruthlessness</span><span class="p-stat-val" style="color:#F87171">45</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">patheticism</span><span class="p-stat-val" style="color:#E8A735">120</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">thwackability</span><span class="p-stat-val" style="color:#8B949E">280</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">divinity</span><span class="p-stat-val" style="color:#60A5FA">410</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">musclitude</span><span class="p-stat-val" style="color:#3B82F6">620</span></div>
+          <div style="margin-top:6px">
+            <div class="p-bar-track"><div class="p-bar-fill" style="width:35%;background:linear-gradient(90deg,#E8A735,#60A5FA)"></div></div>
+            <div class="p-bar-track" style="margin-top:4px"><div class="p-bar-fill" style="width:80%;background:linear-gradient(90deg,#60A5FA,#3B82F6)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="orange-cyan" onclick="select(this)">
+        <div class="opt-name">Orange to Cyan</div>
+        <div class="opt-detail">Amber, tan, gray, aqua, teal</div>
+        <div class="preview">
+          <div style="display:flex;gap:3px;height:14px;border-radius:3px;overflow:hidden;margin-bottom:8px">
+            <span style="flex:1;background:#F59E0B"></span>
+            <span style="flex:1;background:#D4A843"></span>
+            <span style="flex:1;background:#8B949E"></span>
+            <span style="flex:1;background:#22D3EE"></span>
+            <span style="flex:1;background:#06B6D4"></span>
+          </div>
+          <div class="p-stat-row"><span class="p-stat-name">ruthlessness</span><span class="p-stat-val" style="color:#F59E0B">45</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">patheticism</span><span class="p-stat-val" style="color:#D4A843">120</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">thwackability</span><span class="p-stat-val" style="color:#8B949E">280</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">divinity</span><span class="p-stat-val" style="color:#22D3EE">410</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">musclitude</span><span class="p-stat-val" style="color:#06B6D4">620</span></div>
+          <div style="margin-top:6px">
+            <div class="p-bar-track"><div class="p-bar-fill" style="width:35%;background:linear-gradient(90deg,#D4A843,#22D3EE)"></div></div>
+            <div class="p-bar-track" style="margin-top:4px"><div class="p-bar-fill" style="width:80%;background:linear-gradient(90deg,#22D3EE,#06B6D4)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="red-green" onclick="select(this)">
+        <div class="opt-name">Red to Green (classic)</div>
+        <div class="opt-detail">Red, gold, gray, lime, green</div>
+        <div class="preview">
+          <div style="display:flex;gap:3px;height:14px;border-radius:3px;overflow:hidden;margin-bottom:8px">
+            <span style="flex:1;background:#F85149"></span>
+            <span style="flex:1;background:#E8A735"></span>
+            <span style="flex:1;background:#8B949E"></span>
+            <span style="flex:1;background:#4ADE80"></span>
+            <span style="flex:1;background:#3FB950"></span>
+          </div>
+          <div class="p-stat-row"><span class="p-stat-name">ruthlessness</span><span class="p-stat-val" style="color:#F85149">45</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">patheticism</span><span class="p-stat-val" style="color:#E8A735">120</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">thwackability</span><span class="p-stat-val" style="color:#8B949E">280</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">divinity</span><span class="p-stat-val" style="color:#4ADE80">410</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">musclitude</span><span class="p-stat-val" style="color:#3FB950">620</span></div>
+          <div style="margin-top:6px">
+            <div class="p-bar-track"><div class="p-bar-fill" style="width:35%;background:linear-gradient(90deg,#E8A735,#4ADE80)"></div></div>
+            <div class="p-bar-track" style="margin-top:4px"><div class="p-bar-fill" style="width:80%;background:linear-gradient(90deg,#4ADE80,#3FB950)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="rose-indigo" onclick="select(this)">
+        <div class="opt-name">Rose to Indigo</div>
+        <div class="opt-detail">Rose, purple, gray, periwinkle, indigo</div>
+        <div class="preview">
+          <div style="display:flex;gap:3px;height:14px;border-radius:3px;overflow:hidden;margin-bottom:8px">
+            <span style="flex:1;background:#FB7185"></span>
+            <span style="flex:1;background:#C084FC"></span>
+            <span style="flex:1;background:#8B949E"></span>
+            <span style="flex:1;background:#818CF8"></span>
+            <span style="flex:1;background:#6366F1"></span>
+          </div>
+          <div class="p-stat-row"><span class="p-stat-name">ruthlessness</span><span class="p-stat-val" style="color:#FB7185">45</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">patheticism</span><span class="p-stat-val" style="color:#C084FC">120</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">thwackability</span><span class="p-stat-val" style="color:#8B949E">280</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">divinity</span><span class="p-stat-val" style="color:#818CF8">410</span></div>
+          <div class="p-stat-row"><span class="p-stat-name">musclitude</span><span class="p-stat-val" style="color:#6366F1">620</span></div>
+          <div style="margin-top:6px">
+            <div class="p-bar-track"><div class="p-bar-fill" style="width:35%;background:linear-gradient(90deg,#C084FC,#818CF8)"></div></div>
+            <div class="p-bar-track" style="margin-top:4px"><div class="p-bar-fill" style="width:80%;background:linear-gradient(90deg,#818CF8,#6366F1)"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========== 2. PROGRESSION PATH ========== -->
+<div class="section">
+  <div class="section-title">Progression Path</div>
+  <div class="option-group">
+    <div class="option-label">Level Glow Gradient</div>
+    <div class="option-desc">The color the progression bar shifts through as the player levels up (0 to 30).</div>
+    <div class="options-row" data-group="progressionGlow">
+
+      <div class="opt-card selected" data-value="blue-cyan-gold" onclick="select(this)">
+        <div class="opt-name">Blue > Cyan > Purple > Gold (current)</div>
+        <div class="preview">
+          <div style="position:relative;height:24px">
+            <div style="position:absolute;top:9px;left:0;right:0;height:6px;background:var(--muted-bg);border-radius:3px"></div>
+            <div style="position:absolute;top:9px;left:0;width:70%;height:6px;border-radius:3px;background:linear-gradient(90deg,#3B82F6,#22D3EE,#A371F7);box-shadow:0 0 8px rgba(163,113,247,0.5)"></div>
+            <div style="position:absolute;top:4px;left:calc(70% - 7px);width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,white 0%,#A371F7 50%,transparent 100%);box-shadow:0 0 8px 2px rgba(163,113,247,0.8)"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px">
+            <span style="font-size:0.6rem;color:var(--fg-muted)">Lv.1</span>
+            <span style="font-size:0.6rem;color:var(--fg-muted)">Lv.15</span>
+            <span style="font-size:0.6rem;color:var(--fg-muted)">Lv.30</span>
+          </div>
+          <div style="display:flex;gap:3px;height:6px;border-radius:3px;overflow:hidden;margin-top:4px">
+            <span style="flex:1;background:#3B82F6"></span>
+            <span style="flex:1;background:#22D3EE"></span>
+            <span style="flex:1;background:#A371F7"></span>
+            <span style="flex:1;background:#EAB308"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="blue-cyan-white" onclick="select(this)">
+        <div class="opt-name">Blue > Cyan > Ice > White</div>
+        <div class="preview">
+          <div style="position:relative;height:24px">
+            <div style="position:absolute;top:9px;left:0;right:0;height:6px;background:var(--muted-bg);border-radius:3px"></div>
+            <div style="position:absolute;top:9px;left:0;width:70%;height:6px;border-radius:3px;background:linear-gradient(90deg,#3B82F6,#22D3EE,#A5F3FC);box-shadow:0 0 8px rgba(165,243,252,0.5)"></div>
+            <div style="position:absolute;top:4px;left:calc(70% - 7px);width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,white 0%,#A5F3FC 50%,transparent 100%);box-shadow:0 0 8px 2px rgba(165,243,252,0.8)"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px">
+            <span style="font-size:0.6rem;color:var(--fg-muted)">Lv.1</span>
+            <span style="font-size:0.6rem;color:var(--fg-muted)">Lv.15</span>
+            <span style="font-size:0.6rem;color:var(--fg-muted)">Lv.30</span>
+          </div>
+          <div style="display:flex;gap:3px;height:6px;border-radius:3px;overflow:hidden;margin-top:4px">
+            <span style="flex:1;background:#3B82F6"></span>
+            <span style="flex:1;background:#22D3EE"></span>
+            <span style="flex:1;background:#A5F3FC"></span>
+            <span style="flex:1;background:#F0F9FF"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="indigo-purple-gold" onclick="select(this)">
+        <div class="opt-name">Indigo > Purple > Amber > Gold</div>
+        <div class="preview">
+          <div style="position:relative;height:24px">
+            <div style="position:absolute;top:9px;left:0;right:0;height:6px;background:var(--muted-bg);border-radius:3px"></div>
+            <div style="position:absolute;top:9px;left:0;width:70%;height:6px;border-radius:3px;background:linear-gradient(90deg,#6366F1,#A371F7,#F59E0B);box-shadow:0 0 8px rgba(245,158,11,0.5)"></div>
+            <div style="position:absolute;top:4px;left:calc(70% - 7px);width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,white 0%,#F59E0B 50%,transparent 100%);box-shadow:0 0 8px 2px rgba(245,158,11,0.8)"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px">
+            <span style="font-size:0.6rem;color:var(--fg-muted)">Lv.1</span>
+            <span style="font-size:0.6rem;color:var(--fg-muted)">Lv.15</span>
+            <span style="font-size:0.6rem;color:var(--fg-muted)">Lv.30</span>
+          </div>
+          <div style="display:flex;gap:3px;height:6px;border-radius:3px;overflow:hidden;margin-top:4px">
+            <span style="flex:1;background:#6366F1"></span>
+            <span style="flex:1;background:#A371F7"></span>
+            <span style="flex:1;background:#F59E0B"></span>
+            <span style="flex:1;background:#FFD700"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="green-cyan-gold" onclick="select(this)">
+        <div class="opt-name">Green > Cyan > Amber > Gold</div>
+        <div class="preview">
+          <div style="position:relative;height:24px">
+            <div style="position:absolute;top:9px;left:0;right:0;height:6px;background:var(--muted-bg);border-radius:3px"></div>
+            <div style="position:absolute;top:9px;left:0;width:70%;height:6px;border-radius:3px;background:linear-gradient(90deg,#3FB950,#22D3EE,#EAB308);box-shadow:0 0 8px rgba(234,179,8,0.5)"></div>
+            <div style="position:absolute;top:4px;left:calc(70% - 7px);width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,white 0%,#EAB308 50%,transparent 100%);box-shadow:0 0 8px 2px rgba(234,179,8,0.8)"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px">
+            <span style="font-size:0.6rem;color:var(--fg-muted)">Lv.1</span>
+            <span style="font-size:0.6rem;color:var(--fg-muted)">Lv.15</span>
+            <span style="font-size:0.6rem;color:var(--fg-muted)">Lv.30</span>
+          </div>
+          <div style="display:flex;gap:3px;height:6px;border-radius:3px;overflow:hidden;margin-top:4px">
+            <span style="flex:1;background:#3FB950"></span>
+            <span style="flex:1;background:#22D3EE"></span>
+            <span style="flex:1;background:#EAB308"></span>
+            <span style="flex:1;background:#FFD700"></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="option-group">
+    <div class="option-label">Progression Orb</div>
+    <div class="option-desc">The glowing dot at the leading edge of the progress bar.</div>
+    <div class="options-row" data-group="progressionOrb">
+      <div class="opt-card selected" data-value="orb-glow" onclick="select(this)">
+        <div class="opt-name">Radial Glow Orb (current)</div>
+        <div class="preview" style="display:flex;align-items:center;gap:16px;padding:12px 20px">
+          <div style="width:18px;height:18px;border-radius:50%;background:radial-gradient(circle,white 0%,#3B82F6 50%,transparent 100%);box-shadow:0 0 10px 3px rgba(59,130,246,0.8),0 0 20px 4px rgba(59,130,246,0.4);flex-shrink:0"></div>
+          <span style="font-size:0.75rem;color:var(--fg-muted)">White center fading to color halo, multi-layer glow</span>
+        </div>
+      </div>
+      <div class="opt-card" data-value="solid-dot" onclick="select(this)">
+        <div class="opt-name">Solid Dot</div>
+        <div class="preview" style="display:flex;align-items:center;gap:16px;padding:12px 20px">
+          <div style="width:14px;height:14px;border-radius:50%;background:#3B82F6;box-shadow:0 0 6px rgba(59,130,246,0.6);flex-shrink:0"></div>
+          <span style="font-size:0.75rem;color:var(--fg-muted)">Solid colored circle with subtle shadow</span>
+        </div>
+      </div>
+      <div class="opt-card" data-value="none" onclick="select(this)">
+        <div class="opt-name">No Orb</div>
+        <div class="preview" style="display:flex;align-items:center;gap:16px;padding:12px 20px">
+          <div style="width:60px;height:6px;border-radius:3px;background:linear-gradient(90deg,#3B82F6,#22D3EE);flex-shrink:0"></div>
+          <span style="font-size:0.75rem;color:var(--fg-muted)">Bar ends cleanly, no leading indicator</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 3. NEXT ACTION / HERO CARD ========== -->
+<div class="section">
+  <div class="section-title">Next Action Card (Hero Card)</div>
+  <div class="option-group">
+    <div class="option-label">Border Style</div>
+    <div class="option-desc">The glowing border around the "Next: Level X" card.</div>
+    <div class="options-row" data-group="nextActionBorder">
+
+      <div class="opt-card selected" data-value="gradient-glow" onclick="select(this)">
+        <div class="opt-name">Gradient Glow (current)</div>
+        <div class="preview" style="padding:0;overflow:hidden;border:none;border-radius:6px">
+          <div style="background:linear-gradient(90deg,#3B82F6,#22D3EE);padding:1.5px;border-radius:6px">
+            <div style="background:var(--card);border-radius:5px;padding:10px 14px;box-shadow:inset 0 1px 0 rgba(59,130,246,0.1),0 0 20px rgba(59,130,246,0.08)">
+              <div style="font-size:0.72rem;color:#3B82F6;font-weight:600">Next: Level 12</div>
+              <div style="font-size:0.85rem;font-weight:700">Put +50 into Thwackability</div>
+              <div style="font-size:0.7rem;color:var(--fg-muted)">Currently 280 / 400 target</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="solid-glow" onclick="select(this)">
+        <div class="opt-name">Solid Glow</div>
+        <div class="preview" style="padding:0;overflow:hidden;border:none;border-radius:6px">
+          <div style="border:1.5px solid #3B82F6;border-radius:6px;box-shadow:0 0 12px rgba(59,130,246,0.2),0 0 4px rgba(59,130,246,0.1)">
+            <div style="background:var(--card);border-radius:5px;padding:10px 14px">
+              <div style="font-size:0.72rem;color:#3B82F6;font-weight:600">Next: Level 12</div>
+              <div style="font-size:0.85rem;font-weight:700">Put +50 into Thwackability</div>
+              <div style="font-size:0.7rem;color:var(--fg-muted)">Currently 280 / 400 target</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="subtle" onclick="select(this)">
+        <div class="opt-name">Subtle</div>
+        <div class="preview" style="padding:0;overflow:hidden;border:none;border-radius:6px">
+          <div style="border:1.5px solid #60A5FA;border-radius:6px">
+            <div style="background:var(--card);border-radius:5px;padding:10px 14px">
+              <div style="font-size:0.72rem;color:#3B82F6;font-weight:600">Next: Level 12</div>
+              <div style="font-size:0.85rem;font-weight:700">Put +50 into Thwackability</div>
+              <div style="font-size:0.7rem;color:var(--fg-muted)">Currently 280 / 400 target</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="option-group">
+    <div class="option-label">Max Level Variant</div>
+    <div class="option-desc">Special treatment when a player hits level 30.</div>
+    <div class="options-row" data-group="maxLevelStyle">
+
+      <div class="opt-card selected" data-value="gold-purple" onclick="select(this)">
+        <div class="opt-name">Gold to Purple (current)</div>
+        <div class="preview" style="padding:0;overflow:hidden;border:none;border-radius:6px">
+          <div style="background:linear-gradient(90deg,#FFD700,#A371F7);padding:1.5px;border-radius:6px">
+            <div style="background:var(--card);border-radius:5px;padding:10px 14px;box-shadow:inset 0 1px 0 rgba(255,215,0,0.1),0 0 20px rgba(255,215,0,0.08)">
+              <div style="font-size:0.72rem;color:#FFD700;font-weight:600">Max Level Reached</div>
+              <div style="font-size:0.85rem;font-weight:700">Level 30 complete. Build finalized.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="gold-only" onclick="select(this)">
+        <div class="opt-name">Gold Only</div>
+        <div class="preview" style="padding:0;overflow:hidden;border:none;border-radius:6px">
+          <div style="border:1.5px solid #FFD700;border-radius:6px;box-shadow:0 0 16px rgba(255,215,0,0.2),0 0 4px rgba(255,215,0,0.15)">
+            <div style="background:var(--card);border-radius:5px;padding:10px 14px;box-shadow:inset 0 1px 0 rgba(255,215,0,0.1)">
+              <div style="font-size:0.72rem;color:#FFD700;font-weight:600">Max Level Reached</div>
+              <div style="font-size:0.85rem;font-weight:700">Level 30 complete. Build finalized.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="rainbow" onclick="select(this)">
+        <div class="opt-name">Rainbow Shimmer</div>
+        <div class="preview" style="padding:0;overflow:hidden;border:none;border-radius:6px">
+          <div style="background:linear-gradient(90deg,#F87171,#E8A735,#3FB950,#3B82F6,#A371F7,#F87171);background-size:200% 100%;padding:1.5px;border-radius:6px;animation:shimmer 3s linear infinite">
+            <div style="background:var(--card);border-radius:5px;padding:10px 14px">
+              <div style="font-size:0.72rem;color:#FFD700;font-weight:600">Max Level Reached</div>
+              <div style="font-size:0.85rem;font-weight:700">Level 30 complete. Build finalized.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========== 4. STAT DEVELOPMENT BARS ========== -->
+<div class="section">
+  <div class="section-title">Stat Development Progress Bars</div>
+  <div class="option-group">
+    <div class="option-label">Bar Fill Style</div>
+    <div class="option-desc">How the progress bars fill for stat targets.</div>
+    <div class="options-row" data-group="barFillStyle">
+
+      <div class="opt-card selected" data-value="gradient" onclick="select(this)">
+        <div class="opt-name">Gradient Fill (current)</div>
+        <div class="preview">
+          <div style="font-size:0.72rem;display:flex;justify-content:space-between;margin-bottom:3px"><span style="color:var(--fg-muted)">thwackability <span style="color:#E8A735;font-weight:600">-120</span></span><span>280 / 400</span></div>
+          <div class="p-bar-track" style="height:10px"><div class="p-bar-fill" style="width:70%;background:linear-gradient(90deg,#D4A843,#60A5FA)"></div></div>
+          <div style="font-size:0.72rem;display:flex;justify-content:space-between;margin:8px 0 3px"><span style="color:var(--fg-muted)">divinity</span><span>450 / 400</span></div>
+          <div class="p-bar-track" style="height:10px"><div class="p-bar-fill" style="width:100%;background:linear-gradient(90deg,#60A5FA,#3B82F6)"></div></div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="solid" onclick="select(this)">
+        <div class="opt-name">Solid Fill</div>
+        <div class="preview">
+          <div style="font-size:0.72rem;display:flex;justify-content:space-between;margin-bottom:3px"><span style="color:var(--fg-muted)">thwackability <span style="color:#E8A735;font-weight:600">-120</span></span><span>280 / 400</span></div>
+          <div class="p-bar-track" style="height:10px"><div class="p-bar-fill" style="width:70%;background:#60A5FA"></div></div>
+          <div style="font-size:0.72rem;display:flex;justify-content:space-between;margin:8px 0 3px"><span style="color:var(--fg-muted)">divinity</span><span>450 / 400</span></div>
+          <div class="p-bar-track" style="height:10px"><div class="p-bar-fill" style="width:100%;background:#3B82F6"></div></div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="striped" onclick="select(this)">
+        <div class="opt-name">Striped</div>
+        <div class="preview">
+          <div style="font-size:0.72rem;display:flex;justify-content:space-between;margin-bottom:3px"><span style="color:var(--fg-muted)">thwackability <span style="color:#E8A735;font-weight:600">-120</span></span><span>280 / 400</span></div>
+          <div class="p-bar-track" style="height:10px"><div class="p-bar-fill" style="width:70%;background:repeating-linear-gradient(135deg,#60A5FA,#60A5FA 4px,rgba(96,165,250,0.5) 4px,rgba(96,165,250,0.5) 8px)"></div></div>
+          <div style="font-size:0.72rem;display:flex;justify-content:space-between;margin:8px 0 3px"><span style="color:var(--fg-muted)">divinity</span><span>450 / 400</span></div>
+          <div class="p-bar-track" style="height:10px"><div class="p-bar-fill" style="width:100%;background:repeating-linear-gradient(135deg,#3B82F6,#3B82F6 4px,rgba(59,130,246,0.5) 4px,rgba(59,130,246,0.5) 8px)"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="option-group">
+      <div class="option-label">Bar Height</div>
+      <div class="option-desc">Thickness of the progress bars.</div>
+      <div class="options-row" data-group="barHeight">
+        <div class="opt-card" data-value="thin" onclick="select(this)">
+          <div class="opt-name">Thin (6px)</div>
+          <div class="preview"><div class="p-bar-track" style="height:6px"><div class="p-bar-fill" style="width:65%;background:linear-gradient(90deg,#D4A843,#60A5FA)"></div></div></div>
+        </div>
+        <div class="opt-card selected" data-value="medium" onclick="select(this)">
+          <div class="opt-name">Medium (10px, current)</div>
+          <div class="preview"><div class="p-bar-track" style="height:10px"><div class="p-bar-fill" style="width:65%;background:linear-gradient(90deg,#D4A843,#60A5FA)"></div></div></div>
+        </div>
+        <div class="opt-card" data-value="thick" onclick="select(this)">
+          <div class="opt-name">Thick (14px)</div>
+          <div class="preview"><div class="p-bar-track" style="height:14px"><div class="p-bar-fill" style="width:65%;background:linear-gradient(90deg,#D4A843,#60A5FA)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="option-group">
+      <div class="option-label">Shimmer Animation</div>
+      <div class="option-desc">One-time shimmer effect when bars first appear.</div>
+      <div class="options-row" data-group="barShimmer">
+        <div class="opt-card selected" data-value="on" onclick="select(this)">
+          <div class="opt-name">On (current)</div>
+          <div class="preview"><div class="p-bar-track" style="height:10px"><div class="p-bar-fill anim-shimmer" style="width:65%;background:linear-gradient(90deg,#D4A843,#60A5FA,#D4A843);background-size:200% 100%"></div></div></div>
+        </div>
+        <div class="opt-card" data-value="off" onclick="select(this)">
+          <div class="opt-name">Off</div>
+          <div class="preview"><div class="p-bar-track" style="height:10px"><div class="p-bar-fill" style="width:65%;background:linear-gradient(90deg,#D4A843,#60A5FA)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 5. BOON TIMELINE ========== -->
+<div class="section">
+  <div class="section-title">Boon Timeline</div>
+  <div class="option-group">
+    <div class="option-label">Next Boon Indicator</div>
+    <div class="option-desc">How to draw attention to the next upcoming boon level.</div>
+    <div class="options-row" data-group="boonNextIndicator">
+
+      <div class="opt-card selected" data-value="pulse-ring" onclick="select(this)">
+        <div class="opt-name">Pulsing Ring (current)</div>
+        <div class="preview">
+          <div class="p-timeline-row">
+            <div class="p-node" style="background:rgba(59,130,246,0.2);color:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,0.3);animation:pulse-ring 2.5s ease-in-out infinite">20</div>
+            <div><div style="font-weight:600;font-size:0.8rem">Lesser Boon</div><div style="font-size:0.7rem;color:var(--fg-muted)">Recommended: Sight Beyond</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="glow" onclick="select(this)">
+        <div class="opt-name">Glow</div>
+        <div class="preview">
+          <div class="p-timeline-row">
+            <div class="p-node" style="background:rgba(59,130,246,0.2);color:#3B82F6;box-shadow:0 0 10px rgba(59,130,246,0.5),0 0 20px rgba(59,130,246,0.2)">20</div>
+            <div><div style="font-weight:600;font-size:0.8rem">Lesser Boon</div><div style="font-size:0.7rem;color:var(--fg-muted)">Recommended: Sight Beyond</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="none" onclick="select(this)">
+        <div class="opt-name">None</div>
+        <div class="preview">
+          <div class="p-timeline-row">
+            <div class="p-node" style="background:var(--muted-bg);color:var(--fg-muted)">20</div>
+            <div><div style="font-weight:600;font-size:0.8rem">Lesser Boon</div><div style="font-size:0.7rem;color:var(--fg-muted)">Recommended: Sight Beyond</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="option-group">
+    <div class="option-label">Acquired Node Style</div>
+    <div class="option-desc">How completed boon levels look.</div>
+    <div class="options-row" data-group="boonAcquiredStyle">
+
+      <div class="opt-card selected" data-value="checkmark" onclick="select(this)">
+        <div class="opt-name">Checkmark (current)</div>
+        <div class="preview">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="p-node" style="background:rgba(59,130,246,0.3);color:#3B82F6;opacity:0.6">&#10003;</div>
+            <div class="p-node" style="background:rgba(59,130,246,0.3);color:#3B82F6;opacity:0.6">&#10003;</div>
+            <span style="font-size:0.7rem;color:var(--fg-muted)">Taken: Sight Beyond, Taken: Fleet</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="filled-number" onclick="select(this)">
+        <div class="opt-name">Filled + Number</div>
+        <div class="preview">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="p-node" style="background:rgba(59,130,246,0.3);color:#3B82F6;opacity:0.6">10</div>
+            <div class="p-node" style="background:rgba(59,130,246,0.3);color:#3B82F6;opacity:0.6">20</div>
+            <span style="font-size:0.7rem;color:var(--fg-muted)">Keep level numbers visible</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="dot" onclick="select(this)">
+        <div class="opt-name">Filled Dot</div>
+        <div class="preview">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="width:12px;height:12px;border-radius:50%;background:rgba(59,130,246,0.4);opacity:0.6"></div>
+            <div style="width:12px;height:12px;border-radius:50%;background:rgba(59,130,246,0.4);opacity:0.6"></div>
+            <span style="font-size:0.7rem;color:var(--fg-muted)">Minimal, no text</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========== 6. STAT GRID ========== -->
+<div class="section">
+  <div class="section-title">Stat Grid</div>
+  <div class="option-group">
+    <div class="option-label">Hover Effect</div>
+    <div class="option-desc">What happens when you hover over a stat row. Hover over the previews to see each effect.</div>
+    <div class="options-row" data-group="statHover">
+
+      <div class="opt-card selected" data-value="scale-value" onclick="select(this)">
+        <div class="opt-name">Scale Value (current)</div>
+        <div class="preview" style="padding:6px">
+          <style>.sh1:hover .sh1v { transform: scale(1.15); transform-origin: right; }</style>
+          <div class="p-stat-row sh1" style="cursor:pointer;transition:background 0.2s;border-radius:4px">
+            <span class="p-stat-name">thwackability</span>
+            <span class="p-stat-val sh1v" style="color:#60A5FA;transition:transform 0.2s">410</span>
+          </div>
+          <div class="p-stat-row sh1" style="cursor:pointer;transition:background 0.2s;border-radius:4px">
+            <span class="p-stat-name">divinity</span>
+            <span class="p-stat-val sh1v" style="color:#3B82F6;transition:transform 0.2s">620</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="highlight-row" onclick="select(this)">
+        <div class="opt-name">Highlight Row</div>
+        <div class="preview" style="padding:6px">
+          <style>.sh2:hover { background: rgba(255,255,255,0.04) !important; }</style>
+          <div class="p-stat-row sh2" style="cursor:pointer;transition:background 0.2s;border-radius:4px">
+            <span class="p-stat-name">thwackability</span>
+            <span class="p-stat-val" style="color:#60A5FA">410</span>
+          </div>
+          <div class="p-stat-row sh2" style="cursor:pointer;transition:background 0.2s;border-radius:4px">
+            <span class="p-stat-name">divinity</span>
+            <span class="p-stat-val" style="color:#3B82F6">620</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="both" onclick="select(this)">
+        <div class="opt-name">Both</div>
+        <div class="preview" style="padding:6px">
+          <style>.sh3:hover { background: rgba(255,255,255,0.04) !important; } .sh3:hover .sh3v { transform: scale(1.15); transform-origin: right; }</style>
+          <div class="p-stat-row sh3" style="cursor:pointer;transition:background 0.2s;border-radius:4px">
+            <span class="p-stat-name">thwackability</span>
+            <span class="p-stat-val sh3v" style="color:#60A5FA;transition:transform 0.2s">410</span>
+          </div>
+          <div class="p-stat-row sh3" style="cursor:pointer;transition:background 0.2s;border-radius:4px">
+            <span class="p-stat-name">divinity</span>
+            <span class="p-stat-val sh3v" style="color:#3B82F6;transition:transform 0.2s">620</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-card" data-value="none" onclick="select(this)">
+        <div class="opt-name">None</div>
+        <div class="preview" style="padding:6px">
+          <div class="p-stat-row" style="border-radius:4px">
+            <span class="p-stat-name">thwackability</span>
+            <span class="p-stat-val" style="color:#60A5FA">410</span>
+          </div>
+          <div class="p-stat-row" style="border-radius:4px">
+            <span class="p-stat-name">divinity</span>
+            <span class="p-stat-val" style="color:#3B82F6">620</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="option-group">
+    <div class="option-label">Grid Columns (wide screens)</div>
+    <div class="options-row" data-group="statGridCols">
+      <div class="opt-card" data-value="2-col" onclick="select(this)">
+        <div class="opt-name">2 Columns</div>
+        <div class="preview" style="padding:8px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:var(--muted-bg);border-radius:4px;padding:6px 8px;font-size:0.68rem"><div style="color:var(--fg-muted);font-weight:600;text-transform:uppercase;margin-bottom:3px">Batting</div><div style="color:var(--fg-muted)">thwackability, divinity, musclitude, patheticism...</div></div>
+            <div style="background:var(--muted-bg);border-radius:4px;padding:6px 8px;font-size:0.68rem"><div style="color:var(--fg-muted);font-weight:600;text-transform:uppercase;margin-bottom:3px">Defense</div><div style="color:var(--fg-muted)">omniscience, tenaciousness, watchfulness...</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="opt-card selected" data-value="3-col" onclick="select(this)">
+        <div class="opt-name">3 Columns (current)</div>
+        <div class="preview" style="padding:8px">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+            <div style="background:var(--muted-bg);border-radius:4px;padding:5px 6px;font-size:0.62rem"><div style="color:var(--fg-muted);font-weight:600;text-transform:uppercase;margin-bottom:2px">Batting</div><div style="color:var(--fg-muted)">thwack, divinity...</div></div>
+            <div style="background:var(--muted-bg);border-radius:4px;padding:5px 6px;font-size:0.62rem"><div style="color:var(--fg-muted);font-weight:600;text-transform:uppercase;margin-bottom:2px">Defense</div><div style="color:var(--fg-muted)">omni, tenac...</div></div>
+            <div style="background:var(--muted-bg);border-radius:4px;padding:5px 6px;font-size:0.62rem"><div style="color:var(--fg-muted);font-weight:600;text-transform:uppercase;margin-bottom:2px">Baserun</div><div style="color:var(--fg-muted)">laser, speed...</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 7. PLAYER HEADER ========== -->
+<div class="section">
+  <div class="section-title">Player Header</div>
+  <div class="two-col">
+    <div class="option-group">
+      <div class="option-label">Level Badge Style</div>
+      <div class="options-row" data-group="levelBadge">
+        <div class="opt-card selected" data-value="pill" onclick="select(this)">
+          <div class="opt-name">Pill Badge (current)</div>
+          <div class="preview" style="display:flex;align-items:center;gap:10px">
+            <span style="font-weight:700;font-size:1.1rem">Sixpack Dogwalker</span>
+            <span class="p-badge" style="background:#3B82F6;color:white">17</span>
+          </div>
+        </div>
+        <div class="opt-card" data-value="circle" onclick="select(this)">
+          <div class="opt-name">Circle</div>
+          <div class="preview" style="display:flex;align-items:center;gap:10px">
+            <span style="font-weight:700;font-size:1.1rem">Sixpack Dogwalker</span>
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#3B82F6;color:white;font-size:0.7rem;font-weight:700">17</span>
+          </div>
+        </div>
+        <div class="opt-card" data-value="inline" onclick="select(this)">
+          <div class="opt-name">Inline Text</div>
+          <div class="preview" style="display:flex;align-items:baseline;gap:8px">
+            <span style="font-weight:700;font-size:1.1rem">Sixpack Dogwalker</span>
+            <span style="font-size:0.8rem;color:var(--fg-muted)">Lv.17</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="option-group">
+      <div class="option-label">Greater Boon Pills</div>
+      <div class="options-row" data-group="greaterBoonStyle">
+        <div class="opt-card selected" data-value="gold-glow" onclick="select(this)">
+          <div class="opt-name">Gold Glow (current)</div>
+          <div class="preview" style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="p-pill" style="background:rgba(255,215,0,0.15);color:#FFD700;border:1px solid rgba(255,215,0,0.25);box-shadow:0 0 6px rgba(255,215,0,0.15)">Maximalist</span>
+            <span class="p-pill" style="background:rgba(255,215,0,0.15);color:#FFD700;border:1px solid rgba(255,215,0,0.25);box-shadow:0 0 6px rgba(255,215,0,0.15)">Adept</span>
+          </div>
+        </div>
+        <div class="opt-card" data-value="gold-flat" onclick="select(this)">
+          <div class="opt-name">Gold Flat</div>
+          <div class="preview" style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="p-pill" style="background:rgba(255,215,0,0.12);color:#FFD700;border:1px solid rgba(255,215,0,0.2)">Maximalist</span>
+            <span class="p-pill" style="background:rgba(255,215,0,0.12);color:#FFD700;border:1px solid rgba(255,215,0,0.2)">Adept</span>
+          </div>
+        </div>
+        <div class="opt-card" data-value="primary" onclick="select(this)">
+          <div class="opt-name">Primary Blue</div>
+          <div class="preview" style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="p-pill" style="background:rgba(59,130,246,0.15);color:#60A5FA;border:1px solid rgba(59,130,246,0.3)">Maximalist</span>
+            <span class="p-pill" style="background:rgba(59,130,246,0.15);color:#60A5FA;border:1px solid rgba(59,130,246,0.3)">Adept</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 8. PITCH ARSENAL ========== -->
+<div class="section">
+  <div class="section-title">Pitch Arsenal (Pitchers)</div>
+  <div class="two-col">
+    <div class="option-group">
+      <div class="option-label">Donut Chart Colors</div>
+      <div class="options-row" data-group="pitchColors">
+        <div class="opt-card selected" data-value="default-chart" onclick="select(this)">
+          <div class="opt-name">Default Chart (current)</div>
+          <div class="preview" style="display:flex;align-items:center;gap:12px">
+            <svg width="56" height="56" viewBox="0 0 56 56">
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#3B82F6" stroke-width="8" stroke-dasharray="40 86" stroke-dashoffset="0"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#FFD700" stroke-width="8" stroke-dasharray="30 96" stroke-dashoffset="-40"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#3FB950" stroke-width="8" stroke-dasharray="20 106" stroke-dashoffset="-70"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#F85149" stroke-width="8" stroke-dasharray="16 110" stroke-dashoffset="-90"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#A371F7" stroke-width="8" stroke-dasharray="20 106" stroke-dashoffset="-106"/>
+            </svg>
+            <div style="font-size:0.68rem;color:var(--fg-muted);line-height:1.6">
+              <div><span style="color:#3B82F6">&#9632;</span> Fastball</div>
+              <div><span style="color:#FFD700">&#9632;</span> Slider</div>
+              <div><span style="color:#3FB950">&#9632;</span> Curve</div>
+              <div><span style="color:#F85149">&#9632;</span> Change</div>
+            </div>
+          </div>
+        </div>
+        <div class="opt-card" data-value="blues" onclick="select(this)">
+          <div class="opt-name">Blues Scale</div>
+          <div class="preview" style="display:flex;align-items:center;gap:12px">
+            <svg width="56" height="56" viewBox="0 0 56 56">
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#3B82F6" stroke-width="8" stroke-dasharray="40 86" stroke-dashoffset="0"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#60A5FA" stroke-width="8" stroke-dasharray="30 96" stroke-dashoffset="-40"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#93C5FD" stroke-width="8" stroke-dasharray="20 106" stroke-dashoffset="-70"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#BFDBFE" stroke-width="8" stroke-dasharray="16 110" stroke-dashoffset="-90"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#1D4ED8" stroke-width="8" stroke-dasharray="20 106" stroke-dashoffset="-106"/>
+            </svg>
+            <div style="font-size:0.68rem;color:var(--fg-muted);line-height:1.6">
+              <div><span style="color:#3B82F6">&#9632;</span> Fastball</div>
+              <div><span style="color:#60A5FA">&#9632;</span> Slider</div>
+              <div><span style="color:#93C5FD">&#9632;</span> Curve</div>
+              <div><span style="color:#BFDBFE">&#9632;</span> Change</div>
+            </div>
+          </div>
+        </div>
+        <div class="opt-card" data-value="warm" onclick="select(this)">
+          <div class="opt-name">Warm Palette</div>
+          <div class="preview" style="display:flex;align-items:center;gap:12px">
+            <svg width="56" height="56" viewBox="0 0 56 56">
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#FFD700" stroke-width="8" stroke-dasharray="40 86" stroke-dashoffset="0"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#F59E0B" stroke-width="8" stroke-dasharray="30 96" stroke-dashoffset="-40"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#F87171" stroke-width="8" stroke-dasharray="20 106" stroke-dashoffset="-70"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#FB7185" stroke-width="8" stroke-dasharray="16 110" stroke-dashoffset="-90"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#B45309" stroke-width="8" stroke-dasharray="20 106" stroke-dashoffset="-106"/>
+            </svg>
+            <div style="font-size:0.68rem;color:var(--fg-muted);line-height:1.6">
+              <div><span style="color:#FFD700">&#9632;</span> Fastball</div>
+              <div><span style="color:#F59E0B">&#9632;</span> Slider</div>
+              <div><span style="color:#F87171">&#9632;</span> Curve</div>
+              <div><span style="color:#FB7185">&#9632;</span> Change</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="option-group">
+      <div class="option-label">Slice Hover</div>
+      <div class="options-row" data-group="pitchHover">
+        <div class="opt-card selected" data-value="brighten" onclick="select(this)">
+          <div class="opt-name">Brighten (current)</div>
+          <div class="preview" style="text-align:center">
+            <style>.ph1:hover { filter: brightness(1.3); }</style>
+            <svg width="56" height="56" viewBox="0 0 56 56" style="cursor:pointer" class="ph1">
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#3B82F6" stroke-width="8" stroke-dasharray="63 63" stroke-dashoffset="0" style="transition:filter 0.15s"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#FFD700" stroke-width="8" stroke-dasharray="63 63" stroke-dashoffset="-63"/>
+            </svg>
+            <div style="font-size:0.65rem;color:var(--fg-muted);margin-top:2px">Hover me</div>
+          </div>
+        </div>
+        <div class="opt-card" data-value="scale" onclick="select(this)">
+          <div class="opt-name">Scale Out</div>
+          <div class="preview" style="text-align:center">
+            <style>.ph2:hover { transform: scale(1.08); }</style>
+            <svg width="56" height="56" viewBox="0 0 56 56" style="cursor:pointer;transition:transform 0.15s" class="ph2">
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#3B82F6" stroke-width="8" stroke-dasharray="63 63" stroke-dashoffset="0"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#FFD700" stroke-width="8" stroke-dasharray="63 63" stroke-dashoffset="-63"/>
+            </svg>
+            <div style="font-size:0.65rem;color:var(--fg-muted);margin-top:2px">Hover me</div>
+          </div>
+        </div>
+        <div class="opt-card" data-value="none" onclick="select(this)">
+          <div class="opt-name">None</div>
+          <div class="preview" style="text-align:center">
+            <svg width="56" height="56" viewBox="0 0 56 56">
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#3B82F6" stroke-width="8" stroke-dasharray="63 63" stroke-dashoffset="0"/>
+              <circle cx="28" cy="28" r="20" fill="none" stroke="#FFD700" stroke-width="8" stroke-dasharray="63 63" stroke-dashoffset="-63"/>
+            </svg>
+            <div style="font-size:0.65rem;color:var(--fg-muted);margin-top:2px">Static</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 9. ANIMATIONS ========== -->
+<div class="section">
+  <div class="section-title">Animations</div>
+  <div class="option-group">
+    <div class="option-label">Number Pop Animation</div>
+    <div class="option-desc">The fade-up effect when stat counters change value (on-track count, behind count, etc).</div>
+    <div class="options-row" data-group="numberPop">
+      <div class="opt-card selected" data-value="on" onclick="select(this)">
+        <div class="opt-name">On (current)</div>
+        <div class="preview" style="display:flex;align-items:center;gap:16px">
+          <span style="font-weight:700;color:#60A5FA;font-size:1.2rem;animation:num-pop 0.8s ease-out infinite alternate">7</span>
+          <span style="font-size:0.75rem;color:var(--fg-muted)">on track</span>
+          <span style="font-weight:700;color:#E8A735;font-size:1.2rem;animation:num-pop 0.8s ease-out 0.2s infinite alternate">3</span>
+          <span style="font-size:0.75rem;color:var(--fg-muted)">behind</span>
+        </div>
+      </div>
+      <div class="opt-card" data-value="off" onclick="select(this)">
+        <div class="opt-name">Off</div>
+        <div class="preview" style="display:flex;align-items:center;gap:16px">
+          <span style="font-weight:700;color:#60A5FA;font-size:1.2rem">7</span>
+          <span style="font-size:0.75rem;color:var(--fg-muted)">on track</span>
+          <span style="font-weight:700;color:#E8A735;font-size:1.2rem">3</span>
+          <span style="font-size:0.75rem;color:var(--fg-muted)">behind</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 10. CARD STYLING ========== -->
+<div class="section">
+  <div class="section-title">Card Styling</div>
+  <div class="two-col">
+    <div class="option-group">
+      <div class="option-label">Section Header Accent</div>
+      <div class="option-desc">The marker before section titles.</div>
+      <div class="options-row" data-group="sectionAccent">
+        <div class="opt-card selected" data-value="bar" onclick="select(this)">
+          <div class="opt-name">Accent Bar (current)</div>
+          <div class="preview">
+            <div style="display:flex;align-items:center;gap:8px;font-size:0.75rem;font-weight:600;text-transform:uppercase;color:var(--fg-muted);letter-spacing:0.04em">
+              <span style="width:3px;height:14px;background:rgba(59,130,246,0.4);border-radius:2px;display:inline-block"></span>
+              All Stats
+            </div>
+          </div>
+        </div>
+        <div class="opt-card" data-value="dot" onclick="select(this)">
+          <div class="opt-name">Dot</div>
+          <div class="preview">
+            <div style="display:flex;align-items:center;gap:8px;font-size:0.75rem;font-weight:600;text-transform:uppercase;color:var(--fg-muted);letter-spacing:0.04em">
+              <span style="width:6px;height:6px;background:rgba(59,130,246,0.5);border-radius:50%;display:inline-block"></span>
+              All Stats
+            </div>
+          </div>
+        </div>
+        <div class="opt-card" data-value="none" onclick="select(this)">
+          <div class="opt-name">None</div>
+          <div class="preview">
+            <div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;color:var(--fg-muted);letter-spacing:0.04em">
+              All Stats
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="option-group">
+      <div class="option-label">Active Button Style</div>
+      <div class="option-desc">Toggle buttons (What-If, Edit Targets, Done).</div>
+      <div class="options-row" data-group="activeButtonStyle">
+        <div class="opt-card selected" data-value="gradient" onclick="select(this)">
+          <div class="opt-name">Blue Gradient (current)</div>
+          <div class="preview" style="display:flex;gap:8px;align-items:center">
+            <span style="background:linear-gradient(180deg,#4B8DF7,#3B82F6);color:white;padding:4px 12px;border-radius:5px;font-size:0.75rem;font-weight:600">Exit What-If</span>
+            <span style="background:var(--muted-bg);color:var(--fg-muted);padding:4px 12px;border-radius:5px;font-size:0.75rem">What-If Mode</span>
+          </div>
+        </div>
+        <div class="opt-card" data-value="solid" onclick="select(this)">
+          <div class="opt-name">Solid Primary</div>
+          <div class="preview" style="display:flex;gap:8px;align-items:center">
+            <span style="background:#3B82F6;color:white;padding:4px 12px;border-radius:5px;font-size:0.75rem;font-weight:600">Exit What-If</span>
+            <span style="background:var(--muted-bg);color:var(--fg-muted);padding:4px 12px;border-radius:5px;font-size:0.75rem">What-If Mode</span>
+          </div>
+        </div>
+        <div class="opt-card" data-value="outline" onclick="select(this)">
+          <div class="opt-name">Outline</div>
+          <div class="preview" style="display:flex;gap:8px;align-items:center">
+            <span style="background:transparent;color:#3B82F6;border:1.5px solid #3B82F6;padding:3px 12px;border-radius:5px;font-size:0.75rem;font-weight:600">Exit What-If</span>
+            <span style="background:var(--muted-bg);color:var(--fg-muted);padding:4px 12px;border-radius:5px;font-size:0.75rem">What-If Mode</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 11. SPACING ========== -->
+<div class="section">
+  <div class="section-title">Spacing & Density</div>
+  <div class="option-group">
+    <div class="option-label">Overall Density</div>
+    <div class="option-desc">How compact or spacious the layout feels between cards.</div>
+    <div class="options-row" data-group="density">
+      <div class="opt-card" data-value="compact" onclick="select(this)">
+        <div class="opt-name">Compact</div>
+        <div class="preview">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="background:var(--muted-bg);border-radius:4px;padding:6px 10px;font-size:0.7rem;color:var(--fg-muted)">Archetype Card</div>
+            <div style="background:var(--muted-bg);border-radius:4px;padding:6px 10px;font-size:0.7rem;color:var(--fg-muted)">Next Action Card</div>
+            <div style="background:var(--muted-bg);border-radius:4px;padding:6px 10px;font-size:0.7rem;color:var(--fg-muted)">Stat Development</div>
+          </div>
+          <div style="font-size:0.65rem;color:var(--fg-muted);margin-top:6px">space-y-2, gap-3</div>
+        </div>
+      </div>
+      <div class="opt-card selected" data-value="comfortable" onclick="select(this)">
+        <div class="opt-name">Comfortable (current)</div>
+        <div class="preview">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="background:var(--muted-bg);border-radius:4px;padding:6px 10px;font-size:0.7rem;color:var(--fg-muted)">Archetype Card</div>
+            <div style="background:var(--muted-bg);border-radius:4px;padding:6px 10px;font-size:0.7rem;color:var(--fg-muted)">Next Action Card</div>
+            <div style="background:var(--muted-bg);border-radius:4px;padding:6px 10px;font-size:0.7rem;color:var(--fg-muted)">Stat Development</div>
+          </div>
+          <div style="font-size:0.65rem;color:var(--fg-muted);margin-top:6px">space-y-4, gap-4</div>
+        </div>
+      </div>
+      <div class="opt-card" data-value="spacious" onclick="select(this)">
+        <div class="opt-name">Spacious</div>
+        <div class="preview">
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <div style="background:var(--muted-bg);border-radius:4px;padding:6px 10px;font-size:0.7rem;color:var(--fg-muted)">Archetype Card</div>
+            <div style="background:var(--muted-bg);border-radius:4px;padding:6px 10px;font-size:0.7rem;color:var(--fg-muted)">Next Action Card</div>
+            <div style="background:var(--muted-bg);border-radius:4px;padding:6px 10px;font-size:0.7rem;color:var(--fg-muted)">Stat Development</div>
+          </div>
+          <div style="font-size:0.65rem;color:var(--fg-muted);margin-top:6px">space-y-6, gap-6</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== BOTTOM BAR ========== -->
+<div class="bottom-bar">
+  <button class="reset-btn" onclick="resetAll()">Reset to Current</button>
+  <div class="choice-count" id="choiceCount">All defaults selected</div>
+  <button class="copy-btn" id="copyBtn" onclick="copyChoices()">Copy Choices</button>
+</div>
+
+<script>
+const defaults = {}, selections = {};
+
+document.querySelectorAll('[data-group]').forEach(c => {
+  const g = c.dataset.group, s = c.querySelector('.selected');
+  if (s) { defaults[g] = s.dataset.value; selections[g] = s.dataset.value; }
+});
+
+function select(el) {
+  const c = el.closest('[data-group]'), g = c.dataset.group;
+  c.querySelectorAll('.selected').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  selections[g] = el.dataset.value;
+  updateCount();
+}
+
+function updateCount() {
+  let n = 0;
+  for (const k in selections) if (selections[k] !== defaults[k]) n++;
+  document.getElementById('choiceCount').textContent = n === 0 ? 'All defaults selected' : `${n} change${n>1?'s':''} from current`;
+}
+
+function resetAll() {
+  for (const g in defaults) {
+    const c = document.querySelector(`[data-group="${g}"]`);
+    if (!c) continue;
+    c.querySelectorAll('.selected').forEach(s => s.classList.remove('selected'));
+    const t = c.querySelector(`[data-value="${defaults[g]}"]`);
+    if (t) t.classList.add('selected');
+    selections[g] = defaults[g];
+  }
+  updateCount();
+}
+
+const labels = {
+  statScale:'Stat Scale Colors', progressionGlow:'Progression Glow', progressionOrb:'Progression Orb',
+  nextActionBorder:'Next Action Border', maxLevelStyle:'Max Level Style',
+  barFillStyle:'Bar Fill Style', barHeight:'Bar Height', barShimmer:'Bar Shimmer',
+  boonNextIndicator:'Boon Next Indicator', boonAcquiredStyle:'Boon Acquired Style',
+  statHover:'Stat Hover Effect', statGridCols:'Stat Grid Columns',
+  levelBadge:'Level Badge', greaterBoonStyle:'Greater Boon Style',
+  pitchColors:'Pitch Chart Colors', pitchHover:'Pitch Slice Hover',
+  numberPop:'Number Pop Animation', sectionAccent:'Section Header Accent',
+  activeButtonStyle:'Active Button Style', density:'Spacing Density',
+};
+
+function copyChoices() {
+  const changed = {}, kept = {};
+  for (const k in selections) {
+    if (selections[k] !== defaults[k]) changed[k] = selections[k];
+    else kept[k] = selections[k];
+  }
+  let lines = ['## MMOLB Player Builder UI Choices',''];
+  const ck = Object.keys(changed);
+  if (ck.length > 0) {
+    lines.push('### Changes from current:');
+    for (const k of ck) lines.push(`- **${labels[k]||k}**: ${defaults[k]} -> **${changed[k]}**`);
+    lines.push('');
+  }
+  lines.push('### Keep as-is:');
+  for (const k of Object.keys(kept)) lines.push(`- ${labels[k]||k}: ${kept[k]}`);
+
+  navigator.clipboard.writeText(lines.join('\n')).then(() => {
+    const b = document.getElementById('copyBtn');
+    b.textContent = 'Copied!'; b.classList.add('copied');
+    setTimeout(() => { b.textContent = 'Copy Choices'; b.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
