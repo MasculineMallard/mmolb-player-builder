@@ -35,7 +35,7 @@ export function PitchArsenal({ pitches, advice, inline }: PitchArsenalProps) {
     // Largest-remainder rounding so percentages sum to exactly 100
     const rawPcts = pitches.map((p) => (p.frequency / total) * 100);
     const floored = rawPcts.map(Math.floor);
-    let remainder = 100 - floored.reduce((a, b) => a + b, 0);
+    const remainder = 100 - floored.reduce((a, b) => a + b, 0);
     const remainders = rawPcts.map((v, i) => ({ i, r: v - floored[i] }));
     remainders.sort((a, b) => b.r - a.r);
     for (let j = 0; j < remainder; j++) floored[remainders[j].i]++;

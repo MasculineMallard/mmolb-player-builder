@@ -13,7 +13,7 @@ export function useSearch<T>(url: string, query: string) {
 
   useEffect(() => {
     if (debouncedQuery.trim().length < 2) {
-      setResults([]);
+      setResults([]); // eslint-disable-line react-hooks/set-state-in-effect -- reset on query clear
       setError(false);
       return;
     }

@@ -61,7 +61,7 @@ export function ExportShare({ player, archetype }: ExportShareProps) {
   const archetypeId = usePlayerStore((s) => s.archetypeId);
 
   useEffect(() => {
-    setPortalTarget(document.getElementById("share-slot"));
+    setPortalTarget(document.getElementById("share-slot")); // eslint-disable-line react-hooks/set-state-in-effect -- DOM ref after mount (SSR-safe)
   }, []);
 
   const flash = (setter: (s: BtnState) => void, state: BtnState) => {

@@ -151,7 +151,7 @@ export function ArchetypeSelect({
   const player = usePlayerStore((s) => s.player);
 
   useEffect(() => {
-    setLoadError(false);
+    setLoadError(false); // eslint-disable-line react-hooks/set-state-in-effect -- reset before async fetch
     let cancelled = false;
     getArchetypeLoader(playerType)()
       .then((data) => {

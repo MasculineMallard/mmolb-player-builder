@@ -21,7 +21,7 @@ export function usePitchTypes(enabled: boolean): {
 
   useEffect(() => {
     if (!enabled) return;
-    setPitchTypesError(false);
+    setPitchTypesError(false); // eslint-disable-line react-hooks/set-state-in-effect -- reset before async fetch
     let cancelled = false;
     loadPitchTypes()
       .then((data) => {

@@ -12,7 +12,7 @@ function useKeyboardNav(itemCount: number, onSelect: (index: number) => void) {
 
   // Reset when items change
   useEffect(() => {
-    setActiveIndex(-1);
+    setActiveIndex(-1); // eslint-disable-line react-hooks/set-state-in-effect -- reset on list change
   }, [itemCount]);
 
   const handleKeyDown = useCallback(

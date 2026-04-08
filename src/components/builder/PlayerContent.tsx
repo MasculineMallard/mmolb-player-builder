@@ -44,12 +44,12 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
 
   // Reset position override when player changes
   useEffect(() => {
-    setPositionOverride(null);
+    setPositionOverride(null); // eslint-disable-line react-hooks/set-state-in-effect -- reset on player change
   }, [rawPlayer.mmolbPlayerId]);
 
   useEffect(() => {
     if (prevPlayerType.current !== playerType) {
-      setArchetype(null);
+      setArchetype(null); // eslint-disable-line react-hooks/set-state-in-effect -- reset on type switch
       usePlayerStore.getState().setArchetypeId(null);
       prevPlayerType.current = playerType;
     }

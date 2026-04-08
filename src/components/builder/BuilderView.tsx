@@ -43,7 +43,7 @@ export function BuilderView({ playerType }: BuilderViewProps) {
   // Collapse search after player loads
   useEffect(() => {
     if (player && !loading) {
-      setSearchOpen(false);
+      setSearchOpen(false); // eslint-disable-line react-hooks/set-state-in-effect -- derived from async load completion
     }
   }, [player, loading]);
 
