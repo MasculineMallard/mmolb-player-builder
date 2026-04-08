@@ -37,7 +37,7 @@ function WeightedBreakdown({ ev }: { eval?: never; ev: EvaluatedPlayer }) {
   if (hasStats && hasFit) {
     weights = { Attributes: 0.25, Stats: 0.25, Fit: 0.25, Growth: 0.25 };
   } else if (hasStats && !hasFit) {
-    weights = { Attributes: 0.30, Stats: 0.35, Fit: 0, Growth: 0.35 };
+    weights = { Attributes: 0.40, Stats: 0.40, Fit: 0, Growth: 0.20 };
   } else if (!hasStats && hasFit) {
     weights = { Attributes: 0.30, Stats: 0, Fit: 0.35, Growth: 0.35 };
   } else {

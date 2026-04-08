@@ -393,9 +393,9 @@ function computeComposite(
     );
   }
   if (hasStats && !hasFit) {
-    // No fit (pitcher/DH): Attr 30%, Stats 35%, Growth 35%
+    // No fit (pitcher/DH): Attr 40%, Stats 40%, Growth 20%
     return Math.round(
-      attributeScore * 0.30 + statsScore * 0.35 + growthScore * 0.35,
+      attributeScore * 0.40 + statsScore * 0.40 + growthScore * 0.20,
     );
   }
   if (!hasStats && hasFit) {
