@@ -143,24 +143,12 @@ async function getPlayerInternal(id: string): Promise<PlayerData | null> {
     }
     // NoStatsError from transform: propagate (route handler catches for 422)
     if (err instanceof NoStatsError) throw err;
-    // Other errors (timeout, 5xx, network): fall through to DB
-    console.warn(
-      `[player-data] API failed for ${id}, falling back to DB:`,
+    // Other errors (timeout, 5xx, network): no DB fallback (stale data is worse than no data)
+    console.error(
+      `[player-data] API failed for ${id}:`,
       err instanceof Error ? err.message : String(err)
     );
-  }
-
-  // 3. DB fallback
-  try {
-    const player = await getPlayerFull(id);
-    setPlayerCache(id, { kind: "data", data: player, expires: Date.now() + PLAYER_CACHE_TTL });
-    return player;
-  } catch (err) {
-    if (err instanceof NoStatsError) {
-      // Cache the no-stats state so subsequent requests consistently return 422
-      setPlayerCache(id, { kind: "no-stats", expires: Date.now() + PLAYER_CACHE_TTL });
-    }
-    throw err;
+    return null;
   }
 }
 
@@ -198,13 +186,12 @@ async function getTeamRosterInternal(
     if (err instanceof MmolbApiNotFoundError) {
       return [];
     }
-    console.warn(
-      `[player-data] API roster failed for ${teamId}, falling back to DB:`,
+    console.error(
+      `[player-data] API roster failed for ${teamId}:`,
       err instanceof Error ? err.message : String(err)
     );
+    return [];
   }
-
-  return dbGetTeamRoster(teamId);
 }
 
 export async function getTeamRoster(
@@ -237,13 +224,12 @@ export async function getTeamRosterLight(
     if (err instanceof MmolbApiNotFoundError) {
       return [];
     }
-    console.warn(
-      `[player-data] API roster-light failed for ${teamId}, falling back to DB:`,
+    console.error(
+      `[player-data] API roster-light failed for ${teamId}:`,
       err instanceof Error ? err.message : String(err)
     );
+    return [];
   }
-
-  return dbGetTeamRosterLight(teamId);
 }
 
 // ── Search (DB-only, no MMOLB API search endpoint) ──
