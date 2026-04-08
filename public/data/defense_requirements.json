@@ -24,19 +24,19 @@
       "reaction": 4,
       "composure": 3,
       "acrobatics": 3,
-      "agility": 2
+      "awareness": 2
     },
-    "description": "Second basemen need quick reactions, agility for double plays, and acrobatics for diving stops."
+    "description": "Second basemen need quick reactions, acrobatics for diving stops, and awareness for double play turns."
   },
   "3B": {
     "position_name": "Third Base",
     "requirements": {
       "reaction": 4,
-      "composure": 3,
       "arm": 3,
-      "acrobatics": 2
+      "composure": 3,
+      "awareness": 2
     },
-    "description": "Third basemen need elite reactions for hot corner plays and a strong arm for throws across the diamond."
+    "description": "Third basemen need elite reactions for hot corner plays, a strong arm for throws across the diamond, and awareness for DP potential."
   },
   "SS": {
     "position_name": "Shortstop",
@@ -44,9 +44,9 @@
       "reaction": 5,
       "arm": 4,
       "composure": 3,
-      "acrobatics": 2
+      "awareness": 2
     },
-    "description": "Shortstops are the most demanding defensive position, requiring elite reactions and a strong arm."
+    "description": "Shortstops are the most demanding defensive position, requiring elite reactions, a strong arm, and awareness for DPs."
   },
   "LF": {
     "position_name": "Left Field",

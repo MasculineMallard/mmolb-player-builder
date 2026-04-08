@@ -55,7 +55,7 @@ export function DefenseStatBars({ player, role, fitScore }: DefenseStatBarsProps
       {defenseStats.map((stat) => {
         const value = player.stats[stat] ?? 0;
         const weight = entry?.stat_weights[stat] ?? 0.08;
-        const target = Math.round((weight / 0.12) * 200);
+        const target = Math.round((weight / 0.12) * 120);
         const pct = Math.min(100, (value / target) * 100);
 
         return (

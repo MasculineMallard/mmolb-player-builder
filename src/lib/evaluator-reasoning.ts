@@ -127,7 +127,7 @@ function explainFit(
 
   for (const [stat, weight] of Object.entries(entry.stat_weights)) {
     const value = player.stats[stat] ?? 0;
-    const target = Math.round((weight / 0.12) * 200);
+    const target = Math.round((weight / 0.12) * 120);
     const gap = target - value;
     if (gap <= 0) {
       lines.push(`${stat}: ${value} (on target)`);

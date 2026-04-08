@@ -1,66 +1,67 @@
 {
-  "_comment": "Defense stat weights by position. Primary stats get 0.12, secondary get 0.08. Based on positional requirements diagram.",
+  "_comment": "Defense stat weights by position. Weights reflect relative importance for fit scoring. Target formula: (weight / 0.12) * 150. Budget: ~550 total defense (250 initial + 300 bonus levels).",
   "C": {
     "name": "Catcher",
     "emoji": "🥎",
-    "description": "Awareness is king for catchers. Reaction and composure help with passed balls and blocking.",
+    "description": "Awareness is king for catchers. Arm for throwing out stealers. Composure and reaction for blocking.",
     "primary_stats": ["awareness"],
-    "secondary_stats": ["reaction", "composure"],
+    "secondary_stats": ["arm", "composure", "reaction"],
     "stat_weights": {
       "awareness": 0.12,
-      "reaction": 0.08,
-      "composure": 0.08
+      "arm": 0.10,
+      "composure": 0.08,
+      "reaction": 0.08
     }
   },
   "1B": {
     "name": "First Base",
     "emoji": "1️⃣",
-    "description": "Reaction for scooping throws. Composure for handling difficult plays.",
-    "primary_stats": ["reaction", "composure"],
-    "secondary_stats": ["dexterity"],
+    "description": "Reaction for scooping throws. Composure for handling difficult plays. Awareness for DP potential.",
+    "primary_stats": ["reaction"],
+    "secondary_stats": ["composure", "acrobatics"],
     "stat_weights": {
       "reaction": 0.12,
-      "composure": 0.12,
-      "dexterity": 0.08
+      "composure": 0.10,
+      "acrobatics": 0.08
     }
   },
   "2B": {
     "name": "Second Base",
     "emoji": "2️⃣",
-    "description": "Reaction for double play turns. Composure and acrobatics for range.",
-    "primary_stats": ["reaction", "composure", "acrobatics"],
-    "secondary_stats": ["agility"],
+    "description": "Reaction for ground balls. Acrobatics and composure for range. Awareness for double play turns.",
+    "primary_stats": ["reaction", "acrobatics", "composure"],
+    "secondary_stats": ["awareness"],
     "stat_weights": {
       "reaction": 0.12,
       "composure": 0.10,
       "acrobatics": 0.10,
-      "agility": 0.08
+      "awareness": 0.08
     }
   },
   "SS": {
     "name": "Shortstop",
     "emoji": "🔷",
-    "description": "Reaction is critical. Composure and arm for throws across the diamond.",
-    "primary_stats": ["reaction", "composure", "arm"],
-    "secondary_stats": ["acrobatics"],
+    "description": "Reaction is critical. Arm for throws across the diamond. Composure under pressure. Awareness for DPs.",
+    "primary_stats": ["reaction", "arm", "composure"],
+    "secondary_stats": ["awareness"],
     "stat_weights": {
       "reaction": 0.12,
-      "composure": 0.10,
       "arm": 0.10,
-      "acrobatics": 0.08
+      "composure": 0.10,
+      "awareness": 0.08
     }
   },
   "3B": {
     "name": "Third Base",
     "emoji": "3️⃣",
-    "description": "Reaction for hot corner. Composure and arm for long throws.",
-    "primary_stats": ["reaction", "composure", "arm"],
-    "secondary_stats": ["dexterity"],
+    "description": "Reaction for hot corner. Arm for long throws. Composure under pressure. Awareness for DP potential.",
+    "primary_stats": ["reaction", "arm", "composure"],
+    "secondary_stats": ["awareness"],
     "stat_weights": {
       "reaction": 0.12,
-      "composure": 0.10,
       "arm": 0.10,
-      "dexterity": 0.08
+      "composure": 0.10,
+      "awareness": 0.08
     }
   },
   "LF": {

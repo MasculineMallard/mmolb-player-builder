@@ -107,7 +107,7 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
     if (Object.keys(posDefenseWeights).length === 0) return [];
     return Object.entries(posDefenseWeights).map(([statName, weight]) => {
       const current = player.stats[statName] ?? 0;
-      const target = Math.round((weight / 0.12) * 200);
+      const target = Math.round((weight / 0.12) * 120);
       const gap = Math.max(target - current, 0);
       return { statName, current, target, gap, weight, priorityScore: gap * weight, reasoning: "Position defense stat" };
     });
