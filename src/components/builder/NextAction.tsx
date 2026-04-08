@@ -101,8 +101,8 @@ export function NextAction({
 
     for (const [statName, weight] of Object.entries(weights)) {
       const current = playerStats[statName] ?? 0;
-      // Target scales with weight: primary (0.12) → 600, secondary (0.08) → 400
-      const target = Math.round((weight / 0.12) * 600);
+      // Target scales with weight: primary (0.12) → 200, secondary (0.08) → 133
+      const target = Math.round((weight / 0.12) * 200);
       const gap = Math.max(target - current, 0);
       const priorityScore = gap * weight;
 
