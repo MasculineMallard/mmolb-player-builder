@@ -92,22 +92,28 @@ function filterPreRecompRecords(
  * Recomped players have Birthseason = current season AND Birthday > 1 (not there from the start).
  * Their season stats are from a different build and shouldn't be used.
  */
+/**
+ * Check if a player was recently recomposed mid-season.
+ *
+ * A numeric Birthday means the player's current incarnation started on that
+ * day of the season. If it's recent (within 10 days of current day), the
+ * season stats are mostly from the old build and should be suppressed.
+ * If it's older, enough games have been played under the current build
+ * that the stats are usable.
+ *
+ * Birthday = "Preseason" means they've been here since the start: not recomped.
+ */
 function wasRecompedThisSeason(
   raw: MmolbApiPlayer,
-  playerRecords?: MmolbApiPlayerRecord[],
-  currentSeasonId?: string,
+  _playerRecords?: MmolbApiPlayerRecord[],
+  _currentSeasonId?: string,
+  currentDay?: number,
 ): boolean {
-  if (raw.Birthseason == null || raw.Birthday == null) return false;
-  if (!currentSeasonId || !playerRecords?.length) return false;
+  if (typeof raw.Birthday !== "number" || raw.Birthday <= 1) return false;
+  if (currentDay == null) return false;
 
-  // Find the season number for the current SeasonID
-  const currentRecord = playerRecords.find(
-    (r) => r.SeasonID === currentSeasonId && r.SeasonStatus === "Regular Season"
-  );
-  if (!currentRecord) return false;
-
-  // If born this season after day 1, they were recomped mid-season
-  return raw.Birthseason === currentRecord.Season && raw.Birthday > 1;
+  // Only flag as recomped if birthday is within last 10 days
+  return (currentDay - raw.Birthday) < 10;
 }
 
 export function transformPlayer(
@@ -116,6 +122,7 @@ export function transformPlayer(
   teamEmoji: string | null,
   playerRecords?: MmolbApiPlayerRecord[],
   currentSeasonId?: string,
+  currentDay?: number,
 ): PlayerData {
   const stats = buildStatMap(raw);
 
@@ -141,13 +148,11 @@ export function transformPlayer(
   const role = position && ["SP", "RP", "CL", "P"].includes(position.replace(/\d+$/, ""))
     ? "pitcher" as const : "batter" as const;
 
-  // Suppress stats for players recomped mid-season: their season stats
-  // are from a different build and don't reflect the current player.
-  let gameStats: GameStats | null = null;
-  const recompedThisSeason = wasRecompedThisSeason(raw, filteredRecords, currentSeasonId);
-  if (!recompedThisSeason) {
-    gameStats = extractGameStats(raw.Stats, role, filteredRecords, currentSeasonId);
-  }
+  // Check if player was recently recomped (stats may include old build's games)
+  const recompedThisSeason = wasRecompedThisSeason(raw, filteredRecords, currentSeasonId, currentDay);
+  const gameStats = recompedThisSeason
+    ? null
+    : extractGameStats(raw.Stats, role, filteredRecords, currentSeasonId);
 
   return {
     name: `${raw.FirstName} ${raw.LastName}`,

@@ -113,7 +113,7 @@ async function fetchPlayerFromApi(id: string): Promise<PlayerData | null> {
     raw.TeamID
   );
 
-  const player = transformPlayer(raw, teamName, teamEmoji, recordData?.records, state?.SeasonID);
+  const player = transformPlayer(raw, teamName, teamEmoji, recordData?.records, state?.SeasonID, state?.Day);
 
   if (Object.keys(player.stats).length === 0) {
     throw new NoStatsError(id);
@@ -164,7 +164,13 @@ async function getPlayerInternal(id: string): Promise<PlayerData | null> {
   }
 }
 
-export async function getPlayer(id: string): Promise<PlayerData | null> {
+export async function getPlayer(id: string, fresh = false): Promise<PlayerData | null> {
+  if (fresh) {
+    // Bypass cache and inflight dedup for forced refresh
+    playerCache.delete(id);
+    playerInflight.delete(id);
+  }
+
   // Inflight dedup
   const existing = playerInflight.get(id);
   if (existing) return existing;

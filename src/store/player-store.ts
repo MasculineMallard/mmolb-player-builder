@@ -48,6 +48,7 @@ interface PlayerStore {
 
   // Async actions
   importPlayer: (mmolbPlayerId: string) => Promise<void>;
+  refreshPlayer: () => Promise<void>;
   importComparePlayer: (mmolbPlayerId: string) => Promise<void>;
 }
 
@@ -76,9 +77,13 @@ function addToRecent(
 
 async function fetchPlayer(
   mmolbPlayerId: string,
-  signal: AbortSignal
+  signal: AbortSignal,
+  fresh = false,
 ): Promise<PlayerData> {
-  const res = await fetch(`/api/players/${mmolbPlayerId}`, {
+  const url = fresh
+    ? `/api/players/${mmolbPlayerId}?fresh=1`
+    : `/api/players/${mmolbPlayerId}`;
+  const res = await fetch(url, {
     signal: AbortSignal.any([signal, AbortSignal.timeout(18000)]),
   });
   if (!res.ok) {
@@ -146,6 +151,23 @@ export const usePlayerStore = create<PlayerStore>()(
             error: e instanceof Error ? e.message : "Failed to load player",
             loading: false,
           });
+        }
+      },
+
+      refreshPlayer: async () => {
+        const current = get().player;
+        if (!current) return;
+        importAbort?.abort();
+        const controller = new AbortController();
+        importAbort = controller;
+        set({ loading: true, error: null });
+        try {
+          const player = await fetchPlayer(current.mmolbPlayerId, controller.signal, true);
+          if (controller.signal.aborted) { set({ loading: false }); return; }
+          set({ player, loading: false, error: null });
+        } catch (e) {
+          if (isAbortError(e)) { set({ loading: false }); return; }
+          set({ error: e instanceof Error ? e.message : "Failed to refresh", loading: false });
         }
       },
 

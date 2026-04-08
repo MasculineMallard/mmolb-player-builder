@@ -6,7 +6,7 @@
  */
 
 const MMOLB_API_BASE = "https://mmolb.com/api";
-const API_TIMEOUT_MS = 3_000;
+const API_TIMEOUT_MS = 10_000;
 
 // ── Error types ──
 

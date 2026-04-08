@@ -4,7 +4,7 @@ import { NoStatsError } from "@/lib/errors";
 import { validateId } from "@/lib/validation";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -12,8 +12,10 @@ export async function GET(
   const invalid = validateId(id);
   if (invalid) return invalid;
 
+  const fresh = request.nextUrl.searchParams.get("fresh") === "1";
+
   try {
-    const player = await getPlayer(id);
+    const player = await getPlayer(id, fresh);
     if (!player) {
       return NextResponse.json({ error: "Player not found" }, { status: 404 });
     }

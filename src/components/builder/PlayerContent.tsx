@@ -184,14 +184,23 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
             <span className="text-sm text-muted-foreground">
               {player.teamEmoji} {player.teamName} {player.position && `| ${player.position}`}
             </span>
-            {onChangePlayer && !searchOpen && (
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
-                onClick={onChangePlayer}
-                className="text-sm bg-muted text-muted-foreground hover:text-foreground px-3 py-1 rounded-md border border-border hover:bg-muted/80 transition-colors shrink-0"
+                onClick={() => usePlayerStore.getState().refreshPlayer()}
+                className="text-sm bg-muted text-muted-foreground hover:text-foreground px-3 py-1 rounded-md border border-border hover:bg-muted/80 transition-colors"
+                title="Refresh player data from MMOLB"
               >
-                Change Player
+                Refresh
               </button>
-            )}
+              {onChangePlayer && !searchOpen && (
+                <button
+                  onClick={onChangePlayer}
+                  className="text-sm bg-muted text-muted-foreground hover:text-foreground px-3 py-1 rounded-md border border-border hover:bg-muted/80 transition-colors"
+                >
+                  Change Player
+                </button>
+              )}
+            </div>
           </div>
         )}
 
