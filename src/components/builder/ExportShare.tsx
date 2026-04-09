@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { usePlayerStore } from "@/store/player-store";
 import { toPng } from "html-to-image";
 import type { Archetype, PlayerData } from "@/lib/types";
-import { PITCHER_POSITIONS } from "@/lib/constants";
+import { PITCHER_POSITIONS, BASE_PATH } from "@/lib/constants";
 
 const POSITION_DEFENSE: Record<string, string[]> = {
   C: ["awareness", "reaction", "composure"],
@@ -70,7 +70,7 @@ export function ExportShare({ player, archetype }: ExportShareProps) {
   };
 
   const buildShareUrl = () => {
-    const base = window.location.origin + pathname;
+    const base = window.location.origin + BASE_PATH + pathname;
     const params = new URLSearchParams();
     params.set("player", player.mmolbPlayerId);
     if (archetypeId) params.set("archetype", archetypeId);
