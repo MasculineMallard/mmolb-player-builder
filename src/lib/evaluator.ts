@@ -418,8 +418,10 @@ function getRecommendation(
   flags: EvalFlag[],
 ): Recommendation {
   if (flags.includes("MAXED_BOTTOM_QUARTILE")) return "MULCH";
-  if (composite >= 60) return "KEEP";
-  if (composite >= 38) return "HOLD";
+  if (composite >= 65) return "STAR";
+  if (composite >= 55) return "STRONG";
+  if (composite >= 42) return "ROSTER";
+  if (composite >= 35) return "FRINGE";
   return "MULCH";
 }
 

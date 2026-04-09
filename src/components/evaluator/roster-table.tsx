@@ -200,7 +200,7 @@ export function RosterTable({ players, onPositionChange, percentileTables }: {
   }, [players, verdictFilter, roleFilter, sortKey, sortDir]);
 
   const counts = useMemo(() => {
-    const c = { KEEP: 0, HOLD: 0, MULCH: 0 };
+    const c = { STAR: 0, STRONG: 0, ROSTER: 0, FRINGE: 0, MULCH: 0 };
     for (const p of players) c[p.recommendation]++;
     return c;
   }, [players]);
@@ -244,26 +244,36 @@ export function RosterTable({ players, onPositionChange, percentileTables }: {
   return (
     <div>
       {/* Summary strip */}
-      <div className="flex items-center gap-4 mb-3">
+      <div className="flex items-center gap-4 mb-3 flex-wrap">
         <div className="flex items-center gap-1.5">
-          <span style={{ color: "#3FB950" }}>●</span>
-          <span className="text-sm">KEEP: {counts.KEEP}</span>
+          <span style={{ color: "#3B82F6" }}>●</span>
+          <span className="text-sm">Star: {counts.STAR}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span style={{ color: "#FFD700" }}>●</span>
-          <span className="text-sm">HOLD: {counts.HOLD}</span>
+          <span style={{ color: "#60A5FA" }}>●</span>
+          <span className="text-sm">Strong: {counts.STRONG}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span style={{ color: "#8B949E" }}>●</span>
+          <span className="text-sm">Roster: {counts.ROSTER}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span style={{ color: "#EAB308" }}>●</span>
+          <span className="text-sm">Fringe: {counts.FRINGE}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span style={{ color: "#F85149" }}>●</span>
-          <span className="text-sm">MULCH: {counts.MULCH}</span>
+          <span className="text-sm">Mulch: {counts.MULCH}</span>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
         {filterPill("All", "ALL")}
-        {filterPill(`Keep (${counts.KEEP})`, "KEEP", "#3FB950")}
-        {filterPill(`Hold (${counts.HOLD})`, "HOLD", "#FFD700")}
+        {filterPill(`Star (${counts.STAR})`, "STAR", "#3B82F6")}
+        {filterPill(`Strong (${counts.STRONG})`, "STRONG", "#60A5FA")}
+        {filterPill(`Roster (${counts.ROSTER})`, "ROSTER", "#8B949E")}
+        {filterPill(`Fringe (${counts.FRINGE})`, "FRINGE", "#EAB308")}
         {filterPill(`Mulch (${counts.MULCH})`, "MULCH", "#F85149")}
 
         <span className="w-px h-5 bg-border mx-1" />

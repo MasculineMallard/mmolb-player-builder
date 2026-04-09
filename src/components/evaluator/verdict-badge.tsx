@@ -1,8 +1,10 @@
 import type { Recommendation } from "@/lib/evaluator-types";
 
 const VERDICT_STYLES: Record<Recommendation, { bg: string; text: string }> = {
-  KEEP: { bg: "rgba(63, 185, 80, 0.15)", text: "#3FB950" },
-  HOLD: { bg: "rgba(255, 215, 0, 0.15)", text: "#FFD700" },
+  STAR: { bg: "rgba(59, 130, 246, 0.20)", text: "#3B82F6" },
+  STRONG: { bg: "rgba(96, 165, 250, 0.15)", text: "#60A5FA" },
+  ROSTER: { bg: "rgba(139, 148, 158, 0.15)", text: "#8B949E" },
+  FRINGE: { bg: "rgba(234, 179, 8, 0.15)", text: "#EAB308" },
   MULCH: { bg: "rgba(248, 81, 73, 0.15)", text: "#F85149" },
 };
 
@@ -19,8 +21,12 @@ export function VerdictBadge({
       ? "px-4 py-1.5 text-base font-bold rounded-md"
       : "px-2 py-0.5 text-sm font-semibold rounded";
 
+  const glow = verdict === "STAR"
+    ? "0 0 8px rgba(59, 130, 246, 0.5), 0 0 16px rgba(59, 130, 246, 0.2)"
+    : undefined;
+
   return (
-    <span className={cls} style={{ background: style.bg, color: style.text }}>
+    <span className={cls} style={{ background: style.bg, color: style.text, boxShadow: glow }}>
       {verdict}
     </span>
   );
