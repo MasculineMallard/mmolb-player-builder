@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   basePath: "/pop",
+  images: {
+    unoptimized: true,
+  },
   async headers() {
     return [
       {
