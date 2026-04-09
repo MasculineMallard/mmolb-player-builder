@@ -207,17 +207,21 @@ export function computePositionFitScore(
   const entry = positionDefense[basePos] ?? positionDefense[pos];
   if (!entry || !entry.stat_weights || Object.keys(entry.stat_weights).length === 0) return 100;
 
-  let weightedScore = 0;
-  let totalWeight = 0;
+  const DEFENSE_BUDGET = 300;
+  const weights = entry.stat_weights;
+  const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+  if (totalWeight === 0) return 100;
 
-  for (const [stat, weight] of Object.entries(entry.stat_weights)) {
+  let weightedScore = 0;
+
+  for (const [stat, weight] of Object.entries(weights)) {
     const value = player.stats[stat.toLowerCase()] ?? 0;
-    const statScore = Math.min(1, value / 200);
+    // Target per stat = share of 300 budget proportional to weight, capped at 200
+    const target = Math.min(200, Math.round((weight / totalWeight) * DEFENSE_BUDGET));
+    const statScore = Math.min(1, value / target);
     weightedScore += statScore * weight;
-    totalWeight += weight;
   }
 
-  if (totalWeight === 0) return 100;
   return Math.round((weightedScore / totalWeight) * 100);
 }
 
