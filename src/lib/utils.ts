@@ -6,8 +6,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-/** Display cap for stat bars in the builder UI. */
+/** Display cap for offense/pitching stat bars in the builder UI. */
 export const STAT_DISPLAY_MAX = 500;
+
+/** Display cap for defense stat bars in the builder UI. */
+export const DEFENSE_DISPLAY_MAX = 300;
 
 /** Color thresholds for stat values. Yellow→Blue gradient. */
 export function getStatColor(value: number): string {
