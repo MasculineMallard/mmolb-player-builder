@@ -2,7 +2,7 @@ import type { Recommendation } from "@/lib/evaluator-types";
 
 const VERDICT_STYLES: Record<Recommendation, { bg: string; text: string }> = {
   STAR: { bg: "rgba(59, 130, 246, 0.20)", text: "#3B82F6" },
-  STRONG: { bg: "rgba(96, 165, 250, 0.15)", text: "#60A5FA" },
+  STRONG: { bg: "rgba(96, 165, 250, 0.15)", text: "#93C5FD" },
   ROSTER: { bg: "rgba(139, 148, 158, 0.15)", text: "#8B949E" },
   FRINGE: { bg: "rgba(234, 179, 8, 0.15)", text: "#EAB308" },
   MULCH: { bg: "rgba(248, 81, 73, 0.15)", text: "#F85149" },

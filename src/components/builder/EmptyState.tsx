@@ -21,7 +21,7 @@ export function EmptyState({ playerType }: EmptyStateProps) {
           {playerType === "pitcher" ? "Pitcher" : "Batter"} Builder
         </h2>
         <p className="text-muted-foreground mb-6">
-          Plan your Season 11 level-up path. Import a player to see stat
+          Plan your level-up path. Import a player to see stat
           recommendations, boon timelines, and archetype optimization.
         </p>
 

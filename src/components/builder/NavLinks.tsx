@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { CURRENT_SEASON } from "@/lib/constants";
 
 const NAV_ITEMS = [
   { href: "/pitcher", label: "Pitcher Planner" },
@@ -121,7 +122,7 @@ export function NavLinks() {
             ))}
           </nav>
           <div className="px-4 pb-3 pt-1 border-t border-border">
-            <span className="text-sm text-muted-foreground">Season 11</span>
+            <span className="text-sm text-muted-foreground">{CURRENT_SEASON}</span>
           </div>
         </div>
       )}
