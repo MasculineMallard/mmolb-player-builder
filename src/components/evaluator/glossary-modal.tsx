@@ -49,12 +49,24 @@ export function GlossaryButton() {
               {/* Composite score */}
               <section>
                 <h3 className="text-foreground font-semibold mb-1">Composite Score (0-100)</h3>
-                <p>Each player gets a composite score from four pillars, weighted by what data is available:</p>
-                <div className="mt-1 space-y-0.5 ml-2">
-                  <div><span className="text-foreground">Attributes</span> : Quality ratio of stat allocation (T1 weighted 1.0, T2 weighted 0.5, T3 ignored), scored against league percentiles from a 20% sample of all players.</div>
-                  <div><span className="text-foreground">Game Stats</span> : OBP, SLG, K%, BB%, SB% for batters. ERA, WHIP, K/9, BB/9, HR/9 for pitchers. Scored against live league percentiles.</div>
-                  <div><span className="text-foreground">Position Fit</span> : How well defense stats match the position. Budget: 300 total across the position&apos;s key stats.</div>
-                  <div><span className="text-foreground">Growth</span> : Remaining levels and boon slots. Higher for younger players.</div>
+                <p>Four pillars, each scored 0-100, combined by weight:</p>
+                <div className="mt-2 space-y-2 ml-2">
+                  <div>
+                    <span className="text-foreground font-medium">Attributes</span>
+                    <p className="mt-0.5">What fraction of your stat points are in good stats? T1 stats count full, T2 count half, T3 count zero. This gives a ratio (typically 0.47 to 0.75 across the league). Your ratio is scored against a percentile table built from a 20% sample of all players. Because the ratio already normalizes for level (it&apos;s a proportion, not a total), a well-built level 5 and a well-built level 30 score the same.</p>
+                  </div>
+                  <div>
+                    <span className="text-foreground font-medium">Game Stats</span>
+                    <p className="mt-0.5">OBP, SLG, K%, BB%, SB% for batters. ERA, WHIP, K/9, BB/9, HR/9 for pitchers. Each stat scored against live league percentiles (updated daily from every team via the MMOLB API), then combined by weight.</p>
+                  </div>
+                  <div>
+                    <span className="text-foreground font-medium">Position Fit</span>
+                    <p className="mt-0.5">How well your defense stats match the position. Each position has 1-3 key defense stats with fixed targets (primary: 140, secondary: 80, catcher: 200 awareness only). Total budget: 300.</p>
+                  </div>
+                  <div>
+                    <span className="text-foreground font-medium">Growth</span>
+                    <p className="mt-0.5">Remaining stat points and boon slots. A level 1 player has ~100 growth; level 30 has 0. This ensures young players with good foundations aren&apos;t penalized for low totals.</p>
+                  </div>
                 </div>
               </section>
 
@@ -82,8 +94,8 @@ export function GlossaryButton() {
 
               {/* Stat tiers */}
               <section>
-                <h3 className="text-foreground font-semibold mb-1">Attribute Tiers (S10 Regression)</h3>
-                <p className="mb-1">From Bagyilisk&apos;s S10 regression analysis. Which stats actually move outcomes.</p>
+                <h3 className="text-foreground font-semibold mb-1">Attribute Tiers</h3>
+                <p className="mb-1">Based on Bagyilisk&apos;s regression analysis with S11 adjustments. Which stats actually move outcomes.</p>
                 <div className="space-y-1">
                   <div><span className="text-foreground">Batting T1:</span> Contact, Muscle, Intimidation, Aiming, Performance</div>
                   <div><span className="text-foreground">Batting T2:</span> Discipline, Lift, Vision, Determination, Insight, Speed, Cunning</div>
