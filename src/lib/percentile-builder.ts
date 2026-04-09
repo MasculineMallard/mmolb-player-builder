@@ -20,8 +20,9 @@ const CACHE_FILE = join(CACHE_DIR, "percentiles.json");
 interface PercentileCache {
   batting: Record<string, PercentileEntry[]>;
   pitching: Record<string, PercentileEntry[]>;
+  attributes: Record<string, PercentileEntry[]>;
   computedAt: string;
-  playerCount: { batters: number; pitchers: number };
+  playerCount: { batters: number; pitchers: number; attrSampled: number };
 }
 
 let cached: PercentileCache | null = null;
@@ -80,17 +81,30 @@ function validate(tables: PercentileCache): boolean {
   for (const key of REQUIRED_PITCHING_KEYS) {
     if (!Array.isArray(tables.pitching[key]) || tables.pitching[key].length < 10) return false;
   }
+  // Attribute tables are optional (sample may fail) but warn if missing
+  if (!tables.attributes.BATTER_ATTR?.length || !tables.attributes.PITCHER_ATTR?.length) {
+    console.warn("[percentiles] Attribute percentile tables missing or empty");
+  }
   return true;
 }
 
 // ── MMOLB API types (minimal, just what we need) ──
 
 interface ApiTeamPlayer {
+  PlayerID: string;
   FirstName: string;
   LastName: string;
   Position: string;
   PositionType: string;
   Stats: Record<string, number>;
+}
+
+interface ApiFullPlayer {
+  BaseAttributeBonuses: { attribute: string; amount: number }[];
+  AppliedLevelUps: { choice?: { type?: string; attribute?: string; amount?: number } }[];
+  AugmentHistory: { attribute: string; amount: number }[];
+  Position: string;
+  PositionType: string;
 }
 
 interface ApiTeam {
@@ -216,7 +230,91 @@ async function runRefresh(): Promise<void> {
 
     console.log(`[percentiles] Computing: ${batterLines.length} batters, ${pitcherLines.length} pitchers`);
 
-    // 4. Build percentile tables
+    // 4. Sample 20% of players per team for attribute quality percentiles
+    const samplePlayerIds: { id: string; isPitcher: boolean }[] = [];
+    // Re-fetch teams to get player IDs (we only stored stats above)
+    // Actually, we need to collect IDs during step 2. Let's use the IDs we saved.
+    // We'll do a second pass sampling from allPlayers which has PlayerID.
+    for (let i = 0; i < allPlayers.length; i += 5) {
+      // Every 5th player ≈ 20%
+      const p = allPlayers[i];
+      if (p.PlayerID) {
+        const isPitcher = PITCHER_POSITIONS.has(p.Position?.replace(/\d+$/, "") ?? "");
+        samplePlayerIds.push({ id: p.PlayerID, isPitcher });
+      }
+    }
+    console.log(`[percentiles] Sampling ${samplePlayerIds.length} players for attribute percentiles...`);
+
+    const BATTER_T1 = new Set(["contact", "muscle", "intimidation", "aiming", "performance"]);
+    const BATTER_T2 = new Set(["discipline", "lift", "vision", "determination", "insight", "speed", "cunning"]);
+    const BATTER_ALL = ["contact", "muscle", "intimidation", "aiming", "performance", "discipline", "lift", "vision", "determination", "insight", "speed", "cunning", "selflessness", "wisdom"];
+    const PITCHER_T1 = new Set(["velocity", "control", "rotation", "stuff", "presence"]);
+    const PITCHER_T2 = new Set(["deception", "guts", "persuasion", "stamina", "accuracy"]);
+    const PITCHER_ALL = ["velocity", "control", "rotation", "stuff", "presence", "deception", "guts", "persuasion", "stamina", "accuracy", "intuition", "defiance"];
+
+    function computeAttrQuality(attrs: Record<string, number>, isPitcher: boolean): number {
+      const t1 = isPitcher ? PITCHER_T1 : BATTER_T1;
+      const t2 = isPitcher ? PITCHER_T2 : BATTER_T2;
+      const all = isPitcher ? PITCHER_ALL : BATTER_ALL;
+      let weighted = 0;
+      let total = 0;
+      for (const stat of all) {
+        const val = attrs[stat] ?? 0;
+        total += val;
+        if (t1.has(stat)) weighted += val * 1.0;
+        else if (t2.has(stat)) weighted += val * 0.5;
+      }
+      return total > 0 ? weighted / total : 0;
+    }
+
+    function buildStats(player: ApiFullPlayer): Record<string, number> {
+      const sums: Record<string, number> = {};
+      for (const b of player.BaseAttributeBonuses ?? []) {
+        const key = b.attribute.toLowerCase();
+        sums[key] = (sums[key] ?? 0) + b.amount;
+      }
+      for (const lu of player.AppliedLevelUps ?? []) {
+        const c = lu.choice;
+        if (c?.type === "attribute" && c.attribute && c.amount) {
+          const key = c.attribute.toLowerCase();
+          sums[key] = (sums[key] ?? 0) + c.amount;
+        }
+      }
+      for (const a of player.AugmentHistory ?? []) {
+        const key = a.attribute.toLowerCase();
+        sums[key] = (sums[key] ?? 0) + a.amount;
+      }
+      const stats: Record<string, number> = {};
+      for (const [k, v] of Object.entries(sums)) {
+        stats[k] = Math.min(Math.round(v * 100), 1000);
+      }
+      return stats;
+    }
+
+    const batterAttrQualities: number[] = [];
+    const pitcherAttrQualities: number[] = [];
+
+    const ATTR_BATCH = 20;
+    for (let i = 0; i < samplePlayerIds.length; i += ATTR_BATCH) {
+      const batch = samplePlayerIds.slice(i, i + ATTR_BATCH);
+      const results = await Promise.allSettled(
+        batch.map(({ id }) => fetchJson<ApiFullPlayer>(`https://mmolb.com/api/player/${id}`))
+      );
+      for (let j = 0; j < results.length; j++) {
+        const r = results[j];
+        if (r.status !== "fulfilled") continue;
+        const attrs = buildStats(r.value);
+        const isPitcher = batch[j].isPitcher;
+        const quality = computeAttrQuality(attrs, isPitcher);
+        if (quality > 0) {
+          if (isPitcher) pitcherAttrQualities.push(quality);
+          else batterAttrQualities.push(quality);
+        }
+      }
+    }
+    console.log(`[percentiles] Attribute sample: ${batterAttrQualities.length} batters, ${pitcherAttrQualities.length} pitchers`);
+
+    // 5. Build percentile tables
     const battingTables: Record<string, PercentileEntry[]> = {
       AVG: buildPercentileTable(batterLines.map(b => b.avg), true),
       OBP: buildPercentileTable(batterLines.map(b => b.obp), true),
@@ -238,11 +336,17 @@ async function runRefresh(): Promise<void> {
       HR9: buildPercentileTable(pitcherLines.map(p => p.hr9), false),
     };
 
+    const attributeTables: Record<string, PercentileEntry[]> = {
+      BATTER_ATTR: buildPercentileTable(batterAttrQualities, true),
+      PITCHER_ATTR: buildPercentileTable(pitcherAttrQualities, true),
+    };
+
     const result: PercentileCache = {
       batting: battingTables,
       pitching: pitchingTables,
+      attributes: attributeTables,
       computedAt: new Date().toISOString(),
-      playerCount: { batters: batterLines.length, pitchers: pitcherLines.length },
+      playerCount: { batters: batterLines.length, pitchers: pitcherLines.length, attrSampled: batterAttrQualities.length + pitcherAttrQualities.length },
     };
 
     if (validate(result)) {
@@ -276,8 +380,9 @@ export function triggerRefresh(): { status: number; message: string } {
 export function getCachedPercentiles(): {
   batting: Record<string, PercentileEntry[]>;
   pitching: Record<string, PercentileEntry[]>;
+  attributes: Record<string, PercentileEntry[]>;
   computedAt: string;
-  playerCount: { batters: number; pitchers: number };
+  playerCount: { batters: number; pitchers: number; attrSampled: number };
   source: "live";
 } | { source: "none"; lastError: string | null } {
   if (cached) {
@@ -285,3 +390,19 @@ export function getCachedPercentiles(): {
   }
   return { source: "none", lastError };
 }
+
+// ── Auto-refresh: on startup if stale, then every 24h ──
+
+const REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
+const _cacheAge = cached ? Date.now() - new Date(cached.computedAt).getTime() : Infinity;
+if (_cacheAge > REFRESH_INTERVAL_MS) {
+  console.log("[percentiles] Cache stale or missing, auto-refreshing on startup...");
+  setTimeout(() => { if (!isRefreshing) { isRefreshing = true; void runRefresh(); } }, 5000);
+}
+setInterval(() => {
+  if (!isRefreshing) {
+    console.log("[percentiles] Daily auto-refresh triggered");
+    isRefreshing = true;
+    void runRefresh();
+  }
+}, REFRESH_INTERVAL_MS);
