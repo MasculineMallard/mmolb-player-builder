@@ -76,7 +76,9 @@ function battingQuery(season: number): string {
     COUNT(*) FILTER (WHERE et.name = 'HomeRun') as hrs,
     COUNT(*) FILTER (WHERE et.name = 'Walk') as bb,
     COUNT(*) FILTER (WHERE et.is_strikeout) as so,
-    COUNT(*) FILTER (WHERE et.name = 'HitByPitch') as hbp
+    COUNT(*) FILTER (WHERE et.name = 'HitByPitch') as hbp,
+    COUNT(*) FILTER (WHERE et.name = 'StolenBase') as sb,
+    COUNT(*) FILTER (WHERE et.name = 'CaughtStealing') as cs
   FROM data.events_extended ee
   JOIN taxa.event_type et ON ee.event_type = et.id
   WHERE ee.season = ${season}
@@ -174,6 +176,8 @@ async function runRefresh(): Promise<void> {
       const h = +r.singles + +r.doubles + +r.triples + +r.hrs;
       const ab = pa - +r.bb - +r.hbp;
       const tb = +r.singles + 2 * +r.doubles + 3 * +r.triples + 4 * +r.hrs;
+      const sb = +r.sb;
+      const cs = +r.cs;
       return {
         avg: ab > 0 ? h / ab : 0,
         obp: pa > 0 ? (h + +r.bb + +r.hbp) / pa : 0,
@@ -181,6 +185,7 @@ async function runRefresh(): Promise<void> {
         ops: (pa > 0 ? (h + +r.bb + +r.hbp) / pa : 0) + (ab > 0 ? tb / ab : 0),
         kPct: pa > 0 ? +r.so / pa * 100 : 0,
         bbPct: pa > 0 ? +r.bb / pa * 100 : 0,
+        sbPct: (sb + cs) >= 5 ? sb / (sb + cs) : undefined,
       };
     });
 
@@ -204,6 +209,10 @@ async function runRefresh(): Promise<void> {
       OPS: buildPercentileTable(batterLines.map(b => b.ops), true),
       K_PCT: buildPercentileTable(batterLines.map(b => b.kPct), false),
       BB_PCT: buildPercentileTable(batterLines.map(b => b.bbPct), true),
+      SB_PCT: buildPercentileTable(
+        batterLines.map(b => b.sbPct).filter((v): v is number => v !== undefined),
+        true,
+      ),
     };
 
     const pitchingTables: Record<string, PercentileEntry[]> = {
