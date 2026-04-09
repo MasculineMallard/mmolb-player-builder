@@ -57,9 +57,6 @@ export function NextAction({
   // Radar shows archetype priority + secondary stats (not defense)
   const archetypeStats = statRecommendations.filter((r) => !DEFENSE_STATS.has(r.statName));
 
-  // Radar shows archetype priority + secondary stats (not defense)
-  const archetypeStats = statRecommendations.filter((r) => !DEFENSE_STATS.has(r.statName));
-
   return (
     <div className="bg-card border border-border rounded-lg px-3 py-2">
       <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-2">
