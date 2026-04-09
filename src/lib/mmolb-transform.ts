@@ -9,7 +9,7 @@
  *   Intimidation=350, Cunning=299, Acrobatics=252, Contact=50 (augment).
  */
 
-import { POSITION_ORDER } from "./constants";
+import { POSITION_ORDER, CURRENT_SEASON_NUMBER } from "./constants";
 import type { PlayerData, PitchData, RosterPlayer } from "./types";
 import type { GameStats } from "./evaluator-types";
 import type {
@@ -93,12 +93,14 @@ function filterPreRecompRecords(
  * Their season stats are from a different build and shouldn't be used.
  */
 /**
- * Check if a player was recomposed mid-season.
+ * Check if a player was recomposed mid-season in the CURRENT season.
  *
- * A numeric Birthday > 1 means the player's current incarnation started
- * mid-season. The Stats field accumulates from the old incarnation (same
- * name recomp), so season stats are tainted for the rest of the season.
- * Always suppress stats for mid-season recomps.
+ * A numeric Birthday > 1 AND Birthseason matching the current season means
+ * this incarnation started mid-season. The Stats field accumulates from
+ * the old incarnation (same name recomp), so season stats are tainted.
+ *
+ * Players recomped in prior seasons have played full seasons since and
+ * their stats are valid.
  *
  * Birthday = "Preseason" means they've been here since the start: not recomped.
  */
@@ -108,7 +110,8 @@ function wasRecompedThisSeason(
   _currentSeasonId?: string,
   _currentDay?: number,
 ): boolean {
-  return typeof raw.Birthday === "number" && raw.Birthday > 1;
+  return typeof raw.Birthday === "number" && raw.Birthday > 1
+    && raw.Birthseason === CURRENT_SEASON_NUMBER;
 }
 
 export function transformPlayer(
