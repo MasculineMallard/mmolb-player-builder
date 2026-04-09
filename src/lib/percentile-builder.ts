@@ -154,7 +154,6 @@ async function runRefresh(): Promise<void> {
       for (const r of results) {
         if (r.status === "fulfilled") {
           allPlayers.push(...r.value.Players);
-          // Include bench players too
           if (r.value.Bench) {
             for (const group of Object.values(r.value.Bench)) {
               if (Array.isArray(group)) allPlayers.push(...group);
