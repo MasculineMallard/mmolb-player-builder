@@ -51,7 +51,7 @@ export function GlossaryButton() {
                 <h3 className="text-foreground font-semibold mb-1">Composite Score (0-100)</h3>
                 <p>Each player gets a composite score from four pillars, weighted by what data is available:</p>
                 <div className="mt-1 space-y-0.5 ml-2">
-                  <div><span className="text-foreground">Attributes</span> : How well stat points are allocated to high-impact stats (T1 weighted 1.0, T2 weighted 0.5, T3 ignored).</div>
+                  <div><span className="text-foreground">Attributes</span> : Quality ratio of stat allocation (T1 weighted 1.0, T2 weighted 0.5, T3 ignored), scored against league percentiles from a 20% sample of all players.</div>
                   <div><span className="text-foreground">Game Stats</span> : OBP, SLG, K%, BB%, SB% for batters. ERA, WHIP, K/9, BB/9, HR/9 for pitchers. Scored against live league percentiles.</div>
                   <div><span className="text-foreground">Position Fit</span> : How well defense stats match the position. Budget: 300 total across the position&apos;s key stats.</div>
                   <div><span className="text-foreground">Growth</span> : Remaining levels and boon slots. Higher for younger players.</div>
