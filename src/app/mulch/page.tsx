@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import type { TeamSearchResult, RosterPlayer, PlayerData, Archetype } from "@/lib/types";
 import type { EvaluatedPlayer } from "@/lib/evaluator-types";
+import { GlossaryButton } from "@/components/evaluator/glossary-modal";
 import { evaluatePlayer, findBestFitPosition } from "@/lib/evaluator";
 import {
   loadBatterArchetypes,
@@ -160,26 +161,43 @@ export default function EvaluatePage() {
   }, []);
 
   // Export report
-  const copyReport = useCallback(() => {
+  const [copied, setCopied] = useState(false);
+  const copyReport = useCallback(async () => {
     if (!selectedTeam || evaluated.length === 0) return;
     const groups: Record<string, EvaluatedPlayer[]> = { MULCH: [], FRINGE: [], ROSTER: [], STRONG: [], STAR: [] };
-    for (const ev of evaluated) groups[ev.recommendation].push(ev);
+    for (const ev of evaluated) groups[ev.recommendation]?.push(ev);
 
     let report = `## ${selectedTeam.emoji ?? ""} ${selectedTeam.name} - Roster Evaluation\n\n`;
     for (const verdict of ["STAR", "STRONG", "ROSTER", "FRINGE", "MULCH"] as const) {
       const list = groups[verdict];
-      if (list.length === 0) continue;
+      if (!list || list.length === 0) continue;
       report += `### ${verdict} (${list.length})\n`;
       for (const ev of list) {
         const p = ev.player;
         report += `- **${p.name}** (${p.position}, Lv ${p.level})`;
-        report += ` — Attr: ${ev.attributeScore}, Fit: ${ev.positionFitScore}, Stats: ${ev.statsScore ?? "N/A"}, Growth: ${ev.growthScore}`;
+        report += ` - Attr: ${ev.attributeScore}, Fit: ${ev.positionFitScore ?? "N/A"}, Stats: ${ev.statsScore ?? "N/A"}, Growth: ${ev.growthScore}`;
         report += `. ${ev.reasoning.attributes.lines[0] ?? ""}\n`;
       }
       report += "\n";
     }
 
-    navigator.clipboard.writeText(report);
+    try {
+      await navigator.clipboard.writeText(report);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback for non-HTTPS or permissions
+      const textarea = document.createElement("textarea");
+      textarea.value = report;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   }, [selectedTeam, evaluated]);
 
   return (
@@ -205,14 +223,6 @@ export default function EvaluatePage() {
             placeholder="Search teams..."
             className="flex-1 bg-muted border border-border rounded-md px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
           />
-          {loadState === "ready" && (
-            <button
-              onClick={copyReport}
-              className="text-xs bg-muted text-muted-foreground hover:text-foreground px-3 py-1 rounded-md border border-border"
-            >
-              Copy Report
-            </button>
-          )}
         </div>
 
         {/* Search results dropdown */}
@@ -271,6 +281,15 @@ export default function EvaluatePage() {
             <span className="text-xs text-muted-foreground">
               {evaluated.length} players evaluated
             </span>
+            <div className="ml-auto flex items-center gap-2">
+              <GlossaryButton />
+              <button
+                onClick={copyReport}
+                className="text-xs bg-muted text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-md border border-border transition-colors"
+              >
+                {copied ? "Copied!" : "Copy Report"}
+              </button>
+            </div>
           </div>
           {evaluated.some(ev => ev.player.recomped) && (
             <div className="text-xs text-yellow-500 bg-yellow-500/10 border border-yellow-500/20 rounded-md px-3 py-1.5 mb-3">
