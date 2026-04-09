@@ -20,7 +20,7 @@ export function RecentPlayers() {
       <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
         Recent Players
       </h4>
-      <div className="space-y-0.5 max-h-48 overflow-y-auto">
+      <div className="space-y-0.5 max-h-[60vh] overflow-y-auto">
         {recentPlayers.map((p) => {
           const isCurrent = p.mmolbPlayerId === player?.mmolbPlayerId;
           return (

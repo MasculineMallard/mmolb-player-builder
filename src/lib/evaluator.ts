@@ -399,9 +399,9 @@ function computeComposite(
     );
   }
   if (!hasStats && hasFit) {
-    // No game stats: Attr 30%, Fit 35%, Growth 35%
+    // No game stats: Attr 40%, Fit 30%, Growth 30%
     return Math.round(
-      attributeScore * 0.30 + positionFitScore * 0.35 + growthScore * 0.35,
+      attributeScore * 0.40 + positionFitScore * 0.30 + growthScore * 0.30,
     );
   }
   // No stats, no fit (pitcher/DH without game stats): Attr 50%, Growth 50%

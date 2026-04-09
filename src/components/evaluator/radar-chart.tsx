@@ -4,10 +4,10 @@ import { useRef, useEffect } from "react";
 import { STAT_TIERS } from "@/lib/evaluator-data";
 import type { PlayerRole } from "@/lib/evaluator-types";
 
-const SIZE = 200;
+const SIZE = 220;
 const CX = SIZE / 2;
 const CY = SIZE / 2;
-const RADIUS = SIZE / 2 - 30;
+const RADIUS = SIZE / 2 - 40;
 
 export function RadarChart({
   stats,
