@@ -1,6 +1,6 @@
 import type { PlayerData } from "./types";
 
-export type Recommendation = "MULCH" | "HOLD" | "KEEP";
+export type Recommendation = "MULCH" | "FRINGE" | "ROSTER" | "STRONG" | "STAR";
 
 export interface ScoreExplanation {
   score: number | null;

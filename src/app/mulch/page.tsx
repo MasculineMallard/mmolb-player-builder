@@ -162,11 +162,11 @@ export default function EvaluatePage() {
   // Export report
   const copyReport = useCallback(() => {
     if (!selectedTeam || evaluated.length === 0) return;
-    const groups: Record<string, EvaluatedPlayer[]> = { MULCH: [], HOLD: [], KEEP: [] };
+    const groups: Record<string, EvaluatedPlayer[]> = { MULCH: [], FRINGE: [], ROSTER: [], STRONG: [], STAR: [] };
     for (const ev of evaluated) groups[ev.recommendation].push(ev);
 
     let report = `## ${selectedTeam.emoji ?? ""} ${selectedTeam.name} - Roster Evaluation\n\n`;
-    for (const verdict of ["MULCH", "HOLD", "KEEP"] as const) {
+    for (const verdict of ["STAR", "STRONG", "ROSTER", "FRINGE", "MULCH"] as const) {
       const list = groups[verdict];
       if (list.length === 0) continue;
       report += `### ${verdict} (${list.length})\n`;
@@ -187,7 +187,7 @@ export default function EvaluatePage() {
       <div className="mb-2 sm:mb-4">
         <h1 className="text-lg sm:text-xl font-bold text-foreground">Mulch-o-Meter</h1>
         <p className="text-sm text-muted-foreground">
-          Search for a team to evaluate their roster. MULCH / HOLD / KEEP recommendations based on
+          Evaluate your roster. Star / Strong / Roster / Fringe / Mulch ratings based on
           attributes, growth potential, and position fit.
         </p>
       </div>
