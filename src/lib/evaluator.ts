@@ -415,9 +415,7 @@ function computeComposite(
 
 function getRecommendation(
   composite: number,
-  flags: EvalFlag[],
 ): Recommendation {
-  if (flags.includes("MAXED_BOTTOM_QUARTILE")) return "MULCH";
   if (composite >= 65) return "STAR";
   if (composite >= 55) return "STRONG";
   if (composite >= 42) return "ROSTER";
@@ -447,7 +445,7 @@ export function evaluatePlayer(
   const flags = detectFlags(
     player, role, statsScore, detectedArchetype, archetypes, boonLookup, positionDefense,
   );
-  const recommendation = getRecommendation(compositeScore, flags);
+  const recommendation = getRecommendation(compositeScore);
   const reasoning = generateStructuredReasoning(
     player, role, attributeScore, statsScore, growthScore, positionFitScore ?? 0,
     flags, boonLookup, positionDefense,
