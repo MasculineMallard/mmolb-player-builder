@@ -165,7 +165,7 @@ export function computeAttributeScore(
   const tableKey = role === "pitcher" ? "PITCHER_ATTR" : "BATTER_ATTR";
   const table = attrPercentiles?.[tableKey];
   if (table && table.length >= 10) {
-    return percentileToScore(ratio, table);
+    return Math.round(percentileToScore(ratio, table));
   }
 
   // Fallback: scale 0.85 → 100
