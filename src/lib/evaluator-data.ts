@@ -101,6 +101,16 @@ export const BATTING_PERCENTILES: Record<string, PercentileEntry[]> = {
     { pct: 80, value: 8.0 }, { pct: 85, value: 7.4 }, { pct: 90, value: 6.8 },
     { pct: 95, value: 5.9 },
   ],
+  // SB%: higher = better. Estimated from S11 steal attempts (players with >= 5 attempts).
+  SB_PCT: [
+    { pct: 5, value: 0.95 }, { pct: 10, value: 0.90 }, { pct: 15, value: 0.86 },
+    { pct: 20, value: 0.83 }, { pct: 25, value: 0.80 }, { pct: 30, value: 0.78 },
+    { pct: 35, value: 0.75 }, { pct: 40, value: 0.73 }, { pct: 45, value: 0.71 },
+    { pct: 50, value: 0.69 }, { pct: 55, value: 0.67 }, { pct: 60, value: 0.64 },
+    { pct: 65, value: 0.61 }, { pct: 70, value: 0.58 }, { pct: 75, value: 0.55 },
+    { pct: 80, value: 0.50 }, { pct: 85, value: 0.44 }, { pct: 90, value: 0.38 },
+    { pct: 95, value: 0.28 },
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -175,8 +185,9 @@ export const LOWER_IS_BETTER = new Set(["K_PCT", "ERA", "BB9", "H9", "HR9", "WHI
 export const BATTING_STAT_WEIGHTS: Record<string, number> = {
   OBP: 0.30,
   SLG: 0.30,
-  K_PCT: 0.20,
-  BB_PCT: 0.20,
+  K_PCT: 0.15,
+  BB_PCT: 0.15,
+  SB_PCT: 0.10,
 };
 
 /** Pitching stats score weights (must sum to 1.0). */
