@@ -75,7 +75,7 @@ export function StatGridInteractive({
   const activeCategories = Object.entries(STAT_CATEGORIES)
     .filter(
       ([category, statNames]) =>
-        !hiddenCats.has(category) && category !== "luck" && statNames.some((s) => stats[s] !== undefined)
+        !hiddenCats.has(category) && category !== "luck"
     )
     .map(([category, statNames]) => {
       // Append luck stats to defense category
@@ -115,8 +115,7 @@ export function StatGridInteractive({
             </h4>
             <div className="space-y-0.5">
               {statNames.map((statName, statIdx) => {
-                const baseValue = stats[statName];
-                if (baseValue === undefined) return null;
+                const baseValue = stats[statName] ?? 0;
 
                 // Show "Luck" sub-header before first luck stat in defense column
                 const showLuckHeader = category === "defense" && luckStatSet.has(statName) &&
