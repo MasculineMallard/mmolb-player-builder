@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { BASE_PATH } from "@/lib/constants";
 
 export default function Home() {
   return (
@@ -7,7 +8,7 @@ export default function Home() {
       <div className="text-center">
         <div className="flex items-center justify-center gap-1 mb-1">
           <Image
-            src="/pop-can.png"
+            src={`${BASE_PATH}/pop-can.png`}
             alt="POP soda can"
             width={40}
             height={40}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { NavLinks } from "@/components/builder/NavLinks";
+import { BASE_PATH } from "@/lib/constants";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,7 +39,7 @@ export default function RootLayout({
             <header className="border-b border-border bg-card">
               <div className="relative px-4 sm:px-6 lg:px-8 flex items-center h-11 gap-2 md:gap-6">
                 <Link href="/" className="font-bold text-lg flex items-center gap-0.5">
-                  <Image src="/pop-can.png" alt="POP" width={20} height={28} />
+                  <Image src={`${BASE_PATH}/pop-can.png`} alt="POP" width={20} height={28} />
                   POP
                 </Link>
                 <NavLinks />
