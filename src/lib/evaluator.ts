@@ -128,8 +128,9 @@ export function computeStatsScore(
 // Attribute Quality Score (0-100)
 // ---------------------------------------------------------------------------
 
-export function computeAttributeScore(
-  player: PlayerData,
+/** Compute raw attribute quality ratio: T1=1.0, T2=0.5, T3=0 */
+export function computeAttributeRatio(
+  stats: Record<string, number>,
   role: PlayerRole,
 ): number {
   const t1Stats = new Set(STAT_TIERS[role].T1);
@@ -140,25 +141,35 @@ export function computeAttributeScore(
   let totalPoints = 0;
 
   for (const stat of allRoleStats) {
-    const val = player.stats[stat] ?? 0;
+    const val = stats[stat] ?? 0;
     totalPoints += val;
     if (t1Stats.has(stat)) {
       weightedSum += val * 1.0;
     } else if (t2Stats.has(stat)) {
       weightedSum += val * 0.5;
     }
-    // T3: weight 0, contributes nothing
   }
 
-  if (totalPoints === 0) return 0;
+  return totalPoints > 0 ? weightedSum / totalPoints : 0;
+}
 
-  // Normalize: if all points were T1, ratio = 1.0; all T3 = 0.0
-  // Max possible ratio is 1.0 (all T1), but T2 is 0.5, so a realistic
-  // "perfect" build with some T2 investment is ~0.85.
-  // Scale so 0.85 → 100 and 0.0 → 0
-  const ratio = weightedSum / totalPoints;
-  const scaled = Math.min(100, Math.round((ratio / 0.85) * 100));
-  return scaled;
+export function computeAttributeScore(
+  player: PlayerData,
+  role: PlayerRole,
+  attrPercentiles?: Record<string, PercentileEntry[]>,
+): number {
+  const ratio = computeAttributeRatio(player.stats, role);
+  if (ratio === 0) return 0;
+
+  // Use live percentile table if available
+  const tableKey = role === "pitcher" ? "PITCHER_ATTR" : "BATTER_ATTR";
+  const table = attrPercentiles?.[tableKey];
+  if (table && table.length >= 10) {
+    return percentileToScore(ratio, table);
+  }
+
+  // Fallback: scale 0.85 → 100
+  return Math.min(100, Math.round((ratio / 0.85) * 100));
 }
 
 // ---------------------------------------------------------------------------
@@ -434,10 +445,10 @@ export function evaluatePlayer(
   archetypes: Record<string, Archetype>,
   positionDefense: PositionDefenseMap,
   boonLookup: Map<string, { bonuses: Record<string, number>; penalties: Record<string, number> }>,
-  percentileTables?: { batting: Record<string, PercentileEntry[]>; pitching: Record<string, PercentileEntry[]> },
+  percentileTables?: { batting: Record<string, PercentileEntry[]>; pitching: Record<string, PercentileEntry[]>; attributes?: Record<string, PercentileEntry[]> },
 ): EvaluatedPlayer {
   const role = getPlayerRole(player.position);
-  const attributeScore = computeAttributeScore(player, role);
+  const attributeScore = computeAttributeScore(player, role, percentileTables?.attributes);
   const statsScore = computeStatsScore(role, gameStats, percentileTables);
   const growthScore = computeGrowthScore(player);
   const positionFitScore = computePositionFitScore(player, role, positionDefense);

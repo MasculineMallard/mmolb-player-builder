@@ -14,7 +14,7 @@ import { useBoonEmojis } from "@/hooks/use-boon-emojis";
 import { recommendStatPriorities, recommendBoonsByLevel } from "@/lib/advisor";
 import { calculateProgress, generateMilestones } from "@/lib/planner-utils";
 import { optimizePitchArsenal } from "@/lib/optimizer";
-import { S11 } from "@/lib/mechanics";
+import { S11, calculateFitTargets } from "@/lib/mechanics";
 import { PITCHER_POSITIONS, EMPTY_ARCHETYPE } from "@/lib/constants";
 import { usePitchTypes } from "@/hooks/use-pitch-types";
 import { usePlayerStore } from "@/store/player-store";
@@ -127,6 +127,23 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
     () => calculateProgress(player.stats, effectiveArchetype, player.level),
     [player.stats, effectiveArchetype, player.level]
   );
+
+  // Level-normalized archetype fit % (same formula as ArchetypeSelect)
+  const archetypeFitPct = useMemo(() => {
+    const prioritySet = new Set(effectiveArchetype.priority_stats ?? []);
+    const nCore = (effectiveArchetype.priority_stats ?? []).length;
+    const nSupport = (effectiveArchetype.secondary_stats ?? []).length;
+    const { coreTarget, supportTarget } = calculateFitTargets(player.level, nCore, nSupport);
+    let matchScore = 0;
+    let maxPossible = 0;
+    for (const [stat, weight] of Object.entries(effectiveArchetype.stat_weights)) {
+      const value = player.stats[stat] ?? 0;
+      const target = prioritySet.has(stat) ? coreTarget : supportTarget;
+      matchScore += Math.min(value, target) * weight;
+      maxPossible += target * weight;
+    }
+    return maxPossible > 0 ? Math.round((matchScore / maxPossible) * 100) : 0;
+  }, [player.stats, player.level, effectiveArchetype]);
   const milestones = useMemo(() => generateMilestones(player.level), [player.level]);
   const pitchAdvice = useMemo(
     () =>
@@ -288,7 +305,7 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
             mechanics={levelMechanics}
             statRecommendations={recommendations}
             boonTimeline={boonTimeline}
-            progressPercent={progress.progressPercent}
+            progressPercent={archetypeFitPct}
             archetype={activeArchetype}
           />
         )}

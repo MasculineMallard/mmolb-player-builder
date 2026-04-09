@@ -270,6 +270,7 @@ export async function getBoonLookup(): Promise<Map<string, BoonEntry>> {
 export interface LivePercentileTables {
   batting: Record<string, PercentileEntry[]>;
   pitching: Record<string, PercentileEntry[]>;
+  attributes?: Record<string, PercentileEntry[]>;
 }
 
 /**
@@ -286,7 +287,7 @@ export async function loadLivePercentiles(): Promise<LivePercentileTables | null
     const data = await res.json();
     if (data.source !== "live") return null;
     if (!data.batting || !data.pitching) return null;
-    return { batting: data.batting, pitching: data.pitching };
+    return { batting: data.batting, pitching: data.pitching, attributes: data.attributes };
   } catch {
     return null;
   }
