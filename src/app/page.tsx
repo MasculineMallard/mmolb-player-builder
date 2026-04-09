@@ -33,7 +33,7 @@ export default function Home() {
           className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
         >
           <span className="text-3xl">🎯</span>
-          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Pitcher Planner</span>
+          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Perfect Pitcher Planner</span>
           <span className="text-xs text-muted-foreground text-center">Optimize pitching builds and pitch arsenals</span>
         </Link>
         <Link
@@ -41,7 +41,7 @@ export default function Home() {
           className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
         >
           <span className="text-3xl">💪</span>
-          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Batter Builder</span>
+          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Better Batter Builder</span>
           <span className="text-xs text-muted-foreground text-center">Plan batting stat allocation and boon choices</span>
         </Link>
         <Link

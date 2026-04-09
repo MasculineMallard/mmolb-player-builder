@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 import { CURRENT_SEASON } from "@/lib/constants";
 
 const NAV_ITEMS = [
-  { href: "/pitcher", label: "Pitcher Planner" },
-  { href: "/batter", label: "Batter Builder" },
+  { href: "/pitcher", label: "Perfect Pitcher Planner" },
+  { href: "/batter", label: "Better Batter Builder" },
   { href: "/mulch", label: "Mulch-o-Meter" },
 ];
 
