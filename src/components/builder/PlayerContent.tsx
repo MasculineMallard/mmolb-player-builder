@@ -289,8 +289,6 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
             statRecommendations={recommendations}
             boonTimeline={boonTimeline}
             progressPercent={progress.progressPercent}
-            playerStats={player.stats}
-            position={player.position}
             archetype={activeArchetype}
           />
         )}
