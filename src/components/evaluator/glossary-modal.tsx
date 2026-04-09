@@ -85,10 +85,10 @@ export function GlossaryButton() {
                 <h3 className="text-foreground font-semibold mb-1">Attribute Tiers (S10 Regression)</h3>
                 <p className="mb-1">From Bagyilisk&apos;s S10 regression analysis. Which stats actually move outcomes.</p>
                 <div className="space-y-1">
-                  <div><span className="text-foreground">Batting T1:</span> Discipline, Contact, Intimidation, Muscle, Lift</div>
-                  <div><span className="text-foreground">Batting T2:</span> Aiming, Vision, Determination, Insight, Performance, Speed</div>
-                  <div><span className="text-foreground">Pitching T1:</span> Velocity, Control, Rotation, Stuff, Deception</div>
-                  <div><span className="text-foreground">Pitching T2:</span> Presence, Guts, Persuasion, Stamina</div>
+                  <div><span className="text-foreground">Batting T1:</span> Contact, Muscle, Intimidation, Aiming, Performance</div>
+                  <div><span className="text-foreground">Batting T2:</span> Discipline, Lift, Vision, Determination, Insight, Speed, Cunning</div>
+                  <div><span className="text-foreground">Pitching T1:</span> Velocity, Control, Rotation, Stuff, Presence</div>
+                  <div><span className="text-foreground">Pitching T2:</span> Deception, Guts, Persuasion, Stamina, Accuracy</div>
                 </div>
               </section>
 

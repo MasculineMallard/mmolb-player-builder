@@ -15,14 +15,14 @@ import { BASE_PATH } from "./constants";
 
 export const STAT_TIERS: Record<PlayerRole, { T1: string[]; T2: string[]; T3: string[] }> = {
   batter: {
-    T1: ["discipline", "contact", "muscle", "intimidation", "lift"],
-    T2: ["aiming", "vision", "determination", "insight", "performance", "speed"],
-    T3: ["cunning", "selflessness", "wisdom"],
+    T1: ["contact", "muscle", "intimidation", "aiming", "performance"],
+    T2: ["discipline", "lift", "vision", "determination", "insight", "speed", "cunning"],
+    T3: ["selflessness", "wisdom"],
   },
   pitcher: {
-    T1: ["velocity", "control", "rotation", "stuff", "deception"],
-    T2: ["presence", "guts", "persuasion", "stamina"],
-    T3: ["accuracy", "intuition", "defiance"],
+    T1: ["velocity", "control", "rotation", "stuff", "presence"],
+    T2: ["deception", "guts", "persuasion", "stamina", "accuracy"],
+    T3: ["intuition", "defiance"],
   },
 };
 
