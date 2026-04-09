@@ -250,7 +250,7 @@ export function RosterTable({ players, onPositionChange, percentileTables }: {
           <span className="text-sm">Star: {counts.STAR}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span style={{ color: "#60A5FA" }}>●</span>
+          <span style={{ color: "#93C5FD" }}>●</span>
           <span className="text-sm">Strong: {counts.STRONG}</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -271,7 +271,7 @@ export function RosterTable({ players, onPositionChange, percentileTables }: {
       <div className="flex flex-wrap items-center gap-2 mb-3">
         {filterPill("All", "ALL")}
         {filterPill(`Star (${counts.STAR})`, "STAR", "#3B82F6")}
-        {filterPill(`Strong (${counts.STRONG})`, "STRONG", "#60A5FA")}
+        {filterPill(`Strong (${counts.STRONG})`, "STRONG", "#93C5FD")}
         {filterPill(`Roster (${counts.ROSTER})`, "ROSTER", "#8B949E")}
         {filterPill(`Fringe (${counts.FRINGE})`, "FRINGE", "#EAB308")}
         {filterPill(`Mulch (${counts.MULCH})`, "MULCH", "#F85149")}

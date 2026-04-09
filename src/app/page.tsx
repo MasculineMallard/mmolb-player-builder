@@ -23,7 +23,7 @@ export default function Home() {
       </div>
 
       <p className="text-muted-foreground text-sm text-center max-w-md">
-        Plan your MMOLB Season 11 builds. Import players, optimize stat allocation,
+        Plan your MMOLB builds. Import players, optimize stat allocation,
         evaluate rosters, and figure out who to mulch.
       </p>
 

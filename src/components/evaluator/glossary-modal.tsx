@@ -52,7 +52,7 @@ export function GlossaryButton() {
                 <p>Each player gets a composite score from four pillars, weighted by what data is available:</p>
                 <div className="mt-1 space-y-0.5 ml-2">
                   <div><span className="text-foreground">Attributes</span> : How well stat points are allocated to high-impact stats (T1 weighted 1.0, T2 weighted 0.5, T3 ignored).</div>
-                  <div><span className="text-foreground">Game Stats</span> : OBP, SLG, K%, BB%, SB% for batters. ERA, WHIP, K/9, BB/9, HR/9 for pitchers. Scored against live S11 league percentiles.</div>
+                  <div><span className="text-foreground">Game Stats</span> : OBP, SLG, K%, BB%, SB% for batters. ERA, WHIP, K/9, BB/9, HR/9 for pitchers. Scored against live league percentiles.</div>
                   <div><span className="text-foreground">Position Fit</span> : How well defense stats match the position. Budget: 300 total across the position&apos;s key stats.</div>
                   <div><span className="text-foreground">Growth</span> : Remaining levels and boon slots. Higher for younger players.</div>
                 </div>
@@ -127,7 +127,7 @@ export function GlossaryButton() {
               {/* Percentiles */}
               <section>
                 <h3 className="text-foreground font-semibold mb-1">Live Percentiles</h3>
-                <p>Game stats are scored against live S11 percentile tables computed from every team in the league via the MMOLB API. Updated on demand.</p>
+                <p>Game stats are scored against live percentile tables computed from every team in the league via the MMOLB API. Updated on demand.</p>
               </section>
             </div>
           </div>

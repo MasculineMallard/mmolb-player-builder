@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { NavLinks } from "@/components/builder/NavLinks";
-import { BASE_PATH } from "@/lib/constants";
+import { BASE_PATH, CURRENT_SEASON } from "@/lib/constants";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "POP - Player Optimization Planner",
-  description: "MMOLB Season 11 player builder, stat planner, and roster evaluator",
+  description: "MMOLB player builder, stat planner, and roster evaluator",
 };
 
 export default function RootLayout({
@@ -45,7 +45,7 @@ export default function RootLayout({
                 <NavLinks />
                 <div className="ml-auto hidden md:flex items-center gap-3">
                   <div id="share-slot" className="flex items-center gap-2" />
-                  <span className="text-sm text-muted-foreground">Season 11</span>
+                  <span className="text-sm text-muted-foreground">{CURRENT_SEASON}</span>
                 </div>
               </div>
             </header>
