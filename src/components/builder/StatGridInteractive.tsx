@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { STAT_CATEGORIES, CATEGORY_LABELS } from "@/lib/constants";
 import { S11 } from "@/lib/mechanics";
-import { getStatColor, getStatBarColor } from "@/lib/utils";
+import { getStatColor, getStatBarColor, STAT_DISPLAY_MAX } from "@/lib/utils";
 import type { StatRecommendation } from "@/lib/advisor";
 import {
   Tooltip,
@@ -62,7 +62,7 @@ export function StatGridInteractive({
   const handleSaveEdit = useCallback(() => {
     if (editingStatName && onTargetOverride) {
       const val = parseInt(editValue, 10);
-      if (!isNaN(val) && val >= 0 && val <= 1000) {
+      if (!isNaN(val) && val >= 0 && val <= STAT_DISPLAY_MAX) {
         onTargetOverride(editingStatName, val);
       }
     }
@@ -125,9 +125,9 @@ export function StatGridInteractive({
                 const target = rec?.target;
                 const gap = rec?.gap ?? 0;
                 const isHighlighted = highlightSet.has(statName);
-                const barPct = Math.min((baseValue / 1000) * 100, 100);
+                const barPct = Math.min((baseValue / STAT_DISPLAY_MAX) * 100, 100);
                 const barColor = getStatBarColor(baseValue);
-                const isMaxed = baseValue >= 1000;
+                const isMaxed = baseValue >= STAT_DISPLAY_MAX;
                 const isEditing = editingStatName === statName;
 
                 return (
@@ -151,7 +151,7 @@ export function StatGridInteractive({
                           {statName}
                         </TooltipTrigger>
                         <TooltipContent side="top" className="max-w-[240px]">
-                          <p className="capitalize font-medium">{statName}: {baseValue}/1000</p>
+                          <p className="capitalize font-medium">{statName}: {baseValue}/{STAT_DISPLAY_MAX}</p>
                           {target !== undefined && (
                             <p className="text-sm text-muted-foreground">
                               Target: {target}
@@ -185,7 +185,7 @@ export function StatGridInteractive({
                               }}
                               className="w-12 bg-muted border border-border rounded px-1 py-0 text-sm text-foreground text-right tabular-nums focus:outline-none focus:ring-1 focus:ring-ring"
                               min={0}
-                              max={1000}
+                              max={STAT_DISPLAY_MAX}
                               autoFocus
                             />
                           ) : (
@@ -207,7 +207,7 @@ export function StatGridInteractive({
                         <div
                           className="absolute w-[3px] rounded-full z-10"
                           style={{
-                            left: `${Math.min((target / 1000) * 100, 100)}%`,
+                            left: `${Math.min((target / STAT_DISPLAY_MAX) * 100, 100)}%`,
                             top: -1,
                             bottom: -1,
                             backgroundColor: "var(--foreground)",
