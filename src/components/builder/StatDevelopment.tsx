@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import type { StatRecommendation } from "@/lib/advisor";
 import type { ProgressSummary } from "@/lib/planner-utils";
-import { getStatColor, getStatBarColor } from "@/lib/utils";
+import { getStatColor, getStatBarColor, STAT_DISPLAY_MAX } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
@@ -110,7 +110,7 @@ export function StatDevelopment({ recommendations, progress, onTargetOverride }:
   const handleSaveEdit = useCallback(() => {
     if (editingStatName && onTargetOverride) {
       const val = parseInt(editValue, 10);
-      if (!isNaN(val) && val >= 0 && val <= 1000) {
+      if (!isNaN(val) && val >= 0 && val <= STAT_DISPLAY_MAX) {
         onTargetOverride(editingStatName, val);
       }
     }
@@ -176,7 +176,7 @@ export function StatDevelopment({ recommendations, progress, onTargetOverride }:
             }}
             className="w-16 bg-muted border border-border rounded px-1.5 py-0.5 text-sm text-foreground text-right tabular-nums focus:outline-none focus:ring-1 focus:ring-ring"
             min={0}
-            max={1000}
+            max={STAT_DISPLAY_MAX}
             autoFocus
           />
         </div>

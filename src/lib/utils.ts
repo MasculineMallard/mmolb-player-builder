@@ -6,7 +6,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-/** Color thresholds for stat values (0-1000 scale). Yellow→Blue gradient. */
+/** Display cap for stat bars in the builder UI. */
+export const STAT_DISPLAY_MAX = 500;
+
+/** Color thresholds for stat values. Yellow→Blue gradient. */
 export function getStatColor(value: number): string {
   if (value >= 500) return "var(--scale-great)";
   if (value >= 350) return "var(--scale-good)";
@@ -17,10 +20,10 @@ export function getStatColor(value: number): string {
 
 /**
  * Continuous orange→blue gradient for stat bar fills.
- * Returns a CSS color string that smoothly transitions from orange (0) to blue (1000).
+ * Returns a CSS color string that smoothly transitions from orange (0) to blue (STAT_DISPLAY_MAX).
  */
 export function getStatBarColor(value: number): string {
-  const t = Math.min(value / 1000, 1);
+  const t = Math.min(value / STAT_DISPLAY_MAX, 1);
   // Orange (#E8A735) → Amber (#D4A843) → Gray (#8B949E) → Blue (#60A5FA) → Bright Blue (#3B82F6)
   if (t < 0.2) {
     return "#E8A735";
