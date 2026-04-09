@@ -109,12 +109,13 @@ export function GlossaryButton() {
 
               {/* Flags */}
               <section>
-                <h3 className="text-foreground font-semibold mb-1">Override Flags</h3>
+                <h3 className="text-foreground font-semibold mb-1">Warning Flags</h3>
+                <p className="mb-1">Informational only. These don&apos;t override the rating; the composite score decides.</p>
                 <div className="space-y-0.5 ml-2">
-                  <div><span className="text-foreground">MAXED_BOTTOM_QUARTILE:</span> Level 30 with game stats in bottom 25%. Forces MULCH.</div>
                   <div><span className="text-foreground">T1_VOID_LATE:</span> Level 20+ with any T1 stat at 0.</div>
                   <div><span className="text-foreground">BOON_CONFLICT:</span> Boon penalizes an archetype priority stat.</div>
                   <div><span className="text-foreground">DEFENSE_LOCKED:</span> Position-critical defense stat at 0, level &gt; 15.</div>
+                  <div><span className="text-foreground">MAXED_BOTTOM_QUARTILE:</span> Level 30 with game stats in bottom 25%.</div>
                 </div>
               </section>
 
