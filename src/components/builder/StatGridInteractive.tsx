@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { STAT_CATEGORIES, CATEGORY_LABELS } from "@/lib/constants";
 import { S11 } from "@/lib/mechanics";
-import { getStatColor, getStatBarColor, STAT_DISPLAY_MAX } from "@/lib/utils";
+import { getStatColor, getStatBarColor, STAT_DISPLAY_MAX, DEFENSE_DISPLAY_MAX } from "@/lib/utils";
 import type { StatRecommendation } from "@/lib/advisor";
 import {
   Tooltip,
@@ -116,6 +116,7 @@ export function StatGridInteractive({
             <div className="space-y-0.5">
               {statNames.map((statName, statIdx) => {
                 const baseValue = stats[statName] ?? 0;
+                const displayMax = category === "defense" ? DEFENSE_DISPLAY_MAX : STAT_DISPLAY_MAX;
 
                 // Show "Luck" sub-header before first luck stat in defense column
                 const showLuckHeader = category === "defense" && luckStatSet.has(statName) &&
@@ -125,9 +126,9 @@ export function StatGridInteractive({
                 const target = rec?.target;
                 const gap = rec?.gap ?? 0;
                 const isHighlighted = highlightSet.has(statName);
-                const barPct = Math.min((baseValue / STAT_DISPLAY_MAX) * 100, 100);
+                const barPct = Math.min((baseValue / displayMax) * 100, 100);
                 const barColor = getStatBarColor(baseValue);
-                const isMaxed = baseValue >= STAT_DISPLAY_MAX;
+                const isMaxed = baseValue >= displayMax;
                 const isEditing = editingStatName === statName;
 
                 return (
@@ -151,7 +152,7 @@ export function StatGridInteractive({
                           {statName}
                         </TooltipTrigger>
                         <TooltipContent side="top" className="max-w-[240px]">
-                          <p className="capitalize font-medium">{statName}: {baseValue}/{STAT_DISPLAY_MAX}</p>
+                          <p className="capitalize font-medium">{statName}: {baseValue}/{displayMax}</p>
                           {target !== undefined && (
                             <p className="text-sm text-muted-foreground">
                               Target: {target}
@@ -185,7 +186,7 @@ export function StatGridInteractive({
                               }}
                               className="w-12 bg-muted border border-border rounded px-1 py-0 text-sm text-foreground text-right tabular-nums focus:outline-none focus:ring-1 focus:ring-ring"
                               min={0}
-                              max={STAT_DISPLAY_MAX}
+                              max={displayMax}
                               autoFocus
                             />
                           ) : (
@@ -207,7 +208,7 @@ export function StatGridInteractive({
                         <div
                           className="absolute w-[3px] rounded-full z-10"
                           style={{
-                            left: `${Math.min((target / STAT_DISPLAY_MAX) * 100, 100)}%`,
+                            left: `${Math.min((target / displayMax) * 100, 100)}%`,
                             top: -1,
                             bottom: -1,
                             backgroundColor: "var(--foreground)",
