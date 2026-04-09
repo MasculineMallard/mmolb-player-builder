@@ -93,13 +93,12 @@ function filterPreRecompRecords(
  * Their season stats are from a different build and shouldn't be used.
  */
 /**
- * Check if a player was recently recomposed mid-season.
+ * Check if a player was recomposed mid-season.
  *
- * A numeric Birthday means the player's current incarnation started on that
- * day of the season. If it's recent (within 10 days of current day), the
- * season stats are mostly from the old build and should be suppressed.
- * If it's older, enough games have been played under the current build
- * that the stats are usable.
+ * A numeric Birthday > 1 means the player's current incarnation started
+ * mid-season. The Stats field accumulates from the old incarnation (same
+ * name recomp), so season stats are tainted for the rest of the season.
+ * Always suppress stats for mid-season recomps.
  *
  * Birthday = "Preseason" means they've been here since the start: not recomped.
  */
@@ -107,13 +106,9 @@ function wasRecompedThisSeason(
   raw: MmolbApiPlayer,
   _playerRecords?: MmolbApiPlayerRecord[],
   _currentSeasonId?: string,
-  currentDay?: number,
+  _currentDay?: number,
 ): boolean {
-  if (typeof raw.Birthday !== "number" || raw.Birthday <= 1) return false;
-  if (currentDay == null) return false;
-
-  // Only flag as recomped if birthday is within last 10 days
-  return (currentDay - raw.Birthday) < 10;
+  return typeof raw.Birthday === "number" && raw.Birthday > 1;
 }
 
 export function transformPlayer(
