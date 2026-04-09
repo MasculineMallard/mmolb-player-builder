@@ -23,10 +23,10 @@ export function getStatColor(value: number): string {
 
 /**
  * Continuous orange→blue gradient for stat bar fills.
- * Returns a CSS color string that smoothly transitions from orange (0) to blue (STAT_DISPLAY_MAX).
+ * Returns a CSS color string that smoothly transitions from orange (0) to blue (max).
  */
-export function getStatBarColor(value: number): string {
-  const t = Math.min(value / STAT_DISPLAY_MAX, 1);
+export function getStatBarColor(value: number, max: number = STAT_DISPLAY_MAX): string {
+  const t = Math.min(value / max, 1);
   // Orange (#E8A735) → Amber (#D4A843) → Gray (#8B949E) → Blue (#60A5FA) → Bright Blue (#3B82F6)
   if (t < 0.2) {
     return "#E8A735";

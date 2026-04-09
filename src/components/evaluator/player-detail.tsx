@@ -1,5 +1,5 @@
 import type { EvaluatedPlayer, ScoreExplanation, GameStats } from "@/lib/evaluator-types";
-import { getPlayerRole, computeStatsScore } from "@/lib/evaluator";
+import { getPlayerRole } from "@/lib/evaluator";
 import { AttributeBreakdown } from "./attribute-breakdown";
 import { VerdictBadge } from "./verdict-badge";
 import { DefenseStatBars } from "./position-fit-card";

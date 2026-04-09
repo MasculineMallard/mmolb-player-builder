@@ -65,7 +65,7 @@ export interface MmolbApiPlayer {
   GreaterDurability: number;
   Stats?: Record<string, Record<string, number>>;
   Birthseason?: number;
-  Birthday?: number;
+  Birthday?: number | string; // "Preseason" for non-recomps, numeric day for mid-season recomps
 }
 
 export interface MmolbApiTeamPlayer {

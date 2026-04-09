@@ -1,4 +1,5 @@
 import { STAT_TIERS, ROLE_STATS } from "@/lib/evaluator-data";
+import { STAT_DISPLAY_MAX } from "@/lib/utils";
 import type { PlayerRole } from "@/lib/evaluator-types";
 
 function tierLabel(stat: string, role: PlayerRole): { tier: string; color: string } {
@@ -10,8 +11,8 @@ function tierLabel(stat: string, role: PlayerRole): { tier: string; color: strin
 
 function barColor(value: number, tier: string): string {
   if (tier === "T1") {
-    if (value >= 500) return "var(--chart-3)"; // green — elite
-    if (value >= 200) return "var(--chart-1)"; // blue — good
+    if (value >= STAT_DISPLAY_MAX) return "var(--chart-3)"; // green — elite
+    if (value >= STAT_DISPLAY_MAX * 0.4) return "var(--chart-1)"; // blue — good
     if (value > 0) return "var(--scale-poor)"; // gold — developing
     return "var(--chart-4)"; // red — missing
   }
@@ -48,7 +49,7 @@ export function AttributeBreakdown({
         {sorted.map((stat) => {
           const value = stats[stat] ?? 0;
           const { tier, color } = tierLabel(stat, role);
-          const pct = Math.min(100, (value / 500) * 100);
+          const pct = Math.min(100, (value / STAT_DISPLAY_MAX) * 100);
           const isT3 = tier === "T3";
 
           return (
