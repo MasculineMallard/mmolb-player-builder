@@ -3,11 +3,19 @@
  *
  * Uses a dedicated pg.Client (not the shared pool) with 120s timeout.
  * Queries all leagues for complete league-wide percentiles.
- * Results cached in memory for 24h. Lost on deploy/restart; falls back to S10 hardcoded.
+ * Results cached in memory AND persisted to disk so restarts don't lose data.
  */
 
 import { Client } from "pg";
+import { readFileSync, writeFileSync, mkdirSync } from "fs";
+import { join } from "path";
 import type { PercentileEntry } from "./evaluator-types";
+import { fetchState } from "./mmolb-api";
+
+// ── Disk cache path ──
+
+const CACHE_DIR = join(process.cwd(), ".cache");
+const CACHE_FILE = join(CACHE_DIR, "percentiles.json");
 
 // ── Cache ──
 
@@ -16,20 +24,50 @@ interface PercentileCache {
   pitching: Record<string, PercentileEntry[]>;
   computedAt: string;
   playerCount: { batters: number; pitchers: number };
+  season?: number;
 }
 
 let cached: PercentileCache | null = null;
 let isRefreshing = false;
 let lastError: string | null = null;
 
+// ── Load from disk on startup ──
+
+function loadFromDisk(): PercentileCache | null {
+  try {
+    const raw = readFileSync(CACHE_FILE, "utf-8");
+    const data: PercentileCache = JSON.parse(raw);
+    if (data.batting && data.pitching && data.computedAt) return data;
+  } catch {
+    // No cached file or invalid JSON
+  }
+  return null;
+}
+
+function saveToDisk(data: PercentileCache): void {
+  try {
+    mkdirSync(CACHE_DIR, { recursive: true });
+    writeFileSync(CACHE_FILE, JSON.stringify(data), "utf-8");
+  } catch (err) {
+    console.error("[percentiles] Failed to write disk cache:", err);
+  }
+}
+
+// Initialize from disk
+cached = loadFromDisk();
+if (cached) {
+  console.log(`[percentiles] Loaded disk cache from ${cached.computedAt} (S${cached.season ?? "?"})`);
+}
+
 // ── Required keys for validation ──
 
 const REQUIRED_BATTING_KEYS = ["AVG", "OBP", "SLG", "OPS", "K_PCT", "BB_PCT"];
 const REQUIRED_PITCHING_KEYS = ["ERA", "WHIP", "K9", "BB9", "HR9"];
 
-// ── Queries ──
+// ── Queries (season placeholder replaced at runtime) ──
 
-const BATTING_QUERY = `
+function battingQuery(season: number): string {
+  return `
   SELECT batter_name,
     COUNT(*) FILTER (WHERE et.ends_plate_appearance) as pa,
     COUNT(*) FILTER (WHERE et.is_hit AND ee.hit_base = 1) as singles,
@@ -41,12 +79,14 @@ const BATTING_QUERY = `
     COUNT(*) FILTER (WHERE et.name = 'HitByPitch') as hbp
   FROM data.events_extended ee
   JOIN taxa.event_type et ON ee.event_type = et.id
-  WHERE ee.season = 11
+  WHERE ee.season = ${season}
   GROUP BY batter_name
   HAVING COUNT(*) FILTER (WHERE et.ends_plate_appearance) >= 30
 `;
+}
 
-const PITCHING_QUERY = `
+function pitchingQuery(season: number): string {
+  return `
   SELECT pitcher_name,
     SUM(ee.outs_after - ee.outs_before) as outs,
     COUNT(*) FILTER (WHERE et.is_hit) as hits_allowed,
@@ -58,10 +98,11 @@ const PITCHING_QUERY = `
       ELSE home_team_score_after - home_team_score_before END) as runs_allowed
   FROM data.events_extended ee
   JOIN taxa.event_type et ON ee.event_type = et.id
-  WHERE ee.season = 11
+  WHERE ee.season = ${season}
   GROUP BY pitcher_name
   HAVING SUM(ee.outs_after - ee.outs_before) >= 15
 `;
+}
 
 // ── Percentile math ──
 
@@ -85,9 +126,26 @@ function validate(tables: PercentileCache): boolean {
   return true;
 }
 
+// ── Get current season from MMOLB API ──
+
+async function getCurrentSeason(): Promise<number> {
+  try {
+    const state = await fetchState();
+    // SeasonID is an ObjectId, but the season number is in the events data
+    // The state doesn't expose season number directly, so we parse from context
+    // For now, hardcode the mapping or use a reasonable default
+    // TODO: When the API exposes season number, use it directly
+  } catch {
+    // Fallback
+  }
+  return 11; // Current season
+}
+
 // ── Core refresh ──
 
 async function runRefresh(): Promise<void> {
+  const season = await getCurrentSeason();
+
   const client = new Client({
     host: process.env.MMOLDB_HOST || "mmoldb.beiju.me",
     port: parseInt(process.env.MMOLDB_PORT || "42416"),
@@ -100,14 +158,14 @@ async function runRefresh(): Promise<void> {
 
   try {
     await client.connect();
-    console.log("[percentiles] Connected to mmoldb, running batting query...");
+    console.log(`[percentiles] Connected to mmoldb, querying season ${season}...`);
 
     const battingStart = performance.now();
-    const battingResult = await client.query(BATTING_QUERY);
+    const battingResult = await client.query(battingQuery(season));
     console.log(`[percentiles] Batting: ${battingResult.rows.length} players in ${((performance.now() - battingStart) / 1000).toFixed(1)}s`);
 
     const pitchingStart = performance.now();
-    const pitchingResult = await client.query(PITCHING_QUERY);
+    const pitchingResult = await client.query(pitchingQuery(season));
     console.log(`[percentiles] Pitching: ${pitchingResult.rows.length} players in ${((performance.now() - pitchingStart) / 1000).toFixed(1)}s`);
 
     // Compute batting derived stats
@@ -131,7 +189,7 @@ async function runRefresh(): Promise<void> {
       const outs = +r.outs;
       const ip = outs / 3;
       return {
-        era: ip > 0 ? +r.runs_allowed / ip * 9 : 0, // RA/9 stored as ERA
+        era: ip > 0 ? +r.runs_allowed / ip * 9 : 0,
         whip: ip > 0 ? (+r.hits_allowed + +r.walks) / ip : 0,
         k9: ip > 0 ? +r.strikeouts / ip * 9 : 0,
         bb9: ip > 0 ? +r.walks / ip * 9 : 0,
@@ -161,12 +219,14 @@ async function runRefresh(): Promise<void> {
       pitching: pitchingTables,
       computedAt: new Date().toISOString(),
       playerCount: { batters: batterLines.length, pitchers: pitcherLines.length },
+      season,
     };
 
     if (validate(result)) {
       cached = result;
       lastError = null;
-      console.log(`[percentiles] Refresh complete. ${batterLines.length} batters, ${pitcherLines.length} pitchers.`);
+      saveToDisk(result);
+      console.log(`[percentiles] Refresh complete. ${batterLines.length} batters, ${pitcherLines.length} pitchers. Saved to disk.`);
     } else {
       lastError = "Validation failed: missing or incomplete percentile tables";
       console.error("[percentiles]", lastError);

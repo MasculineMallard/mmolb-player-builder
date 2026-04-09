@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import type { TeamSearchResult, RosterPlayer, PlayerData, Archetype } from "@/lib/types";
 import type { EvaluatedPlayer } from "@/lib/evaluator-types";
 import { evaluatePlayer, findBestFitPosition } from "@/lib/evaluator";

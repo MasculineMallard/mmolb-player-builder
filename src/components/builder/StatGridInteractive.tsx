@@ -127,7 +127,7 @@ export function StatGridInteractive({
                 const gap = rec?.gap ?? 0;
                 const isHighlighted = highlightSet.has(statName);
                 const barPct = Math.min((baseValue / displayMax) * 100, 100);
-                const barColor = getStatBarColor(baseValue);
+                const barColor = getStatBarColor(baseValue, displayMax);
                 const isMaxed = baseValue >= displayMax;
                 const isEditing = editingStatName === statName;
 
@@ -223,7 +223,7 @@ export function StatGridInteractive({
                           backgroundColor: barColor,
                           boxShadow: isMaxed
                             ? `0 0 6px ${barColor}, 0 0 12px ${barColor}40`
-                            : baseValue >= 800
+                            : baseValue >= displayMax * 0.8
                               ? `0 0 4px ${barColor}60`
                               : "none",
                         }}

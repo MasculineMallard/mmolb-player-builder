@@ -175,9 +175,8 @@ export const LOWER_IS_BETTER = new Set(["K_PCT", "ERA", "BB9", "H9", "HR9", "WHI
 export const BATTING_STAT_WEIGHTS: Record<string, number> = {
   OBP: 0.30,
   SLG: 0.30,
-  K_PCT: 0.15,
-  BB_PCT: 0.15,
-  SB_PCT: 0.10,
+  K_PCT: 0.20,
+  BB_PCT: 0.20,
 };
 
 /** Pitching stats score weights (must sum to 1.0). */
