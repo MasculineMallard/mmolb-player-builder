@@ -101,6 +101,16 @@ export const BATTING_PERCENTILES: Record<string, PercentileEntry[]> = {
     { pct: 80, value: 8.0 }, { pct: 85, value: 7.4 }, { pct: 90, value: 6.8 },
     { pct: 95, value: 5.9 },
   ],
+  // SB%: higher = better. Estimated from S11 steal attempts (players with >= 5 attempts).
+  SB_PCT: [
+    { pct: 5, value: 0.95 }, { pct: 10, value: 0.90 }, { pct: 15, value: 0.86 },
+    { pct: 20, value: 0.83 }, { pct: 25, value: 0.80 }, { pct: 30, value: 0.78 },
+    { pct: 35, value: 0.75 }, { pct: 40, value: 0.73 }, { pct: 45, value: 0.71 },
+    { pct: 50, value: 0.69 }, { pct: 55, value: 0.67 }, { pct: 60, value: 0.64 },
+    { pct: 65, value: 0.61 }, { pct: 70, value: 0.58 }, { pct: 75, value: 0.55 },
+    { pct: 80, value: 0.50 }, { pct: 85, value: 0.44 }, { pct: 90, value: 0.38 },
+    { pct: 95, value: 0.28 },
+  ],
 };
 
 // ---------------------------------------------------------------------------
