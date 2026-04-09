@@ -147,6 +147,9 @@ export function NextAction({
 
   const allCards = [...offenseStats, ...defenseRecs];
 
+  // Radar shows archetype priority + secondary stats (not defense)
+  const archetypeStats = statRecommendations.filter((r) => !DEFENSE_STATS.has(r.statName));
+
   return (
     <div className="bg-card border border-border rounded-lg px-3 py-2">
       <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-2">
@@ -185,7 +188,7 @@ export function NextAction({
               {" "}Luck may also be offered as an option.
             </p>
           </div>
-        ) : allCards.length > 0 ? (
+        ) : archetypeStats.length > 0 ? (
           <div>
             <div className="flex items-center gap-2 mb-1">
               {archetype.emoji && <span className="text-lg">{archetype.emoji}</span>}
@@ -203,9 +206,9 @@ export function NextAction({
             </div>
             <div className="flex justify-center">
               <RadarChart
-                stats={Object.fromEntries(allCards.map((c) => [c.statName, c.current]))}
-                targets={Object.fromEntries(allCards.map((c) => [c.statName, c.target]))}
-                statLabels={allCards.map((c) => c.statName)}
+                stats={Object.fromEntries(archetypeStats.map((c) => [c.statName, c.current]))}
+                targets={Object.fromEntries(archetypeStats.map((c) => [c.statName, c.target]))}
+                statLabels={archetypeStats.map((c) => c.statName)}
               />
             </div>
           </div>

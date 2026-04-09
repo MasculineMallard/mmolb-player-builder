@@ -191,7 +191,7 @@ export function ProgressionPath({
               </div>
 
               <span
-                className="text-center leading-tight mt-1 whitespace-nowrap"
+                className="text-center leading-tight mt-1 whitespace-nowrap hidden sm:block"
                 style={{
                   fontSize: 15,
                   letterSpacing: "0.01em",
@@ -203,6 +203,20 @@ export function ProgressionPath({
                 }}
               >
                 {m.name}
+              </span>
+              <span
+                className="text-center leading-tight mt-0.5 whitespace-nowrap sm:hidden"
+                style={{
+                  fontSize: 10,
+                  letterSpacing: "0.01em",
+                  color: isCurrent || isMax
+                    ? "var(--foreground)"
+                    : "var(--muted-foreground)",
+                  fontWeight: isCurrent || isMax ? 600 : 400,
+                  opacity: !isCompleted ? 0.5 : isCurrent || isMax ? 1 : 0.7,
+                }}
+              >
+                {m.name === "Defense Bonus" ? "Def" : m.name === "Lesser Boon" ? "Boon" : m.name}
               </span>
             </div>
           );

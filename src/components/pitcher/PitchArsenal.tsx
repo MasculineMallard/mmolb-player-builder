@@ -138,7 +138,7 @@ export function PitchArsenal({ pitches, advice, inline }: PitchArsenalProps) {
                   key={r}
                   className="text-sm font-medium text-[var(--chart-2)] bg-[var(--chart-2)]/10 border border-[var(--chart-2)]/30 px-2 py-0.5 rounded-full w-fit"
                 >
-                  - {r}
+                  - {PITCH_NAMES[r] ?? r.toUpperCase()}
                 </span>
               ))}
             </div>
@@ -233,7 +233,7 @@ export function PitchArsenal({ pitches, advice, inline }: PitchArsenalProps) {
                 key={r}
                 className="text-sm font-medium text-[var(--chart-2)] bg-[var(--chart-2)]/10 border border-[var(--chart-2)]/30 px-2.5 py-0.5 rounded-full w-fit"
               >
-                - {r}
+                - {PITCH_NAMES[r] ?? r.toUpperCase()}
               </span>
             ))}
           </div>
