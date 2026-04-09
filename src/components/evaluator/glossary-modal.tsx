@@ -99,9 +99,9 @@ export function GlossaryButton() {
                 <div className="space-y-0.5 ml-2 text-xs">
                   <div><span className="text-foreground">C:</span> Awareness</div>
                   <div><span className="text-foreground">1B:</span> Reaction, Awareness, Composure</div>
-                  <div><span className="text-foreground">2B:</span> Reaction, Awareness, Composure, Acrobatics</div>
-                  <div><span className="text-foreground">SS:</span> Reaction, Awareness, Composure, Arm</div>
-                  <div><span className="text-foreground">3B:</span> Reaction, Awareness, Composure, Arm</div>
+                  <div><span className="text-foreground">2B:</span> Reaction, Awareness, Composure</div>
+                  <div><span className="text-foreground">SS:</span> Reaction, Awareness, Composure</div>
+                  <div><span className="text-foreground">3B:</span> Reaction, Awareness, Composure</div>
                   <div><span className="text-foreground">OF:</span> Acrobatics, Agility, Arm</div>
                   <div><span className="text-foreground">P/DH:</span> Not scored</div>
                 </div>

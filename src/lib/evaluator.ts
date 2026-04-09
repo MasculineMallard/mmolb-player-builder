@@ -207,17 +207,18 @@ export function computePositionFitScore(
   const entry = positionDefense[basePos] ?? positionDefense[pos];
   if (!entry || !entry.stat_weights || Object.keys(entry.stat_weights).length === 0) return 100;
 
-  const DEFENSE_BUDGET = 300;
   const weights = entry.stat_weights;
+  const primaryStats = new Set(entry.primary_stats ?? []);
   const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
   if (totalWeight === 0) return 100;
 
+  // Fixed targets: primary 140, secondary 80. Catcher special case: 200.
+  const isCatcher = basePos === "C";
   let weightedScore = 0;
 
   for (const [stat, weight] of Object.entries(weights)) {
     const value = player.stats[stat.toLowerCase()] ?? 0;
-    // Target per stat = share of 300 budget proportional to weight, capped at 200
-    const target = Math.min(200, Math.round((weight / totalWeight) * DEFENSE_BUDGET));
+    const target = isCatcher ? 200 : primaryStats.has(stat) ? 140 : 80;
     const statScore = Math.min(1, value / target);
     weightedScore += statScore * weight;
   }

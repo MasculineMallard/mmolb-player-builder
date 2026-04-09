@@ -45,11 +45,11 @@ export function DefenseStatBars({ player, role, fitScore }: DefenseStatBarsProps
   }
 
   const weights = entry?.stat_weights ?? {};
+  const primaryStats = new Set(entry?.primary_stats ?? []);
   const defenseStats = Object.keys(weights);
   if (defenseStats.length === 0) return null;
 
-  const DEFENSE_BUDGET = 300;
-  const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+  const isCatcher = basePos === "C";
 
   return (
     <div className="space-y-1.5">
@@ -58,8 +58,7 @@ export function DefenseStatBars({ player, role, fitScore }: DefenseStatBarsProps
       </div>
       {defenseStats.map((stat) => {
         const value = player.stats[stat] ?? 0;
-        const weight = weights[stat] ?? 0.08;
-        const target = Math.min(200, Math.round((weight / totalWeight) * DEFENSE_BUDGET));
+        const target = isCatcher ? 200 : primaryStats.has(stat) ? 140 : 80;
         const pct = Math.min(100, (value / target) * 100);
 
         return (
