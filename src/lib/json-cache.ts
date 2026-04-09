@@ -1,3 +1,5 @@
+import { BASE_PATH } from "./constants";
+
 /**
  * Generic singleton JSON cache factory.
  * Creates a fetch-once, cache-forever loader for static JSON data files.
@@ -10,11 +12,12 @@ export function createJsonCache<T extends object>(
 ): () => Promise<T> {
   let cache: T | null = null;
   let pending: Promise<T> | null = null;
+  const fullUrl = url.startsWith("/") ? `${BASE_PATH}${url}` : url;
 
   return function load(): Promise<T> {
     if (cache) return Promise.resolve(cache);
     if (pending) return pending;
-    pending = fetch(url, { signal: AbortSignal.timeout(10000), cache: "no-store" })
+    pending = fetch(fullUrl, { signal: AbortSignal.timeout(10000), cache: "no-store" })
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status}`);
         return res.json() as Promise<unknown>;
