@@ -52,7 +52,7 @@ export function NavLinks() {
 
   // Close on route change
   useEffect(() => {
-    setOpen(false);
+    setOpen(false); // eslint-disable-line react-hooks/set-state-in-effect -- intentional: close menu when navigating
   }, [pathname]);
 
   return (
