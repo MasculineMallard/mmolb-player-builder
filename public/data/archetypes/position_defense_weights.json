@@ -25,40 +25,37 @@
   "2B": {
     "name": "Second Base",
     "emoji": "2️⃣",
-    "description": "Reaction for ground balls. Awareness for DP turns and steal prevention. Composure and acrobatics for range.",
+    "description": "Reaction for ground balls. Awareness for DP turns and steal prevention. Composure under pressure.",
     "primary_stats": ["reaction"],
-    "secondary_stats": ["awareness", "composure", "acrobatics"],
+    "secondary_stats": ["awareness", "composure"],
     "stat_weights": {
       "reaction": 0.12,
       "awareness": 0.10,
-      "composure": 0.08,
-      "acrobatics": 0.08
+      "composure": 0.08
     }
   },
   "SS": {
     "name": "Shortstop",
     "emoji": "🔷",
-    "description": "Reaction for ground balls. Awareness for DP turns and steal prevention. Composure under pressure. Arm for throws across the diamond.",
+    "description": "Reaction for ground balls. Awareness for DP turns and steal prevention. Composure under pressure.",
     "primary_stats": ["reaction"],
-    "secondary_stats": ["awareness", "composure", "arm"],
+    "secondary_stats": ["awareness", "composure"],
     "stat_weights": {
       "reaction": 0.12,
       "awareness": 0.10,
-      "composure": 0.08,
-      "arm": 0.08
+      "composure": 0.08
     }
   },
   "3B": {
     "name": "Third Base",
     "emoji": "3️⃣",
-    "description": "Reaction for hot corner. Awareness for DP potential. Composure under pressure. Arm for long throws.",
+    "description": "Reaction for hot corner. Awareness for DP potential. Composure under pressure.",
     "primary_stats": ["reaction"],
-    "secondary_stats": ["awareness", "composure", "arm"],
+    "secondary_stats": ["awareness", "composure"],
     "stat_weights": {
       "reaction": 0.12,
       "awareness": 0.10,
-      "composure": 0.08,
-      "arm": 0.08
+      "composure": 0.08
     }
   },
   "LF": {
