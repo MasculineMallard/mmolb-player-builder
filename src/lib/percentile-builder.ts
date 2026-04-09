@@ -1,16 +1,14 @@
 /**
- * Build live percentile tables from mmoldb S11 game events.
+ * Build live percentile tables from MMOLB API team/player stats.
  *
- * Uses a dedicated pg.Client (not the shared pool) with 120s timeout.
- * Queries all leagues for complete league-wide percentiles.
+ * Fetches all team rosters from the MMOLB API, computes batting and pitching
+ * lines, then builds percentile tables. No MMOLDB dependency.
  * Results cached in memory AND persisted to disk so restarts don't lose data.
  */
 
-import { Client } from "pg";
 import { readFileSync, writeFileSync, mkdirSync } from "fs";
 import { join } from "path";
 import type { PercentileEntry } from "./evaluator-types";
-import { fetchState } from "./mmolb-api";
 
 // ── Disk cache path ──
 
@@ -24,14 +22,13 @@ interface PercentileCache {
   pitching: Record<string, PercentileEntry[]>;
   computedAt: string;
   playerCount: { batters: number; pitchers: number };
-  season?: number;
 }
 
 let cached: PercentileCache | null = null;
 let isRefreshing = false;
 let lastError: string | null = null;
 
-// ── Load from disk on startup ──
+// ── Disk persistence ──
 
 function loadFromDisk(): PercentileCache | null {
   try {
@@ -56,55 +53,13 @@ function saveToDisk(data: PercentileCache): void {
 // Initialize from disk
 cached = loadFromDisk();
 if (cached) {
-  console.log(`[percentiles] Loaded disk cache from ${cached.computedAt} (S${cached.season ?? "?"})`);
+  console.log(`[percentiles] Loaded disk cache from ${cached.computedAt}`);
 }
 
 // ── Required keys for validation ──
 
 const REQUIRED_BATTING_KEYS = ["AVG", "OBP", "SLG", "OPS", "K_PCT", "BB_PCT"];
 const REQUIRED_PITCHING_KEYS = ["ERA", "WHIP", "K9", "BB9", "HR9"];
-
-// ── Queries (season placeholder replaced at runtime) ──
-
-function battingQuery(season: number): string {
-  return `
-  SELECT batter_name,
-    COUNT(*) FILTER (WHERE et.ends_plate_appearance) as pa,
-    COUNT(*) FILTER (WHERE et.is_hit AND ee.hit_base = 1) as singles,
-    COUNT(*) FILTER (WHERE et.is_hit AND ee.hit_base = 2) as doubles,
-    COUNT(*) FILTER (WHERE et.is_hit AND ee.hit_base = 3) as triples,
-    COUNT(*) FILTER (WHERE et.name = 'HomeRun') as hrs,
-    COUNT(*) FILTER (WHERE et.name = 'Walk') as bb,
-    COUNT(*) FILTER (WHERE et.is_strikeout) as so,
-    COUNT(*) FILTER (WHERE et.name = 'HitByPitch') as hbp,
-    COUNT(*) FILTER (WHERE et.name = 'StolenBase') as sb,
-    COUNT(*) FILTER (WHERE et.name = 'CaughtStealing') as cs
-  FROM data.events_extended ee
-  JOIN taxa.event_type et ON ee.event_type = et.id
-  WHERE ee.season = ${season}
-  GROUP BY batter_name
-  HAVING COUNT(*) FILTER (WHERE et.ends_plate_appearance) >= 30
-`;
-}
-
-function pitchingQuery(season: number): string {
-  return `
-  SELECT pitcher_name,
-    SUM(ee.outs_after - ee.outs_before) as outs,
-    COUNT(*) FILTER (WHERE et.is_hit) as hits_allowed,
-    COUNT(*) FILTER (WHERE et.name = 'HomeRun') as hr_allowed,
-    COUNT(*) FILTER (WHERE et.name = 'Walk') as walks,
-    COUNT(*) FILTER (WHERE et.is_strikeout) as strikeouts,
-    SUM(CASE WHEN top_of_inning
-      THEN away_team_score_after - away_team_score_before
-      ELSE home_team_score_after - home_team_score_before END) as runs_allowed
-  FROM data.events_extended ee
-  JOIN taxa.event_type et ON ee.event_type = et.id
-  WHERE ee.season = ${season}
-  GROUP BY pitcher_name
-  HAVING SUM(ee.outs_after - ee.outs_before) >= 15
-`;
-}
 
 // ── Percentile math ──
 
@@ -128,80 +83,141 @@ function validate(tables: PercentileCache): boolean {
   return true;
 }
 
-// ── Get current season from MMOLB API ──
+// ── MMOLB API types (minimal, just what we need) ──
 
-async function getCurrentSeason(): Promise<number> {
-  try {
-    const state = await fetchState();
-    // SeasonID is an ObjectId, but the season number is in the events data
-    // The state doesn't expose season number directly, so we parse from context
-    // For now, hardcode the mapping or use a reasonable default
-    // TODO: When the API exposes season number, use it directly
-  } catch {
-    // Fallback
-  }
-  return 11; // Current season
+interface ApiTeamPlayer {
+  FirstName: string;
+  LastName: string;
+  Position: string;
+  PositionType: string;
+  Stats: Record<string, number>;
+}
+
+interface ApiTeam {
+  Players: ApiTeamPlayer[];
+  Bench?: Record<string, ApiTeamPlayer[]>;
+}
+
+interface ApiLeague {
+  Teams: string[];
+}
+
+interface ApiState {
+  GreaterLeagues: string[];
+  LesserLeagues: string[];
+}
+
+const PITCHER_POSITIONS = new Set(["SP", "RP", "CL", "P"]);
+const MIN_PA = 30;
+const MIN_OUTS = 15;
+const MIN_STEAL_ATTEMPTS = 5;
+
+// ── Fetch helpers ──
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
+  if (!res.ok) throw new Error(`${url}: ${res.status}`);
+  return res.json() as Promise<T>;
 }
 
 // ── Core refresh ──
 
 async function runRefresh(): Promise<void> {
-  const season = await getCurrentSeason();
-
-  const client = new Client({
-    host: process.env.MMOLDB_HOST || "mmoldb.beiju.me",
-    port: parseInt(process.env.MMOLDB_PORT || "42416"),
-    database: process.env.MMOLDB_DATABASE || "mmoldb",
-    user: process.env.MMOLDB_USER || "guest",
-    password: process.env.MMOLDB_PASSWORD ?? (process.env.NODE_ENV === "production" ? undefined : "moldybees"),
-    ssl: false,
-    statement_timeout: 120_000,
-  });
-
   try {
-    await client.connect();
-    console.log(`[percentiles] Connected to mmoldb, querying season ${season}...`);
+    console.log("[percentiles] Fetching all teams from MMOLB API...");
 
-    const battingStart = performance.now();
-    const battingResult = await client.query(battingQuery(season));
-    console.log(`[percentiles] Batting: ${battingResult.rows.length} players in ${((performance.now() - battingStart) / 1000).toFixed(1)}s`);
+    // 1. Get all team IDs from leagues
+    const state = await fetchJson<ApiState>("https://mmolb.com/api/state");
+    const leagueIds = [...state.GreaterLeagues, ...state.LesserLeagues];
 
-    const pitchingStart = performance.now();
-    const pitchingResult = await client.query(pitchingQuery(season));
-    console.log(`[percentiles] Pitching: ${pitchingResult.rows.length} players in ${((performance.now() - pitchingStart) / 1000).toFixed(1)}s`);
+    const teamIds: string[] = [];
+    const leagueResults = await Promise.allSettled(
+      leagueIds.map(id => fetchJson<ApiLeague>(`https://mmolb.com/api/league/${id}`))
+    );
+    for (const r of leagueResults) {
+      if (r.status === "fulfilled") {
+        for (const t of r.value.Teams) {
+          if (typeof t === "string") teamIds.push(t);
+        }
+      }
+    }
+    console.log(`[percentiles] Found ${teamIds.length} teams across ${leagueIds.length} leagues`);
 
-    // Compute batting derived stats
-    const batterLines = battingResult.rows.map((r: Record<string, string>) => {
-      const pa = +r.pa;
-      const h = +r.singles + +r.doubles + +r.triples + +r.hrs;
-      const ab = pa - +r.bb - +r.hbp;
-      const tb = +r.singles + 2 * +r.doubles + 3 * +r.triples + 4 * +r.hrs;
-      const sb = +r.sb;
-      const cs = +r.cs;
-      return {
-        avg: ab > 0 ? h / ab : 0,
-        obp: pa > 0 ? (h + +r.bb + +r.hbp) / pa : 0,
-        slg: ab > 0 ? tb / ab : 0,
-        ops: (pa > 0 ? (h + +r.bb + +r.hbp) / pa : 0) + (ab > 0 ? tb / ab : 0),
-        kPct: pa > 0 ? +r.so / pa * 100 : 0,
-        bbPct: pa > 0 ? +r.bb / pa * 100 : 0,
-        sbPct: (sb + cs) >= 5 ? sb / (sb + cs) : undefined,
-      };
-    });
+    // 2. Fetch team rosters in batches of 20 to avoid overwhelming the API
+    const allPlayers: ApiTeamPlayer[] = [];
+    const BATCH = 20;
+    for (let i = 0; i < teamIds.length; i += BATCH) {
+      const batch = teamIds.slice(i, i + BATCH);
+      const results = await Promise.allSettled(
+        batch.map(id => fetchJson<ApiTeam>(`https://mmolb.com/api/team/${id}`))
+      );
+      for (const r of results) {
+        if (r.status === "fulfilled") {
+          allPlayers.push(...r.value.Players);
+          // Include bench players too
+          if (r.value.Bench) {
+            for (const group of Object.values(r.value.Bench)) {
+              if (Array.isArray(group)) allPlayers.push(...group);
+            }
+          }
+        }
+      }
+    }
+    console.log(`[percentiles] Fetched ${allPlayers.length} players`);
 
-    // Compute pitching derived stats
-    const pitcherLines = pitchingResult.rows.map((r: Record<string, string>) => {
-      const outs = +r.outs;
-      const ip = outs / 3;
-      return {
-        era: ip > 0 ? +r.runs_allowed / ip * 9 : 0,
-        whip: ip > 0 ? (+r.hits_allowed + +r.walks) / ip : 0,
-        k9: ip > 0 ? +r.strikeouts / ip * 9 : 0,
-        bb9: ip > 0 ? +r.walks / ip * 9 : 0,
-        hr9: ip > 0 ? +r.hr_allowed / ip * 9 : 0,
-      };
-    });
+    // 3. Split into batters and pitchers, compute lines
+    const batterLines: { avg: number; obp: number; slg: number; ops: number; kPct: number; bbPct: number; sbPct?: number }[] = [];
+    const pitcherLines: { era: number; whip: number; k9: number; bb9: number; hr9: number }[] = [];
 
+    for (const p of allPlayers) {
+      const s = p.Stats;
+      if (!s) continue;
+
+      const isPitcher = PITCHER_POSITIONS.has(p.Position?.replace(/\d+$/, "") ?? "");
+
+      if (isPitcher) {
+        const outs = s.outs ?? 0;
+        if (outs < MIN_OUTS) continue;
+        const ip = outs / 3;
+        pitcherLines.push({
+          era: (s.earned_runs ?? 0) / ip * 9,
+          whip: ((s.hits_allowed ?? 0) + (s.walks ?? 0)) / ip,
+          k9: (s.strikeouts ?? 0) / ip * 9,
+          bb9: (s.walks ?? 0) / ip * 9,
+          hr9: (s.home_runs_allowed ?? 0) / ip * 9,
+        });
+      } else {
+        const pa = s.plate_appearances ?? 0;
+        if (pa < MIN_PA) continue;
+        const singles = s.singles ?? 0;
+        const doubles = s.doubles ?? 0;
+        const triples = s.triples ?? 0;
+        const hrs = s.home_runs ?? 0;
+        const bb = s.walked ?? 0;
+        const hbp = s.hit_by_pitch ?? 0;
+        const so = s.struck_out ?? 0;
+        const sb = s.stolen_bases ?? 0;
+        const cs = s.caught_stealing ?? 0;
+
+        const h = singles + doubles + triples + hrs;
+        const ab = pa - bb - hbp - (s.sac_flies ?? 0);
+        const tb = singles + 2 * doubles + 3 * triples + 4 * hrs;
+
+        batterLines.push({
+          avg: ab > 0 ? h / ab : 0,
+          obp: pa > 0 ? (h + bb + hbp) / pa : 0,
+          slg: ab > 0 ? tb / ab : 0,
+          ops: (pa > 0 ? (h + bb + hbp) / pa : 0) + (ab > 0 ? tb / ab : 0),
+          kPct: pa > 0 ? so / pa * 100 : 0,
+          bbPct: pa > 0 ? bb / pa * 100 : 0,
+          sbPct: (sb + cs) >= MIN_STEAL_ATTEMPTS ? sb / (sb + cs) : undefined,
+        });
+      }
+    }
+
+    console.log(`[percentiles] Computing: ${batterLines.length} batters, ${pitcherLines.length} pitchers`);
+
+    // 4. Build percentile tables
     const battingTables: Record<string, PercentileEntry[]> = {
       AVG: buildPercentileTable(batterLines.map(b => b.avg), true),
       OBP: buildPercentileTable(batterLines.map(b => b.obp), true),
@@ -228,7 +244,6 @@ async function runRefresh(): Promise<void> {
       pitching: pitchingTables,
       computedAt: new Date().toISOString(),
       playerCount: { batters: batterLines.length, pitchers: pitcherLines.length },
-      season,
     };
 
     if (validate(result)) {
@@ -244,7 +259,6 @@ async function runRefresh(): Promise<void> {
     lastError = err instanceof Error ? err.message : String(err);
     console.error("[percentiles] Refresh failed:", lastError);
   } finally {
-    await client.end().catch(() => {});
     isRefreshing = false;
   }
 }
@@ -259,7 +273,6 @@ export function triggerRefresh(): { status: number; message: string } {
   void runRefresh();
   return { status: 202, message: "Refresh started" };
 }
-
 
 export function getCachedPercentiles(): {
   batting: Record<string, PercentileEntry[]>;
