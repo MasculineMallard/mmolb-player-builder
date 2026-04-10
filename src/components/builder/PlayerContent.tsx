@@ -105,13 +105,21 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
   // Defense stat recommendations from position weights
   const defenseRecommendations = useMemo(() => {
     if (Object.keys(posDefenseWeights).length === 0) return [];
-    return Object.entries(posDefenseWeights).map(([statName, weight]) => {
-      const current = player.stats[statName] ?? 0;
-      const target = Math.round((weight / 0.12) * 120);
-      const gap = Math.max(target - current, 0);
-      return { statName, current, target, gap, weight, priorityScore: gap * weight, reasoning: "Position defense stat" };
-    });
-  }, [posDefenseWeights, player.stats]);
+    const pastDefenseLevels = player.level >= 25;
+    return Object.entries(posDefenseWeights)
+      .map(([statName, weight]) => {
+        const current = player.stats[statName] ?? 0;
+        const target = Math.round((weight / 0.12) * 120);
+        const gap = Math.max(target - current, 0);
+        // After level 25, suppress defense food unless stat is critically zero
+        if (pastDefenseLevels && current > 0) return null;
+        const reasoning = pastDefenseLevels
+          ? "Position defense stat (no defense levels remain)"
+          : "Position defense stat";
+        return { statName, current, target, gap, weight, priorityScore: gap * weight, reasoning };
+      })
+      .filter((r): r is NonNullable<typeof r> => r !== null);
+  }, [posDefenseWeights, player.stats, player.level]);
   const recommendations = useMemo(
     () => [...offenseRecommendations, ...defenseRecommendations],
     [offenseRecommendations, defenseRecommendations]

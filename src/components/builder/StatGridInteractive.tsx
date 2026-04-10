@@ -91,6 +91,7 @@ export function StatGridInteractive({
         <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
           <span className="w-0.5 h-3.5 bg-primary/40 rounded-full" />
           All Stats
+          <span className="normal-case tracking-normal font-normal text-muted-foreground/60 text-xs">(base only, no boons/items)</span>
         </h3>
         {hasTargets && (
           <button

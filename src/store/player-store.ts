@@ -27,6 +27,9 @@ interface PlayerStore {
   // Selected archetype
   archetypeId: string | null;
 
+  // Per-player archetype mapping (playerId -> archetypeId)
+  playerArchetypes: Record<string, string>;
+
   // Last loaded team roster (for quick switching)
   lastTeam: TeamSearchResult | null;
   lastRoster: RosterPlayer[];
@@ -44,6 +47,7 @@ interface PlayerStore {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setArchetypeId: (id: string | null) => void;
+  setPlayerArchetype: (playerId: string, archetypeId: string | null) => void;
   setLastTeam: (team: TeamSearchResult | null, roster: RosterPlayer[]) => void;
   clearCompare: () => void;
 
@@ -110,6 +114,7 @@ export const usePlayerStore = create<PlayerStore>()(
       loading: false,
       error: null,
       archetypeId: null,
+      playerArchetypes: {},
       lastTeam: null,
       lastRoster: [],
       recentPlayers: [],
@@ -121,6 +126,15 @@ export const usePlayerStore = create<PlayerStore>()(
       setLoading: (loading) => set({ loading }),
       setError: (error) => set({ error, loading: false }),
       setArchetypeId: (archetypeId) => set({ archetypeId }),
+      setPlayerArchetype: (playerId, archetypeId) => set((state) => {
+        const next = { ...state.playerArchetypes };
+        if (archetypeId) {
+          next[playerId] = archetypeId;
+        } else {
+          delete next[playerId];
+        }
+        return { playerArchetypes: next };
+      }),
       setLastTeam: (lastTeam, lastRoster) => set({ lastTeam, lastRoster }),
       clearCompare: () => set({ comparePlayer: null, compareError: null }),
 
@@ -200,21 +214,27 @@ export const usePlayerStore = create<PlayerStore>()(
     }),
     {
       name: "mmolb-player-store",
-      version: 2,
+      version: 3,
       partialize: (state) => ({
         player: state.player,
         archetypeId: state.archetypeId,
+        playerArchetypes: state.playerArchetypes,
         recentPlayers: state.recentPlayers,
       }),
       migrate: (persisted, version) => {
+        const old = persisted as Record<string, unknown>;
         if (version < 2) {
-          console.warn(`[player-store] migrating from v${version} to v2`);
-          const old = persisted as Record<string, unknown>;
+          console.warn(`[player-store] migrating from v${version} to v3`);
           return {
             player: old.player ?? null,
             archetypeId: old.archetypeId ?? null,
+            playerArchetypes: {},
             recentPlayers: [],
           };
+        }
+        if (version < 3) {
+          console.warn(`[player-store] migrating from v${version} to v3`);
+          return { ...old, playerArchetypes: {} };
         }
         return persisted as Record<string, unknown>;
       },
