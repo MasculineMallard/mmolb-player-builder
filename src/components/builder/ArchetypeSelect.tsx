@@ -148,6 +148,8 @@ export function ArchetypeSelect({
   const [showCustom, setShowCustom] = useState(false);
   const archetypeId = usePlayerStore((s) => s.archetypeId);
   const setArchetypeId = usePlayerStore((s) => s.setArchetypeId);
+  const setPlayerArchetype = usePlayerStore((s) => s.setPlayerArchetype);
+  const playerArchetypes = usePlayerStore((s) => s.playerArchetypes);
   const player = usePlayerStore((s) => s.player);
 
   useEffect(() => {
@@ -167,23 +169,31 @@ export function ArchetypeSelect({
     return () => { cancelled = true; };
   }, [playerType]);
 
-  // Restore archetype from store/URL after archetypes load
+  // Restore archetype from per-player mapping, then fall back to global archetypeId
   useEffect(() => {
-    if (archetypeId && archetypeId !== "__custom" && archetypes[archetypeId]) {
-      onArchetypeChange(archetypes[archetypeId]);
+    if (Object.keys(archetypes).length === 0) return;
+    const playerId = player?.mmolbPlayerId;
+    const savedId = playerId ? playerArchetypes[playerId] : null;
+    const restoreId = savedId ?? archetypeId;
+    if (restoreId && restoreId !== "__custom" && archetypes[restoreId]) {
+      if (restoreId !== archetypeId) setArchetypeId(restoreId);
+      onArchetypeChange(archetypes[restoreId]);
     }
-  }, [archetypeId, archetypes, onArchetypeChange]);
+  }, [player?.mmolbPlayerId, archetypes]); // eslint-disable-line react-hooks/exhaustive-deps -- restore on player/archetype load
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const key = e.target.value || null;
+    const playerId = player?.mmolbPlayerId;
     if (key === "__custom") {
       setShowCustom(true);
       setArchetypeId("__custom");
+      if (playerId) setPlayerArchetype(playerId, "__custom");
       onArchetypeChange(null);
       return;
     }
     setShowCustom(false);
     setArchetypeId(key);
+    if (playerId) setPlayerArchetype(playerId, key);
     onArchetypeChange(key ? archetypes[key] : null);
   };
 
