@@ -391,18 +391,23 @@ export function getCachedPercentiles(): {
   return { source: "none", lastError };
 }
 
-// ── Auto-refresh: on startup if stale, then every 24h ──
+// ── Auto-refresh: production only, on startup if stale, then every 24h ──
+// In dev mode, use POST /api/percentiles/refresh to trigger manually.
 
-const REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
-const _cacheAge = cached ? Date.now() - new Date(cached.computedAt).getTime() : Infinity;
-if (_cacheAge > REFRESH_INTERVAL_MS) {
-  console.log("[percentiles] Cache stale or missing, auto-refreshing on startup...");
-  setTimeout(() => { if (!isRefreshing) { isRefreshing = true; void runRefresh(); } }, 5000);
-}
-setInterval(() => {
-  if (!isRefreshing) {
-    console.log("[percentiles] Daily auto-refresh triggered");
-    isRefreshing = true;
-    void runRefresh();
+if (process.env.NODE_ENV === "production") {
+  const REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
+  const _cacheAge = cached ? Date.now() - new Date(cached.computedAt).getTime() : Infinity;
+  if (_cacheAge > REFRESH_INTERVAL_MS) {
+    console.log("[percentiles] Cache stale or missing, auto-refreshing on startup...");
+    setTimeout(() => { if (!isRefreshing) { isRefreshing = true; void runRefresh(); } }, 5000);
   }
-}, REFRESH_INTERVAL_MS);
+  setInterval(() => {
+    if (!isRefreshing) {
+      console.log("[percentiles] Daily auto-refresh triggered");
+      isRefreshing = true;
+      void runRefresh();
+    }
+  }, REFRESH_INTERVAL_MS);
+} else {
+  console.log("[percentiles] Dev mode: auto-refresh disabled. Use POST /api/percentiles/refresh to trigger.");
+}
