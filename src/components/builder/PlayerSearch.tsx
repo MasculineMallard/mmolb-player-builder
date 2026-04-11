@@ -97,7 +97,9 @@ function NameSearch({
         <p className="text-sm text-muted-foreground">Searching...</p>
       )}
       {error && (
-        <p className="text-sm text-destructive">Search failed. Try again.</p>
+        <p className="text-sm text-destructive">
+          Name search is unavailable (database may be down). Use Browse Teams instead.
+        </p>
       )}
       {results.length > 0 && (
         <div
