@@ -127,10 +127,13 @@ export function recommendBoonsByLevel(
   // in normal gameplay. This is the best mapping available without level metadata on boons.
   const takenBoonsList = takenBoons.lesser;
   const timeline: BoonTimelineEntry[] = [];
-  let takenIdx = 0;
 
-  for (const [level, label] of boonSchedule) {
-    const acquired = currentLevel >= level;
+  for (let i = 0; i < boonSchedule.length; i++) {
+    const [level, label] = boonSchedule[i];
+    // A boon slot is acquired when the player has actually picked it,
+    // not just when they've reached the level. This handles the case
+    // where a player is at level 30 but hasn't selected their 3rd boon yet.
+    const acquired = i < takenBoonsList.length;
     const allSuggestions = archetype.recommended_lesser_boons ?? [];
 
     const alreadyUsed = new Set([...takenLesser, ...plannedLesser]);
@@ -143,10 +146,7 @@ export function recommendBoonsByLevel(
       plannedLesser.add(filtered[0].toLowerCase());
     }
 
-    const takenBoonName = acquired && takenIdx < takenBoonsList.length
-      ? takenBoonsList[takenIdx]
-      : null;
-    if (acquired) takenIdx++;
+    const takenBoonName = acquired ? takenBoonsList[i] : null;
 
     timeline.push({
       level,

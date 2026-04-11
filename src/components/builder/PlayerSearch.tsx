@@ -123,9 +123,6 @@ function NameSearch({
               <span className="text-sm text-muted-foreground">
                 {p.teamEmoji} {p.teamName}
               </span>
-              <span className="text-sm text-muted-foreground">
-                Lv.{p.level}
-              </span>
             </button>
           ))}
         </div>
