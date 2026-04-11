@@ -12,6 +12,7 @@ export interface LevelMechanics {
   defenseBonusAmount: number;
   isBoonLevel: boolean;
   isDefenseLevel: boolean;
+  hasPendingBoon: boolean;
 }
 
 interface NextActionProps {
@@ -28,13 +29,15 @@ const DEFENSE_STATS: Set<string> = new Set([
 ]);
 
 export function NextAction({
-  mechanics: { level, maxLevel, pointsPerLevel, defenseBonusAmount, isBoonLevel, isDefenseLevel },
+  mechanics: { level, maxLevel, pointsPerLevel, defenseBonusAmount, isBoonLevel, isDefenseLevel, hasPendingBoon },
   statRecommendations,
   boonTimeline,
   progressPercent,
   archetype,
 }: NextActionProps) {
-  if (level >= maxLevel) {
+  const nextBoon = boonTimeline.find((b) => !b.acquired);
+
+  if (level >= maxLevel && !hasPendingBoon) {
     return (
       <div className="bg-gradient-to-r from-[var(--chart-2)] to-[var(--chart-5)] p-[1px] rounded-lg">
         <div
@@ -52,8 +55,6 @@ export function NextAction({
     );
   }
 
-  const nextBoon = boonTimeline.find((b) => !b.acquired);
-
   // Radar shows archetype priority + secondary stats (not defense)
   const archetypeStats = statRecommendations.filter((r) => !DEFENSE_STATS.has(r.statName));
 
@@ -64,7 +65,7 @@ export function NextAction({
         Archetype Fit
       </h3>
       <div>
-        {isBoonLevel && nextBoon ? (
+        {(isBoonLevel || hasPendingBoon) && nextBoon ? (
           <div>
             <p className="text-base font-bold mb-1">Choose a Lesser Boon</p>
             {nextBoon.recommendations.length > 0 ? (

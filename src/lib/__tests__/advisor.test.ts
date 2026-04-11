@@ -107,9 +107,20 @@ describe("recommendBoonsByLevel", () => {
     expect(timeline.every((t) => !t.acquired)).toBe(true);
   });
 
-  it("marks first boon as acquired for level 15 player", () => {
+  it("marks no boons as acquired for level 15 player with no taken boons", () => {
     const timeline = recommendBoonsByLevel(15, mockArchetype);
-    expect(timeline[0].acquired).toBe(true); // level 10
+    expect(timeline[0].acquired).toBe(false); // level 10 — not picked yet
+    expect(timeline[1].acquired).toBe(false); // level 20
+    expect(timeline[2].acquired).toBe(false); // level 30
+  });
+
+  it("marks first boon as acquired for level 15 player with 1 taken boon", () => {
+    const timeline = recommendBoonsByLevel(15, mockArchetype, {
+      lesser: ["Draconic"],
+      greater: [],
+    });
+    expect(timeline[0].acquired).toBe(true); // level 10 — picked
+    expect(timeline[0].takenBoonName).toBe("Draconic");
     expect(timeline[1].acquired).toBe(false); // level 20
     expect(timeline[2].acquired).toBe(false); // level 30
   });

@@ -15,7 +15,7 @@ import { recommendStatPriorities, recommendBoonsByLevel } from "@/lib/advisor";
 import { calculateProgress, generateMilestones } from "@/lib/planner-utils";
 import { optimizePitchArsenal, computePitchFitPct } from "@/lib/optimizer";
 import { S11, calculateFitTargets } from "@/lib/mechanics";
-import { PITCHER_POSITIONS, EMPTY_ARCHETYPE } from "@/lib/constants";
+import { PITCHER_POSITIONS, EMPTY_ARCHETYPE, STAT_CATEGORIES } from "@/lib/constants";
 import { usePitchTypes } from "@/hooks/use-pitch-types";
 import { usePlayerStore } from "@/store/player-store";
 import { loadPositionDefense } from "@/lib/evaluator-data";
@@ -124,6 +124,13 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
     () => [...offenseRecommendations, ...defenseRecommendations],
     [offenseRecommendations, defenseRecommendations]
   );
+  // For food recommendations, filter out defense+luck stats past level 25
+  // (no more defense bonus levels, so defense food is wasted)
+  const foodRecommendations = useMemo(() => {
+    if (player.level < 25) return recommendations;
+    const noFoodStats = new Set<string>([...STAT_CATEGORIES.defense, ...STAT_CATEGORIES.luck]);
+    return recommendations.filter(r => !noFoodStats.has(r.statName));
+  }, [recommendations, player.level]);
   const boonTimeline = useMemo(
     () => recommendBoonsByLevel(
       player.level, effectiveArchetype,
@@ -188,14 +195,19 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
     },
     [hasArchetype, effectiveArchetype, posDefenseStats]
   );
-  const levelMechanics = useMemo(() => ({
-    level: player.level,
-    maxLevel: S11.maxLevel,
-    pointsPerLevel: S11.pointsPerLevel,
-    defenseBonusAmount: S11.defenseBonusAmount,
-    isBoonLevel: (S11.boonLevels as readonly number[]).includes(player.level + 1),
-    isDefenseLevel: (S11.defenseBonusLevels as readonly number[]).includes(player.level + 1),
-  }), [player.level]);
+  const levelMechanics = useMemo(() => {
+    const boonLevelsReached = (S11.boonLevels as readonly number[]).filter(l => player.level >= l).length;
+    const hasPendingBoon = player.lesserBoons.length < boonLevelsReached;
+    return {
+      level: player.level,
+      maxLevel: S11.maxLevel,
+      pointsPerLevel: S11.pointsPerLevel,
+      defenseBonusAmount: S11.defenseBonusAmount,
+      isBoonLevel: (S11.boonLevels as readonly number[]).includes(player.level + 1),
+      isDefenseLevel: (S11.defenseBonusLevels as readonly number[]).includes(player.level + 1),
+      hasPendingBoon,
+    };
+  }, [player.level, player.lesserBoons.length]);
 
   const boonCount = player.lesserBoons.length + player.greaterBoons.length;
   const showPitchArsenal = isPitcher && player.pitches.length > 0;
@@ -330,7 +342,7 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
         )}
 
         {hasArchetype && (
-          <FoodRecommendation recommendations={recommendations} />
+          <FoodRecommendation recommendations={foodRecommendations} />
         )}
 
       </div>
