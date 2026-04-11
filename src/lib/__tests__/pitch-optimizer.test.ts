@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   calculatePitchEffectiveness,
   optimizePitchArsenal,
+  computePitchFitPct,
 } from "../optimizer";
 import type { Archetype } from "../types";
 
@@ -225,5 +226,67 @@ describe("optimizePitchArsenal", () => {
       expect(typeof entry.effectiveness).toBe("number");
       expect(entry.pitchType).toBeTruthy();
     }
+  });
+});
+
+describe("computePitchFitPct", () => {
+  const pitchTypesData = {
+    sl: { name: "Slider", tier: 1 },
+    fs: { name: "Splitter", tier: 1 },
+    ch: { name: "Changeup", tier: 2 },
+    ff: { name: "Fastball", tier: 3 },
+    kc: { name: "Knuckle Curve", tier: 1 },
+    fc: { name: "Cutter", tier: 2 },
+  };
+
+  const makeArch = (pitches: string[]): Archetype => ({
+    name: "Test",
+    description: "",
+    priority_stats: [],
+    secondary_stats: [],
+    stat_weights: {},
+    recommended_pitches: pitches,
+  });
+
+  it("returns null for archetype with no recommended pitches", () => {
+    expect(computePitchFitPct(["sl"], makeArch([]), pitchTypesData)).toBeNull();
+  });
+
+  it("returns null for archetype with undefined recommended pitches", () => {
+    const arch: Archetype = { name: "Test", description: "", priority_stats: [], secondary_stats: [], stat_weights: {} };
+    expect(computePitchFitPct(["sl"], arch, pitchTypesData)).toBeNull();
+  });
+
+  it("returns 0 when player has none of the recommended pitches", () => {
+    expect(computePitchFitPct(["ff"], makeArch(["sl", "fs", "ch"]), pitchTypesData)).toBe(0);
+  });
+
+  it("returns 100 when player has all recommended pitches", () => {
+    expect(computePitchFitPct(["sl", "fs", "ch"], makeArch(["sl", "fs", "ch"]), pitchTypesData)).toBe(100);
+  });
+
+  it("returns 100 when player has extra pitches beyond recommended", () => {
+    expect(computePitchFitPct(["sl", "fs", "ch", "ff", "kc"], makeArch(["sl", "fs", "ch"]), pitchTypesData)).toBe(100);
+  });
+
+  it("weights T1 pitches higher than T3", () => {
+    // Recommended: sl(T1=1.5), ff(T3=0.75) → total=2.25
+    // Player has ff only → matched=0.75 → 0.75/2.25=33%
+    expect(computePitchFitPct(["ff"], makeArch(["sl", "ff"]), pitchTypesData)).toBe(33);
+    // Player has sl only → matched=1.5 → 1.5/2.25=67%
+    expect(computePitchFitPct(["sl"], makeArch(["sl", "ff"]), pitchTypesData)).toBe(67);
+  });
+
+  it("handles partial overlap with tier weighting", () => {
+    // Fastball Command: sl(T1=1.5), fc(T2=1.0), ff(T3=0.75), kc(T1=1.5) → total=4.75
+    // Player has sl + ff → matched=1.5+0.75=2.25 → 2.25/4.75=47%
+    expect(computePitchFitPct(["sl", "ff"], makeArch(["sl", "fc", "ff", "kc"]), pitchTypesData)).toBe(47);
+  });
+
+  it("defaults to weight 1.0 for unknown pitch types", () => {
+    // "xx" not in pitchTypesData → tier undefined → weight 1.0
+    // Recommended: sl(1.5), xx(1.0) → total=2.5
+    // Player has xx → matched=1.0 → 1.0/2.5=40%
+    expect(computePitchFitPct(["xx"], makeArch(["sl", "xx"]), pitchTypesData)).toBe(40);
   });
 });

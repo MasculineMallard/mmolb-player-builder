@@ -13,7 +13,7 @@ import { ExportShare } from "./ExportShare";
 import { useBoonEmojis } from "@/hooks/use-boon-emojis";
 import { recommendStatPriorities, recommendBoonsByLevel } from "@/lib/advisor";
 import { calculateProgress, generateMilestones } from "@/lib/planner-utils";
-import { optimizePitchArsenal } from "@/lib/optimizer";
+import { optimizePitchArsenal, computePitchFitPct } from "@/lib/optimizer";
 import { S11, calculateFitTargets } from "@/lib/mechanics";
 import { PITCHER_POSITIONS, EMPTY_ARCHETYPE } from "@/lib/constants";
 import { usePitchTypes } from "@/hooks/use-pitch-types";
@@ -152,6 +152,12 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
     }
     return maxPossible > 0 ? Math.round((matchScore / maxPossible) * 100) : 0;
   }, [player.stats, player.level, effectiveArchetype]);
+  const pitchFitPct = useMemo(
+    () => isPitcher && hasArchetype && Object.keys(pitchTypes).length > 0
+      ? computePitchFitPct(player.pitches.map((p) => p.name), effectiveArchetype, pitchTypes)
+      : null,
+    [isPitcher, hasArchetype, pitchTypes, player.pitches, effectiveArchetype]
+  );
   const milestones = useMemo(() => generateMilestones(player.level), [player.level]);
   const pitchAdvice = useMemo(
     () =>
@@ -306,7 +312,12 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
           )}
         </div>
 
-        <ArchetypeSelect playerType={playerType} onArchetypeChange={handleArchetypeChange} />
+        <ArchetypeSelect
+          playerType={playerType}
+          onArchetypeChange={handleArchetypeChange}
+          pitchTypes={isPitcher ? pitchTypes : undefined}
+          playerPitches={isPitcher ? player.pitches.map((p) => p.name) : undefined}
+        />
 
         {hasArchetype && (
           <NextAction

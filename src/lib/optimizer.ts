@@ -29,6 +29,38 @@ export function calculateStatTargets(archetype: Archetype): {
   return { corePer, supportPer };
 }
 
+/** Tier weight for pitch fit calculation. Elite pitches matter more. */
+function tierWeight(tier: number | undefined): number {
+  if (tier === 1) return 1.5;
+  if (tier === 3) return 0.75;
+  return 1.0; // T2 or unknown
+}
+
+/**
+ * Compute how well a player's current pitches match an archetype's recommendations.
+ * Returns 0-100 percentage, or null if the archetype has no recommended pitches.
+ */
+export function computePitchFitPct(
+  playerPitchNames: string[],
+  archetype: Archetype,
+  pitchTypesData: PitchTypesMap
+): number | null {
+  const recommended = archetype.recommended_pitches;
+  if (!recommended || recommended.length === 0) return null;
+
+  const playerSet = new Set(playerPitchNames);
+  let matched = 0;
+  let total = 0;
+
+  for (const pitch of recommended) {
+    const w = tierWeight(pitchTypesData[pitch]?.tier);
+    total += w;
+    if (playerSet.has(pitch)) matched += w;
+  }
+
+  return total > 0 ? Math.round((matched / total) * 100) : null;
+}
+
 export interface PitchEffectiveness {
   pitchType: string;
   effectiveness: number;

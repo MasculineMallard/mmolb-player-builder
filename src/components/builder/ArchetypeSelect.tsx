@@ -6,11 +6,14 @@ import { isAbortError } from "@/lib/utils";
 import { createJsonCache, isNonArrayObject } from "@/lib/json-cache";
 import { STAT_CATEGORIES } from "@/lib/constants";
 import { calculateFitTargets } from "@/lib/mechanics";
-import type { Archetype } from "@/lib/types";
+import { computePitchFitPct } from "@/lib/optimizer";
+import type { Archetype, PitchTypesMap } from "@/lib/types";
 
 interface ArchetypeSelectProps {
   playerType: "pitcher" | "batter";
   onArchetypeChange: (archetype: Archetype | null) => void;
+  pitchTypes?: PitchTypesMap;
+  playerPitches?: string[];
 }
 
 interface ArchetypeMap {
@@ -142,6 +145,8 @@ function CustomArchetypeEditor({
 export function ArchetypeSelect({
   playerType,
   onArchetypeChange,
+  pitchTypes,
+  playerPitches,
 }: ArchetypeSelectProps) {
   const [archetypes, setArchetypes] = useState<ArchetypeMap>({});
   const [loadError, setLoadError] = useState(false);
@@ -216,6 +221,21 @@ export function ArchetypeSelect({
     return map;
   }, [player, archetypes]);
 
+  // Compute pitch fit % for each archetype
+  const pitchFitPcts = useMemo(() => {
+    if (!playerPitches?.length || !pitchTypes || Object.keys(archetypes).length === 0)
+      return new Map<string, number | null>();
+    const map = new Map<string, number | null>();
+    for (const [key, arch] of Object.entries(archetypes)) {
+      map.set(key, computePitchFitPct(playerPitches, arch, pitchTypes));
+    }
+    return map;
+  }, [playerPitches, pitchTypes, archetypes]);
+
+  const selectedPitchFitPct = selectedArch && playerPitches?.length && pitchTypes
+    ? computePitchFitPct(playerPitches, selectedArch, pitchTypes)
+    : null;
+
   return (
     <div className="bg-card border border-border rounded-lg px-3 py-2">
       <label className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1 flex items-center gap-2">
@@ -223,7 +243,7 @@ export function ArchetypeSelect({
         Archetype
         {selectedArch && selectedFitPct != null && player && (
           <span className="normal-case tracking-normal font-normal text-muted-foreground">
-            {selectedFitPct}% fit <span className="opacity-60">(for Lv. {player.level})</span>
+            {selectedFitPct}% stat{selectedPitchFitPct != null && (<> · {selectedPitchFitPct}% pitch</>)} <span className="opacity-60">(Lv. {player.level})</span>
           </span>
         )}
       </label>
@@ -238,9 +258,13 @@ export function ArchetypeSelect({
         <option value="">Select an archetype...</option>
         {entries.map(([key, arch]) => {
           const pct = fitPcts.get(key);
+          const pitchPct = pitchFitPcts.get(key);
+          const pctLabel = pct != null
+            ? pitchPct != null ? ` ${pct}% / ${pitchPct}%` : ` ${pct}%`
+            : "";
           return (
             <option key={key} value={key}>
-              {arch.emoji ? `${arch.emoji} ` : ""}{arch.name}{pct != null ? ` ${pct}%` : ""}
+              {arch.emoji ? `${arch.emoji} ` : ""}{arch.name}{pctLabel}
             </option>
           );
         })}
@@ -271,6 +295,27 @@ export function ArchetypeSelect({
               </span>
             ))}
           </div>
+          {selectedArch.recommended_pitches && selectedArch.recommended_pitches.length > 0 && playerPitches && (
+            <div className="flex gap-1.5 flex-wrap mb-1.5">
+              {selectedArch.recommended_pitches.map((pitch) => {
+                const has = playerPitches.includes(pitch);
+                const info = pitchTypes?.[pitch];
+                const label = info?.name ?? pitch.toUpperCase();
+                return (
+                  <span
+                    key={pitch}
+                    className={`text-xs px-2 py-0.5 rounded-full border ${
+                      has
+                        ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                        : "bg-muted/50 text-muted-foreground/50 border-border/50"
+                    }`}
+                  >
+                    {label}
+                  </span>
+                );
+              })}
+            </div>
+          )}
           <p className="text-sm text-muted-foreground">
             {selectedArch.description}
           </p>
