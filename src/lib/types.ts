@@ -53,6 +53,7 @@ export interface TeamSearchResult {
 
 export type PitchTypeInfo = {
   name: string;
+  tier?: number;
   priority_stats?: string[];
   secondary_stats?: string[];
 };
