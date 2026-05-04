@@ -9,7 +9,7 @@
  *   Intimidation=350, Cunning=299, Acrobatics=252, Contact=50 (augment).
  */
 
-import { POSITION_ORDER, CURRENT_SEASON_NUMBER } from "./constants";
+import { POSITION_ORDER } from "./constants";
 import type { PlayerData, PitchData, RosterPlayer } from "./types";
 import type { GameStats } from "./evaluator-types";
 import type {
@@ -103,15 +103,27 @@ function filterPreRecompRecords(
  * their stats are valid.
  *
  * Birthday = "Preseason" means they've been here since the start: not recomped.
+ *
+ * Derives the current season number from playerrecord data (matching the
+ * live SeasonID) so this doesn't break on season rollover.
  */
 function wasRecompedThisSeason(
   raw: MmolbApiPlayer,
-  _playerRecords?: MmolbApiPlayerRecord[],
-  _currentSeasonId?: string,
+  playerRecords?: MmolbApiPlayerRecord[],
+  currentSeasonId?: string,
   _currentDay?: number,
 ): boolean {
-  return typeof raw.Birthday === "number" && raw.Birthday > 1
-    && raw.Birthseason === CURRENT_SEASON_NUMBER;
+  if (typeof raw.Birthday !== "number" || raw.Birthday <= 1) return false;
+  if (raw.Birthseason == null) return false;
+
+  // Derive current season number from playerrecord if possible
+  let currentSeasonNumber: number | undefined;
+  if (playerRecords && currentSeasonId) {
+    const match = playerRecords.find((r) => r.SeasonID === currentSeasonId);
+    if (match) currentSeasonNumber = match.Season;
+  }
+
+  return raw.Birthseason === currentSeasonNumber;
 }
 
 export function transformPlayer(
