@@ -1,6 +1,6 @@
 "use client";
 
-import type { StatRecommendation, BoonTimelineEntry } from "@/lib/advisor";
+import type { StatRecommendation, BoonTimelineEntry, BoonScore } from "@/lib/advisor";
 import { STAT_CATEGORIES } from "@/lib/constants";
 import { RadarChart } from "@/components/evaluator/radar-chart";
 import type { Archetype } from "@/lib/types";
@@ -21,6 +21,7 @@ interface NextActionProps {
   boonTimeline: BoonTimelineEntry[];
   progressPercent: number;
   archetype: Archetype;
+  topScoredBoons?: BoonScore[];
 }
 
 const DEFENSE_STATS: Set<string> = new Set([
@@ -34,6 +35,7 @@ export function NextAction({
   boonTimeline,
   progressPercent,
   archetype,
+  topScoredBoons,
 }: NextActionProps) {
   const nextBoon = boonTimeline.find((b) => !b.acquired);
 
@@ -68,7 +70,20 @@ export function NextAction({
         {(isBoonLevel || hasPendingBoon) && nextBoon ? (
           <div>
             <p className="text-base font-bold mb-1">Choose a Lesser Boon</p>
-            {nextBoon.recommendations.length > 0 ? (
+            {topScoredBoons && topScoredBoons.length > 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Recommended:{" "}
+                <span className="text-foreground font-medium">
+                  {topScoredBoons[0].emoji} {topScoredBoons[0].boonName}
+                </span>
+                <span className="text-green-400 ml-1">(+{topScoredBoons[0].absoluteGain} {topScoredBoons[0].bonusStatDisplay})</span>
+                {topScoredBoons.length > 1 && (
+                  <span>
+                    {" "}or {topScoredBoons.slice(1, 3).map(b => b.boonName).join(", ")}
+                  </span>
+                )}
+              </p>
+            ) : nextBoon.recommendations.length > 0 ? (
               <p className="text-sm text-muted-foreground">
                 Recommended:{" "}
                 <span className="text-foreground font-medium">

@@ -8,6 +8,8 @@
 import { calculateStatTargets } from "./optimizer";
 import type { Archetype } from "./types";
 import { S11 } from "./mechanics";
+import { STAT_TIERS, ROLE_STATS } from "./evaluator-data";
+import type { PlayerRole } from "./evaluator-types";
 
 export interface StatRecommendation {
   statName: string;
@@ -159,5 +161,108 @@ export function recommendBoonsByLevel(
   }
 
   return timeline;
+}
+
+// ---------------------------------------------------------------------------
+// Boon Recombobulator Advisor — stat-aware boon scoring
+// ---------------------------------------------------------------------------
+
+export interface BoonData {
+  name: string;
+  emoji: string;
+  description: string;
+  bonuses: Record<string, number>;
+  penalties: Record<string, number>;
+}
+
+export interface BoonScore {
+  boonName: string;
+  emoji: string;
+  bonusStat: string;
+  penaltyStat: string;
+  bonusStatDisplay: string;
+  penaltyStatDisplay: string;
+  absoluteGain: number;
+  absoluteLoss: number;
+  score: number;
+  bonusTier: "T1" | "T2" | "T3" | "off-role";
+  penaltyTier: "T1" | "T2" | "T3" | "off-role";
+}
+
+const TIER_WEIGHTS = { T1: 3.0, T2: 1.5, T3: 0.5, "off-role": 0.0 } as const;
+const PENALTY_OFF_ROLE_WEIGHT = 0.1;
+
+function getTier(stat: string, role: PlayerRole): "T1" | "T2" | "T3" | "off-role" {
+  const tiers = STAT_TIERS[role];
+  if (tiers.T1.includes(stat)) return "T1";
+  if (tiers.T2.includes(stat)) return "T2";
+  if (tiers.T3.includes(stat)) return "T3";
+  return "off-role";
+}
+
+/**
+ * Score all lesser boons for a player based on stat tiers, absolute gain, and archetype fit.
+ * Returns boons sorted by score descending, excluding already-taken boons.
+ */
+export function scoreBoons(
+  playerStats: Record<string, number>,
+  role: PlayerRole,
+  takenBoons: string[],
+  boonList: BoonData[],
+): BoonScore[] {
+  const taken = new Set(takenBoons.map(b => b.toLowerCase()));
+  const roleStats = new Set(ROLE_STATS[role]);
+
+  const scores: BoonScore[] = [];
+
+  for (const boon of boonList) {
+    if (taken.has(boon.name.toLowerCase())) continue;
+
+    const bonusEntries = Object.entries(boon.bonuses);
+    const penaltyEntries = Object.entries(boon.penalties);
+    if (bonusEntries.length === 0) continue;
+
+    const [bonusStatDisplay] = bonusEntries[0];
+    const [penaltyStatDisplay] = penaltyEntries[0] ?? [""];
+    const bonusStat = bonusStatDisplay.toLowerCase();
+    const penaltyStat = penaltyStatDisplay.toLowerCase();
+
+    // Skip boons that boost stats outside this role entirely
+    if (!roleStats.has(bonusStat)) continue;
+
+    const bonusTier = getTier(bonusStat, role);
+    const penaltyTier = penaltyStat ? getTier(penaltyStat, role) : "off-role";
+
+    const baseBonus = playerStats[bonusStat] ?? 0;
+    const basePenalty = penaltyStat ? (playerStats[penaltyStat] ?? 0) : 0;
+
+    const absoluteGain = baseBonus * 0.5;
+    const absoluteLoss = basePenalty * 0.5;
+
+    // Score = tier weight * absolute gain (bonus) - tier weight * absolute loss (penalty)
+    const bonusScore = TIER_WEIGHTS[bonusTier] * absoluteGain;
+
+    const penaltyTierW = penaltyTier === "off-role"
+      ? PENALTY_OFF_ROLE_WEIGHT
+      : TIER_WEIGHTS[penaltyTier];
+    const penaltyCost = penaltyTierW * absoluteLoss;
+
+    scores.push({
+      boonName: boon.name,
+      emoji: boon.emoji,
+      bonusStat,
+      penaltyStat,
+      bonusStatDisplay,
+      penaltyStatDisplay,
+      absoluteGain: Math.round(absoluteGain),
+      absoluteLoss: Math.round(absoluteLoss),
+      score: bonusScore - penaltyCost,
+      bonusTier,
+      penaltyTier,
+    });
+  }
+
+  scores.sort((a, b) => b.score - a.score);
+  return scores;
 }
 

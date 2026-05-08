@@ -70,6 +70,26 @@ export function calculateFitTargets(
   return { coreTarget, supportTarget };
 }
 
+/**
+ * Compute the target value for a defense stat given its position weight.
+ * Shared between PlayerContent (food recs) and item-advisor (item recs).
+ */
+export function calculateDefenseTarget(weight: number): number {
+  return Math.round((weight / 0.12) * 120);
+}
+
+/**
+ * Count how many defense bonus levels remain for a player.
+ * Defense bonuses at levels 5, 15, 25 give +100 each.
+ */
+export function remainingDefenseBonusLevels(currentLevel: number): number {
+  let remaining = 0;
+  for (const lvl of S11.defenseBonusLevels) {
+    if (currentLevel < lvl) remaining++;
+  }
+  return remaining;
+}
+
 if (process.env.NODE_ENV === "development") {
   console.warn(
     "[mechanics] UNCONFIRMED: defenseLevelsGivePrimary=%s, totalPrimaryPoints=%d. " +
