@@ -7,14 +7,16 @@ import { StatGridInteractive } from "./StatGridInteractive";
 
 import { ProgressionPath } from "./ProgressionPath";
 import { FoodRecommendation } from "./FoodRecommendation";
-import { BoonOrbs } from "./BoonOrbs";
+import { BoonAdvisor } from "./BoonAdvisor";
 import { PitchArsenal } from "@/components/pitcher/PitchArsenal";
 import { ExportShare } from "./ExportShare";
 import { useBoonEmojis } from "@/hooks/use-boon-emojis";
-import { recommendStatPriorities, recommendBoonsByLevel } from "@/lib/advisor";
+import { recommendStatPriorities, recommendBoonsByLevel, scoreBoons } from "@/lib/advisor";
+import type { BoonData } from "@/lib/advisor";
+import { loadBoons } from "@/lib/evaluator-data";
 import { calculateProgress, generateMilestones } from "@/lib/planner-utils";
 import { optimizePitchArsenal, computePitchFitPct } from "@/lib/optimizer";
-import { S11, calculateFitTargets } from "@/lib/mechanics";
+import { S11, calculateFitTargets, calculateDefenseTarget } from "@/lib/mechanics";
 import { PITCHER_POSITIONS, EMPTY_ARCHETYPE, STAT_CATEGORIES } from "@/lib/constants";
 import { usePitchTypes } from "@/hooks/use-pitch-types";
 import { usePlayerStore } from "@/store/player-store";
@@ -58,6 +60,18 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
   const isPitcher =
     playerType === "pitcher" || PITCHER_POSITIONS.has(player.position ?? "");
   const { pitchTypes, pitchTypesError } = usePitchTypes(isPitcher);
+
+  // Load boon data for scoring
+  const [boonList, setBoonList] = useState<BoonData[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    loadBoons()
+      .then((data) => {
+        if (!cancelled) setBoonList(data.lesser_boons as BoonData[]); // eslint-disable-line react-hooks/set-state-in-effect -- async load
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   // Load position defense weights for defense stat highlighting + targets
   const [posDefenseWeights, setPosDefenseWeights] = useState<Record<string, number>>({});
@@ -109,7 +123,7 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
     return Object.entries(posDefenseWeights)
       .map(([statName, weight]) => {
         const current = player.stats[statName] ?? 0;
-        const target = Math.round((weight / 0.12) * 120);
+        const target = calculateDefenseTarget(weight);
         const gap = Math.max(target - current, 0);
         // After level 25, suppress defense food unless stat is critically zero
         if (pastDefenseLevels && current > 0) return null;
@@ -138,6 +152,21 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
     ),
     [player.level, effectiveArchetype, player.lesserBoons, player.greaterBoons]
   );
+  // Score all boons for the boon advisor (based on actual stats, not archetype)
+  const allScoredBoons = useMemo(
+    () => boonList.length > 0
+      ? scoreBoons(player.stats, playerType, player.lesserBoons, boonList)
+      : [],
+    [player.stats, playerType, player.lesserBoons, boonList]
+  );
+  // Score the player's current boons (re-score without excluding them)
+  const currentBoonScores = useMemo(() => {
+    if (boonList.length === 0 || player.lesserBoons.length === 0) return [];
+    const allScored = scoreBoons(player.stats, playerType, [], boonList);
+    const takenSet = new Set(player.lesserBoons.map(b => b.toLowerCase()));
+    return allScored.filter(s => takenSet.has(s.boonName.toLowerCase()));
+  }, [player.stats, playerType, player.lesserBoons, boonList]);
+
   const progress = useMemo(
     () => calculateProgress(player.stats, effectiveArchetype, player.level),
     [player.stats, effectiveArchetype, player.level]
@@ -338,6 +367,7 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
             boonTimeline={boonTimeline}
             progressPercent={archetypeFitPct}
             archetype={activeArchetype}
+            topScoredBoons={allScoredBoons.length > 0 ? allScoredBoons.slice(0, 3) : undefined}
           />
         )}
 
@@ -364,7 +394,12 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
           }
         />
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-2">
-          <BoonOrbs boonTimeline={boonTimeline} boonEmojis={boonEmojis} />
+          <BoonAdvisor
+            scoredBoons={allScoredBoons}
+            takenBoons={player.lesserBoons}
+            boonEmojis={boonEmojis}
+            currentBoonScores={currentBoonScores}
+          />
           <div className="xl:col-span-2 h-full">
             <ProgressionPath milestones={milestones} currentLevel={player.level} />
           </div>

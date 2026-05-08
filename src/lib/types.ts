@@ -9,6 +9,8 @@ export interface Archetype {
   recommended_lesser_boons?: string[];
   recommended_greater_boons?: string[];
   stat_targets?: Record<string, number>;
+  equipment_priority?: string[];
+  equipment_affixes?: string[];
 }
 
 export interface PitchData {
