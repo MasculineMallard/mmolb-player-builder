@@ -397,29 +397,54 @@ function computeComposite(
   statsScore: number | null,
   growthScore: number,
   positionFitScore: number | null,
+  role: PlayerRole,
 ): number {
   const hasFit = positionFitScore != null;
   const hasStats = statsScore != null;
 
+  if (role === "batter") {
+    if (hasStats && hasFit) {
+      // Batter, all 4: Stats 40%, Attr 20%, Fit 20%, Growth 20%
+      return Math.round(
+        attributeScore * 0.20 + statsScore * 0.40 + positionFitScore * 0.20 + growthScore * 0.20,
+      );
+    }
+    if (hasStats && !hasFit) {
+      // Batter DH, no fit: Stats 50%, Attr 25%, Growth 25%
+      return Math.round(
+        attributeScore * 0.25 + statsScore * 0.50 + growthScore * 0.25,
+      );
+    }
+    if (!hasStats && hasFit) {
+      // Batter, no game stats: Attr 40%, Fit 30%, Growth 30%
+      return Math.round(
+        attributeScore * 0.40 + positionFitScore * 0.30 + growthScore * 0.30,
+      );
+    }
+    // Batter, no stats + no fit: Attr 50%, Growth 50%
+    return Math.round(
+      attributeScore * 0.50 + growthScore * 0.50,
+    );
+  }
+
+  // Pitcher weights (unchanged)
   if (hasStats && hasFit) {
-    // All 4 scores: equal 25% each
     return Math.round(
       attributeScore * 0.25 + statsScore * 0.25 + positionFitScore * 0.25 + growthScore * 0.25,
     );
   }
   if (hasStats && !hasFit) {
-    // No fit (pitcher/DH): Attr 40%, Stats 40%, Growth 20%
+    // No fit (pitcher): Attr 40%, Stats 40%, Growth 20%
     return Math.round(
       attributeScore * 0.40 + statsScore * 0.40 + growthScore * 0.20,
     );
   }
   if (!hasStats && hasFit) {
-    // No game stats: Attr 40%, Fit 30%, Growth 30%
     return Math.round(
       attributeScore * 0.40 + positionFitScore * 0.30 + growthScore * 0.30,
     );
   }
-  // No stats, no fit (pitcher/DH without game stats): Attr 50%, Growth 50%
+  // No stats, no fit: Attr 50%, Growth 50%
   return Math.round(
     attributeScore * 0.50 + growthScore * 0.50,
   );
@@ -453,7 +478,7 @@ export function evaluatePlayer(
   const growthScore = computeGrowthScore(player);
   const positionFitScore = computePositionFitScore(player, role, positionDefense);
   const detectedArchetype = detectArchetype(player, role, archetypes);
-  const compositeScore = computeComposite(attributeScore, statsScore, growthScore, positionFitScore);
+  const compositeScore = computeComposite(attributeScore, statsScore, growthScore, positionFitScore, role);
   const flags = detectFlags(
     player, role, statsScore, detectedArchetype, archetypes, boonLookup, positionDefense,
   );
