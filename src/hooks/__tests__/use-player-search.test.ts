@@ -48,7 +48,7 @@ describe("usePlayerSearch", () => {
     await flushMicrotasks();
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(mockFetch.mock.calls[0][0]).toBe("/api/players/search?q=Test");
+    expect(mockFetch.mock.calls[0][0]).toBe("/pop/api/players/search?q=Test");
     expect(result.current.results).toEqual(mockResults);
     expect(result.current.loading).toBe(false);
   });
@@ -119,6 +119,6 @@ describe("usePlayerSearch", () => {
     expect(mockFetch.mock.calls.length - callsBefore).toBeLessThanOrEqual(1);
     // The last call should be for "Test"
     const lastCall = mockFetch.mock.calls[mockFetch.mock.calls.length - 1];
-    expect(lastCall[0]).toBe("/api/players/search?q=Test");
+    expect(lastCall[0]).toBe("/pop/api/players/search?q=Test");
   });
 });

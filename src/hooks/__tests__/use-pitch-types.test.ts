@@ -44,7 +44,7 @@ describe("usePitchTypes", () => {
     await flushMicrotasks();
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(mockFetch.mock.calls[0][0]).toBe("/data/pitch_types.json");
+    expect(mockFetch.mock.calls[0][0]).toBe("/pop/data/pitch_types.json");
     expect(result.current.pitchTypes).toEqual(mockData);
     expect(result.current.pitchTypesError).toBe(false);
   });
