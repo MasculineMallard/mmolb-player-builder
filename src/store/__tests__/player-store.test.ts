@@ -125,7 +125,7 @@ describe("importPlayer", () => {
     expect(state.player).toEqual(mockPlayer);
     expect(state.loading).toBe(false);
     expect(state.error).toBeNull();
-    expect(mockFetch.mock.calls[0][0]).toBe("/api/players/p1");
+    expect(mockFetch.mock.calls[0][0]).toBe("/pop/api/players/p1");
   });
 
   it("sets error on 404", async () => {
