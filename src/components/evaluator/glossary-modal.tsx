@@ -57,7 +57,7 @@ export function GlossaryButton() {
                   </div>
                   <div>
                     <span className="text-foreground font-medium">Game Stats</span>
-                    <p className="mt-0.5">OBP, SLG, K%, BB%, SB% for batters. ERA, WHIP, K/9, BB/9, HR/9 for pitchers. Each stat scored against live league percentiles (updated daily from every team via the MMOLB API), then combined by weight.</p>
+                    <p className="mt-0.5">OBP (30%), SLG (30%), K% (13%), BB% (13%), SB% (14%) for batters. ERA (20%), WHIP (25%), K/9 (25%), BB/9 (15%), HR/9 (15%) for pitchers. Each stat scored against live league percentiles (updated daily from every team via the MMOLB API), then combined by weight.</p>
                   </div>
                   <div>
                     <span className="text-foreground font-medium">Position Fit</span>
@@ -73,6 +73,7 @@ export function GlossaryButton() {
               {/* Weight table */}
               <section>
                 <h3 className="text-foreground font-semibold mb-1">Weight Distribution</h3>
+                <p className="mb-1">Batters weight game stats more heavily. Pitchers use equal weights.</p>
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="text-left text-foreground">
@@ -84,8 +85,14 @@ export function GlossaryButton() {
                     </tr>
                   </thead>
                   <tbody>
+                    <tr className="border-t border-border/30"><td colSpan={5} className="text-foreground font-medium pt-1">Batters</td></tr>
+                    <tr><td>All available</td><td>20%</td><td>40%</td><td>20%</td><td>20%</td></tr>
+                    <tr><td>No fit (DH)</td><td>25%</td><td>50%</td><td>-</td><td>25%</td></tr>
+                    <tr><td>No game stats</td><td>40%</td><td>-</td><td>30%</td><td>30%</td></tr>
+                    <tr><td>No stats + no fit</td><td>50%</td><td>-</td><td>-</td><td>50%</td></tr>
+                    <tr className="border-t border-border/30"><td colSpan={5} className="text-foreground font-medium pt-1">Pitchers</td></tr>
                     <tr><td>All available</td><td>25%</td><td>25%</td><td>25%</td><td>25%</td></tr>
-                    <tr><td>No fit (pitcher/DH)</td><td>40%</td><td>40%</td><td>-</td><td>20%</td></tr>
+                    <tr><td>No fit</td><td>40%</td><td>40%</td><td>-</td><td>20%</td></tr>
                     <tr><td>No game stats</td><td>40%</td><td>-</td><td>30%</td><td>30%</td></tr>
                     <tr><td>No stats + no fit</td><td>50%</td><td>-</td><td>-</td><td>50%</td></tr>
                   </tbody>
