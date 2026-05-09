@@ -189,7 +189,7 @@ export interface BoonScore {
   penaltyTier: "T1" | "T2" | "T3" | "off-role";
 }
 
-const TIER_WEIGHTS = { T1: 3.0, T2: 1.5, T3: 0.5, "off-role": 0.0 } as const;
+const TIER_WEIGHTS = { T1: 3.0, T2: 2.0, T3: 0.8, "off-role": 0.0 } as const;
 const PENALTY_OFF_ROLE_WEIGHT = 0.1;
 
 function getTier(stat: string, role: PlayerRole): "T1" | "T2" | "T3" | "off-role" {
