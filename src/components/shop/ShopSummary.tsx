@@ -25,6 +25,7 @@ function preferredType(currentValue: number, boonMultiplier: number): "flat" | "
 export function ShopSummary({ recommendations, statNeeds, globalValue }: ShopSummaryProps) {
   if (recommendations.length === 0 || statNeeds.length === 0) return null;
 
+  // Build stat → slots map from recommendations
   const statToSlots = new Map<string, string[]>();
   for (const rec of recommendations) {
     for (const pick of [...rec.offensivePicks, ...rec.defensivePicks]) {
@@ -34,6 +35,7 @@ export function ShopSummary({ recommendations, statNeeds, globalValue }: ShopSum
     }
   }
 
+  // Top stat needs that appear in recommendations
   const rows: { stat: string; gap: number; pref: "flat" | "pct"; slots: string[] }[] = [];
   for (const need of statNeeds) {
     if (rows.length >= 8) break;
@@ -51,21 +53,28 @@ export function ShopSummary({ recommendations, statNeeds, globalValue }: ShopSum
   if (rows.length === 0) return null;
 
   return (
-    <div className="bg-gray-900/90 border border-gray-700 rounded-md overflow-hidden h-full">
-      <div className="px-1.5 py-0.5 bg-gray-800/80 border-b border-gray-700 text-center">
-        <span className="text-[11px] font-semibold text-gray-300">Shopping List</span>
+    <div className="bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-lg overflow-hidden flex flex-col">
+      {/* Header */}
+      <div className="bg-gray-800/80 px-3 py-1.5 border-b border-gray-700 text-center">
+        <span className="text-sm font-semibold text-gray-200">Shopping List</span>
       </div>
-      <div className="px-1.5 py-0.5">
+
+      {/* Stat rows */}
+      <div className="px-3 py-2 space-y-0.5">
         {rows.map((row) => (
-          <div key={row.stat} className="flex items-center gap-1 text-[11px] leading-[16px]">
-            <span className="capitalize font-medium text-gray-100 truncate flex-1">{row.stat}</span>
-            {row.gap > 0 && <span className="text-gray-500 shrink-0">-{Math.round(row.gap)}</span>}
-            <span className={`font-mono shrink-0 ${row.pref === "flat" ? "text-blue-300/70" : "text-blue-400"}`}>
-              {row.pref === "flat" ? `+${globalValue}` : `${globalValue}%`}
-            </span>
-            <span className="flex gap-px shrink-0">
-              {row.slots.map((s) => <span key={s} className="text-[10px]" title={s}>{SLOT_EMOJI[s]}</span>)}
-            </span>
+          <div key={row.stat} className="flex items-center justify-between text-sm h-[22px]">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="capitalize font-medium text-gray-100 truncate">{row.stat}</span>
+              {row.gap > 0 && <span className="text-xs text-gray-500">-{Math.round(row.gap)}</span>}
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className={`text-xs font-mono ${row.pref === "flat" ? "text-blue-300/70" : "text-blue-400"}`}>
+                {row.pref === "flat" ? `+${globalValue}` : `${globalValue}%`}
+              </span>
+              <span className="flex gap-0.5">
+                {row.slots.map((s) => <span key={s} className="text-xs" title={s}>{SLOT_EMOJI[s]}</span>)}
+              </span>
+            </div>
           </div>
         ))}
       </div>

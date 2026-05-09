@@ -22,18 +22,17 @@ export function PlayerEquipmentGraphic({
   );
 
   return (
-    <div className="grid grid-cols-3 gap-1.5">
-      {/* Shopping list — spans left column, taller */}
-      <div className="row-span-2">
+    <div className="flex gap-2 flex-wrap">
+      <div className="flex-1 min-w-[140px]">
         <ShopSummary recommendations={recommendations} statNeeds={statNeeds} globalValue={globalValue} />
       </div>
-
-      {/* Item cards fill remaining cells */}
       {SLOT_ORDER.map((slot) => {
         const rec = recMap.get(slot);
         if (!rec) return null;
         return (
-          <SlotCard key={slot} recommendation={rec} globalValue={globalValue} statNeeds={statNeeds} />
+          <div key={slot} className="flex-1 min-w-[120px]">
+            <SlotCard recommendation={rec} globalValue={globalValue} statNeeds={statNeeds} />
+          </div>
         );
       })}
     </div>
