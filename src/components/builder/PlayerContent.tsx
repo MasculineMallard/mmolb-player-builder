@@ -17,7 +17,7 @@ import { loadBoons } from "@/lib/evaluator-data";
 import { calculateProgress, generateMilestones } from "@/lib/planner-utils";
 import { optimizePitchArsenal, computePitchFitPct } from "@/lib/optimizer";
 import { S11, calculateFitTargets, calculateDefenseTarget } from "@/lib/mechanics";
-import { PITCHER_POSITIONS, EMPTY_ARCHETYPE, STAT_CATEGORIES } from "@/lib/constants";
+import { EMPTY_ARCHETYPE, STAT_CATEGORIES } from "@/lib/constants";
 import { usePitchTypes } from "@/hooks/use-pitch-types";
 import { usePlayerStore } from "@/store/player-store";
 import { loadPositionDefense } from "@/lib/evaluator-data";
@@ -57,8 +57,7 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
     }
   }, [playerType]);
 
-  const isPitcher =
-    playerType === "pitcher" || PITCHER_POSITIONS.has(player.position ?? "");
+  const isPitcher = playerType === "pitcher";
   const { pitchTypes, pitchTypesError } = usePitchTypes(isPitcher);
 
   // Load boon data for scoring
