@@ -63,7 +63,19 @@ function BoonRow({ entry, rank }: { entry: BoonScore; rank?: number }) {
 }
 
 export function BoonAdvisor({ scoredBoons, takenBoons, boonEmojis, currentBoonScores }: BoonAdvisorProps) {
-  const top6 = useMemo(() => scoredBoons.slice(0, 6), [scoredBoons]);
+  const top6 = useMemo(() => {
+    const result: typeof scoredBoons = [];
+    let t3Count = 0;
+    for (const b of scoredBoons) {
+      if (result.length >= 6) break;
+      if (b.bonusTier === "T3") {
+        if (t3Count >= 1) continue;
+        t3Count++;
+      }
+      result.push(b);
+    }
+    return result;
+  }, [scoredBoons]);
 
   if (top6.length === 0) return null;
 
