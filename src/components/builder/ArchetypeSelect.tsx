@@ -151,6 +151,7 @@ export function ArchetypeSelect({
   const [archetypes, setArchetypes] = useState<ArchetypeMap>({});
   const [loadError, setLoadError] = useState(false);
   const [showCustom, setShowCustom] = useState(false);
+  const [customArch, setCustomArch] = useState<Archetype | null>(null);
   const archetypeId = usePlayerStore((s) => s.archetypeId);
   const setArchetypeId = usePlayerStore((s) => s.setArchetypeId);
   const setPlayerArchetype = usePlayerStore((s) => s.setPlayerArchetype);
@@ -204,11 +205,12 @@ export function ArchetypeSelect({
 
   const handleCustomSave = useCallback((arch: Archetype) => {
     setShowCustom(false);
+    setCustomArch(arch);
     onArchetypeChange(arch);
   }, [onArchetypeChange]);
 
   const entries = Object.entries(archetypes);
-  const selectedArch = archetypeId && archetypeId !== "__custom" ? archetypes[archetypeId] : null;
+  const selectedArch = archetypeId === "__custom" ? customArch : archetypeId ? archetypes[archetypeId] : null;
   const selectedFitPct = selectedArch && player ? computeFitPct(player.stats, selectedArch, player.level) : null;
 
   // Compute fit % for each archetype for dropdown display
@@ -316,9 +318,11 @@ export function ArchetypeSelect({
               })}
             </div>
           )}
-          <p className="text-sm text-muted-foreground">
-            {selectedArch.description}
-          </p>
+          {archetypeId !== "__custom" && (
+            <p className="text-sm text-muted-foreground">
+              {selectedArch.description}
+            </p>
+          )}
         </div>
       )}
     </div>
