@@ -1,0 +1,24 @@
+{
+  "batter": {
+    "head": {
+      "offensive": ["contact", "cunning", "insight", "intimidation", "vision", "wisdom"],
+      "defensive": ["awareness", "composure", "patience", "reaction"]
+    },
+    "body": {
+      "offensive": ["aiming", "cunning", "determination", "discipline", "intimidation", "muscle", "wisdom", "performance", "speed", "stealth"],
+      "defensive": ["acrobatics", "arm", "composure", "patience"]
+    },
+    "hands": {
+      "offensive": ["aiming", "contact", "determination", "lift", "muscle", "selflessness", "vision"],
+      "defensive": ["agility", "arm", "dexterity", "reaction"]
+    },
+    "feet": {
+      "offensive": ["discipline", "insight", "lift", "selflessness", "performance", "speed", "stealth"],
+      "defensive": ["acrobatics", "agility", "awareness", "dexterity", "reaction"]
+    },
+    "charm": {
+      "offensive": ["contact", "muscle", "determination", "insight", "discipline", "luck", "greed"],
+      "defensive": ["acrobatics", "agility", "arm", "awareness", "composure", "dexterity", "patience", "reaction"]
+    }
+  }
+}

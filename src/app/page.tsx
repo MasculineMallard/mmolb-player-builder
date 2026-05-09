@@ -27,7 +27,7 @@ export default function Home() {
         evaluate rosters, and figure out who to mulch.
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl w-full">
         <Link
           href="/pitcher"
           className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
@@ -51,6 +51,14 @@ export default function Home() {
           <span className="text-3xl">⚾</span>
           <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Mulch-o-Meter</span>
           <span className="text-xs text-muted-foreground text-center">Evaluate your roster: mulch, hold, or keep</span>
+        </Link>
+        <Link
+          href="/shop"
+          className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
+        >
+          <span className="text-3xl">🧵</span>
+          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Slugger Sartoria</span>
+          <span className="text-xs text-muted-foreground text-center">Build your ideal items to fill stat gaps</span>
         </Link>
       </div>
     </div>
