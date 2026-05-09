@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/pitcher", label: "Perfect Pitcher Planner" },
   { href: "/batter", label: "Better Batter Builder" },
   { href: "/mulch", label: "Mulch-o-Meter" },
+  { href: "/shop", label: "Slugger Sartoria" },
 ];
 
 export function NavLinks() {
