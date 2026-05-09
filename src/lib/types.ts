@@ -34,7 +34,24 @@ export interface PlayerData {
   pitches: PitchData[];
   gameStats?: import("./evaluator-types").GameStats | null;
   recomped?: boolean;
+  equipment?: PlayerEquipment;
 }
+
+export interface ItemEffect {
+  attribute: string;
+  tier: number;
+  type: "flat" | "pct";
+  value: number; // display scale (e.g. 22 = +22 flat or 22%)
+}
+
+export interface EquipmentSlot {
+  slot: string;
+  name: string;
+  emoji: string;
+  effects: ItemEffect[];
+}
+
+export type PlayerEquipment = Record<string, EquipmentSlot>; // keyed by lowercase slot: head, body, hands, feet, charm/accessory
 
 export interface PlayerSearchResult {
   mmolbPlayerId: string;

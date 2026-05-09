@@ -385,6 +385,7 @@ export function ShopView() {
                   flatMax={selectedTier.flatMax}
                   pctMax={selectedTier.pctMax}
                   statNeeds={statNeeds}
+                  equipment={player.equipment}
                 />
 
                 <StatBarPanel

@@ -63,19 +63,17 @@ export function ShopSummary({ recommendations, statNeeds, flatMax, pctMax }: Sho
       {/* Stat rows */}
       <div className="px-3 py-2 space-y-0.5">
         {rows.map((row) => (
-          <div key={row.stat} className="flex items-center justify-between text-sm h-[22px]">
+          <div key={row.stat} className="grid grid-cols-[1fr_auto_auto] items-center text-sm h-[22px] gap-x-3">
             <div className="flex items-center gap-1.5 min-w-0">
               <span className="capitalize font-medium text-gray-100 truncate">{row.stat}</span>
               {row.gap > 0 && <span className="text-xs text-gray-500">-{Math.round(row.gap)}</span>}
             </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className={`text-xs font-mono ${row.pref === "flat" ? "text-sky-200" : "text-blue-400"}`}>
-                {row.pref === "flat" ? `+${flatMax}` : `${pctMax}%`}
-              </span>
-              <span className="flex gap-0.5">
-                {row.slots.map((s) => <span key={s} className="text-xs" title={s}>{SLOT_EMOJI[s]}</span>)}
-              </span>
-            </div>
+            <span className={`text-xs font-mono text-center min-w-[32px] ${row.pref === "flat" ? "text-sky-200" : "text-blue-400"}`}>
+              {row.pref === "flat" ? `+${flatMax}` : `${pctMax}%`}
+            </span>
+            <span className="flex gap-0.5">
+              {row.slots.map((s) => <span key={s} className="text-xs" title={s}>{SLOT_EMOJI[s]}</span>)}
+            </span>
           </div>
         ))}
       </div>
