@@ -5,18 +5,20 @@ import type { StatNeed } from "@/lib/item-advisor";
 
 interface SlotCardProps {
   recommendation: SlotRecommendation;
-  globalValue: number;
+  flatMax: number;
+  pctMax: number;
   statNeeds: StatNeed[];
 }
 
-function preferredType(stat: string, statNeeds: StatNeed[]): "flat" | "pct" {
+function preferredType(stat: string, statNeeds: StatNeed[], flatMax: number, pctMax: number): "flat" | "pct" {
   const need = statNeeds.find((n) => n.stat === stat);
   if (!need) return "flat";
-  const crossover = 100 * Math.max(need.boonMultiplier, 1.0);
-  return need.currentValue > crossover ? "pct" : "flat";
+  const flatGain = flatMax * Math.max(need.boonMultiplier, 1.0);
+  const pctGain = need.currentValue * (pctMax / 100);
+  return pctGain > flatGain ? "pct" : "flat";
 }
 
-export function SlotCard({ recommendation: rec, globalValue, statNeeds }: SlotCardProps) {
+export function SlotCard({ recommendation: rec, flatMax, pctMax, statNeeds }: SlotCardProps) {
   return (
     <div className="bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-lg overflow-hidden flex flex-col">
       {/* Header */}
@@ -29,12 +31,12 @@ export function SlotCard({ recommendation: rec, globalValue, statNeeds }: SlotCa
       {/* Offensive stats */}
       <div className="px-3 pt-2 pb-1 space-y-0.5">
         {rec.offensivePicks.map((pick) => {
-          const pref = preferredType(pick.stat, statNeeds);
+          const pref = preferredType(pick.stat, statNeeds, flatMax, pctMax);
           return (
             <div key={pick.stat} className="flex items-center justify-between text-sm h-[22px]">
               <span className="capitalize font-medium text-gray-100">{pick.stat}</span>
-              <span className={`text-xs font-mono ${pref === "flat" ? "text-blue-300/70" : "text-blue-400"}`}>
-                {pref === "flat" ? `+${globalValue}` : `${globalValue}%`}
+              <span className={`text-xs font-mono ${pref === "flat" ? "text-sky-300" : "text-blue-400"}`}>
+                {pref === "flat" ? `+${flatMax}` : `${pctMax}%`}
               </span>
             </div>
           );
@@ -50,12 +52,12 @@ export function SlotCard({ recommendation: rec, globalValue, statNeeds }: SlotCa
       {rec.defensivePicks.length > 0 && (
         <div className="px-3 pt-1 pb-2 space-y-0.5">
           {rec.defensivePicks.map((pick) => {
-            const pref = preferredType(pick.stat, statNeeds);
+            const pref = preferredType(pick.stat, statNeeds, flatMax, pctMax);
             return (
               <div key={pick.stat} className="flex items-center justify-between text-sm h-[22px]">
                 <span className="capitalize font-medium text-yellow-400">{pick.stat}</span>
-                <span className={`text-xs font-mono ${pref === "flat" ? "text-blue-300/70" : "text-blue-400"}`}>
-                  {pref === "flat" ? `+${globalValue}` : `${globalValue}%`}
+                <span className={`text-xs font-mono ${pref === "flat" ? "text-sky-300" : "text-blue-400"}`}>
+                  {pref === "flat" ? `+${flatMax}` : `${pctMax}%`}
                 </span>
               </div>
             );

@@ -11,7 +11,8 @@ interface StatBarPanelProps {
   recommendations: SlotRecommendation[];
   playerStats: Record<string, number>;
   boonMultipliers: Record<string, number>;
-  globalValue: number;
+  flatMax: number;
+  pctMax: number;
   archetype: Archetype;
 }
 
@@ -29,7 +30,8 @@ export function StatBarPanel({
   recommendations,
   playerStats,
   boonMultipliers,
-  globalValue,
+  flatMax,
+  pctMax,
   archetype,
 }: StatBarPanelProps) {
   const bars = useMemo(() => {
@@ -59,8 +61,8 @@ export function StatBarPanel({
       const boonMult = boonMultipliers[stat] ?? 1.0;
       const target = prioritySet.has(stat) ? corePer : secondarySet.has(stat) ? supportPer : 0;
 
-      const withFlat = count > 0 ? Math.round(current + globalValue * count * boonMult) : current;
-      const withPct = count > 0 ? Math.round(current * Math.pow(1 + globalValue / 100, count)) : current;
+      const withFlat = count > 0 ? Math.round(current + flatMax * count * boonMult) : current;
+      const withPct = count > 0 ? Math.round(current * Math.pow(1 + pctMax / 100, count)) : current;
 
       return {
         stat, current, withFlat, withPct,
@@ -73,7 +75,7 @@ export function StatBarPanel({
     const defense = STAT_CATEGORIES.defense.map((s) => buildBar(s, "defense")).filter((b): b is StatBar => b !== null);
 
     return { batting, baserunning, defense };
-  }, [recommendations, playerStats, boonMultipliers, globalValue, archetype]);
+  }, [recommendations, playerStats, boonMultipliers, flatMax, pctMax, archetype]);
 
   const allBars = [...bars.batting, ...bars.baserunning, ...bars.defense];
   if (allBars.length === 0) return null;
@@ -88,7 +90,7 @@ export function StatBarPanel({
         <span className="w-0.5 h-3.5 bg-primary/40 rounded-full" />
         Projected Build
         <span className="normal-case tracking-normal font-normal text-muted-foreground/70 text-xs">
-          if all 5 items target these stats at +{globalValue}
+          if all 5 items target these stats at +{flatMax} flat / {pctMax}%
         </span>
       </h3>
 
@@ -188,7 +190,7 @@ function BarRow({ bar, displayMax, isPriority, isSecondary }: {
           {hasImprovement && (
             <>
               <span className="text-gray-600 mx-1.5">|</span>
-              <span className="text-blue-400/70 w-10 text-right">+{flatDelta}</span>
+              <span className="text-sky-300 w-10 text-right">+{flatDelta}</span>
               <span className="text-gray-600 mx-1.5">|</span>
               <span className="text-blue-400 w-10 text-right">+{pctDelta}</span>
             </>
@@ -216,14 +218,14 @@ function BarRow({ bar, displayMax, isPriority, isSecondary }: {
           {/* Shared improvement zone — both flat and pct cover this */}
           {seg1Pct > 0 && (
             <div
-              className={`h-full ${flatIsSmaller ? "bg-blue-400/50" : "bg-blue-600/80"}`}
+              className={`h-full ${flatIsSmaller ? "bg-sky-300/50" : "bg-blue-600/80"}`}
               style={{ width: `${seg1Pct}%` }}
             />
           )}
           {/* Extended zone — only the larger projection reaches here */}
           {seg2Pct > 0.3 && (
             <div
-              className={`h-full ${flatIsSmaller ? "bg-blue-600/80" : "bg-blue-400/50"}`}
+              className={`h-full ${flatIsSmaller ? "bg-blue-600/80" : "bg-sky-300/50"}`}
               style={{ width: `${seg2Pct}%` }}
             />
           )}

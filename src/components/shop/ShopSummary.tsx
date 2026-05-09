@@ -6,7 +6,8 @@ import type { StatNeed } from "@/lib/item-advisor";
 interface ShopSummaryProps {
   recommendations: SlotRecommendation[];
   statNeeds: StatNeed[];
-  globalValue: number;
+  flatMax: number;
+  pctMax: number;
 }
 
 const SLOT_EMOJI: Record<string, string> = {
@@ -17,15 +18,16 @@ const SLOT_EMOJI: Record<string, string> = {
   charm: "🧿",
 };
 
-function preferredType(currentValue: number, boonMultiplier: number): "flat" | "pct" {
-  const crossover = 100 * Math.max(boonMultiplier, 1.0);
-  return currentValue > crossover ? "pct" : "flat";
+function preferredType(currentValue: number, boonMultiplier: number, flatMax: number, pctMax: number): "flat" | "pct" {
+  // Compare actual gains: flat gives flatMax * boonMult, pct gives current * pctMax/100
+  const flatGain = flatMax * Math.max(boonMultiplier, 1.0);
+  const pctGain = currentValue * (pctMax / 100);
+  return pctGain > flatGain ? "pct" : "flat";
 }
 
-export function ShopSummary({ recommendations, statNeeds, globalValue }: ShopSummaryProps) {
+export function ShopSummary({ recommendations, statNeeds, flatMax, pctMax }: ShopSummaryProps) {
   if (recommendations.length === 0 || statNeeds.length === 0) return null;
 
-  // Build stat → slots map from recommendations
   const statToSlots = new Map<string, string[]>();
   for (const rec of recommendations) {
     for (const pick of [...rec.offensivePicks, ...rec.defensivePicks]) {
@@ -35,7 +37,6 @@ export function ShopSummary({ recommendations, statNeeds, globalValue }: ShopSum
     }
   }
 
-  // Top stat needs that appear in recommendations
   const rows: { stat: string; gap: number; pref: "flat" | "pct"; slots: string[] }[] = [];
   for (const need of statNeeds) {
     if (rows.length >= 8) break;
@@ -45,7 +46,7 @@ export function ShopSummary({ recommendations, statNeeds, globalValue }: ShopSum
     rows.push({
       stat: need.stat,
       gap: Math.max(need.archetypeGap, need.defenseGap),
-      pref: preferredType(need.currentValue, need.boonMultiplier),
+      pref: preferredType(need.currentValue, need.boonMultiplier, flatMax, pctMax),
       slots,
     });
   }
@@ -68,8 +69,8 @@ export function ShopSummary({ recommendations, statNeeds, globalValue }: ShopSum
               {row.gap > 0 && <span className="text-xs text-gray-500">-{Math.round(row.gap)}</span>}
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              <span className={`text-xs font-mono ${row.pref === "flat" ? "text-blue-300/70" : "text-blue-400"}`}>
-                {row.pref === "flat" ? `+${globalValue}` : `${globalValue}%`}
+              <span className={`text-xs font-mono ${row.pref === "flat" ? "text-sky-300" : "text-blue-400"}`}>
+                {row.pref === "flat" ? `+${flatMax}` : `${pctMax}%`}
               </span>
               <span className="flex gap-0.5">
                 {row.slots.map((s) => <span key={s} className="text-xs" title={s}>{SLOT_EMOJI[s]}</span>)}
