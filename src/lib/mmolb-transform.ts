@@ -10,7 +10,7 @@
  */
 
 import { POSITION_ORDER } from "./constants";
-import type { PlayerData, PitchData, RosterPlayer } from "./types";
+import type { PlayerData, PitchData, RosterPlayer, PlayerEquipment, ItemEffect, EquipmentSlot } from "./types";
 import type { GameStats } from "./evaluator-types";
 import type {
   MmolbApiPlayer,
@@ -126,6 +126,34 @@ function wasRecompedThisSeason(
   return raw.Birthseason === currentSeasonNumber;
 }
 
+/** Map API slot keys to our canonical lowercase keys */
+const SLOT_KEY_MAP: Record<string, string> = {
+  Head: "head", Body: "body", Hands: "hands", Feet: "feet",
+  Accessory: "charm", // batter accessory = charm
+};
+
+function transformEquipment(raw: MmolbApiPlayer): PlayerEquipment | undefined {
+  if (!raw.Equipment) return undefined;
+  const equipment: PlayerEquipment = {};
+  for (const [apiKey, item] of Object.entries(raw.Equipment)) {
+    const key = SLOT_KEY_MAP[apiKey] ?? apiKey.toLowerCase();
+    const effects: ItemEffect[] = (item.Effects ?? []).map((e) => ({
+      attribute: e.Attribute.toLowerCase(),
+      tier: e.Tier,
+      type: e.Type === "FlatBonus" ? "flat" as const : "pct" as const,
+      value: Math.round(e.Value * 100),
+    }));
+    const slot: EquipmentSlot = {
+      slot: key,
+      name: item.Name,
+      emoji: item.Emoji,
+      effects,
+    };
+    equipment[key] = slot;
+  }
+  return Object.keys(equipment).length > 0 ? equipment : undefined;
+}
+
 export function transformPlayer(
   raw: MmolbApiPlayer,
   teamName: string | null,
@@ -180,6 +208,7 @@ export function transformPlayer(
     pitches,
     gameStats,
     ...(recompedThisSeason ? { recomped: true } : {}),
+    equipment: transformEquipment(raw),
   };
 }
 

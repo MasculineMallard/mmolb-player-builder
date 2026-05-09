@@ -78,13 +78,26 @@ export function ShopGlossaryButton() {
 
               <section>
                 <h3 className="text-foreground font-semibold mb-1">Item Cards</h3>
-                <p>Each card shows the recommended affixes for one equipment slot. White stats are offensive, <span className="text-yellow-400">yellow stats</span> are defensive. The <span className="text-yellow-400">★</span> marks the two highest-priority slots.</p>
-                <p className="mt-1">Items roll 3 offensive + 2 defensive attributes. The same stat can appear twice on one item (once flat, once percent).</p>
+                <p>Each card shows the recommended affixes for one equipment slot with four columns: stat name, what your current item has, the ideal value, and the difference.</p>
+                <p className="mt-1">White stats are offensive, <span className="text-yellow-400">yellow stats</span> are defensive. Items roll 3 offensive + 2 defensive attributes. The same stat can appear twice on one item (once flat, once percent).</p>
+              </section>
+
+              <section>
+                <h3 className="text-foreground font-semibold mb-1">Star Indicators</h3>
+                <div className="space-y-1 ml-2">
+                  <div><span className="text-blue-400">★ Blue star</span> = stat target priority. The two slots with the most impactful archetype stats.</div>
+                  <div><span className="text-yellow-400">★ Yellow star</span> = shop priority. The two slots where your current item is furthest from ideal. These are where to spend coins first.</div>
+                </div>
+              </section>
+
+              <section>
+                <h3 className="text-foreground font-semibold mb-1">Current Equipment</h3>
+                <p>The &quot;has&quot; column shows what your equipped item gives for each recommended stat. A dash means the item doesn&apos;t cover that stat at all. The &quot;diff&quot; column shows the gap: <span className="text-green-400">green</span> means your item meets or exceeds ideal, <span className="text-red-400">red</span> means there&apos;s a gap to close.</p>
               </section>
 
               <section>
                 <h3 className="text-foreground font-semibold mb-1">Projected Build</h3>
-                <p>Shows what your stats would look like if all 5 items targeted the recommended stats. The bars show current (grey), flat projection (cyan), and percent projection (blue). The white line marks your archetype target.</p>
+                <p>Shows what your stats would look like if all 5 items targeted the recommended stats. The bars show current (grey), flat projection (light blue), and percent projection (blue). The white line marks your archetype target.</p>
               </section>
 
               <section>

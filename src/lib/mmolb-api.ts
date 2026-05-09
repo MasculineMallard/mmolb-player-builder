@@ -66,6 +66,12 @@ export interface MmolbApiPlayer {
   Stats?: Record<string, Record<string, number>>;
   Birthseason?: number;
   Birthday?: number | string; // "Preseason" for non-recomps, numeric day for mid-season recomps
+  Equipment?: Record<string, {
+    Slot: string;
+    Name: string;
+    Emoji: string;
+    Effects: { Attribute: string; Tier: number; Type: string; Value: number }[];
+  }>;
 }
 
 export interface MmolbApiTeamPlayer {
