@@ -22,7 +22,15 @@ import type { SlotRecommendation } from "@/lib/item-advisor";
 import { PlayerEquipmentGraphic } from "./PlayerEquipmentGraphic";
 import { StatBarPanel } from "./StatBarPanel";
 
-const GLOBAL_VALUES = [5, 10, 15, 20, 25, 30];
+export const ITEM_TIERS = [
+  { tier: 1, flatMax: 5,  pctMax: 4 },
+  { tier: 2, flatMax: 10, pctMax: 8 },
+  { tier: 3, flatMax: 15, pctMax: 12 },
+  { tier: 4, flatMax: 20, pctMax: 16 },
+  { tier: 5, flatMax: 25, pctMax: 20 },
+  { tier: 6, flatMax: 30, pctMax: 24 },
+  { tier: 7, flatMax: 35, pctMax: 28 },
+];
 const BATTER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"];
 
 export function ShopView() {
@@ -32,8 +40,9 @@ export function ShopView() {
   const [searchOpen, setSearchOpen] = useState(true);
 
   const [archetype, setArchetype] = useState<Archetype | null>(null);
-  const [globalValue, setGlobalValue] = useState(15);
+  const [tierIndex, setTierIndex] = useState(2); // default tier 3
   const [positionOverride, setPositionOverride] = useState<string | null>(null);
+  const selectedTier = ITEM_TIERS[tierIndex];
 
   const boonEmojis = useBoonEmojis();
 
@@ -301,25 +310,26 @@ export function ShopView() {
               )}
             </div>
 
-            {/* Global item value selector + legend */}
+            {/* Item tier selector + legend */}
             <div className="bg-card border border-border rounded-lg px-3 py-2">
               <div className="flex items-center gap-3 flex-wrap">
-                <span className="text-sm font-medium">Bonus:</span>
+                <span className="text-sm font-medium">Item Tier:</span>
                 <div className="flex gap-1">
-                  {GLOBAL_VALUES.map((v) => (
+                  {ITEM_TIERS.map((t, i) => (
                     <button
-                      key={v}
-                      onClick={() => setGlobalValue(v)}
+                      key={t.tier}
+                      onClick={() => setTierIndex(i)}
                       className={`px-2 py-0.5 rounded text-sm font-mono transition-colors ${
-                        globalValue === v
+                        tierIndex === i
                           ? "bg-primary text-primary-foreground"
                           : "bg-secondary text-muted-foreground hover:text-foreground"
                       }`}
                     >
-                      +{v}
+                      T{t.tier}
                     </button>
                   ))}
                 </div>
+                <span className="text-xs text-muted-foreground">+{selectedTier.flatMax} flat / {selectedTier.pctMax}%</span>
               </div>
               <div className="flex items-center gap-5 mt-2">
                 <div className="flex items-center gap-2">
@@ -332,7 +342,7 @@ export function ShopView() {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded bg-blue-400/50" />
-                  <span className="text-sm text-muted-foreground">+flat base</span>
+                  <span className="text-sm text-muted-foreground">+flat</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded bg-blue-600/80" />
@@ -370,7 +380,8 @@ export function ShopView() {
                 {/* Summary + Item cards in a row */}
                 <PlayerEquipmentGraphic
                   recommendations={recommendations}
-                  globalValue={globalValue}
+                  flatMax={selectedTier.flatMax}
+                  pctMax={selectedTier.pctMax}
                   statNeeds={statNeeds}
                 />
 
@@ -378,7 +389,8 @@ export function ShopView() {
                 recommendations={recommendations}
                 playerStats={player.stats}
                 boonMultipliers={boonMultipliers}
-                globalValue={globalValue}
+                flatMax={selectedTier.flatMax}
+                pctMax={selectedTier.pctMax}
                 archetype={archetype}
               />
               </>

@@ -11,7 +11,8 @@ interface StatBarPanelProps {
   recommendations: SlotRecommendation[];
   playerStats: Record<string, number>;
   boonMultipliers: Record<string, number>;
-  globalValue: number;
+  flatMax: number;
+  pctMax: number;
   archetype: Archetype;
 }
 
@@ -29,7 +30,8 @@ export function StatBarPanel({
   recommendations,
   playerStats,
   boonMultipliers,
-  globalValue,
+  flatMax,
+  pctMax,
   archetype,
 }: StatBarPanelProps) {
   const bars = useMemo(() => {
@@ -59,8 +61,8 @@ export function StatBarPanel({
       const boonMult = boonMultipliers[stat] ?? 1.0;
       const target = prioritySet.has(stat) ? corePer : secondarySet.has(stat) ? supportPer : 0;
 
-      const withFlat = count > 0 ? Math.round(current + globalValue * count * boonMult) : current;
-      const withPct = count > 0 ? Math.round(current * Math.pow(1 + globalValue / 100, count)) : current;
+      const withFlat = count > 0 ? Math.round(current + flatMax * count * boonMult) : current;
+      const withPct = count > 0 ? Math.round(current * Math.pow(1 + pctMax / 100, count)) : current;
 
       return {
         stat, current, withFlat, withPct,
@@ -73,7 +75,7 @@ export function StatBarPanel({
     const defense = STAT_CATEGORIES.defense.map((s) => buildBar(s, "defense")).filter((b): b is StatBar => b !== null);
 
     return { batting, baserunning, defense };
-  }, [recommendations, playerStats, boonMultipliers, globalValue, archetype]);
+  }, [recommendations, playerStats, boonMultipliers, flatMax, pctMax, archetype]);
 
   const allBars = [...bars.batting, ...bars.baserunning, ...bars.defense];
   if (allBars.length === 0) return null;
@@ -88,7 +90,7 @@ export function StatBarPanel({
         <span className="w-0.5 h-3.5 bg-primary/40 rounded-full" />
         Projected Build
         <span className="normal-case tracking-normal font-normal text-muted-foreground/70 text-xs">
-          if all 5 items target these stats at +{globalValue}
+          if all 5 items target these stats at +{flatMax} flat / {pctMax}%
         </span>
       </h3>
 
