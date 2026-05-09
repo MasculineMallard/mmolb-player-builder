@@ -66,7 +66,7 @@ export function ShopGlossaryButton() {
                 <h3 className="text-foreground font-semibold mb-1">Flat vs. Percent</h3>
                 <p>Flat bonuses add a fixed amount (amplified by boons). Percent bonuses multiply your current stat value. At low stats, flat is better. At high stats, percent is better. The crossover depends on the tier and your boon multiplier.</p>
                 <div className="mt-1 space-y-0.5 ml-2">
-                  <div><span className="text-cyan-300">Cyan text/bar</span> = flat bonus projection</div>
+                  <div><span className="text-sky-300">Light blue text/bar</span> = flat bonus projection</div>
                   <div><span className="text-blue-400">Blue text/bar</span> = percent bonus projection</div>
                 </div>
               </section>

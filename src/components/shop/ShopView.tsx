@@ -343,7 +343,7 @@ export function ShopView() {
                   <span className="text-sm text-muted-foreground">target</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-cyan-300/50" />
+                  <div className="w-4 h-4 rounded bg-sky-300/50" />
                   <span className="text-sm text-muted-foreground">+flat</span>
                 </div>
                 <div className="flex items-center gap-2">
