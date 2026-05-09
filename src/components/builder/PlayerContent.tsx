@@ -155,9 +155,9 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
   // Score all boons for the boon advisor (based on actual stats, not archetype)
   const allScoredBoons = useMemo(
     () => boonList.length > 0
-      ? scoreBoons(player.stats, playerType, player.lesserBoons, boonList)
+      ? scoreBoons(player.stats, playerType, [], boonList)
       : [],
-    [player.stats, playerType, player.lesserBoons, boonList]
+    [player.stats, playerType, boonList]
   );
   // Score the player's current boons (re-score without excluding them)
   const currentBoonScores = useMemo(() => {
@@ -371,9 +371,12 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
           />
         )}
 
-        {hasArchetype && (
-          <FoodRecommendation recommendations={foodRecommendations} />
-        )}
+        <BoonAdvisor
+          scoredBoons={allScoredBoons}
+          takenBoons={player.lesserBoons}
+          boonEmojis={boonEmojis}
+          currentBoonScores={currentBoonScores}
+        />
 
       </div>
 
@@ -393,14 +396,11 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
             ) : undefined
           }
         />
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-2">
-          <BoonAdvisor
-            scoredBoons={allScoredBoons}
-            takenBoons={player.lesserBoons}
-            boonEmojis={boonEmojis}
-            currentBoonScores={currentBoonScores}
-          />
-          <div className="xl:col-span-2 h-full">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-2">
+          {hasArchetype && (
+            <FoodRecommendation recommendations={foodRecommendations} />
+          )}
+          <div className="h-full">
             <ProgressionPath milestones={milestones} currentLevel={player.level} />
           </div>
         </div>
