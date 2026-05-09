@@ -190,7 +190,7 @@ function BarRow({ bar, displayMax, isPriority, isSecondary }: {
           {hasImprovement && (
             <>
               <span className="text-gray-600 mx-1.5">|</span>
-              <span className="text-blue-400/70 w-10 text-right">+{flatDelta}</span>
+              <span className="text-cyan-300 w-10 text-right">+{flatDelta}</span>
               <span className="text-gray-600 mx-1.5">|</span>
               <span className="text-blue-400 w-10 text-right">+{pctDelta}</span>
             </>
@@ -218,14 +218,14 @@ function BarRow({ bar, displayMax, isPriority, isSecondary }: {
           {/* Shared improvement zone — both flat and pct cover this */}
           {seg1Pct > 0 && (
             <div
-              className={`h-full ${flatIsSmaller ? "bg-blue-400/50" : "bg-blue-600/80"}`}
+              className={`h-full ${flatIsSmaller ? "bg-cyan-300/50" : "bg-blue-600/80"}`}
               style={{ width: `${seg1Pct}%` }}
             />
           )}
           {/* Extended zone — only the larger projection reaches here */}
           {seg2Pct > 0.3 && (
             <div
-              className={`h-full ${flatIsSmaller ? "bg-blue-600/80" : "bg-blue-400/50"}`}
+              className={`h-full ${flatIsSmaller ? "bg-blue-600/80" : "bg-cyan-300/50"}`}
               style={{ width: `${seg2Pct}%` }}
             />
           )}

@@ -21,6 +21,7 @@ import {
 import type { SlotRecommendation } from "@/lib/item-advisor";
 import { PlayerEquipmentGraphic } from "./PlayerEquipmentGraphic";
 import { StatBarPanel } from "./StatBarPanel";
+import { ShopGlossaryButton } from "./ShopGlossary";
 
 export const ITEM_TIERS = [
   { tier: 1, flatMax: 5,  pctMax: 4 },
@@ -330,6 +331,7 @@ export function ShopView() {
                   ))}
                 </div>
                 <span className="text-xs text-muted-foreground">+{selectedTier.flatMax} flat / {selectedTier.pctMax}%</span>
+                <ShopGlossaryButton />
               </div>
               <div className="flex items-center gap-5 mt-2">
                 <div className="flex items-center gap-2">
@@ -341,7 +343,7 @@ export function ShopView() {
                   <span className="text-sm text-muted-foreground">target</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-blue-400/50" />
+                  <div className="w-4 h-4 rounded bg-cyan-300/50" />
                   <span className="text-sm text-muted-foreground">+flat</span>
                 </div>
                 <div className="flex items-center gap-2">

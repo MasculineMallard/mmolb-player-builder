@@ -69,7 +69,7 @@ export function ShopSummary({ recommendations, statNeeds, flatMax, pctMax }: Sho
               {row.gap > 0 && <span className="text-xs text-gray-500">-{Math.round(row.gap)}</span>}
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              <span className={`text-xs font-mono ${row.pref === "flat" ? "text-blue-300/70" : "text-blue-400"}`}>
+              <span className={`text-xs font-mono ${row.pref === "flat" ? "text-cyan-300" : "text-blue-400"}`}>
                 {row.pref === "flat" ? `+${flatMax}` : `${pctMax}%`}
               </span>
               <span className="flex gap-0.5">
