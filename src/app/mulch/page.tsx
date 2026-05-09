@@ -284,6 +284,13 @@ export default function EvaluatePage() {
             <div className="ml-auto flex items-center gap-2">
               <GlossaryButton />
               <button
+                onClick={() => selectedTeam && loadAndEvaluate(selectedTeam)}
+                className="text-xs bg-muted text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-md border border-border transition-colors"
+                title="Refresh roster data from MMOLB"
+              >
+                Refresh
+              </button>
+              <button
                 onClick={copyReport}
                 className="text-xs bg-muted text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-md border border-border transition-colors"
               >
