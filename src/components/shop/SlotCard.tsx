@@ -35,7 +35,7 @@ export function SlotCard({ recommendation: rec, flatMax, pctMax, statNeeds }: Sl
           return (
             <div key={pick.stat} className="flex items-center justify-between text-sm h-[22px]">
               <span className="capitalize font-medium text-gray-100">{pick.stat}</span>
-              <span className={`text-xs font-mono ${pref === "flat" ? "text-sky-300" : "text-blue-400"}`}>
+              <span className={`text-xs font-mono ${pref === "flat" ? "text-sky-200" : "text-blue-400"}`}>
                 {pref === "flat" ? `+${flatMax}` : `${pctMax}%`}
               </span>
             </div>
@@ -56,7 +56,7 @@ export function SlotCard({ recommendation: rec, flatMax, pctMax, statNeeds }: Sl
             return (
               <div key={pick.stat} className="flex items-center justify-between text-sm h-[22px]">
                 <span className="capitalize font-medium text-yellow-400">{pick.stat}</span>
-                <span className={`text-xs font-mono ${pref === "flat" ? "text-sky-300" : "text-blue-400"}`}>
+                <span className={`text-xs font-mono ${pref === "flat" ? "text-sky-200" : "text-blue-400"}`}>
                   {pref === "flat" ? `+${flatMax}` : `${pctMax}%`}
                 </span>
               </div>
