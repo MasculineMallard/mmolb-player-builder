@@ -19,7 +19,6 @@ import {
   loadItemSlotAttributes,
 } from "@/lib/item-advisor";
 import type { SlotRecommendation } from "@/lib/item-advisor";
-import { ShopSummary } from "./ShopSummary";
 import { PlayerEquipmentGraphic } from "./PlayerEquipmentGraphic";
 import { StatBarPanel } from "./StatBarPanel";
 
@@ -370,8 +369,6 @@ export function ShopView() {
               <>
                 {/* Summary + Item cards in a row */}
                 <PlayerEquipmentGraphic
-                  player={effectivePlayer!}
-                  archetype={archetype}
                   recommendations={recommendations}
                   globalValue={globalValue}
                   statNeeds={statNeeds}
