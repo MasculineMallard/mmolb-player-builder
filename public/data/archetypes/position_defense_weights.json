@@ -1,5 +1,5 @@
 {
-  "_comment": "Defense stat weights by position. Source: pinned defense graphic from fix-my-team Discord. Font size = importance. Awareness added for infield (DP/steal prevention).",
+  "_comment": "Defense stat weights by position. Blended: 50% original estimates + 50% S11 OLS regression (normalized to 0.12 scale). Regression source: positional fielding value OLS with R² quality checks.",
   "C": {
     "name": "Catcher",
     "emoji": "🥎",
@@ -13,61 +13,62 @@
   "1B": {
     "name": "First Base",
     "emoji": "1️⃣",
-    "description": "Reaction for scooping throws. Awareness for DP potential. Composure for error avoidance.",
+    "description": "Reaction for scooping throws. Composure for error avoidance.",
     "primary_stats": ["reaction"],
-    "secondary_stats": ["awareness", "composure"],
+    "secondary_stats": ["composure"],
     "stat_weights": {
       "reaction": 0.12,
-      "awareness": 0.10,
-      "composure": 0.08
+      "composure": 0.07
     }
   },
   "2B": {
     "name": "Second Base",
     "emoji": "2️⃣",
-    "description": "Reaction for ground balls. Awareness for DP turns and steal prevention. Composure under pressure.",
+    "description": "Reaction-dominant. Awareness and composure contribute marginally.",
     "primary_stats": ["reaction"],
     "secondary_stats": ["awareness", "composure"],
     "stat_weights": {
       "reaction": 0.12,
-      "awareness": 0.10,
-      "composure": 0.08
+      "awareness": 0.05,
+      "composure": 0.04
     }
   },
   "SS": {
     "name": "Shortstop",
     "emoji": "🔷",
-    "description": "Reaction for ground balls. Awareness for DP turns and steal prevention. Composure under pressure.",
+    "description": "Reaction for ground balls. Composure under pressure. Arm for relay throws.",
     "primary_stats": ["reaction"],
-    "secondary_stats": ["awareness", "composure"],
+    "secondary_stats": ["composure", "awareness", "arm"],
     "stat_weights": {
       "reaction": 0.12,
-      "awareness": 0.10,
-      "composure": 0.08
+      "composure": 0.07,
+      "awareness": 0.05,
+      "arm": 0.02
     }
   },
   "3B": {
     "name": "Third Base",
     "emoji": "3️⃣",
-    "description": "Reaction for hot corner. Awareness for DP potential. Composure under pressure.",
+    "description": "Reaction-dominant hot corner. Composure and awareness are minor factors.",
     "primary_stats": ["reaction"],
-    "secondary_stats": ["awareness", "composure"],
+    "secondary_stats": ["composure", "awareness"],
     "stat_weights": {
       "reaction": 0.12,
-      "awareness": 0.10,
-      "composure": 0.08
+      "composure": 0.06,
+      "awareness": 0.05
     }
   },
   "LF": {
     "name": "Left Field",
     "emoji": "⬅️",
-    "description": "Acrobatics for catches. Agility for range. Arm for throws home.",
+    "description": "Acrobatics for catches. Agility for range. Arm for throws home. Dexterity contributes.",
     "primary_stats": ["acrobatics"],
-    "secondary_stats": ["agility", "arm"],
+    "secondary_stats": ["agility", "arm", "dexterity"],
     "stat_weights": {
       "acrobatics": 0.12,
-      "agility": 0.10,
-      "arm": 0.08
+      "agility": 0.09,
+      "arm": 0.08,
+      "dexterity": 0.03
     }
   },
   "CF": {
@@ -78,20 +79,21 @@
     "secondary_stats": ["agility", "arm"],
     "stat_weights": {
       "acrobatics": 0.12,
-      "agility": 0.10,
+      "agility": 0.09,
       "arm": 0.08
     }
   },
   "RF": {
     "name": "Right Field",
     "emoji": "➡️",
-    "description": "Acrobatics for catches. Agility for range. Arm for throws to third.",
+    "description": "Acrobatics for catches. Arm for throws to third. Agility for range. Dexterity contributes.",
     "primary_stats": ["acrobatics"],
-    "secondary_stats": ["agility", "arm"],
+    "secondary_stats": ["arm", "agility", "dexterity"],
     "stat_weights": {
       "acrobatics": 0.12,
-      "agility": 0.10,
-      "arm": 0.08
+      "arm": 0.08,
+      "agility": 0.08,
+      "dexterity": 0.02
     }
   },
   "DH": {
