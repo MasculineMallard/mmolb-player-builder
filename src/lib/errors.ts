@@ -4,3 +4,11 @@ export class NoStatsError extends Error {
     this.name = "NoStatsError";
   }
 }
+
+export class ApiUnavailableError extends Error {
+  constructor(playerId: string, cause?: unknown) {
+    super(`MMOLB API unavailable for player ${playerId}`);
+    this.name = "ApiUnavailableError";
+    this.cause = cause;
+  }
+}

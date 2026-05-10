@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPlayer } from "@/lib/player-data";
-import { NoStatsError } from "@/lib/errors";
+import { NoStatsError, ApiUnavailableError } from "@/lib/errors";
 import { validateId } from "@/lib/validation";
 
 export async function GET(
@@ -25,6 +25,12 @@ export async function GET(
   } catch (error) {
     if (error instanceof NoStatsError) {
       return NextResponse.json({ error: "Player exists but has no stats yet" }, { status: 422 });
+    }
+    if (error instanceof ApiUnavailableError) {
+      return NextResponse.json(
+        { error: "MMOLB API is temporarily unavailable. Try again in a moment." },
+        { status: 503 }
+      );
     }
     console.error("Get player error:", error instanceof Error ? error.message : String(error));
     return NextResponse.json(

@@ -25,7 +25,7 @@ import {
   searchPlayers as dbSearchPlayers,
   searchTeams as dbSearchTeams,
 } from "./queries";
-import { NoStatsError } from "./errors";
+import { NoStatsError, ApiUnavailableError } from "./errors";
 import type {
   PlayerData,
   PlayerSearchResult,
@@ -140,12 +140,13 @@ async function getPlayerInternal(id: string): Promise<PlayerData | null> {
     }
     // NoStatsError from transform: propagate (route handler catches for 422)
     if (err instanceof NoStatsError) throw err;
-    // Other errors (timeout, 5xx, network): no DB fallback (stale data is worse than no data)
+    // Other errors (timeout, 5xx, network): surface to caller so UI can
+    // distinguish "player doesn't exist" from "API is down, try again"
     console.error(
       `[player-data] API failed for ${id}:`,
       err instanceof Error ? err.message : String(err)
     );
-    return null;
+    throw new ApiUnavailableError(id, err);
   }
 }
 
