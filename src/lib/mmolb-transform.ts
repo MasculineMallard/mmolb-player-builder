@@ -136,6 +136,7 @@ function transformEquipment(raw: MmolbApiPlayer): PlayerEquipment | undefined {
   if (!raw.Equipment) return undefined;
   const equipment: PlayerEquipment = {};
   for (const [apiKey, item] of Object.entries(raw.Equipment)) {
+    if (!item) continue; // bench players have null equipment slots
     const key = SLOT_KEY_MAP[apiKey] ?? apiKey.toLowerCase();
     const effects: ItemEffect[] = (item.Effects ?? []).map((e) => ({
       attribute: e.Attribute.toLowerCase(),

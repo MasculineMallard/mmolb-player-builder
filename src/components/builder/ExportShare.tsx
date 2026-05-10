@@ -9,14 +9,14 @@ import type { Archetype, PlayerData } from "@/lib/types";
 import { PITCHER_POSITIONS, BASE_PATH } from "@/lib/constants";
 
 const POSITION_DEFENSE: Record<string, string[]> = {
-  C: ["awareness", "reaction", "composure"],
-  "1B": ["reaction", "composure", "dexterity"],
-  "2B": ["reaction", "composure", "acrobatics"],
-  "3B": ["reaction", "arm", "composure"],
-  SS: ["reaction", "arm", "acrobatics"],
-  LF: ["acrobatics", "agility", "arm"],
+  C: ["awareness"],
+  "1B": ["reaction", "composure"],
+  "2B": ["reaction", "awareness", "composure"],
+  "3B": ["reaction", "composure", "awareness"],
+  SS: ["reaction", "composure", "awareness", "arm"],
+  LF: ["acrobatics", "agility", "arm", "dexterity"],
   CF: ["acrobatics", "agility", "arm"],
-  RF: ["acrobatics", "agility", "arm"],
+  RF: ["acrobatics", "arm", "agility", "dexterity"],
 };
 
 interface ExportShareProps {

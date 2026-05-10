@@ -35,6 +35,7 @@ export default function EvaluatePage() {
   const [evaluated, setEvaluated] = useState<EvaluatedPlayer[]>([]);
   const [loadState, setLoadState] = useState<LoadState>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
   const searchAbort = useRef<AbortController | null>(null);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const evalRef = useRef<EvalRefData | null>(null);
@@ -86,6 +87,7 @@ export default function EvaluatePage() {
     setQuery("");
     setLoadState("loading");
     setError(null);
+    setWarning(null);
 
     try {
       // Fetch full roster (includes isBench flag for position assignment)
@@ -97,21 +99,32 @@ export default function EvaluatePage() {
       const benchPlayerIds = new Set(roster.filter(r => r.isBench).map(r => r.mmolbPlayerId));
 
       // Fetch all player details in parallel
+      const failedPlayers: string[] = [];
       const playerPromises = roster.map(async (rp) => {
         try {
           const res = await fetch(`${BASE_PATH}/api/players/${rp.mmolbPlayerId}`, {
             signal: AbortSignal.timeout(30000),
           });
-          if (!res.ok) return null;
+          if (!res.ok) {
+            failedPlayers.push(`${rp.firstName} ${rp.lastName}`);
+            return null;
+          }
           const data = await res.json();
           return data as PlayerData;
         } catch {
+          failedPlayers.push(`${rp.firstName} ${rp.lastName}`);
           return null;
         }
       });
       const players = (await Promise.all(playerPromises)).filter(
         (p): p is PlayerData => p != null,
       );
+      if (failedPlayers.length > 0) {
+        console.warn(`[mulch] Could not load ${failedPlayers.length} players: ${failedPlayers.join(", ")}`);
+        setWarning(`Could not load ${failedPlayers.length} player${failedPlayers.length > 1 ? "s" : ""}: ${failedPlayers.join(", ")}. The MMOLB API may be temporarily unavailable for these players.`);
+      } else {
+        setWarning(null);
+      }
 
       // Load reference data (including live percentiles)
       const [batterArchetypes, pitcherArchetypes, positionDefense, boonLookup, percentileTables] =
@@ -268,6 +281,13 @@ export default function EvaluatePage() {
       {loadState === "error" && (
         <div className="text-center py-12">
           <div className="text-sm text-destructive">{error}</div>
+        </div>
+      )}
+
+      {/* Warning banner for partially loaded rosters */}
+      {warning && loadState === "ready" && (
+        <div className="mb-3 rounded-md border border-yellow-600/40 bg-yellow-950/30 px-3 py-2 text-xs text-yellow-200">
+          {warning}
         </div>
       )}
 

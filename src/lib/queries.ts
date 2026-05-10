@@ -39,6 +39,7 @@ export async function searchPlayers(
 ): Promise<PlayerSearchResult[]> {
   const { whereClause, params, limitParam } = buildSearchParams(nameQuery, limit);
 
+  // Primary: fast query via team_player_versions (indexed)
   const { rows } = await timedQuery("searchPlayers", () =>
     pool.query(
       `SELECT
@@ -60,6 +61,40 @@ export async function searchPlayers(
       params
     )
   );
+
+  // Fallback: if no results, search player_versions directly (slower but
+  // catches players missing from team_player_versions, e.g. new bench players)
+  if (rows.length === 0) {
+    const pvWhereClause = whereClause.replace(/tpv\./g, "pv.");
+    const { rows: pvRows } = await timedQuery("searchPlayers-fallback", () =>
+      pool.query(
+        `SELECT
+           pv.mmolb_player_id,
+           pv.first_name,
+           pv.last_name,
+           pv.level,
+           tv.name as team_name,
+           tv.emoji as team_emoji
+         FROM data.player_versions pv
+         LEFT JOIN data.team_versions tv ON pv.mmolb_team_id = tv.mmolb_team_id
+           AND tv.valid_until IS NULL
+         WHERE pv.valid_until IS NULL
+           AND (${pvWhereClause})
+         ORDER BY pv.level DESC
+         LIMIT ${limitParam}`,
+        params
+      )
+    );
+    return pvRows.map((row: Record<string, unknown>) => ({
+      mmolbPlayerId: asString(row.mmolb_player_id),
+      firstName: asString(row.first_name),
+      lastName: asString(row.last_name),
+      name: `${asString(row.first_name)} ${asString(row.last_name)}`,
+      level: asNumber(row.level, 1),
+      teamName: asStringOrNull(row.team_name),
+      teamEmoji: asStringOrNull(row.team_emoji),
+    }));
+  }
 
   return rows.map((row: Record<string, unknown>) => ({
     mmolbPlayerId: asString(row.mmolb_player_id),

@@ -97,7 +97,9 @@ async function fetchPlayer(
         ? "Player not found"
         : res.status === 422
           ? "Player exists but has no stats yet"
-          : `Server error (${res.status})`
+          : res.status === 503
+            ? "MMOLB API is temporarily unavailable. Try again in a moment."
+            : `Server error (${res.status})`
     );
   }
   try {
