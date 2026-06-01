@@ -6,9 +6,10 @@
  * Results cached in memory AND persisted to disk so restarts don't lose data.
  */
 
-import { readFileSync, writeFileSync, mkdirSync } from "fs";
+import { readFileSync, writeFileSync, renameSync, mkdirSync } from "fs";
 import { join } from "path";
 import type { PercentileEntry } from "./evaluator-types";
+import { buildBaseStatMap } from "./mmolb-transform";
 
 // ── Disk cache path ──
 
@@ -36,8 +37,13 @@ function loadFromDisk(): PercentileCache | null {
     const raw = readFileSync(CACHE_FILE, "utf-8");
     const data: PercentileCache = JSON.parse(raw);
     if (data.batting && data.pitching && data.computedAt) return data;
-  } catch {
-    // No cached file or invalid JSON
+  } catch (err) {
+    // ENOENT (no cache written yet) is expected on first run; surface anything
+    // else so a corrupt/unreadable cache isn't silently ignored.
+    const code = (err as NodeJS.ErrnoException)?.code;
+    if (code !== "ENOENT") {
+      console.warn("[percentiles] Could not read disk cache:", err instanceof Error ? err.message : String(err));
+    }
   }
   return null;
 }
@@ -45,7 +51,11 @@ function loadFromDisk(): PercentileCache | null {
 function saveToDisk(data: PercentileCache): void {
   try {
     mkdirSync(CACHE_DIR, { recursive: true });
-    writeFileSync(CACHE_FILE, JSON.stringify(data), "utf-8");
+    // Write-then-rename so a crash mid-write can't leave a truncated JSON file
+    // (rename is atomic on the same filesystem).
+    const tmp = `${CACHE_FILE}.tmp`;
+    writeFileSync(tmp, JSON.stringify(data), "utf-8");
+    renameSync(tmp, CACHE_FILE);
   } catch (err) {
     console.error("[percentiles] Failed to write disk cache:", err);
   }
@@ -101,7 +111,9 @@ interface ApiTeamPlayer {
 
 interface ApiFullPlayer {
   BaseAttributeBonuses: { attribute: string; amount: number }[];
-  AppliedLevelUps: { choice?: { type?: string; attribute?: string; amount?: number } }[];
+  // Use ScheduledLevelUps (not AppliedLevelUps) to match the screenshot-verified
+  // transform: BaseAttributeBonuses already includes applied level-ups.
+  ScheduledLevelUps: { choice?: { type?: string; attribute?: string; amount?: number } }[];
   AugmentHistory: { attribute: string; amount: number }[];
   Position: string;
   PositionType: string;
@@ -267,30 +279,6 @@ async function runRefresh(): Promise<void> {
       return total > 0 ? weighted / total : 0;
     }
 
-    function buildStats(player: ApiFullPlayer): Record<string, number> {
-      const sums: Record<string, number> = {};
-      for (const b of player.BaseAttributeBonuses ?? []) {
-        const key = b.attribute.toLowerCase();
-        sums[key] = (sums[key] ?? 0) + b.amount;
-      }
-      for (const lu of player.AppliedLevelUps ?? []) {
-        const c = lu.choice;
-        if (c?.type === "attribute" && c.attribute && c.amount) {
-          const key = c.attribute.toLowerCase();
-          sums[key] = (sums[key] ?? 0) + c.amount;
-        }
-      }
-      for (const a of player.AugmentHistory ?? []) {
-        const key = a.attribute.toLowerCase();
-        sums[key] = (sums[key] ?? 0) + a.amount;
-      }
-      const stats: Record<string, number> = {};
-      for (const [k, v] of Object.entries(sums)) {
-        stats[k] = Math.min(Math.round(v * 100), 1000);
-      }
-      return stats;
-    }
-
     const batterAttrQualities: number[] = [];
     const pitcherAttrQualities: number[] = [];
 
@@ -303,7 +291,7 @@ async function runRefresh(): Promise<void> {
       for (let j = 0; j < results.length; j++) {
         const r = results[j];
         if (r.status !== "fulfilled") continue;
-        const attrs = buildStats(r.value);
+        const attrs = buildBaseStatMap(r.value);
         const isPitcher = batch[j].isPitcher;
         const quality = computeAttrQuality(attrs, isPitcher);
         if (quality > 0) {
@@ -349,6 +337,15 @@ async function runRefresh(): Promise<void> {
       playerCount: { batters: batterLines.length, pitchers: pitcherLines.length, attrSampled: batterAttrQualities.length + pitcherAttrQualities.length },
     };
 
+    // Drop empty tables (e.g. sparse early-season SB%) so nothing downstream
+    // scores against an empty percentile table. A required key that comes up
+    // empty is removed here and then caught by validate() below (refresh rejected).
+    for (const tbls of [result.batting, result.pitching]) {
+      for (const key of Object.keys(tbls)) {
+        if (tbls[key].length === 0) delete tbls[key];
+      }
+    }
+
     if (validate(result)) {
       cached = result;
       lastError = null;
@@ -391,13 +388,27 @@ export function getCachedPercentiles(): {
   return { source: "none", lastError };
 }
 
-// ── Auto-refresh: production only, on startup if stale, then every 24h ──
+// ── Auto-refresh scheduler: production only, on startup if stale, then every 24h ──
 // In dev mode, use POST /api/percentiles/refresh to trigger manually.
+//
+// Started once at server boot from src/instrumentation.ts (nodejs runtime only),
+// instead of at module-import time, so importing this module for getCachedPercentiles
+// (e.g. from the health route) doesn't side-effect a scheduler.
 
-if (process.env.NODE_ENV === "production") {
+let schedulerStarted = false;
+
+export function startPercentileScheduler(): void {
+  if (schedulerStarted) return;
+  schedulerStarted = true;
+
+  if (process.env.NODE_ENV !== "production") {
+    console.log("[percentiles] Dev mode: auto-refresh disabled. Use POST /api/percentiles/refresh to trigger.");
+    return;
+  }
+
   const REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
-  const _cacheAge = cached ? Date.now() - new Date(cached.computedAt).getTime() : Infinity;
-  if (_cacheAge > REFRESH_INTERVAL_MS) {
+  const cacheAge = cached ? Date.now() - new Date(cached.computedAt).getTime() : Infinity;
+  if (cacheAge > REFRESH_INTERVAL_MS) {
     console.log("[percentiles] Cache stale or missing, auto-refreshing on startup...");
     setTimeout(() => { if (!isRefreshing) { isRefreshing = true; void runRefresh(); } }, 5000);
   }
@@ -408,6 +419,4 @@ if (process.env.NODE_ENV === "production") {
       void runRefresh();
     }
   }, REFRESH_INTERVAL_MS);
-} else {
-  console.log("[percentiles] Dev mode: auto-refresh disabled. Use POST /api/percentiles/refresh to trigger.");
 }

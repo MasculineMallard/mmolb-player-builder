@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ITEM_TIERS } from "@/lib/constants";
 
 interface ShopGlossaryButtonProps {
   toolName?: string;
@@ -56,13 +57,9 @@ export function ShopGlossaryButton({ toolName = "Super Slugger Sartoria", isPitc
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><td>T1</td><td>+5</td><td>4%</td></tr>
-                    <tr><td>T2</td><td>+10</td><td>8%</td></tr>
-                    <tr><td>T3</td><td>+15</td><td>12%</td></tr>
-                    <tr><td>T4</td><td>+20</td><td>16%</td></tr>
-                    <tr><td>T5</td><td>+25</td><td>20%</td></tr>
-                    <tr><td>T6</td><td>+30</td><td>24%</td></tr>
-                    <tr><td>T7</td><td>+35</td><td>28%</td></tr>
+                    {ITEM_TIERS.map((t) => (
+                      <tr key={t.tier}><td>T{t.tier}</td><td>+{t.flatMax}</td><td>{t.pctMax}%</td></tr>
+                    ))}
                   </tbody>
                 </table>
               </section>

@@ -6,8 +6,9 @@ import { usePlayerStore } from "@/store/player-store";
 import { PlayerSearch } from "@/components/builder/PlayerSearch";
 import { RecentPlayers } from "@/components/builder/RecentPlayers";
 import { ArchetypeSelect } from "@/components/builder/ArchetypeSelect";
+import { PlayerHeader } from "@/components/builder/PlayerHeader";
 import { LoadingSkeleton } from "@/components/builder/LoadingSkeleton";
-import { PITCHER_POSITIONS } from "@/lib/constants";
+import { PITCHER_POSITIONS, ITEM_TIERS } from "@/lib/constants";
 import { loadPositionDefense, getBoonLookup } from "@/lib/evaluator-data";
 import type { PositionDefenseMap } from "@/lib/evaluator-data";
 import type { Archetype } from "@/lib/types";
@@ -22,17 +23,6 @@ import type { SlotRecommendation } from "@/lib/item-advisor";
 import { PlayerEquipmentGraphic } from "./PlayerEquipmentGraphic";
 import { StatBarPanel } from "./StatBarPanel";
 import { ShopGlossaryButton } from "./ShopGlossary";
-
-export const ITEM_TIERS = [
-  { tier: 1, flatMax: 5,  pctMax: 4 },
-  { tier: 2, flatMax: 10, pctMax: 8 },
-  { tier: 3, flatMax: 15, pctMax: 12 },
-  { tier: 4, flatMax: 20, pctMax: 16 },
-  { tier: 5, flatMax: 25, pctMax: 20 },
-  { tier: 6, flatMax: 30, pctMax: 24 },
-  { tier: 7, flatMax: 35, pctMax: 28 },
-];
-const BATTER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"];
 
 interface ShopViewProps {
   forcePlayerType?: "batter" | "pitcher";
@@ -135,7 +125,6 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
 
   const recentPlayers = usePlayerStore((s) => s.recentPlayers);
   const hasRecent = recentPlayers.length > 0;
-  const boonCount = (player?.lesserBoons.length ?? 0) + (player?.greaterBoons.length ?? 0);
 
   return (
     <div className="space-y-2">
@@ -216,111 +205,17 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
           {/* LEFT PANEL */}
           <div className="space-y-2 min-w-0 flex flex-col">
 
-            {/* Team bar — matches builder exactly */}
-            {player.teamName && (
-              <div className="bg-muted/50 border border-border rounded-lg px-3 py-1.5 flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  {player.teamEmoji} {player.teamName} {player.position && `| ${player.position}`}
-                </span>
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    onClick={() => usePlayerStore.getState().refreshPlayer()}
-                    className="text-sm bg-muted text-muted-foreground hover:text-foreground px-2 sm:px-3 py-1 rounded-md border border-border hover:bg-muted/80 transition-colors"
-                    title="Refresh player data from MMOLB"
-                  >
-                    Refresh
-                  </button>
-                  {!searchOpen && (
-                    <button
-                      onClick={() => setSearchOpen(true)}
-                      className="text-sm bg-muted text-muted-foreground hover:text-foreground px-2 sm:px-3 py-1 rounded-md border border-border hover:bg-muted/80 transition-colors"
-                    >
-                      Change Player
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Player header card — matches builder: name, level, durability, position dropdown, boons */}
-            <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-[0_1px_3px_rgba(0,0,0,0.3)]">
-              <div className="flex items-center justify-between gap-1.5 sm:gap-3">
-                <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-wrap">
-                  <h2 className="text-lg font-bold truncate">{player.name}</h2>
-                  <span className="text-sm text-muted-foreground shrink-0">Lv.{player.level}</span>
-                  {/* Durability pips */}
-                  <span className="flex items-center gap-0.5 shrink-0" title={`Durability: ${player.durability}/5`}>
-                    {Array.from({ length: 5 }, (_, i) => (
-                      <span
-                        key={i}
-                        className="inline-block w-2 h-2 rounded-full"
-                        style={{
-                          backgroundColor: i < player.durability
-                            ? player.durability <= 2 ? 'var(--scale-bad)' : player.durability <= 3 ? 'var(--scale-poor)' : 'var(--scale-good)'
-                            : 'var(--muted)',
-                        }}
-                      />
-                    ))}
-                  </span>
-                  {/* Position: dropdown for batters (defense matters), static label for pitchers */}
-                  {isPitcher ? (
-                    <span className="text-[13px] font-bold text-[#00e5ff] shrink-0">{player.position}</span>
-                  ) : (
-                    <select
-                      value={effectivePosition ?? ""}
-                      onChange={(e) => setPositionOverride(e.target.value === player.position ? null : e.target.value)}
-                      className="bg-[#1a2332] text-[#00e5ff] px-1.5 py-0.5 rounded text-[13px] font-bold border-none cursor-pointer shrink-0"
-                    >
-                      {BATTER_POSITIONS.map((pos) => (
-                        <option key={pos} value={pos}>{pos}</option>
-                      ))}
-                    </select>
-                  )}
-                </div>
-                {/* Change Player if no team bar */}
-                {!player.teamName && !searchOpen && (
-                  <button
-                    onClick={() => setSearchOpen(true)}
-                    className="text-sm bg-muted text-muted-foreground hover:text-foreground px-3 py-1 rounded-md border border-border hover:bg-muted/80 transition-colors shrink-0"
-                  >
-                    Change Player
-                  </button>
-                )}
-              </div>
-              {/* Boons */}
-              {boonCount > 0 && (
-                <>
-                  <div className="h-px bg-gradient-to-r from-border via-border/50 to-transparent mt-1.5 mb-1.5" />
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {player.lesserBoons.map((b) => {
-                      const emoji = boonEmojis.get(b.toLowerCase());
-                      return (
-                        <span key={b} className="text-sm bg-muted px-2 py-0.5 rounded text-muted-foreground">
-                          {emoji && <span className="mr-0.5">{emoji}</span>}{b}
-                        </span>
-                      );
-                    })}
-                    {player.greaterBoons.map((b) => {
-                      const emoji = boonEmojis.get(b.toLowerCase());
-                      return (
-                        <span
-                          key={b}
-                          className="text-sm px-2 py-0.5 rounded font-medium"
-                          style={{
-                            backgroundColor: 'rgba(255, 215, 0, 0.15)',
-                            color: 'var(--chart-2)',
-                            boxShadow: '0 0 6px rgba(255, 215, 0, 0.15), inset 0 0 4px rgba(255, 215, 0, 0.05)',
-                            border: '1px solid rgba(255, 215, 0, 0.25)',
-                          }}
-                        >
-                          {emoji && <span className="mr-0.5">{emoji}</span>}{b}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-            </div>
+            {/* Player header — shared with the builder */}
+            <PlayerHeader
+              player={player}
+              isPitcher={isPitcher}
+              boonEmojis={boonEmojis}
+              positionValue={effectivePosition ?? ""}
+              onPositionChange={(v) => setPositionOverride(v === player.position ? null : v)}
+              onChangePlayer={() => setSearchOpen(true)}
+              searchOpen={searchOpen}
+              showPitcherPositionLabel
+            />
 
             {/* Item tier selector + legend */}
             <div className="bg-card border border-border rounded-lg px-3 py-2">

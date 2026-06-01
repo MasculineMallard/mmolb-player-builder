@@ -1,7 +1,7 @@
 "use client";
 
-import type { SlotRecommendation } from "@/lib/item-advisor";
-import type { StatNeed } from "@/lib/item-advisor";
+import type { SlotRecommendation, StatNeed, SlotName } from "@/lib/item-advisor";
+import { SLOT_META } from "@/lib/item-advisor";
 
 interface ShopSummaryProps {
   recommendations: SlotRecommendation[];
@@ -9,14 +9,6 @@ interface ShopSummaryProps {
   flatMax: number;
   pctMax: number;
 }
-
-const SLOT_EMOJI: Record<string, string> = {
-  head: "🪖",
-  body: "👕",
-  hands: "🧤",
-  feet: "🥾",
-  charm: "🧿",
-};
 
 function preferredType(currentValue: number, boonMultiplier: number, flatMax: number, pctMax: number): "flat" | "pct" {
   // Compare actual gains: flat gives flatMax * boonMult, pct gives current * pctMax/100
@@ -72,7 +64,7 @@ export function ShopSummary({ recommendations, statNeeds, flatMax, pctMax }: Sho
               {row.pref === "flat" ? `+${flatMax}` : `${pctMax}%`}
             </span>
             <span className="flex gap-0.5">
-              {row.slots.map((s) => <span key={s} className="text-xs" title={s}>{SLOT_EMOJI[s]}</span>)}
+              {row.slots.map((s) => <span key={s} className="text-xs" title={s}>{SLOT_META[s as SlotName]?.emoji}</span>)}
             </span>
           </div>
         ))}

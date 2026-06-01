@@ -115,7 +115,7 @@ export const BATTING_PERCENTILES: Record<string, PercentileEntry[]> = {
 
 // ---------------------------------------------------------------------------
 // Pitching Percentile Tables
-// Lower value = better for ERA, BB9, H9, HR9, WHIP
+// Lower value = better for ERA, BB9, HR9, WHIP
 // Higher value = better for K9
 // ---------------------------------------------------------------------------
 
@@ -137,15 +137,6 @@ export const PITCHING_PERCENTILES: Record<string, PercentileEntry[]> = {
     { pct: 65, value: 4.11 }, { pct: 70, value: 4.30 }, { pct: 75, value: 4.50 },
     { pct: 80, value: 4.74 }, { pct: 85, value: 5.01 }, { pct: 90, value: 5.36 },
     { pct: 95, value: 6.00 },
-  ],
-  H9: [
-    { pct: 5, value: 6.02 }, { pct: 10, value: 6.66 }, { pct: 15, value: 7.09 },
-    { pct: 20, value: 7.41 }, { pct: 25, value: 7.71 }, { pct: 30, value: 7.96 },
-    { pct: 35, value: 8.20 }, { pct: 40, value: 8.44 }, { pct: 45, value: 8.69 },
-    { pct: 50, value: 9.00 }, { pct: 55, value: 9.18 }, { pct: 60, value: 9.42 },
-    { pct: 65, value: 9.68 }, { pct: 70, value: 9.99 }, { pct: 75, value: 10.30 },
-    { pct: 80, value: 10.67 }, { pct: 85, value: 11.15 }, { pct: 90, value: 11.70 },
-    { pct: 95, value: 12.65 },
   ],
   HR9: [
     { pct: 5, value: 0.32 }, { pct: 10, value: 0.49 }, { pct: 15, value: 0.61 },
@@ -178,9 +169,6 @@ export const PITCHING_PERCENTILES: Record<string, PercentileEntry[]> = {
   ],
 };
 
-/** Which stats are "lower is better" for percentile scoring. */
-export const LOWER_IS_BETTER = new Set(["K_PCT", "ERA", "BB9", "H9", "HR9", "WHIP"]);
-
 /** Batting stats score weights (must sum to 1.0). */
 export const BATTING_STAT_WEIGHTS: Record<string, number> = {
   OBP: 0.30,
@@ -198,6 +186,51 @@ export const PITCHING_STAT_WEIGHTS: Record<string, number> = {
   BB9: 0.15,
   HR9: 0.15,
 };
+
+// ---------------------------------------------------------------------------
+// Composite weights — single source of truth for the four-pillar weighting.
+// Used by the engine (evaluator.computeComposite) AND the display breakdown
+// (player-detail.WeightedBreakdown) so they can never drift apart.
+// Each scenario's weights must sum to 1.0.
+// ---------------------------------------------------------------------------
+
+export interface CompositeWeights {
+  attr: number;
+  stats: number;
+  fit: number;
+  growth: number;
+}
+
+export const COMPOSITE_WEIGHTS: Record<
+  PlayerRole,
+  { all: CompositeWeights; statsOnly: CompositeWeights; fitOnly: CompositeWeights; neither: CompositeWeights }
+> = {
+  batter: {
+    all: { attr: 0.20, stats: 0.40, fit: 0.20, growth: 0.20 },
+    statsOnly: { attr: 0.25, stats: 0.50, fit: 0, growth: 0.25 }, // DH, no fit
+    fitOnly: { attr: 0.40, stats: 0, fit: 0.30, growth: 0.30 }, // no game stats
+    neither: { attr: 0.50, stats: 0, fit: 0, growth: 0.50 },
+  },
+  pitcher: {
+    all: { attr: 0.25, stats: 0.25, fit: 0.25, growth: 0.25 },
+    statsOnly: { attr: 0.40, stats: 0.40, fit: 0, growth: 0.20 },
+    fitOnly: { attr: 0.40, stats: 0, fit: 0.30, growth: 0.30 },
+    neither: { attr: 0.50, stats: 0, fit: 0, growth: 0.50 },
+  },
+};
+
+/** Pick the composite weight set for a role given which pillars are present. */
+export function getCompositeWeights(
+  role: PlayerRole,
+  hasStats: boolean,
+  hasFit: boolean,
+): CompositeWeights {
+  const r = COMPOSITE_WEIGHTS[role];
+  if (hasStats && hasFit) return r.all;
+  if (hasStats) return r.statsOnly;
+  if (hasFit) return r.fitOnly;
+  return r.neither;
+}
 
 // ---------------------------------------------------------------------------
 // Archetype loaders (client-side, cached)
@@ -288,7 +321,11 @@ export async function loadLivePercentiles(): Promise<LivePercentileTables | null
     if (data.source !== "live") return null;
     if (!data.batting || !data.pitching) return null;
     return { batting: data.batting, pitching: data.pitching, attributes: data.attributes };
-  } catch {
+  } catch (err) {
+    console.warn(
+      "[percentiles] Live percentile fetch failed, using fallback tables:",
+      err instanceof Error ? err.message : String(err),
+    );
     return null;
   }
 }

@@ -12,6 +12,86 @@
 
 ---
 
+## Fix Round 10 — 2026-06-01
+
+Verified: build ✓ (TS passes) · 158 tests (13 files, +15 new engine tests) · lint 0 errors. See FIX_PROGRESS.md for full detail.
+
+**Both blockers fixed; both open questions resolved; ~11/15 warnings + ~7/15 suggestions done.**
+
+### Done
+- BLOCKER: empty-percentile-table crash — length guard in `percentileToScore` + skip-empty in `computeStatsScore` + omit-empty in percentile-builder before validate.
+- BLOCKER: added error.tsx / not-found.tsx / global-error.tsx.
+- Composite-weight drift → `COMPOSITE_WEIGHTS`/`getCompositeWeights` single source (engine + player-detail).
+- Stale VERDICT_ORDER → `RECOMMENDATION_ORDER` (5 verdicts) in evaluator-types.
+- Q1 divergence: shared `buildBaseStatMap` (percentile-builder now matches verified transform; uses ScheduledLevelUps not AppliedLevelUps).
+- Q2: VERIFIED FALSE POSITIVE — `/api/team` Players[].Stats is flat; runRefresh correct (confirmed via live mmolb.com capture).
+- Archetype-fit consolidated → `optimizer.computeArchetypeFitPct` (3 sites).
+- Engine test suite (evaluator.test.ts) + weight-sum-1.0 assertions.
+- Deleted dead code: queries.ts getPlayerFull/getTeamRoster/getTeamRosterLight (+parsePlayerRows), generateShopSummary, H9 table+field, LOWER_IS_BETTER.
+- item-advisor position-index strip; radar-chart useMemo; mulch fan-out concurrency cap (8); shadcn→devDeps; rate-limit on refresh route; atomic disk write; console.warn on 3 silent catches.
+
+### Second pass — all remaining structural work DONE (2026-06-01, same day)
+Build + 158 tests + lint (0 errors) green. Full detail in FIX_PROGRESS.md. Summary:
+- Scheduler → `startPercentileScheduler()` + `src/instrumentation.ts` (Next emitted `.next/server/instrumentation.js`, so register() runs at boot). Daily-refresh firing in prod = Railway log check.
+- Shared `DurabilityPips` (`components/ui/durability-pips.tsx`) + shared `PlayerHeader` (`components/builder/PlayerHeader.tsx`). ⚠️ DurabilityPips copies weren't identical — eval table = green (`--chart-3`), builder/shop = blue (`--scale-good`); preserved both via `goodColor` prop, flagged the drift for unify decision.
+- `MulchView` extracted (`components/evaluator/mulch-view.tsx`, page is now a thin wrapper) using `useTeamSearch`; `buildRosterReport` in `lib/evaluator-report.ts`.
+- Constant dedups: `BATTER_POSITIONS`/`FIELDING_POSITIONS`/`ROSTER_POSITIONS` + `EVAL_POSITION_ORDER` + `ITEM_TIERS` in constants; `SLOT_META` exported (ShopSummary dedup); `RECOMMENDATION_THRESHOLDS` + `VERDICT_COLORS` single-sourced in evaluator-types.
+- Richer `/api/health` (db + mmolb reachability + percentile staleness; db is the only 503 trigger).
+
+### Season decision (resolved)
+- CURRENT_SEASON: user confirmed **Season 12 launches today (2026-06-01)** → "Season 12" label is correct, no change. mechanics.ts `S11` constants + MILESTONE_LEVELS still need S12 verification vs Danny's patch notes / live API (DATA task; NOT renamed S11→S12 to avoid implying unverified values are confirmed).
+
+### Still pending (preview / data, not code)
+- Visual QA on Railway preview: PlayerHeader pixel-match, durability pip colors (+ unify decision), Mulch search/Copy Report, `[percentiles]` boot log.
+- S12 mechanics verification once numbers are public.
+- Optional/skipped (low value): percentile compute/cache module split, cache hit/miss logging, json-cache TTL.
+
+---
+
+## Codebase Review #10 — 2026-05-31
+
+**Overall: C** | LOC: 12,601 (10,829 src + 1,772 test) | Blockers: 2 | Open Questions: 2 | Warnings: 15 | Suggestions: 15
+Report: REVIEW.html
+
+Grade trend: C+ → B- → B → B → B → B+ → C+ → B → B- (#9) → **C (#10)**. LOC ~doubled since #9 (6,165 → 12,601). Lenses run: Architecture, Systems, Security, Observability, Deep Bugs, Critical Bugs, Bloat, Performance, Refactoring + Synthesis. Skipped: Pipeline/DAG (no DAG), LLM Expert (no AI), Accessibility (personal tool).
+
+### Root cause (one story)
+Doubled by bolting on 3 new subsystems (live-percentile builder, boon advisor/scoreBoons, shop/item-advisor) via copy-paste without single-sourcing domain facts or adding tests. A crash path + no error boundaries + zero engine tests all stack in the same hot files (percentile-builder + evaluator).
+
+### Top 3 Action Items
+1. Fix the SB_PCT empty-percentile-table white-screen crash: length guard in `percentileToScore` (evaluator.ts:48-90) + add `SB_PCT` to `REQUIRED_BATTING_KEYS` (percentile-builder.ts:78) so sparse tables are rejected.
+2. Add `error.tsx` / `not-found.tsx` / `global-error.tsx` (none exist) — contains the crash and any render throw.
+3. Centralize `COMPOSITE_WEIGHTS` (fixes batter 25/25/25/25 display drift in player-detail.tsx) + `RECOMMENDATION_ORDER` (fixes dead VERDICT_ORDER sort in roster-table.tsx).
+
+### Fix Phases
+- Phase 0 (independent, mostly sub-hour): 10 items — both blockers, 2 display bugs, item-advisor position-strip, radar-chart memo, shadcn→devDeps, rate-limit refresh route, delete dead code, mulch concurrency limiter.
+- Phase 1 (after Phase 0): engine unit tests, weight-sum-1.0 test, delete dead queries.ts functions.
+- Phase 2 (verification-gated): resolve AppliedLevelUps vs ScheduledLevelUps + flat-vs-nested Stats — CAPTURE REAL mmolb.com FIXTURES FIRST, do not guess field names.
+- Phase 3 (refactor, after tests): split percentile-builder (compute/cache/scheduler), extract MulchView, shared PlayerHeader, consolidate archetype-fit.
+- Phase 4 (proactive): instrumentation, health check, json-cache TTL, CURRENT_SEASON reconcile.
+
+### Quick Wins
+- Length guard + SB_PCT key (kills the whole crash class)
+- 3 error-boundary files (~30 LOC)
+- COMPOSITE_WEIGHTS + RECOMMENDATION_ORDER centralization
+- shadcn → devDependencies + npm audit fix
+- console.warn on 3 silent catches (resolveTeamMeta, loadLivePercentiles, loadFromDisk)
+- Delete generateShopSummary + H9 table + LOWER_IS_BETTER (~50 LOC dead)
+
+### Open Questions (verify against live API — do NOT guess)
+- percentile-builder reads `AppliedLevelUps`; mmolb-transform reads `ScheduledLevelUps`. One side drops level-up attribute points → biases every Attributes score. Capture a real player JSON to confirm the live field.
+- runRefresh reads `p.Stats` as a flat Record; rest of codebase treats Stats as nested-by-team. If nested, live percentiles silently never populate. Confirm the team-stats endpoint shape.
+
+### Watch List
+- Refactor Critical: 2 (composite weights, VERDICT_ORDER). Refactor count: 2 Critical / 5 Moderate / 11 Low.
+- Ticking clocks (all scale-out only; single-instance is fine): percentile-builder setInterval-at-import (N workers = N crawls), per-process rate-limit+caches, per-player sampling growth, uncapped mulch fan-out, external-DB index reliance.
+
+### Regressions since #9
+- Resolved: PlayerInfo.tsx + StatGrid.tsx deleted; rate-limit Map now pruned (partial); use-boon-emojis silent catch fixed.
+- New debt: SB_PCT crash, composite-weight drift, stale VERDICT_ORDER, AppliedLevelUps divergence, silent-catch pattern reappeared in 3 NEW sites, ~242 LOC new duplication, shadcn vulns.
+
+---
+
 ## Codebase Review #9 — 2026-03-30
 
 **Overall: B-** | LOC: 6,165 | Blockers: 3 | Warnings: 12 | Suggestions: 9

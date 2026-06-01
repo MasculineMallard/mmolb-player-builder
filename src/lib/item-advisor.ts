@@ -76,7 +76,7 @@ export const loadItemSlotAttributes = createJsonCache<ItemSlotData>(
 // Constants
 // ---------------------------------------------------------------------------
 
-const SLOT_META: Record<SlotName, { label: string; emoji: string }> = {
+export const SLOT_META: Record<SlotName, { label: string; emoji: string }> = {
   head: { label: "Helmet", emoji: "🪖" },
   body: { label: "Jersey", emoji: "👕" },
   hands: { label: "Gloves", emoji: "🧤" },
@@ -149,8 +149,11 @@ export function analyzeStatNeeds(
   const secondarySet = new Set(archetype.secondary_stats ?? []);
   const editedTargets = archetype.stat_targets ?? {};
 
-  // Defense data for this position
-  const posDef = player.position ? positionDefense[player.position] : undefined;
+  // Defense data for this position. Strip a trailing index ("SS1" -> "SS") so
+  // API-sourced suffixed positions resolve, matching the evaluator/UI lookup.
+  const rawPos = player.position;
+  const basePos = rawPos?.replace(/\d+$/, "");
+  const posDef = basePos ? (positionDefense[basePos] ?? positionDefense[rawPos!]) : undefined;
   const defWeights = posDef?.stat_weights ?? {};
 
   // Future defense bonus levels reduce defense urgency
@@ -418,38 +421,4 @@ export function projectStatCombined(
 ): number {
   const afterFlat = current + (flatValue * boonMultiplier);
   return afterFlat * (1 + pctValue / 100);
-}
-
-// ---------------------------------------------------------------------------
-// Summary generation
-// ---------------------------------------------------------------------------
-
-export function generateShopSummary(
-  recommendations: SlotRecommendation[],
-  archetype: Archetype,
-): { headline: string; detail: string } {
-  if (recommendations.length === 0) {
-    return {
-      headline: "No item recommendations available",
-      detail: "Select an archetype to see shopping recommendations.",
-    };
-  }
-
-  const top = recommendations[0];
-  const topStat = top.offensivePicks[0]?.stat ?? top.defensivePicks[0]?.stat;
-
-  const slotsWithGaps = recommendations.filter(
-    (r) => r.offensivePicks.some((p) => p.score > MET_TARGET_FLOOR) ||
-           r.defensivePicks.some((p) => p.score > MET_TARGET_FLOOR),
-  ).length;
-
-  const headline = topStat
-    ? `Priority: ${top.label} with ${topStat}`
-    : `Start with ${top.label}`;
-
-  const detail = slotsWithGaps <= 2
-    ? `${slotsWithGaps} of 5 slots have meaningful gaps. Focus your coins here.`
-    : `${slotsWithGaps} of 5 slots have gaps. ${top.label} and ${recommendations[1]?.label ?? "Charm"} first if budget is limited.`;
-
-  return { headline, detail };
 }

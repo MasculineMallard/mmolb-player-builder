@@ -21,13 +21,27 @@ import type {
 
 const STAT_SCALE = 100; // matches DB_STAT_SCALE in query-utils.ts
 
+/** Minimal shape of the three attribute sources a player payload carries. */
+export interface RawAttributeSources {
+  BaseAttributeBonuses?: { attribute: string; amount: number }[];
+  ScheduledLevelUps?: { choice?: { type?: string; attribute?: string; amount?: number } }[];
+  AugmentHistory?: { attribute: string; amount: number }[];
+}
+
 /**
- * Build a stat map from the three API attribute sources.
- * BaseAttributeBonuses: base generation + applied level-ups (including defense bonuses)
- * ScheduledLevelUps: chosen but not yet applied level-ups
- * AugmentHistory: augment attribute changes
+ * Build the "base stats" map (Equipment OFF, Boons OFF) from the three API
+ * attribute sources. Screenshot-verified against a real level-25 player.
+ *
+ * Single source of truth shared by the player transform AND the live-percentile
+ * builder, so evaluated players and the percentile baseline use identical
+ * attribute math. (Reading any other level-up field, e.g. AppliedLevelUps,
+ * either double-counts points already in BaseAttributeBonuses or drops the
+ * scheduled-not-yet-applied ones.)
+ *   BaseAttributeBonuses: base generation + already-applied level-ups (+ defense bonuses)
+ *   ScheduledLevelUps: chosen but not-yet-applied level-ups (boon choices excluded)
+ *   AugmentHistory: augment attribute changes
  */
-function buildStatMap(raw: MmolbApiPlayer): Record<string, number> {
+export function buildBaseStatMap(raw: RawAttributeSources): Record<string, number> {
   const sums = new Map<string, number>();
 
   const add = (attr: string, amount: number) => {
@@ -58,6 +72,10 @@ function buildStatMap(raw: MmolbApiPlayer): Record<string, number> {
     stats[key] = Math.min(Math.round(total * STAT_SCALE), 1000);
   }
   return stats;
+}
+
+function buildStatMap(raw: MmolbApiPlayer): Record<string, number> {
+  return buildBaseStatMap(raw);
 }
 
 /** Convert API LesserDurability to 0-5 pip scale. Verified: API returns 0-5 directly. */
