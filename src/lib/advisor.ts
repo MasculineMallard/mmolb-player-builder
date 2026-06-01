@@ -43,9 +43,7 @@ export function recommendStatPriorities(
   for (const statName of [...priorityStats, ...secondaryStats]) {
     if (seen.has(statName)) continue;
     seen.add(statName);
-    if (!(statName in stats)) continue;
-
-    const current = stats[statName];
+    const current = stats[statName] ?? 0;
     const weight = statWeights[statName] ?? 1.0;
 
     let target: number;
