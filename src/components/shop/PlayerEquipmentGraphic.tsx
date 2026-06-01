@@ -40,15 +40,7 @@ export function PlayerEquipmentGraphic({
     recommendations.map((r) => [r.slot, r]),
   );
 
-  // Blue stars: top 2 by stat priority score (existing behavior)
-  const statPrioritySlots = new Set(
-    [...recommendations]
-      .sort((a, b) => b.priority - a.priority)
-      .slice(0, 2)
-      .map((r) => r.slot),
-  );
-
-  // Wait, priority is 1=best. Let me fix: sort ascending (1 first = highest priority)
+  // Blue stars: top 2 by stat priority score (priority 1 = best)
   const sortedByPriority = [...recommendations].sort((a, b) => a.priority - b.priority);
   const topStatSlots = new Set(sortedByPriority.slice(0, 2).map((r) => r.slot));
 

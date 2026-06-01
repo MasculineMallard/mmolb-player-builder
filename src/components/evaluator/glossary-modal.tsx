@@ -102,7 +102,7 @@ export function GlossaryButton() {
               {/* Stat tiers */}
               <section>
                 <h3 className="text-foreground font-semibold mb-1">Attribute Tiers</h3>
-                <p className="mb-1">Based on Bagyilisk&apos;s regression analysis with S11 adjustments. Which stats actually move outcomes.</p>
+                <p className="mb-1">Based on Bagyilisk&apos;s S10 and S11 regression analyses. Which stats actually move outcomes.</p>
                 <div className="space-y-1">
                   <div><span className="text-foreground">Batting T1:</span> Contact, Muscle, Intimidation, Aiming, Performance</div>
                   <div><span className="text-foreground">Batting T2:</span> Discipline, Lift, Vision, Determination, Insight, Speed, Cunning</div>

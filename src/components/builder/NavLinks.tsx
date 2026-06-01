@@ -10,7 +10,8 @@ const NAV_ITEMS = [
   { href: "/pitcher", label: "Perfect Pitcher Planner" },
   { href: "/batter", label: "Better Batter Builder" },
   { href: "/mulch", label: "Mulch-o-Meter" },
-  { href: "/shop", label: "Slugger Sartoria" },
+  { href: "/shop", label: "Super Slugger Sartoria" },
+  { href: "/pitcher-shop", label: "Heroic Hurler Haberdashery" },
 ];
 
 export function NavLinks() {

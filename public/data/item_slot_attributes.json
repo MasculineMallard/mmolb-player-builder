@@ -20,5 +20,27 @@
       "offensive": ["contact", "muscle", "determination", "insight", "discipline", "luck", "greed"],
       "defensive": ["acrobatics", "agility", "arm", "awareness", "composure", "dexterity", "patience", "reaction"]
     }
+  },
+  "pitcher": {
+    "head": {
+      "offensive": ["accuracy", "deception", "intuition", "persuasion", "presence", "stuff"],
+      "defensive": ["awareness", "composure", "patience", "reaction"]
+    },
+    "body": {
+      "offensive": ["defiance", "guts", "intuition", "persuasion", "presence", "stamina"],
+      "defensive": ["arm", "composure", "patience"]
+    },
+    "hands": {
+      "offensive": ["accuracy", "control", "deception", "rotation", "stuff", "velocity"],
+      "defensive": ["arm", "dexterity", "reaction"]
+    },
+    "feet": {
+      "offensive": ["control", "defiance", "guts", "rotation", "stamina", "velocity"],
+      "defensive": ["awareness", "dexterity", "reaction"]
+    },
+    "charm": {
+      "offensive": ["accuracy", "velocity", "persuasion", "presence", "intuition", "luck", "greed"],
+      "defensive": ["arm", "dexterity", "reaction"]
+    }
   }
 }
