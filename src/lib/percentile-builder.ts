@@ -29,6 +29,10 @@ interface PercentileCache {
 let cached: PercentileCache | null = null;
 let isRefreshing = false;
 let lastError: string | null = null;
+let lastDiskCheck = 0;
+
+// How often a reader re-reads the disk cache to pick up another instance's refresh.
+const DISK_RECHECK_MS = 60_000;
 
 // ── Disk persistence ──
 
@@ -65,6 +69,21 @@ function saveToDisk(data: PercentileCache): void {
 cached = loadFromDisk();
 if (cached) {
   console.log(`[percentiles] Loaded disk cache from ${cached.computedAt}`);
+}
+
+/**
+ * Adopt the on-disk cache if it's newer than what we hold in memory (or we hold
+ * nothing). The disk file is the cross-instance source of truth: the auto-refresh
+ * scheduler is started from instrumentation.ts, which Next may bundle into a
+ * different module instance than the API routes — so the scheduler's in-memory
+ * `cached` is NOT shared with the route handlers. Reading back from disk bridges
+ * that gap (and the multi-worker scale-out case) without a shared store.
+ */
+function syncFromDisk(): void {
+  const disk = loadFromDisk();
+  if (disk && (!cached || new Date(disk.computedAt) > new Date(cached.computedAt))) {
+    cached = disk;
+  }
 }
 
 // ── Required keys for validation ──
@@ -382,6 +401,12 @@ export function getCachedPercentiles(): {
   playerCount: { batters: number; pitchers: number; attrSampled: number };
   source: "live";
 } | { source: "none"; lastError: string | null } {
+  // Pull in another instance's refresh from disk (TTL-guarded to bound disk reads).
+  const now = Date.now();
+  if (!cached || now - lastDiskCheck > DISK_RECHECK_MS) {
+    lastDiskCheck = now;
+    syncFromDisk();
+  }
   if (cached) {
     return { ...cached, source: "live" };
   }
