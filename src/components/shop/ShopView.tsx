@@ -34,7 +34,13 @@ export const ITEM_TIERS = [
 ];
 const BATTER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"];
 
-export function ShopView() {
+interface ShopViewProps {
+  forcePlayerType?: "batter" | "pitcher";
+  toolName?: string;
+  toolEmoji?: string;
+}
+
+export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria", toolEmoji = "🧵" }: ShopViewProps) {
   const { player, loading, error } = usePlayerStore();
   const searchParams = useSearchParams();
   const didAutoImport = useRef(false);
@@ -50,7 +56,8 @@ export function ShopView() {
   // Data loading
   const [posDefense, setPosDefense] = useState<PositionDefenseMap>({});
   const [boonLookup, setBoonLookup] = useState<Map<string, { bonuses: Record<string, number>; penalties: Record<string, number> }>>(new Map());
-  const [slotData, setSlotData] = useState<Record<string, { offensive?: string[]; defensive?: string[]; all?: string[] }> | null>(null);
+  const [batterSlotData, setBatterSlotData] = useState<Record<string, { offensive?: string[]; defensive?: string[]; all?: string[] }> | null>(null);
+  const [pitcherSlotData, setPitcherSlotData] = useState<Record<string, { offensive?: string[]; defensive?: string[]; all?: string[] }> | null>(null);
 
   // Reset position override on player change
   useEffect(() => {
@@ -87,13 +94,17 @@ export function ShopView() {
         if (cancelled) return;
         setPosDefense(pd);
         setBoonLookup(bl);
-        setSlotData(sd.batter);
+        setBatterSlotData(sd.batter);
+        setPitcherSlotData(sd.pitcher ?? null);
       })
       .catch(() => {});
     return () => { cancelled = true; };
   }, []);
 
-  const isPitcher = player?.position ? PITCHER_POSITIONS.has(player.position) : false;
+  const detectedPitcher = player?.position ? PITCHER_POSITIONS.has(player.position) : false;
+  const isPitcher = forcePlayerType ? forcePlayerType === "pitcher" : detectedPitcher;
+  const playerType = isPitcher ? "pitcher" : "batter";
+  const slotData = isPitcher ? pitcherSlotData : batterSlotData;
   const effectivePosition = positionOverride ?? player?.position ?? null;
 
   const effectivePlayer = useMemo(() => {
@@ -108,14 +119,14 @@ export function ShopView() {
   }, [player, boonLookup]);
 
   const statNeeds = useMemo(() => {
-    if (!effectivePlayer || !archetype || isPitcher) return [];
+    if (!effectivePlayer || !archetype) return [];
     return analyzeStatNeeds(effectivePlayer, archetype, posDefense, boonMultipliers);
-  }, [effectivePlayer, archetype, posDefense, boonMultipliers, isPitcher]);
+  }, [effectivePlayer, archetype, posDefense, boonMultipliers]);
 
   const recommendations = useMemo<SlotRecommendation[]>(() => {
     if (statNeeds.length === 0 || !slotData || !archetype) return [];
-    return recommendItems(statNeeds, slotData, archetype);
-  }, [statNeeds, slotData, archetype]);
+    return recommendItems(statNeeds, slotData, archetype, playerType);
+  }, [statNeeds, slotData, archetype, playerType]);
 
 
   const handleArchetypeChange = useCallback((a: Archetype | null) => {
@@ -158,10 +169,10 @@ export function ShopView() {
       {!player && !loading && !searchOpen && (
         <div className="bg-card border border-border rounded-lg p-8">
           <div className="max-w-lg mx-auto text-center">
-            <div className="text-4xl mb-4">🧵</div>
-            <h2 className="text-xl font-bold mb-2">Slugger Sartoria</h2>
+            <div className="text-4xl mb-4">{toolEmoji}</div>
+            <h2 className="text-xl font-bold mb-2">{toolName}</h2>
             <p className="text-muted-foreground mb-6">
-              Build your ideal items. Import a batter to see per-slot recommendations
+              Build your ideal items. Import a {isPitcher ? "pitcher" : "player"} to see per-slot recommendations
               with stat projections you can customize.
             </p>
             {hasRecent && (
@@ -182,15 +193,11 @@ export function ShopView() {
         </div>
       )}
 
-      {/* Pitcher warning */}
-      {player && !loading && isPitcher && (
-        <div className="bg-card border border-border rounded-lg p-8 text-center">
-          <div className="text-4xl mb-4">⚾</div>
-          <h2 className="text-xl font-bold mb-2">Batters Only (For Now)</h2>
-          <p className="text-muted-foreground">Pitcher item shopping is coming in a future update.</p>
-          <button onClick={() => setSearchOpen(true)} className="mt-4 text-sm text-primary hover:underline">
-            Search for a batter instead
-          </button>
+      {forcePlayerType && player && !loading && forcePlayerType !== (detectedPitcher ? "pitcher" : "batter") && (
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg px-3 py-2">
+          <p className="text-amber-400 text-sm">
+            ⚠️ This player is a {detectedPitcher ? "pitcher" : "batter"}, but this tool is for {forcePlayerType}s. Stats and archetypes may not apply.
+          </p>
         </div>
       )}
 
@@ -202,8 +209,8 @@ export function ShopView() {
         </div>
       )}
 
-      {/* Main content — two column layout matching batter builder */}
-      {player && !loading && !isPitcher && (
+      {/* Main content — two column layout */}
+      {player && !loading && (
         <div className="xl:grid xl:grid-cols-[420px_1fr] xl:gap-2 space-y-2 xl:space-y-0">
 
           {/* LEFT PANEL */}
@@ -255,16 +262,20 @@ export function ShopView() {
                       />
                     ))}
                   </span>
-                  {/* Position dropdown */}
-                  <select
-                    value={effectivePosition ?? ""}
-                    onChange={(e) => setPositionOverride(e.target.value === player.position ? null : e.target.value)}
-                    className="bg-[#1a2332] text-[#00e5ff] px-1.5 py-0.5 rounded text-[13px] font-bold border-none cursor-pointer shrink-0"
-                  >
-                    {BATTER_POSITIONS.map((pos) => (
-                      <option key={pos} value={pos}>{pos}</option>
-                    ))}
-                  </select>
+                  {/* Position: dropdown for batters (defense matters), static label for pitchers */}
+                  {isPitcher ? (
+                    <span className="text-[13px] font-bold text-[#00e5ff] shrink-0">{player.position}</span>
+                  ) : (
+                    <select
+                      value={effectivePosition ?? ""}
+                      onChange={(e) => setPositionOverride(e.target.value === player.position ? null : e.target.value)}
+                      className="bg-[#1a2332] text-[#00e5ff] px-1.5 py-0.5 rounded text-[13px] font-bold border-none cursor-pointer shrink-0"
+                    >
+                      {BATTER_POSITIONS.map((pos) => (
+                        <option key={pos} value={pos}>{pos}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
                 {/* Change Player if no team bar */}
                 {!player.teamName && !searchOpen && (
@@ -331,7 +342,7 @@ export function ShopView() {
                   ))}
                 </div>
                 <span className="text-xs text-muted-foreground">+{selectedTier.flatMax} flat / {selectedTier.pctMax}%</span>
-                <ShopGlossaryButton />
+                <ShopGlossaryButton toolName={toolName} isPitcher={isPitcher} />
               </div>
               <div className="flex items-center gap-5 mt-2">
                 <div className="flex items-center gap-2">
@@ -355,7 +366,7 @@ export function ShopView() {
 
             {/* Archetype selector */}
             <ArchetypeSelect
-              playerType="batter"
+              playerType={playerType}
               onArchetypeChange={handleArchetypeChange}
             />
 
@@ -367,7 +378,14 @@ export function ShopView() {
               </div>
             )}
 
-            {archetype && recommendations.length === 0 && (
+            {archetype && recommendations.length === 0 && !slotData && (
+              <div className="bg-card border border-destructive/50 rounded-lg p-6 text-center">
+                <div className="text-3xl mb-2">⚠️</div>
+                <p className="text-sm text-destructive">Could not load item slot data. Try refreshing the page.</p>
+              </div>
+            )}
+
+            {archetype && recommendations.length === 0 && slotData && (
               <div className="bg-card border border-border rounded-lg p-6 text-center">
                 <div className="text-3xl mb-2">✅</div>
                 <p className="text-sm text-muted-foreground">No significant stat gaps found.</p>
@@ -395,6 +413,7 @@ export function ShopView() {
                 flatMax={selectedTier.flatMax}
                 pctMax={selectedTier.pctMax}
                 archetype={archetype}
+                playerType={playerType}
               />
               </>
             )}

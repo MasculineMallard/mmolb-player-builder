@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 
-export function ShopGlossaryButton() {
+interface ShopGlossaryButtonProps {
+  toolName?: string;
+  isPitcher?: boolean;
+}
+
+export function ShopGlossaryButton({ toolName = "Super Slugger Sartoria", isPitcher = false }: ShopGlossaryButtonProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -24,7 +29,7 @@ export function ShopGlossaryButton() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 bg-card z-10">
-              <h2 className="text-sm font-bold uppercase tracking-wide">Slugger Sartoria Guide</h2>
+              <h2 className="text-sm font-bold uppercase tracking-wide">{toolName} Guide</h2>
               <button
                 onClick={() => setOpen(false)}
                 className="text-muted-foreground hover:text-foreground text-lg leading-none"
@@ -105,10 +110,12 @@ export function ShopGlossaryButton() {
                 <p>Boons that boost a stat make flat items more effective for that stat (+50% boon = flat items give 1.5x value). This is factored into the flat vs. percent recommendation and the stat priority scoring.</p>
               </section>
 
-              <section>
-                <h3 className="text-foreground font-semibold mb-1">Position Override</h3>
-                <p>Change the position dropdown to model defense needs for a different position. Useful for evaluating position switches.</p>
-              </section>
+              {!isPitcher && (
+                <section>
+                  <h3 className="text-foreground font-semibold mb-1">Position Override</h3>
+                  <p>Change the position dropdown to model defense needs for a different position. Useful for evaluating position switches.</p>
+                </section>
+              )}
             </div>
           </div>
         </div>

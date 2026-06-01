@@ -1,12 +1,12 @@
 /**
  * Item Shopping Advisor calculation engine.
  *
- * Analyzes a batter's stat needs (archetype + defense + boon synergy)
+ * Analyzes a player's stat needs (archetype + defense + boon synergy)
  * and builds the "ideal item" for each equipment slot.
  *
  * Items roll 3 offensive + 2 defensive attributes per slot.
  * Same attribute can appear twice: once flat (+X) and once % (+X%).
- * Luck/Greed only appear on Charms (batter accessory).
+ * Luck/Greed only appear on Charms.
  */
 
 import { calculateStatTargets } from "./optimizer";
@@ -64,6 +64,7 @@ interface SlotAttributes {
 
 interface ItemSlotData {
   batter: Record<string, SlotAttributes>;
+  pitcher?: Record<string, SlotAttributes>;
 }
 
 export const loadItemSlotAttributes = createJsonCache<ItemSlotData>(
@@ -81,6 +82,10 @@ const SLOT_META: Record<SlotName, { label: string; emoji: string }> = {
   hands: { label: "Gloves", emoji: "🧤" },
   feet: { label: "Boots", emoji: "🥾" },
   charm: { label: "Charm", emoji: "🧿" },
+};
+
+const PITCHER_SLOT_OVERRIDES: Partial<Record<SlotName, { label: string; emoji: string }>> = {
+  charm: { label: "Pendant", emoji: "🧿" },
 };
 
 const SLOT_ORDER: SlotName[] = ["head", "body", "hands", "feet", "charm"];
@@ -279,6 +284,7 @@ export function recommendItems(
   statNeeds: StatNeed[],
   slotData: Record<string, SlotAttributes>,
   archetype: Archetype,
+  playerType: "batter" | "pitcher" = "batter",
 ): SlotRecommendation[] {
   const equipAffixes = new Set(archetype.equipment_affixes ?? []);
   const equipPriority = archetype.equipment_priority ?? [];
@@ -313,7 +319,7 @@ export function recommendItems(
   for (const slot of orderedSlots) {
     const attrs = slotData[slot];
     if (!attrs) continue;
-    const meta = SLOT_META[slot];
+    const meta = (playerType === "pitcher" && PITCHER_SLOT_OVERRIDES[slot]) || SLOT_META[slot];
 
     const offPool = attrs.offensive ?? [];
     const defPool = attrs.defensive ?? [];

@@ -14,6 +14,7 @@ interface StatBarPanelProps {
   flatMax: number;
   pctMax: number;
   archetype: Archetype;
+  playerType?: "batter" | "pitcher";
 }
 
 interface StatBar {
@@ -23,7 +24,7 @@ interface StatBar {
   withPct: number;
   target: number;
   itemSlots: number;
-  group: "batting" | "baserunning" | "defense";
+  group: "batting" | "pitching" | "baserunning" | "defense";
 }
 
 export function StatBarPanel({
@@ -33,7 +34,10 @@ export function StatBarPanel({
   flatMax,
   pctMax,
   archetype,
+  playerType = "batter",
 }: StatBarPanelProps) {
+  const isPitcher = playerType === "pitcher";
+
   const bars = useMemo(() => {
     const { corePer, supportPer } = calculateStatTargets(archetype);
     const prioritySet = new Set(archetype.priority_stats ?? []);
@@ -70,19 +74,28 @@ export function StatBarPanel({
       };
     }
 
-    const batting = STAT_CATEGORIES.batting.map((s) => buildBar(s, "batting")).filter((b): b is StatBar => b !== null);
-    const baserunning = STAT_CATEGORIES.baserunning.map((s) => buildBar(s, "baserunning")).filter((b): b is StatBar => b !== null);
+    // Primary stats: batting for batters, pitching for pitchers
+    const primaryCategory = isPitcher ? "pitching" : "batting";
+    const primaryGroup = isPitcher ? "pitching" as const : "batting" as const;
+    const primary = STAT_CATEGORIES[primaryCategory].map((s) => buildBar(s, primaryGroup)).filter((b): b is StatBar => b !== null);
+
+    // Baserunning: only for batters
+    const baserunning = isPitcher
+      ? []
+      : STAT_CATEGORIES.baserunning.map((s) => buildBar(s, "baserunning")).filter((b): b is StatBar => b !== null);
+
     const defense = STAT_CATEGORIES.defense.map((s) => buildBar(s, "defense")).filter((b): b is StatBar => b !== null);
 
-    return { batting, baserunning, defense };
-  }, [recommendations, playerStats, boonMultipliers, flatMax, pctMax, archetype]);
+    return { primary, baserunning, defense };
+  }, [recommendations, playerStats, boonMultipliers, flatMax, pctMax, archetype, isPitcher]);
 
-  const allBars = [...bars.batting, ...bars.baserunning, ...bars.defense];
+  const allBars = [...bars.primary, ...bars.baserunning, ...bars.defense];
   if (allBars.length === 0) return null;
 
-  const maxStat = Math.max(...allBars.map((b) => Math.max(b.current, b.withFlat, b.withPct, b.target)), 500);
   const prioritySet = new Set(archetype.priority_stats ?? []);
   const secondarySet = new Set(archetype.secondary_stats ?? []);
+
+  const primaryLabel = isPitcher ? CATEGORY_LABELS.pitching : CATEGORY_LABELS.batting;
 
   return (
     <div className="bg-card border border-border rounded-lg px-3 py-2">
@@ -95,13 +108,13 @@ export function StatBarPanel({
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-12 gap-y-4 md:gap-y-6">
-        {bars.batting.length > 0 && (
+        {bars.primary.length > 0 && (
           <div>
             <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1 border-b border-border pb-0.5">
-              {CATEGORY_LABELS.batting}
+              {primaryLabel}
             </h4>
             <div className="space-y-0.5">
-              {bars.batting.map((b) => (
+              {bars.primary.map((b) => (
                 <BarRow key={b.stat} bar={b} displayMax={STAT_DISPLAY_MAX} isPriority={prioritySet.has(b.stat)} isSecondary={secondarySet.has(b.stat)} />
               ))}
             </div>
@@ -165,9 +178,6 @@ function BarRow({ bar, displayMax, isPriority, isSecondary }: {
   const seg1Pct = minProjPct - currentPct;
   // Second segment: the difference between the two projections
   const seg2Pct = maxProjPct - minProjPct;
-
-  const minDelta = Math.min(flatDelta, pctDelta);
-  const maxDelta = Math.max(flatDelta, pctDelta);
 
   return (
     <div className="py-1 px-1 rounded">

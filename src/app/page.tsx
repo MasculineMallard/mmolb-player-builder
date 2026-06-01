@@ -27,7 +27,7 @@ export default function Home() {
         evaluate rosters, and figure out who to mulch.
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 max-w-5xl w-full">
         <Link
           href="/pitcher"
           className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
@@ -57,8 +57,16 @@ export default function Home() {
           className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
         >
           <span className="text-3xl">🧵</span>
-          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Slugger Sartoria</span>
-          <span className="text-xs text-muted-foreground text-center">Build your ideal items to fill stat gaps</span>
+          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Super Slugger Sartoria</span>
+          <span className="text-xs text-muted-foreground text-center">Build your ideal batter items to fill stat gaps</span>
+        </Link>
+        <Link
+          href="/pitcher-shop"
+          className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
+        >
+          <span className="text-3xl">🎩</span>
+          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Heroic Hurler Haberdashery</span>
+          <span className="text-xs text-muted-foreground text-center">Build your ideal pitcher items to fill stat gaps</span>
         </Link>
       </div>
     </div>
