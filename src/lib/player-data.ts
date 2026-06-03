@@ -89,8 +89,13 @@ async function resolveTeamMeta(
     const fullName = teamFullName(team.Location, team.Name);
     cacheTeamMeta(team._id, fullName, team.Emoji ?? null);
     return { name: fullName, emoji: team.Emoji ?? null };
-  } catch {
-    // Negative cache: avoid repeated 3s timeouts for the same team during outages
+  } catch (err) {
+    // Negative cache: avoid repeated 3s timeouts for the same team during outages.
+    // Log so persistently-blank team names are diagnosable rather than silent.
+    console.warn(
+      `[player-data] team meta lookup failed for ${teamId}:`,
+      err instanceof Error ? err.message : String(err),
+    );
     teamMetaCache.set(teamId, { name: "", emoji: null, expires: Date.now() + TEAM_META_NEGATIVE_TTL });
     return { name: "", emoji: null };
   }

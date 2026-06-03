@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { NextAction } from "./NextAction";
 import { ArchetypeSelect } from "./ArchetypeSelect";
+import { PlayerHeader } from "./PlayerHeader";
 import { StatGridInteractive } from "./StatGridInteractive";
 
 import { ProgressionPath } from "./ProgressionPath";
@@ -15,8 +16,8 @@ import { recommendStatPriorities, recommendBoonsByLevel, scoreBoons } from "@/li
 import type { BoonData } from "@/lib/advisor";
 import { loadBoons } from "@/lib/evaluator-data";
 import { calculateProgress, generateMilestones } from "@/lib/planner-utils";
-import { optimizePitchArsenal, computePitchFitPct } from "@/lib/optimizer";
-import { S11, calculateFitTargets, calculateDefenseTarget } from "@/lib/mechanics";
+import { optimizePitchArsenal, computePitchFitPct, computeArchetypeFitPct } from "@/lib/optimizer";
+import { S11, calculateDefenseTarget } from "@/lib/mechanics";
 import { EMPTY_ARCHETYPE, STAT_CATEGORIES } from "@/lib/constants";
 import { usePitchTypes } from "@/hooks/use-pitch-types";
 import { usePlayerStore } from "@/store/player-store";
@@ -29,8 +30,6 @@ interface PlayerContentProps {
   onChangePlayer?: () => void;
   searchOpen?: boolean;
 }
-
-const BATTER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"];
 
 export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, searchOpen }: PlayerContentProps) {
   const [archetype, setArchetype] = useState<Archetype | null>(null);
@@ -171,22 +170,11 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
     [player.stats, effectiveArchetype, player.level]
   );
 
-  // Level-normalized archetype fit % (same formula as ArchetypeSelect)
-  const archetypeFitPct = useMemo(() => {
-    const prioritySet = new Set(effectiveArchetype.priority_stats ?? []);
-    const nCore = (effectiveArchetype.priority_stats ?? []).length;
-    const nSupport = (effectiveArchetype.secondary_stats ?? []).length;
-    const { coreTarget, supportTarget } = calculateFitTargets(player.level, nCore, nSupport);
-    let matchScore = 0;
-    let maxPossible = 0;
-    for (const [stat, weight] of Object.entries(effectiveArchetype.stat_weights)) {
-      const value = player.stats[stat] ?? 0;
-      const target = prioritySet.has(stat) ? coreTarget : supportTarget;
-      matchScore += Math.min(value, target) * weight;
-      maxPossible += target * weight;
-    }
-    return maxPossible > 0 ? Math.round((matchScore / maxPossible) * 100) : 0;
-  }, [player.stats, player.level, effectiveArchetype]);
+  // Level-normalized archetype fit % (shared with the evaluator + ArchetypeSelect)
+  const archetypeFitPct = useMemo(
+    () => computeArchetypeFitPct(player.stats, effectiveArchetype, player.level),
+    [player.stats, player.level, effectiveArchetype],
+  );
   const pitchFitPct = useMemo(
     () => isPitcher && hasArchetype && Object.keys(pitchTypes).length > 0
       ? computePitchFitPct(player.pitches.map((p) => p.name), effectiveArchetype, pitchTypes)
@@ -237,7 +225,6 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
     };
   }, [player.level, player.lesserBoons.length]);
 
-  const boonCount = player.lesserBoons.length + player.greaterBoons.length;
   const showPitchArsenal = isPitcher && player.pitches.length > 0;
 
   return (
@@ -249,108 +236,15 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
 
       {/* LEFT PANEL: Player info + Planning/Action */}
       <div className="space-y-2 min-w-0 flex flex-col">
-        {/* Team bar */}
-        {player.teamName && (
-          <div className="bg-muted/50 border border-border rounded-lg px-3 py-1.5 flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">
-              {player.teamEmoji} {player.teamName} {player.position && `| ${player.position}`}
-            </span>
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                onClick={() => usePlayerStore.getState().refreshPlayer()}
-                className="text-sm bg-muted text-muted-foreground hover:text-foreground px-2 sm:px-3 py-1 rounded-md border border-border hover:bg-muted/80 transition-colors"
-                title="Refresh player data from MMOLB"
-              >
-                Refresh
-              </button>
-              {onChangePlayer && !searchOpen && (
-                <button
-                  onClick={onChangePlayer}
-                  className="text-sm bg-muted text-muted-foreground hover:text-foreground px-2 sm:px-3 py-1 rounded-md border border-border hover:bg-muted/80 transition-colors"
-                >
-                  Change Player
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Player header */}
-        <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-[0_1px_3px_rgba(0,0,0,0.3)]">
-          <div className="flex items-center justify-between gap-1.5 sm:gap-3">
-            <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-wrap">
-              <h2 className="text-lg font-bold truncate">{player.name}</h2>
-              <span className="text-sm text-muted-foreground shrink-0">Lv.{player.level}</span>
-              {/* Durability pips */}
-              <span className="flex items-center gap-0.5 shrink-0" title={`Durability: ${player.durability}/5`}>
-                {Array.from({ length: 5 }, (_, i) => (
-                  <span
-                    key={i}
-                    className="inline-block w-2 h-2 rounded-full"
-                    style={{
-                      backgroundColor: i < player.durability
-                        ? player.durability <= 2 ? 'var(--scale-bad)' : player.durability <= 3 ? 'var(--scale-poor)' : 'var(--scale-good)'
-                        : 'var(--muted)',
-                    }}
-                  />
-                ))}
-              </span>
-              {/* Position dropdown (batters only) */}
-              {playerType === "batter" && (
-                <select
-                  value={player.position ?? ""}
-                  onChange={(e) => setPositionOverride(e.target.value)}
-                  className="bg-[#1a2332] text-[#00e5ff] px-1.5 py-0.5 rounded text-[13px] font-bold border-none cursor-pointer shrink-0"
-                >
-                  {BATTER_POSITIONS.map(pos => (
-                    <option key={pos} value={pos}>{pos}</option>
-                  ))}
-                </select>
-              )}
-            </div>
-            {/* Change Player button if no team bar above */}
-            {!player.teamName && onChangePlayer && !searchOpen && (
-              <button
-                onClick={onChangePlayer}
-                className="text-sm bg-muted text-muted-foreground hover:text-foreground px-3 py-1 rounded-md border border-border hover:bg-muted/80 transition-colors shrink-0"
-              >
-                Change Player
-              </button>
-            )}
-          </div>
-          {boonCount > 0 && (
-            <>
-              <div className="h-px bg-gradient-to-r from-border via-border/50 to-transparent mt-1.5 mb-1.5" />
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {player.lesserBoons.map((b) => {
-                  const emoji = boonEmojis.get(b.toLowerCase());
-                  return (
-                    <span key={b} className="text-sm bg-muted px-2 py-0.5 rounded text-muted-foreground">
-                      {emoji && <span className="mr-0.5">{emoji}</span>}{b}
-                    </span>
-                  );
-                })}
-                {player.greaterBoons.map((b) => {
-                  const emoji = boonEmojis.get(b.toLowerCase());
-                  return (
-                    <span
-                      key={b}
-                      className="text-sm px-2 py-0.5 rounded font-medium"
-                      style={{
-                        backgroundColor: 'rgba(255, 215, 0, 0.15)',
-                        color: 'var(--chart-2)',
-                        boxShadow: '0 0 6px rgba(255, 215, 0, 0.15), inset 0 0 4px rgba(255, 215, 0, 0.05)',
-                        border: '1px solid rgba(255, 215, 0, 0.25)',
-                      }}
-                    >
-                      {emoji && <span className="mr-0.5">{emoji}</span>}{b}
-                    </span>
-                  );
-                })}
-              </div>
-            </>
-          )}
-        </div>
+        <PlayerHeader
+          player={player}
+          isPitcher={isPitcher}
+          boonEmojis={boonEmojis}
+          positionValue={player.position ?? ""}
+          onPositionChange={(v) => setPositionOverride(v)}
+          onChangePlayer={onChangePlayer}
+          searchOpen={searchOpen}
+        />
 
         <ArchetypeSelect
           playerType={playerType}

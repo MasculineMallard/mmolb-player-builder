@@ -19,11 +19,14 @@ import {
   PITCHING_PERCENTILES,
   BATTING_STAT_WEIGHTS,
   PITCHING_STAT_WEIGHTS,
+  getCompositeWeights,
   type PositionDefenseMap,
 } from "./evaluator-data";
-import { calculatePrimaryPointsAtLevel, TOTAL_PRIMARY_POINTS, S11, calculateFitTargets } from "./mechanics";
+import { calculatePrimaryPointsAtLevel, TOTAL_PRIMARY_POINTS, S11 } from "./mechanics";
+import { computeArchetypeFitPct } from "./optimizer";
 import { generateStructuredReasoning } from "./evaluator-reasoning";
-import { PITCHER_POSITIONS } from "./constants";
+import { RECOMMENDATION_THRESHOLDS } from "./evaluator-types";
+import { PITCHER_POSITIONS, FIELDING_POSITIONS } from "./constants";
 
 // ---------------------------------------------------------------------------
 // Role detection
@@ -46,6 +49,10 @@ export function getPlayerRole(position: string | null): PlayerRole {
  * So top 5% → score 95, top 95% → score 5.
  */
 export function percentileToScore(value: number, table: PercentileEntry[]): number {
+  // Empty table (e.g. a sparse live percentile table such as early-season SB%)
+  // has no data to score against — return a neutral score instead of crashing
+  // on table[0]. The stats-score caller also skips empty tables (see below).
+  if (table.length === 0) return 50;
   // Tables are sorted pct ascending (5, 10, 15, ..., 95)
   // For "higher is better" stats: value at pct=5 is highest, pct=95 is lowest
   // For "lower is better" stats: value at pct=5 is lowest, pct=95 is highest
@@ -113,7 +120,7 @@ export function computeStatsScore(
     if (value == null) continue;
 
     const table = tables[statKey];
-    if (!table) continue;
+    if (!table || table.length === 0) continue;
 
     const score = percentileToScore(value, table);
     weightedSum += score * weight;
@@ -241,8 +248,6 @@ export function computePositionFitScore(
 // Best Position Fit (for bench batters)
 // ---------------------------------------------------------------------------
 
-const BATTER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
-
 export function findBestFitPosition(
   player: PlayerData,
   positionDefense: PositionDefenseMap,
@@ -250,7 +255,7 @@ export function findBestFitPosition(
   let bestPos = player.position ?? "DH";
   let bestScore = -1;
 
-  for (const pos of BATTER_POSITIONS) {
+  for (const pos of FIELDING_POSITIONS) {
     const modified = { ...player, position: pos };
     const score = computePositionFitScore(modified, "batter", positionDefense);
     if (score != null && score > bestScore) {
@@ -278,22 +283,7 @@ export function detectArchetype(
   const level = player.level ?? 1;
 
   for (const [key, arch] of Object.entries(archetypes)) {
-    const prioritySet = new Set(arch.priority_stats ?? []);
-    const nCore = (arch.priority_stats ?? []).length;
-    const nSupport = (arch.secondary_stats ?? []).length;
-    const { coreTarget, supportTarget } = calculateFitTargets(level, nCore, nSupport);
-
-    let matchScore = 0;
-    let maxPossible = 0;
-
-    for (const [stat, weight] of Object.entries(arch.stat_weights)) {
-      const value = player.stats[stat] ?? 0;
-      const target = prioritySet.has(stat) ? coreTarget : supportTarget;
-      matchScore += Math.min(value, target) * weight;
-      maxPossible += target * weight;
-    }
-
-    const fitPct = maxPossible > 0 ? Math.round((matchScore / maxPossible) * 100) : 0;
+    const fitPct = computeArchetypeFitPct(player.stats, arch, level);
 
     if (fitPct > bestFitPct) {
       bestFitPct = fitPct;
@@ -392,7 +382,7 @@ function detectFlags(
 // Composite & Recommendation
 // ---------------------------------------------------------------------------
 
-function computeComposite(
+export function computeComposite(
   attributeScore: number,
   statsScore: number | null,
   growthScore: number,
@@ -402,61 +392,23 @@ function computeComposite(
   const hasFit = positionFitScore != null;
   const hasStats = statsScore != null;
 
-  if (role === "batter") {
-    if (hasStats && hasFit) {
-      // Batter, all 4: Stats 40%, Attr 20%, Fit 20%, Growth 20%
-      return Math.round(
-        attributeScore * 0.20 + statsScore * 0.40 + positionFitScore * 0.20 + growthScore * 0.20,
-      );
-    }
-    if (hasStats && !hasFit) {
-      // Batter DH, no fit: Stats 50%, Attr 25%, Growth 25%
-      return Math.round(
-        attributeScore * 0.25 + statsScore * 0.50 + growthScore * 0.25,
-      );
-    }
-    if (!hasStats && hasFit) {
-      // Batter, no game stats: Attr 40%, Fit 30%, Growth 30%
-      return Math.round(
-        attributeScore * 0.40 + positionFitScore * 0.30 + growthScore * 0.30,
-      );
-    }
-    // Batter, no stats + no fit: Attr 50%, Growth 50%
-    return Math.round(
-      attributeScore * 0.50 + growthScore * 0.50,
-    );
-  }
-
-  // Pitcher weights (unchanged)
-  if (hasStats && hasFit) {
-    return Math.round(
-      attributeScore * 0.25 + statsScore * 0.25 + positionFitScore * 0.25 + growthScore * 0.25,
-    );
-  }
-  if (hasStats && !hasFit) {
-    // No fit (pitcher): Attr 40%, Stats 40%, Growth 20%
-    return Math.round(
-      attributeScore * 0.40 + statsScore * 0.40 + growthScore * 0.20,
-    );
-  }
-  if (!hasStats && hasFit) {
-    return Math.round(
-      attributeScore * 0.40 + positionFitScore * 0.30 + growthScore * 0.30,
-    );
-  }
-  // No stats, no fit: Attr 50%, Growth 50%
+  // Weights live in evaluator-data.COMPOSITE_WEIGHTS (single source of truth,
+  // shared with the WeightedBreakdown display). Absent pillars carry weight 0.
+  const w = getCompositeWeights(role, hasStats, hasFit);
   return Math.round(
-    attributeScore * 0.50 + growthScore * 0.50,
+    attributeScore * w.attr +
+      (statsScore ?? 0) * w.stats +
+      (positionFitScore ?? 0) * w.fit +
+      growthScore * w.growth,
   );
 }
 
-function getRecommendation(
+export function getRecommendation(
   composite: number,
 ): Recommendation {
-  if (composite >= 65) return "STAR";
-  if (composite >= 55) return "STRONG";
-  if (composite >= 42) return "ROSTER";
-  if (composite >= 35) return "FRINGE";
+  for (const { min, verdict } of RECOMMENDATION_THRESHOLDS) {
+    if (composite >= min) return verdict;
+  }
   return "MULCH";
 }
 

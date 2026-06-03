@@ -5,7 +5,7 @@
  * Operates on plain objects (no class instances).
  */
 
-import { TOTAL_PRIMARY_POINTS } from "./mechanics";
+import { TOTAL_PRIMARY_POINTS, calculateFitTargets } from "./mechanics";
 import type { Archetype, PitchTypesMap } from "./types";
 
 /** Max stat value in the display scale (DB stores 0-10, we display 0-1000). */
@@ -27,6 +27,32 @@ export function calculateStatTargets(archetype: Archetype): {
   const supportPer = Math.floor((TOTAL_PRIMARY_POINTS * 0.3) / nSupport);
 
   return { corePer, supportPer };
+}
+
+/**
+ * Level-normalized fit % of a player's stats against an archetype.
+ * Single source of truth — used by the evaluator (detectArchetype),
+ * ArchetypeSelect, and PlayerContent.
+ */
+export function computeArchetypeFitPct(
+  stats: Record<string, number>,
+  archetype: Archetype,
+  level: number,
+): number {
+  const prioritySet = new Set(archetype.priority_stats ?? []);
+  const nCore = (archetype.priority_stats ?? []).length;
+  const nSupport = (archetype.secondary_stats ?? []).length;
+  const { coreTarget, supportTarget } = calculateFitTargets(level, nCore, nSupport);
+
+  let matchScore = 0;
+  let maxPossible = 0;
+  for (const [stat, weight] of Object.entries(archetype.stat_weights)) {
+    const value = stats[stat] ?? 0;
+    const target = prioritySet.has(stat) ? coreTarget : supportTarget;
+    matchScore += Math.min(value, target) * weight;
+    maxPossible += target * weight;
+  }
+  return maxPossible > 0 ? Math.round((matchScore / maxPossible) * 100) : 0;
 }
 
 /** Tier weight for pitch fit calculation. Elite pitches matter more. */

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { STAT_TIERS } from "@/lib/evaluator-data";
 import type { PlayerRole } from "@/lib/evaluator-types";
 
@@ -22,29 +22,31 @@ export function RadarChart({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Determine which stats to show
-  let labels: string[];
-  let t1Set: Set<string>;
-
-  if (statLabels) {
-    labels = statLabels;
-    t1Set = role ? new Set(STAT_TIERS[role].T1) : new Set();
-  } else if (role) {
-    const tiers = STAT_TIERS[role];
-    const t2Sorted = [...tiers.T2].sort((a, b) => (stats[b] ?? 0) - (stats[a] ?? 0));
-    labels = [...tiers.T1, ...t2Sorted.slice(0, 3)];
-    t1Set = new Set(tiers.T1);
-  } else {
-    labels = Object.keys(stats).slice(0, 8);
-    t1Set = new Set();
-  }
+  // Determine which stats to show. Memoized so the useEffect below doesn't
+  // redraw the canvas on every parent render (labels/t1Set were fresh objects
+  // each render, defeating the dependency array).
+  const { labels, t1Set } = useMemo(() => {
+    if (statLabels) {
+      return { labels: statLabels, t1Set: role ? new Set(STAT_TIERS[role].T1) : new Set<string>() };
+    }
+    if (role) {
+      const tiers = STAT_TIERS[role];
+      const t2Sorted = [...tiers.T2].sort((a, b) => (stats[b] ?? 0) - (stats[a] ?? 0));
+      return { labels: [...tiers.T1, ...t2Sorted.slice(0, 3)], t1Set: new Set(tiers.T1) };
+    }
+    return { labels: Object.keys(stats).slice(0, 8), t1Set: new Set<string>() };
+  }, [statLabels, role, stats]);
 
   const n = labels.length;
 
   // Determine max value for scaling (500 default, or max of stats+targets if higher)
-  const maxVal = targets
-    ? Math.max(500, ...labels.map((l) => Math.max(stats[l] ?? 0, targets[l] ?? 0)))
-    : 500;
+  const maxVal = useMemo(
+    () =>
+      targets
+        ? Math.max(500, ...labels.map((l) => Math.max(stats[l] ?? 0, targets[l] ?? 0)))
+        : 500,
+    [targets, labels, stats],
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;

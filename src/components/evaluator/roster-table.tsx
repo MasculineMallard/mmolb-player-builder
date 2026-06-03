@@ -2,7 +2,10 @@
 
 import { useState, useMemo } from "react";
 import type { EvaluatedPlayer, Recommendation } from "@/lib/evaluator-types";
+import { RECOMMENDATION_ORDER, VERDICT_COLORS } from "@/lib/evaluator-types";
+import { EVAL_POSITION_ORDER, ROSTER_POSITIONS } from "@/lib/constants";
 import { getPlayerRole } from "@/lib/evaluator";
+import { DurabilityPips } from "@/components/ui/durability-pips";
 import { PlayerRow } from "./player-row";
 import { ScoreBadge } from "./score-badge";
 import { VerdictBadge } from "./verdict-badge";
@@ -11,20 +14,9 @@ import { PlayerDetail } from "./player-detail";
 type SortKey = "position" | "name" | "durability" | "level" | "attributes" | "stats" | "fit" | "growth" | "total" | "verdict";
 type RoleFilter = "all" | "batter" | "pitcher";
 
-const POSITION_ORDER: Record<string, number> = {
-  C: 0, "1B": 1, "2B": 2, "3B": 3, SS: 4,
-  LF: 5, CF: 6, RF: 7, DH: 8,
-  SP: 9, RP: 10, CL: 11,
-  Bench: 12,
-};
-
-const VERDICT_ORDER: Record<string, number> = {
-  MULCH: 0, HOLD: 1, KEEP: 2,
-};
-
 function positionRank(pos: string | null): number {
   if (!pos) return 99;
-  return POSITION_ORDER[pos] ?? 50;
+  return EVAL_POSITION_ORDER[pos] ?? 50;
 }
 
 type SortDir = "asc" | "desc";
@@ -43,24 +35,6 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "growth", label: "Growth" },
   { key: "verdict", label: "Verdict" },
 ];
-
-function DurabilityPips({ durability }: { durability: number }) {
-  return (
-    <span className="flex items-center gap-0.5">
-      {Array.from({ length: 5 }, (_, i) => (
-        <span
-          key={i}
-          className="inline-block w-2 h-2 rounded-full"
-          style={{
-            backgroundColor: i < durability
-              ? durability <= 2 ? "var(--scale-bad)" : durability <= 3 ? "var(--scale-poor)" : "var(--chart-3)"
-              : "var(--muted)",
-          }}
-        />
-      ))}
-    </span>
-  );
-}
 
 function MobilePlayerCard({ ev, onPositionChange, percentileTables }: {
   ev: EvaluatedPlayer;
@@ -97,7 +71,7 @@ function MobilePlayerCard({ ev, onPositionChange, percentileTables }: {
         {/* Row 2: Level, Durability, Composite */}
         <div className="flex items-center gap-3 mb-1.5">
           <span className="text-sm text-muted-foreground">Lv.{p.level}</span>
-          <DurabilityPips durability={p.durability} />
+          <DurabilityPips durability={p.durability} goodColor="var(--chart-3)" />
           <span className="ml-auto text-sm font-bold" style={{ color: ev.compositeScore >= 60 ? "var(--scale-good)" : ev.compositeScore >= 40 ? "var(--scale-mid)" : "var(--scale-bad)" }}>
             {ev.compositeScore}
           </span>
@@ -124,7 +98,7 @@ function MobilePlayerCard({ ev, onPositionChange, percentileTables }: {
                 }}
                 className="bg-[#1a2332] text-[#00e5ff] px-2 py-1 rounded text-[13px] font-bold border-none cursor-pointer"
               >
-                {["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH", "SP", "RP", "CL"].map(pos => (
+                {ROSTER_POSITIONS.map(pos => (
                   <option key={pos} value={pos}>{pos}</option>
                 ))}
               </select>
@@ -189,7 +163,7 @@ export function RosterTable({ players, onPositionChange, percentileTables }: {
         case "total":
           cmp = a.compositeScore - b.compositeScore; break;
         case "verdict":
-          cmp = (VERDICT_ORDER[a.recommendation] ?? 1) - (VERDICT_ORDER[b.recommendation] ?? 1); break;
+          cmp = RECOMMENDATION_ORDER[a.recommendation] - RECOMMENDATION_ORDER[b.recommendation]; break;
         default:
           cmp = 0;
       }
@@ -246,23 +220,23 @@ export function RosterTable({ players, onPositionChange, percentileTables }: {
       {/* Summary strip */}
       <div className="flex items-center gap-4 mb-3 flex-wrap">
         <div className="flex items-center gap-1.5">
-          <span style={{ color: "#3B82F6" }}>●</span>
+          <span style={{ color: VERDICT_COLORS.STAR }}>●</span>
           <span className="text-sm">Star: {counts.STAR}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span style={{ color: "#93C5FD" }}>●</span>
+          <span style={{ color: VERDICT_COLORS.STRONG }}>●</span>
           <span className="text-sm">Strong: {counts.STRONG}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span style={{ color: "#8B949E" }}>●</span>
+          <span style={{ color: VERDICT_COLORS.ROSTER }}>●</span>
           <span className="text-sm">Roster: {counts.ROSTER}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span style={{ color: "#EAB308" }}>●</span>
+          <span style={{ color: VERDICT_COLORS.FRINGE }}>●</span>
           <span className="text-sm">Fringe: {counts.FRINGE}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span style={{ color: "#F85149" }}>●</span>
+          <span style={{ color: VERDICT_COLORS.MULCH }}>●</span>
           <span className="text-sm">Mulch: {counts.MULCH}</span>
         </div>
       </div>
@@ -270,11 +244,11 @@ export function RosterTable({ players, onPositionChange, percentileTables }: {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
         {filterPill("All", "ALL")}
-        {filterPill(`Star (${counts.STAR})`, "STAR", "#3B82F6")}
-        {filterPill(`Strong (${counts.STRONG})`, "STRONG", "#93C5FD")}
-        {filterPill(`Roster (${counts.ROSTER})`, "ROSTER", "#8B949E")}
-        {filterPill(`Fringe (${counts.FRINGE})`, "FRINGE", "#EAB308")}
-        {filterPill(`Mulch (${counts.MULCH})`, "MULCH", "#F85149")}
+        {filterPill(`Star (${counts.STAR})`, "STAR", VERDICT_COLORS.STAR)}
+        {filterPill(`Strong (${counts.STRONG})`, "STRONG", VERDICT_COLORS.STRONG)}
+        {filterPill(`Roster (${counts.ROSTER})`, "ROSTER", VERDICT_COLORS.ROSTER)}
+        {filterPill(`Fringe (${counts.FRINGE})`, "FRINGE", VERDICT_COLORS.FRINGE)}
+        {filterPill(`Mulch (${counts.MULCH})`, "MULCH", VERDICT_COLORS.MULCH)}
 
         <span className="w-px h-5 bg-border mx-1" />
 

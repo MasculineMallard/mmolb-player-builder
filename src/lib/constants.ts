@@ -111,7 +111,7 @@ export const EMPTY_ARCHETYPE: Archetype = {
   stat_weights: {},
 };
 
-/** Position sort order for roster display. */
+/** Position sort order for the builder roster / mmolb-transform — pitchers first. */
 export const POSITION_ORDER: Record<string, number> = {
   SP: 0,
   RP: 1,
@@ -128,4 +128,40 @@ export const POSITION_ORDER: Record<string, number> = {
   P: 12,
   Bench: 99,
 };
+
+/**
+ * Position sort order for the roster *evaluator* table (Mulch-o-Meter) — batters
+ * first, then pitchers. Intentionally differs from POSITION_ORDER (pitchers-first);
+ * kept as its own named constant so each view's grouping is explicit rather than a
+ * drifting local copy.
+ */
+export const EVAL_POSITION_ORDER: Record<string, number> = {
+  C: 0, "1B": 1, "2B": 2, "3B": 3, SS: 4,
+  LF: 5, CF: 6, RF: 7, DH: 8,
+  SP: 9, RP: 10, CL: 11,
+  Bench: 12,
+};
+
+/** Batter positions for position-override dropdowns (includes DH). */
+export const BATTER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"] as const;
+
+/**
+ * Fielding positions for best-fit defensive scoring. DH is excluded: it has no
+ * defensive value, so it is never the "best fit" target for a bench bat.
+ */
+export const FIELDING_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"] as const;
+
+/** Every manually-assignable position in the roster evaluator table (batters + DH + pitchers). */
+export const ROSTER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH", "SP", "RP", "CL"] as const;
+
+/** Item affix tiers — max flat (+X) and percent (+X%) roll the tool models per tier. */
+export const ITEM_TIERS = [
+  { tier: 1, flatMax: 5,  pctMax: 4 },
+  { tier: 2, flatMax: 10, pctMax: 8 },
+  { tier: 3, flatMax: 15, pctMax: 12 },
+  { tier: 4, flatMax: 20, pctMax: 16 },
+  { tier: 5, flatMax: 25, pctMax: 20 },
+  { tier: 6, flatMax: 30, pctMax: 24 },
+  { tier: 7, flatMax: 35, pctMax: 28 },
+] as const;
 

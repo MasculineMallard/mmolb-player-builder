@@ -2,6 +2,36 @@ import type { PlayerData } from "./types";
 
 export type Recommendation = "MULCH" | "FRINGE" | "ROSTER" | "STRONG" | "STAR";
 
+/** Sort order for verdicts, best → worst. Single source for verdict ordering. */
+export const RECOMMENDATION_ORDER: Record<Recommendation, number> = {
+  STAR: 0,
+  STRONG: 1,
+  ROSTER: 2,
+  FRINGE: 3,
+  MULCH: 4,
+};
+
+/** Accent color per verdict (best → worst). Single source for verdict/score coloring. */
+export const VERDICT_COLORS: Record<Recommendation, string> = {
+  STAR: "#3B82F6",
+  STRONG: "#93C5FD",
+  ROSTER: "#8B949E",
+  FRINGE: "#EAB308",
+  MULCH: "#F85149",
+};
+
+/**
+ * Composite-score cutoffs mapping a 0-100 score to a verdict (descending).
+ * Single source for getRecommendation and the score-badge coloring, so the
+ * badge color can never drift out of sync with the verdict it represents.
+ */
+export const RECOMMENDATION_THRESHOLDS: { min: number; verdict: Recommendation }[] = [
+  { min: 65, verdict: "STAR" },
+  { min: 55, verdict: "STRONG" },
+  { min: 42, verdict: "ROSTER" },
+  { min: 35, verdict: "FRINGE" },
+];
+
 export interface ScoreExplanation {
   score: number | null;
   label: string;
@@ -59,7 +89,6 @@ export interface GameStats {
   WHIP?: number;
   K9?: number;
   BB9?: number;
-  H9?: number;
   HR9?: number;
 }
 

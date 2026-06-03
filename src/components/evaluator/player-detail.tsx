@@ -6,6 +6,7 @@ import { DefenseStatBars } from "./position-fit-card";
 import {
   BATTING_STAT_WEIGHTS, PITCHING_STAT_WEIGHTS,
   BATTING_PERCENTILES, PITCHING_PERCENTILES,
+  getCompositeWeights,
   type LivePercentileTables,
 } from "@/lib/evaluator-data";
 
@@ -33,16 +34,16 @@ function WeightedBreakdown({ ev }: { eval?: never; ev: EvaluatedPlayer }) {
   const hasStats = ev.statsScore != null;
   const hasFit = ev.positionFitScore != null;
 
-  let weights: Record<string, number>;
-  if (hasStats && hasFit) {
-    weights = { Attributes: 0.25, Stats: 0.25, Fit: 0.25, Growth: 0.25 };
-  } else if (hasStats && !hasFit) {
-    weights = { Attributes: 0.40, Stats: 0.40, Fit: 0, Growth: 0.20 };
-  } else if (!hasStats && hasFit) {
-    weights = { Attributes: 0.30, Stats: 0, Fit: 0.35, Growth: 0.35 };
-  } else {
-    weights = { Attributes: 0.50, Stats: 0, Fit: 0, Growth: 0.50 };
-  }
+  // Use the engine's COMPOSITE_WEIGHTS (single source of truth) so the displayed
+  // per-pillar weights and points always reconcile with the composite score.
+  const role = getPlayerRole(ev.player.position);
+  const w = getCompositeWeights(role, hasStats, hasFit);
+  const weights: Record<string, number> = {
+    Attributes: w.attr,
+    Stats: w.stats,
+    Fit: w.fit,
+    Growth: w.growth,
+  };
 
   const rows = [
     { label: "Attributes", score: ev.attributeScore, weight: weights.Attributes },
