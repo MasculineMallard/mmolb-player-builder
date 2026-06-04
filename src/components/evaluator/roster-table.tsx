@@ -71,7 +71,7 @@ function MobilePlayerCard({ ev, onPositionChange, percentileTables }: {
         {/* Row 2: Level, Durability, Composite */}
         <div className="flex items-center gap-3 mb-1.5">
           <span className="text-sm text-muted-foreground">Lv.{p.level}</span>
-          <DurabilityPips durability={p.durability} goodColor="var(--chart-3)" />
+          <DurabilityPips durability={p.durability} />
           <span className="ml-auto text-sm font-bold" style={{ color: ev.compositeScore >= 60 ? "var(--scale-good)" : ev.compositeScore >= 40 ? "var(--scale-mid)" : "var(--scale-bad)" }}>
             {ev.compositeScore}
           </span>

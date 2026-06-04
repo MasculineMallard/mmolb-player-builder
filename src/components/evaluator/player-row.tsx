@@ -45,7 +45,7 @@ export function PlayerRow({ eval: ev, onPositionChange, percentileTables }: {
           </div>
         </td>
         <td className="px-3 py-2 text-center">
-          <DurabilityPips durability={p.durability} goodColor="var(--chart-3)" />
+          <DurabilityPips durability={p.durability} />
         </td>
         <td className="px-3 py-2 text-center text-sm text-muted-foreground">
           {p.level}
