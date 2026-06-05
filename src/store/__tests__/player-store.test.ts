@@ -26,6 +26,8 @@ beforeEach(() => {
       loading: false,
       error: null,
       archetypeId: null,
+      playerArchetypes: {},
+      playerTargetOverrides: {},
       lastTeam: null,
       lastRoster: [],
     });
@@ -228,5 +230,61 @@ describe("importPlayer", () => {
     });
 
     expect(usePlayerStore.getState().error).toBe("Player exists but has no stats yet");
+  });
+});
+
+describe("target overrides", () => {
+  it("setTargetOverride stores a target keyed by player + archetype", () => {
+    act(() => {
+      usePlayerStore.getState().setTargetOverride("p1", "power", "batting", 500);
+    });
+    expect(usePlayerStore.getState().playerTargetOverrides["p1::power"]).toEqual({ batting: 500 });
+  });
+
+  it("merges multiple stats under the same player + archetype key", () => {
+    act(() => {
+      usePlayerStore.getState().setTargetOverride("p1", "power", "batting", 500);
+      usePlayerStore.getState().setTargetOverride("p1", "power", "power", 700);
+    });
+    expect(usePlayerStore.getState().playerTargetOverrides["p1::power"]).toEqual({ batting: 500, power: 700 });
+  });
+
+  it("updates an existing stat target in place", () => {
+    act(() => {
+      usePlayerStore.getState().setTargetOverride("p1", "power", "batting", 500);
+      usePlayerStore.getState().setTargetOverride("p1", "power", "batting", 650);
+    });
+    expect(usePlayerStore.getState().playerTargetOverrides["p1::power"]).toEqual({ batting: 650 });
+  });
+
+  it("keeps overrides isolated per player and per archetype", () => {
+    act(() => {
+      usePlayerStore.getState().setTargetOverride("p1", "power", "batting", 500);
+      usePlayerStore.getState().setTargetOverride("p1", "contact", "batting", 300);
+      usePlayerStore.getState().setTargetOverride("p2", "power", "batting", 100);
+    });
+    const all = usePlayerStore.getState().playerTargetOverrides;
+    expect(all["p1::power"]).toEqual({ batting: 500 });
+    expect(all["p1::contact"]).toEqual({ batting: 300 });
+    expect(all["p2::power"]).toEqual({ batting: 100 });
+  });
+
+  it("clearTargetOverrides removes only the targeted player + archetype", () => {
+    act(() => {
+      usePlayerStore.getState().setTargetOverride("p1", "power", "batting", 500);
+      usePlayerStore.getState().setTargetOverride("p1", "contact", "batting", 300);
+      usePlayerStore.getState().clearTargetOverrides("p1", "power");
+    });
+    const all = usePlayerStore.getState().playerTargetOverrides;
+    expect(all["p1::power"]).toBeUndefined();
+    expect(all["p1::contact"]).toEqual({ batting: 300 });
+  });
+
+  it("clearTargetOverrides is a no-op for an unknown key", () => {
+    act(() => {
+      usePlayerStore.getState().setTargetOverride("p1", "power", "batting", 500);
+      usePlayerStore.getState().clearTargetOverrides("p1", "missing");
+    });
+    expect(usePlayerStore.getState().playerTargetOverrides["p1::power"]).toEqual({ batting: 500 });
   });
 });
