@@ -2,6 +2,7 @@
 
 import type { StatRecommendation, BoonTimelineEntry, BoonScore } from "@/lib/advisor";
 import { STAT_CATEGORIES } from "@/lib/constants";
+import { remainingPrimaryPoints } from "@/lib/mechanics";
 import { RadarChart } from "@/components/evaluator/radar-chart";
 import type { Archetype } from "@/lib/types";
 
@@ -60,12 +61,24 @@ export function NextAction({
   // Radar shows archetype priority + secondary stats (not defense)
   const archetypeStats = statRecommendations.filter((r) => !DEFENSE_STATS.has(r.statName));
 
+  // Flag when stat targets need more primary points than the remaining levels
+  // can supply. Defense/luck stats are excluded (funded by defense bonus levels,
+  // not primary points). Approximate — pointsPerLevel is an expected value.
+  const pointsRemaining = remainingPrimaryPoints(level);
+  const pointsNeeded = archetypeStats.reduce((sum, r) => sum + Math.max(r.gap, 0), 0);
+  const pointShortfall = Math.round(pointsNeeded - pointsRemaining);
+
   return (
     <div className="bg-card border border-border rounded-lg px-3 py-2">
       <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-2">
         <span className="w-0.5 h-3 bg-primary/40 rounded-full" />
         Archetype Fit
       </h3>
+      {pointShortfall > 0 && (
+        <div className="mb-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-xs text-amber-400">
+          ⚠ Over-targeted: your goals need ~{Math.round(pointsNeeded)} pts but only ~{pointsRemaining} are earnable by Lv {maxLevel} (~{pointShortfall} short). Trim a target or lower a goal.
+        </div>
+      )}
       <div>
         {(isBoonLevel || hasPendingBoon) && nextBoon ? (
           <div>
