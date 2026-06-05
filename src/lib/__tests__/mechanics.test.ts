@@ -3,6 +3,7 @@ import {
   S11,
   calculatePrimaryPointsAtLevel,
   TOTAL_PRIMARY_POINTS,
+  remainingPrimaryPoints,
 } from "../mechanics";
 
 describe("S11 mechanics", () => {
@@ -60,6 +61,25 @@ describe("calculatePrimaryPointsAtLevel", () => {
 
   it("matches S11.totalPrimaryPoints constant", () => {
     expect(TOTAL_PRIMARY_POINTS).toBe(S11.totalPrimaryPoints);
+  });
+});
+
+describe("remainingPrimaryPoints", () => {
+  it("equals the full pool at level 1 (nothing earned yet)", () => {
+    expect(remainingPrimaryPoints(1)).toBe(TOTAL_PRIMARY_POINTS);
+  });
+
+  it("drops by what has been earned partway through", () => {
+    // At level 5, 150 primary points have been earned (levels 2-4).
+    expect(remainingPrimaryPoints(5)).toBe(TOTAL_PRIMARY_POINTS - 150);
+  });
+
+  it("is 0 at max level", () => {
+    expect(remainingPrimaryPoints(S11.maxLevel)).toBe(0);
+  });
+
+  it("never goes negative past max level", () => {
+    expect(remainingPrimaryPoints(99)).toBe(0);
   });
 });
 

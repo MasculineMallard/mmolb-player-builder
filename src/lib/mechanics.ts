@@ -90,6 +90,15 @@ export function remainingDefenseBonusLevels(currentLevel: number): number {
   return remaining;
 }
 
+/**
+ * Primary stat points a player can still earn from `currentLevel` up to max
+ * level. Used to flag builds whose stat targets need more points than the
+ * remaining levels can supply. Approximate: pointsPerLevel is an expected value.
+ */
+export function remainingPrimaryPoints(currentLevel: number): number {
+  return Math.max(TOTAL_PRIMARY_POINTS - calculatePrimaryPointsAtLevel(currentLevel), 0);
+}
+
 if (process.env.NODE_ENV === "development") {
   console.warn(
     "[mechanics] UNCONFIRMED: defenseLevelsGivePrimary=%s, totalPrimaryPoints=%d. " +
