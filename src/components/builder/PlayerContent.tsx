@@ -31,11 +31,16 @@ interface PlayerContentProps {
   searchOpen?: boolean;
 }
 
+const EMPTY_OVERRIDES: Record<string, number> = {};
+
 export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, searchOpen }: PlayerContentProps) {
   const [archetype, setArchetype] = useState<Archetype | null>(null);
   const prevPlayerType = useRef(playerType);
   const boonEmojis = useBoonEmojis();
-  const [targetOverrides, setTargetOverrides] = useState<Record<string, number>>({});
+  const archetypeId = usePlayerStore((s) => s.archetypeId);
+  const playerTargetOverrides = usePlayerStore((s) => s.playerTargetOverrides);
+  const setTargetOverrideStore = usePlayerStore((s) => s.setTargetOverride);
+  const clearTargetOverridesStore = usePlayerStore((s) => s.clearTargetOverrides);
   const [positionOverride, setPositionOverride] = useState<string | null>(null);
 
   // Apply position override for batters
@@ -92,11 +97,15 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
 
   const handleArchetypeChange = useCallback((arch: Archetype | null) => {
     setArchetype(arch);
-    setTargetOverrides({});
   }, []);
 
   const activeArchetype = archetype ?? EMPTY_ARCHETYPE;
   const hasArchetype = archetype !== null;
+
+  // Custom target overrides are saved per player + archetype in the store, so a
+  // tweaked build persists and reloads when you revisit that player/archetype.
+  const overrideKey = hasArchetype && archetypeId ? `${player.mmolbPlayerId}::${archetypeId}` : null;
+  const targetOverrides = overrideKey ? (playerTargetOverrides[overrideKey] ?? EMPTY_OVERRIDES) : EMPTY_OVERRIDES;
 
   const effectiveArchetype = useMemo(() => {
     if (Object.keys(targetOverrides).length === 0) return activeArchetype;
@@ -107,8 +116,16 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
   }, [activeArchetype, targetOverrides]);
 
   const handleTargetOverride = useCallback((statName: string, target: number) => {
-    setTargetOverrides((prev) => ({ ...prev, [statName]: target }));
-  }, []);
+    if (hasArchetype && archetypeId) {
+      setTargetOverrideStore(player.mmolbPlayerId, archetypeId, statName, target);
+    }
+  }, [hasArchetype, archetypeId, player.mmolbPlayerId, setTargetOverrideStore]);
+
+  const handleResetTargets = useCallback(() => {
+    if (hasArchetype && archetypeId) {
+      clearTargetOverridesStore(player.mmolbPlayerId, archetypeId);
+    }
+  }, [hasArchetype, archetypeId, player.mmolbPlayerId, clearTargetOverridesStore]);
 
   const offenseRecommendations = useMemo(
     () => recommendStatPriorities(player.stats, effectiveArchetype, 10),
@@ -283,6 +300,8 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
           isPitcher={isPitcher}
           recommendations={hasArchetype ? recommendations : undefined}
           onTargetOverride={hasArchetype ? handleTargetOverride : undefined}
+          onResetTargets={hasArchetype ? handleResetTargets : undefined}
+          hasOverrides={Object.keys(targetOverrides).length > 0}
           extraColumn={
             showPitchArsenal ? (
               <PitchArsenal pitches={player.pitches} advice={pitchAdvice} inline />

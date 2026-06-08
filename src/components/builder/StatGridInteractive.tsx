@@ -19,6 +19,8 @@ interface StatGridInteractiveProps {
   isPitcher: boolean;
   recommendations?: StatRecommendation[];
   onTargetOverride?: (statName: string, target: number) => void;
+  onResetTargets?: () => void;
+  hasOverrides?: boolean;
   extraColumn?: React.ReactNode;
 }
 
@@ -36,6 +38,8 @@ export function StatGridInteractive({
   isPitcher,
   recommendations = [],
   onTargetOverride,
+  onResetTargets,
+  hasOverrides = false,
   extraColumn,
 }: StatGridInteractiveProps) {
   const [editing, setEditing] = useState(false);
@@ -95,17 +99,27 @@ export function StatGridInteractive({
           <span className="normal-case tracking-normal font-normal text-muted-foreground/70 text-xs">(no boons or items)</span>
         </h3>
         {hasTargets && (
-          <button
-            onClick={() => { setEditing(!editing); setEditingStatName(null); }}
-            className={`text-sm px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-md transition-all duration-150 ${
-              editing
-                ? "text-primary-foreground hover:brightness-110 active:scale-[0.98]"
-                : "bg-muted text-muted-foreground hover:text-foreground"
-            }`}
-            style={editing ? { background: 'linear-gradient(180deg, #4B8DF7 0%, #3B82F6 100%)' } : undefined}
-          >
-            {editing ? "Done" : "Edit Targets"}
-          </button>
+          <div className="flex items-center gap-2">
+            {hasOverrides && onResetTargets && (
+              <button
+                onClick={onResetTargets}
+                className="text-sm px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-md bg-muted text-muted-foreground hover:text-foreground transition-all duration-150"
+              >
+                Reset
+              </button>
+            )}
+            <button
+              onClick={() => { setEditing(!editing); setEditingStatName(null); }}
+              className={`text-sm px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-md transition-all duration-150 ${
+                editing
+                  ? "text-primary-foreground hover:brightness-110 active:scale-[0.98]"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
+              style={editing ? { background: 'linear-gradient(180deg, #4B8DF7 0%, #3B82F6 100%)' } : undefined}
+            >
+              {editing ? "Done" : "Edit Targets"}
+            </button>
+          </div>
         )}
       </div>
 

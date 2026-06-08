@@ -30,6 +30,10 @@ interface PlayerStore {
   // Per-player archetype mapping (playerId -> archetypeId)
   playerArchetypes: Record<string, string>;
 
+  // Per-player + per-archetype custom stat target overrides.
+  // Keyed by `${playerId}::${archetypeId}` -> { statName: target }
+  playerTargetOverrides: Record<string, Record<string, number>>;
+
   // Last loaded team roster (for quick switching)
   lastTeam: TeamSearchResult | null;
   lastRoster: RosterPlayer[];
@@ -48,6 +52,8 @@ interface PlayerStore {
   setError: (error: string | null) => void;
   setArchetypeId: (id: string | null) => void;
   setPlayerArchetype: (playerId: string, archetypeId: string | null) => void;
+  setTargetOverride: (playerId: string, archetypeId: string, statName: string, target: number) => void;
+  clearTargetOverrides: (playerId: string, archetypeId: string) => void;
   setLastTeam: (team: TeamSearchResult | null, roster: RosterPlayer[]) => void;
   clearCompare: () => void;
 
@@ -117,6 +123,7 @@ export const usePlayerStore = create<PlayerStore>()(
       error: null,
       archetypeId: null,
       playerArchetypes: {},
+      playerTargetOverrides: {},
       lastTeam: null,
       lastRoster: [],
       recentPlayers: [],
@@ -136,6 +143,23 @@ export const usePlayerStore = create<PlayerStore>()(
           delete next[playerId];
         }
         return { playerArchetypes: next };
+      }),
+      setTargetOverride: (playerId, archetypeId, statName, target) => set((state) => {
+        const key = `${playerId}::${archetypeId}`;
+        const existing = state.playerTargetOverrides[key] ?? {};
+        return {
+          playerTargetOverrides: {
+            ...state.playerTargetOverrides,
+            [key]: { ...existing, [statName]: target },
+          },
+        };
+      }),
+      clearTargetOverrides: (playerId, archetypeId) => set((state) => {
+        const key = `${playerId}::${archetypeId}`;
+        if (!(key in state.playerTargetOverrides)) return {};
+        const next = { ...state.playerTargetOverrides };
+        delete next[key];
+        return { playerTargetOverrides: next };
       }),
       setLastTeam: (lastTeam, lastRoster) => set({ lastTeam, lastRoster }),
       clearCompare: () => set({ comparePlayer: null, compareError: null }),
@@ -216,27 +240,33 @@ export const usePlayerStore = create<PlayerStore>()(
     }),
     {
       name: "mmolb-player-store",
-      version: 3,
+      version: 4,
       partialize: (state) => ({
         player: state.player,
         archetypeId: state.archetypeId,
         playerArchetypes: state.playerArchetypes,
+        playerTargetOverrides: state.playerTargetOverrides,
         recentPlayers: state.recentPlayers,
       }),
       migrate: (persisted, version) => {
         const old = persisted as Record<string, unknown>;
         if (version < 2) {
-          console.warn(`[player-store] migrating from v${version} to v3`);
+          console.warn(`[player-store] migrating from v${version} to v4`);
           return {
             player: old.player ?? null,
             archetypeId: old.archetypeId ?? null,
             playerArchetypes: {},
+            playerTargetOverrides: {},
             recentPlayers: [],
           };
         }
         if (version < 3) {
-          console.warn(`[player-store] migrating from v${version} to v3`);
-          return { ...old, playerArchetypes: {} };
+          console.warn(`[player-store] migrating from v${version} to v4`);
+          return { ...old, playerArchetypes: {}, playerTargetOverrides: {} };
+        }
+        if (version < 4) {
+          console.warn(`[player-store] migrating from v${version} to v4`);
+          return { ...old, playerTargetOverrides: {} };
         }
         return persisted as Record<string, unknown>;
       },
