@@ -154,14 +154,14 @@ export const FIELDING_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"
 /** Every manually-assignable position in the roster evaluator table (batters + DH + pitchers). */
 export const ROSTER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH", "SP", "RP", "CL"] as const;
 
-/** Item affix tiers — max flat (+X) and percent (+X%) roll the tool models per tier. */
+/** Item affix tiers — max flat (+X) and percent (+X%) roll the tool models per tier. S13 values (equipment nerf): flat steps by 4 (T7 caps at 28 per Danny's notes), percent steps by 2 (2% per tier). */
 export const ITEM_TIERS = [
-  { tier: 1, flatMax: 5,  pctMax: 4 },
-  { tier: 2, flatMax: 10, pctMax: 8 },
-  { tier: 3, flatMax: 15, pctMax: 12 },
-  { tier: 4, flatMax: 20, pctMax: 16 },
-  { tier: 5, flatMax: 25, pctMax: 20 },
-  { tier: 6, flatMax: 30, pctMax: 24 },
-  { tier: 7, flatMax: 35, pctMax: 28 },
+  { tier: 1, flatMax: 5,  pctMax: 2 },
+  { tier: 2, flatMax: 9,  pctMax: 4 },
+  { tier: 3, flatMax: 13, pctMax: 6 },
+  { tier: 4, flatMax: 17, pctMax: 8 },
+  { tier: 5, flatMax: 21, pctMax: 10 },
+  { tier: 6, flatMax: 25, pctMax: 12 },
+  { tier: 7, flatMax: 28, pctMax: 14 },
 ] as const;
 
