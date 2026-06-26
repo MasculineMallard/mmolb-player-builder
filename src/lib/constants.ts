@@ -4,10 +4,10 @@ import type { Archetype } from "./types";
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "/pop";
 
 /** Current season display label. Update when a new season starts. */
-export const CURRENT_SEASON = "Season 12";
+export const CURRENT_SEASON = "Season 13";
 
 /** Current season number. Update when a new season starts. */
-export const CURRENT_SEASON_NUMBER = 12;
+export const CURRENT_SEASON_NUMBER = 13;
 
 /** Stat categories matching attributes.json structure. */
 export const STAT_CATEGORIES = {
