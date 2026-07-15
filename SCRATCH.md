@@ -1006,3 +1006,50 @@ New: timedQuery wrapper for query duration logging
 - Health check endpoint
 - README rewrite
 - Coverage thresholds in vitest config
+
+
+---
+
+## Tech Debt — Batted-Ball Findings Audit (2026-07-11, no changes made)
+
+Source: S13 fair-ball-type analysis (`../reference/fair-ball-types-s13.md`, raw CSVs in `../reference/data/`). Panel mockup exists at `batted-ball-panel-preview.html` (3 options, picker). Observed batted-ball rates are NOT queryable live in POP today; items below are split accordingly.
+
+### Archetype data mismatches (needs paired edit: skill + POP JSON together)
+1. **Power Slugger axis conflict** — Lift (priority) + Aiming (secondary) fight each other: batter FB% vs LD% trade at r=-0.58, and S10 regressions show Lift suppresses LD while Aiming suppresses FB. Secondary points in Aiming are partially wasted. Fix candidate: swap Aiming -> Performance (top-tier, absent from this archetype) or Vision, in BOTH `~/.claude/skills/mmolb/references/archetypes-and-builds.md` and `public/data/archetypes/batter_archetypes.json` (incl. stat_weights). Only batter archetype with a co-investment conflict; other 11 clean.
+2. **Fly Ball Hitter — Selflessness secondary** (low priority; from S10 tier data, not the batted-ball dataset) — negligible-impact stat occupying a secondary slot. Same swap logic if ever touched.
+3. **Skill note candidate** — add a "build axes" principle to archetypes-and-builds.md: batters have two axes (never co-invest Lift and Aiming); pitchers have one (ground vs air, arsenal picks the point; FB vs GB r=-0.84).
+
+### Live-computable POP features (attributes + arsenal only, no batted-ball data needed)
+4. **Axis-conflict lint** — warn when a batter build meaningfully invests in both Lift and Aiming. No conflict detection exists today (checked advisor.ts, evaluator-reasoning.ts, mechanics.ts).
+5. **Expected-profile tags** — "LD hitter (expected)" (Aiming-dominant, low Lift), "Launch (expected)" (Lift-dominant), "Groundballer (expected)" (Stuff + 2+ of SI/FS/KC). Label as expected-from-build, not observed.
+6. **Popup guardrail (policy)** — never surface batter popup rate as an evaluation signal anywhere; true skill SD 0.67pp = noise. Pitcher PU is modest-real (1.20pp).
+
+### Parked until a live batted-ball data path exists (MMOLDB event aggregation)
+7. Batted-ball profile panel (mockup done), FB/GB/LD/PU percentile grids in percentile-builder, observed-rate tags (pitcher GB% >= 55 "Groundballer", batter LD% >= 30 "Line-Drive Machine"), and the observed half of the build-expression check (expected vs observed delta).
+
+### Validated, no action
+- Line Drive Hitter (LD is the largest batter-controlled signal, 4.28pp true SD) and Groundball Machine (GB is the largest pitcher signal, 5.21pp) are the best-evidenced archetypes in the set. No "popup pitcher" archetype is correctly absent (1.2pp, garnish not a build).
+
+---
+
+## S14 Updates (2026-07-14, branch `s14-data-updates`)
+
+Source: S14 patch notes + community findings, curated in `~/.claude/skills/mmolb/references/s14-patch-notes.md` (raw log alongside it). Skill files updated same day. Items 1-2-4 below IMPLEMENTED on branch `s14-data-updates`; the rest deferred with reasons.
+
+### Done (branch `s14-data-updates`)
+1. **Season constant** — `src/lib/constants.ts`: CURRENT_SEASON / CURRENT_SEASON_NUMBER → Season 14. (ARCHITECTURE.md line about "Season 12" is doubly stale; actual was 13.)
+2. **Intuition dump-stat fix** — removed `intuition` from `dump_stats` for the eight 4-pitch archetypes in `pitcher_archetypes.json` (control_artist, groundball_machine, workhorse, damage_control, chase_specialist, breaking_ball_specialist, knuckleball_artist, fastball_command). Kept dumped for the three 3-pitch archetypes (power_pitcher, elite_reliever, guts_monster) where the S14 scaling benefit is minimal. deception_master already carried intuition at 0.08 secondary (now actually justified). Note: `dump_stats` has no src consumer today (data-only), so this is truth-maintenance + future-proofing, not an engine change.
+4. **1B Awareness gap** — added awareness to 1B in both `position_defense_weights.json` (secondary, 0.05, matching 2B/SS/3B) and `defense_requirements.json` (2). Grounded in the DP mechanic (1B takes the final out of most DPs) + community consensus, not just Sponduzi's gradient.
+
+### Deferred (with reasons)
+- **S15 RE-EVAL (user-flagged 2026-07-14): Intuition, Wisdom, Selflessness.** Once the community measures the S14 effects (Intuition bonus per pitch type known; what doubled Wisdom actually moves; Selflessness sac vs DP behavior), re-evaluate their tiers/weights in evaluator-data.ts STAT_TIERS, batter/pitcher archetype JSONs, and percentile-builder.ts (duplicate tier source) for Season 15. Pair with the matching skill files (`~/.claude/skills/mmolb/references/attributes.md`, s14-patch-notes.md open items).
+- **Conditional Intuition weight in evaluator.ts** (weight 0 under 3 pitches, scaled for 4-6): the bonus magnitude is unmeasured at S14 launch; a made-up multiplier would be false precision. Revisit when the community measures it (part of the S15 re-eval above). When doing it, remember `percentile-builder.ts` duplicates stat tiers (review #10 hotspot) — change both or drift.
+- **Patience weights for infielders** (S14: GB/popups to OF now check assigned infielder's Reaction/Patience): direction is right but magnitude is a pure guess pre-data; the `_comment` blend ("50% S11 OLS regression") is invalidated for OF-adjacent plays anyway. Do both together as an S14 re-fit once data accumulates in MMOLDB.
+- **Sponduzi's full gradient** (Awareness C > 1B > 2B > SS > 3B, Reaction inverse): unverified theory; don't rebuild weights on it, just watch.
+
+### Lower priority
+6. **Selflessness** (batter): S14 doubled its non-DP effect but from a negligible base, and nerfed its DP inducement. Existing item #2 above (swap it out of Fly Ball Hitter secondary) stands, arguably stronger now.
+7. **Accuracy/Cunning zone-selection buffs:** no tier moves yet — evaluator already has accuracy at T2 pitching and cunning at T2 batting. Re-check against S14 percentiles mid-season; community verdict on accuracy is still split even post-buff.
+8. **Mods context:** DT + Jetpack proc chances increased. If/when POP surfaces player mods: DT only procs on balls hit directly at the holder (best on high-traffic infield), Jetpack is HR robbery (best on CF). No data path for proc counts (not in API/MMOLDB; EMMOLB Ctrl+F is the community method).
+9. **Batted-ball panel seed** (parked item #7 above): S13 CSVs are now pre-S14 for GB out rates given the fielding change; label as S13 baseline and re-pull post-S14.
+10. **Run environment:** S14 early ~9.3 total runs (down from S13's 10.2, pitchers slightly buffed). Live percentile crawler absorbs this; hardcoded S10/S11 fallback tables just get staler (known debt).

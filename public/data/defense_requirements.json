@@ -14,9 +14,10 @@
     "requirements": {
       "reaction": 4,
       "composure": 3,
-      "acrobatics": 2
+      "acrobatics": 2,
+      "awareness": 2
     },
-    "description": "First basemen need quick reactions for ground balls and composure for handling throws."
+    "description": "First basemen need quick reactions for ground balls, composure for handling throws, and awareness for double-play turns."
   },
   "2B": {
     "position_name": "Second Base",

@@ -43,7 +43,7 @@
     "recommended_lesser_boons": ["Angelic", "Director", "Clockwork"],
     "equipment_priority": ["head", "body"],
     "equipment_affixes": ["control", "accuracy", "persuasion"],
-    "dump_stats": ["stuff", "deception", "intuition"]
+    "dump_stats": ["stuff", "deception"]
   },
   "groundball_machine": {
     "name": "Groundball Machine",
@@ -66,7 +66,7 @@
     "recommended_lesser_boons": ["Hextouch", "Venomous", "Miasma"],
     "equipment_priority": ["body", "head"],
     "equipment_affixes": ["stuff", "accuracy", "presence"],
-    "dump_stats": ["deception", "intuition", "defiance"]
+    "dump_stats": ["deception", "defiance"]
   },
   "deception_master": {
     "name": "Deception Master",
@@ -112,7 +112,7 @@
     "recommended_lesser_boons": ["Tireless", "Hardy", "Lionheart"],
     "equipment_priority": ["body", "head"],
     "equipment_affixes": ["stamina", "guts", "control"],
-    "dump_stats": ["accuracy", "deception", "intuition"]
+    "dump_stats": ["accuracy", "deception"]
   },
   "damage_control": {
     "name": "Damage Control",
@@ -135,7 +135,7 @@
     "recommended_lesser_boons": ["Miasma", "Venomous", "Spotlight"],
     "equipment_priority": ["body", "head"],
     "equipment_affixes": ["control", "stuff", "presence"],
-    "dump_stats": ["accuracy", "intuition", "defiance"]
+    "dump_stats": ["accuracy", "defiance"]
   },
   "chase_specialist": {
     "name": "Chase Specialist",
@@ -158,7 +158,7 @@
     "recommended_lesser_boons": ["Ambassador", "Courier", "Ill"],
     "equipment_priority": ["head", "body"],
     "equipment_affixes": ["persuasion", "guts", "control"],
-    "dump_stats": ["accuracy", "deception", "intuition"]
+    "dump_stats": ["accuracy", "deception"]
   },
   "elite_reliever": {
     "name": "Elite Reliever",
@@ -204,7 +204,7 @@
     "recommended_lesser_boons": ["Cyclone", "Shopper", "Geometry Expert"],
     "equipment_priority": ["head", "body"],
     "equipment_affixes": ["rotation", "control", "presence"],
-    "dump_stats": ["stuff", "persuasion", "intuition"]
+    "dump_stats": ["stuff", "persuasion"]
   },
   "knuckleball_artist": {
     "name": "Knuckleball Artist",
@@ -227,7 +227,7 @@
     "recommended_lesser_boons": ["Hextouch", "Weaver", "Confused"],
     "equipment_priority": ["head", "body"],
     "equipment_affixes": ["stuff", "rotation", "deception"],
-    "dump_stats": ["velocity", "persuasion", "intuition"]
+    "dump_stats": ["velocity", "persuasion"]
   },
   "guts_monster": {
     "name": "Guts Monster",
@@ -273,6 +273,6 @@
     "recommended_lesser_boons": ["Afterburner", "Meteor", "Stormrider"],
     "equipment_priority": ["head", "body"],
     "equipment_affixes": ["velocity", "control", "accuracy"],
-    "dump_stats": ["deception", "intuition", "defiance"]
+    "dump_stats": ["deception", "defiance"]
   }
 }
