@@ -13,12 +13,13 @@
   "1B": {
     "name": "First Base",
     "emoji": "1️⃣",
-    "description": "Reaction for scooping throws. Composure for error avoidance.",
+    "description": "Reaction for scooping throws. Composure for error avoidance. Awareness for double-play turns (1B takes the final out of most DPs).",
     "primary_stats": ["reaction"],
-    "secondary_stats": ["composure"],
+    "secondary_stats": ["composure", "awareness"],
     "stat_weights": {
       "reaction": 0.12,
-      "composure": 0.07
+      "composure": 0.07,
+      "awareness": 0.05
     }
   },
   "2B": {
