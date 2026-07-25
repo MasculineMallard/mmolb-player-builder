@@ -122,6 +122,13 @@ function filterPreRecompRecords(
  *
  * Birthday = "Preseason" means they've been here since the start: not recomped.
  *
+ * Birthseason/Birthday alone can't tell a recomp from a player who was simply
+ * CREATED mid-season (new signings, callups) — both reset those fields. A recomp
+ * keeps the same PlayerID, so the previous incarnation's seasons are still in
+ * playerrecord; a brand-new player has no history before Birthseason and its
+ * stats are entirely its own. Requires the UNFILTERED records: the pre-recomp
+ * rows that prove this are exactly what filterPreRecompRecords strips.
+ *
  * Derives the current season number from playerrecord data (matching the
  * live SeasonID) so this doesn't break on season rollover.
  */
@@ -140,8 +147,9 @@ function wasRecompedThisSeason(
     const match = playerRecords.find((r) => r.SeasonID === currentSeasonId);
     if (match) currentSeasonNumber = match.Season;
   }
+  if (raw.Birthseason !== currentSeasonNumber) return false;
 
-  return raw.Birthseason === currentSeasonNumber;
+  return playerRecords!.some((r) => r.Season < raw.Birthseason!);
 }
 
 /** Map API slot keys to our canonical lowercase keys */
@@ -206,7 +214,7 @@ export function transformPlayer(
     ? "pitcher" as const : "batter" as const;
 
   // Check if player was recently recomped (stats may include old build's games)
-  const recompedThisSeason = wasRecompedThisSeason(raw, filteredRecords, currentSeasonId, currentDay);
+  const recompedThisSeason = wasRecompedThisSeason(raw, playerRecords, currentSeasonId, currentDay);
   const gameStats = recompedThisSeason
     ? null
     : extractGameStats(raw.Stats, role, filteredRecords, currentSeasonId);
