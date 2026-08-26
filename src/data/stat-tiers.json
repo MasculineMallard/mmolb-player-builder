@@ -1,0 +1,13 @@
+{
+  "_provenance": "S15 canonical attribute tiers. Single source of truth consumed by BOTH surfaces: evaluator-data.ts (STAT_TIERS, the app) and mmolb/sample_eval.py (the CLI rater), plus percentile-builder.ts (attribute-percentile table). Derived from the S15 regression (mmolb/reference/s15/S15_regression_results.txt) + patch notes, per Drake's tiering principles P1 (Tier-1 is regression-proven-only) and P2 (weigh outcome value, not raw coefficient). Batter moves vs S10: discipline T2->T1, insight T2->T1, intimidation T1->T2, cunning T2->T3; aiming holds T1, vision holds T2. Pitcher tiers UNCHANGED (accuracy stays T2 per P1). Rationale + evidence: references/s15-tier-rationale.md.",
+  "batter": {
+    "T1": ["contact", "performance", "aiming", "discipline", "insight", "muscle"],
+    "T2": ["vision", "lift", "speed", "intimidation", "determination"],
+    "T3": ["cunning", "selflessness", "wisdom"]
+  },
+  "pitcher": {
+    "T1": ["velocity", "control", "rotation", "stuff", "presence"],
+    "T2": ["accuracy", "deception", "persuasion", "guts", "stamina"],
+    "T3": ["intuition", "defiance"]
+  }
+}

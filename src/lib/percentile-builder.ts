@@ -10,6 +10,7 @@ import { readFileSync, writeFileSync, renameSync, mkdirSync } from "fs";
 import { join } from "path";
 import type { PercentileEntry } from "./evaluator-types";
 import { buildBaseStatMap } from "./mmolb-transform";
+import { computeAttributeRatio } from "./evaluator";
 
 // ── Disk cache path ──
 
@@ -276,28 +277,11 @@ async function runRefresh(): Promise<void> {
     }
     console.log(`[percentiles] Sampling ${samplePlayerIds.length} players for attribute percentiles...`);
 
-    const BATTER_T1 = new Set(["contact", "muscle", "intimidation", "aiming", "performance"]);
-    const BATTER_T2 = new Set(["discipline", "lift", "vision", "determination", "insight", "speed", "cunning"]);
-    const BATTER_ALL = ["contact", "muscle", "intimidation", "aiming", "performance", "discipline", "lift", "vision", "determination", "insight", "speed", "cunning", "selflessness", "wisdom"];
-    const PITCHER_T1 = new Set(["velocity", "control", "rotation", "stuff", "presence"]);
-    const PITCHER_T2 = new Set(["deception", "guts", "persuasion", "stamina", "accuracy"]);
-    const PITCHER_ALL = ["velocity", "control", "rotation", "stuff", "presence", "deception", "guts", "persuasion", "stamina", "accuracy", "intuition", "defiance"];
-
-    function computeAttrQuality(attrs: Record<string, number>, isPitcher: boolean): number {
-      const t1 = isPitcher ? PITCHER_T1 : BATTER_T1;
-      const t2 = isPitcher ? PITCHER_T2 : BATTER_T2;
-      const all = isPitcher ? PITCHER_ALL : BATTER_ALL;
-      let weighted = 0;
-      let total = 0;
-      for (const stat of all) {
-        const val = attrs[stat] ?? 0;
-        total += val;
-        if (t1.has(stat)) weighted += val * 1.0;
-        else if (t2.has(stat)) weighted += val * 0.5;
-      }
-      return total > 0 ? weighted / total : 0;
-    }
-
+    // Attribute "quality" is the tier-weighted ratio (T1=1.0, T2=0.5, T3=0). Uses the
+    // SHARED computeAttributeRatio so the percentile table this builds (BATTER_ATTR /
+    // PITCHER_ATTR) always matches the tiers the app scores against — no third copy to
+    // drift. When STAT_TIERS changes, this table regenerates under the new tiers on the
+    // next refresh (blocker #3).
     const batterAttrQualities: number[] = [];
     const pitcherAttrQualities: number[] = [];
 
@@ -312,7 +296,7 @@ async function runRefresh(): Promise<void> {
         if (r.status !== "fulfilled") continue;
         const attrs = buildBaseStatMap(r.value);
         const isPitcher = batch[j].isPitcher;
-        const quality = computeAttrQuality(attrs, isPitcher);
+        const quality = computeAttributeRatio(attrs, isPitcher ? "pitcher" : "batter");
         if (quality > 0) {
           if (isPitcher) pitcherAttrQualities.push(quality);
           else batterAttrQualities.push(quality);
