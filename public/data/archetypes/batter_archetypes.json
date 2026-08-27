@@ -4,80 +4,80 @@
     "emoji": "💥",
     "tagline": "Raw home run power",
     "description": "Maximum home run potential with elite muscle and lift. Sacrifices contact for raw power.",
-    "priority_stats": ["muscle", "lift", "intimidation"],
-    "secondary_stats": ["contact", "discipline", "aiming"],
+    "priority_stats": ["muscle", "lift", "contact"],
+    "secondary_stats": ["intimidation", "discipline", "aiming"],
     "stat_weights": {
       "muscle": 0.12,
       "lift": 0.12,
-      "intimidation": 0.12,
-      "contact": 0.08,
+      "contact": 0.12,
+      "intimidation": 0.08,
       "discipline": 0.08,
       "aiming": 0.08
     },
     "recommended_greater_boons": ["Clutch", "Insider"],
     "recommended_lesser_boons": ["Draconic", "Giant", "Fire Elemental"],
     "equipment_priority": ["hands", "head", "body"],
-    "equipment_affixes": ["muscle", "lift", "intimidation"]
+    "equipment_affixes": ["muscle", "lift", "contact"]
   },
   "contact_hitter": {
     "name": "Contact Hitter",
     "emoji": "✋",
     "tagline": "Put the ball in play",
     "description": "Elite contact rate puts the ball in play consistently. High batting average with gap power from aiming.",
-    "priority_stats": ["contact", "aiming", "muscle"],
-    "secondary_stats": ["discipline", "insight", "performance"],
+    "priority_stats": ["contact", "aiming", "discipline"],
+    "secondary_stats": ["insight", "muscle", "performance"],
     "stat_weights": {
       "contact": 0.12,
       "aiming": 0.12,
-      "muscle": 0.12,
-      "discipline": 0.08,
+      "discipline": 0.12,
       "insight": 0.08,
+      "muscle": 0.08,
       "performance": 0.08
     },
     "recommended_greater_boons": ["Clutch", "All Knowing"],
     "recommended_lesser_boons": ["Sweet Tooth", "Deadeye", "Draconic"],
     "equipment_priority": ["hands", "head"],
-    "equipment_affixes": ["contact", "aiming", "muscle"]
+    "equipment_affixes": ["contact", "aiming", "discipline"]
   },
   "obp_machine": {
     "name": "OBP Machine",
     "emoji": "🎯",
     "tagline": "Get on base any way possible",
     "description": "Elite on-base percentage through walks, HBP, and plate presence. Forces pitchers into bad counts.",
-    "priority_stats": ["discipline", "cunning", "intimidation"],
-    "secondary_stats": ["contact", "aiming", "vision"],
+    "priority_stats": ["discipline", "insight", "contact"],
+    "secondary_stats": ["cunning", "intimidation", "vision"],
     "stat_weights": {
       "discipline": 0.12,
-      "cunning": 0.12,
-      "intimidation": 0.12,
-      "contact": 0.08,
-      "aiming": 0.08,
+      "insight": 0.12,
+      "contact": 0.12,
+      "cunning": 0.08,
+      "intimidation": 0.08,
       "vision": 0.08
     },
     "recommended_greater_boons": ["All Knowing", "Underdog"],
     "recommended_lesser_boons": ["Calculated", "Fae", "Ogre"],
     "equipment_priority": ["head", "hands"],
-    "equipment_affixes": ["discipline", "cunning", "intimidation"]
+    "equipment_affixes": ["discipline", "insight", "contact"]
   },
   "base_stealer": {
     "name": "Base Stealer",
     "emoji": "🦝",
     "tagline": "Swipe bags at will",
     "description": "Combines stealth with cunning for elite stolen base success. Reads pitchers and takes extra bases.",
-    "priority_stats": ["stealth", "cunning", "greed"],
-    "secondary_stats": ["speed", "contact", "performance"],
+    "priority_stats": ["stealth", "greed", "speed"],
+    "secondary_stats": ["cunning", "contact", "performance"],
     "stat_weights": {
       "stealth": 0.12,
-      "cunning": 0.12,
       "greed": 0.12,
-      "speed": 0.08,
+      "speed": 0.12,
+      "cunning": 0.08,
       "contact": 0.08,
       "performance": 0.08
     },
     "recommended_greater_boons": ["Lucky", "All Knowing"],
     "recommended_lesser_boons": ["Thief", "Sneaky", "Charger"],
     "equipment_priority": ["feet", "hands", "head"],
-    "equipment_affixes": ["stealth", "cunning", "greed"]
+    "equipment_affixes": ["stealth", "greed", "speed"]
   },
   "line_drive_hitter": {
     "name": "Line Drive Hitter",
@@ -105,14 +105,14 @@
     "tagline": "Foul off everything",
     "description": "Elite determination extends at-bats by fouling off pitches. Never gives up an at-bat. Learns from each pitch.",
     "priority_stats": ["determination", "discipline", "contact"],
-    "secondary_stats": ["vision", "cunning", "wisdom"],
+    "secondary_stats": ["insight", "vision", "cunning"],
     "stat_weights": {
       "determination": 0.12,
       "discipline": 0.12,
       "contact": 0.12,
+      "insight": 0.08,
       "vision": 0.08,
-      "cunning": 0.08,
-      "wisdom": 0.08
+      "cunning": 0.08
     },
     "recommended_greater_boons": ["Iron Will", "All Knowing"],
     "recommended_lesser_boons": ["Bulwark", "Calculated", "Horizon"],
@@ -125,14 +125,14 @@
     "tagline": "No weaknesses, all-around",
     "description": "Well-rounded offensive approach with no major weaknesses. Adapts to any situation.",
     "priority_stats": ["contact", "discipline", "muscle"],
-    "secondary_stats": ["aiming", "vision", "speed"],
+    "secondary_stats": ["aiming", "insight", "vision"],
     "stat_weights": {
       "contact": 0.12,
       "discipline": 0.12,
       "muscle": 0.12,
       "aiming": 0.08,
-      "vision": 0.08,
-      "speed": 0.08
+      "insight": 0.08,
+      "vision": 0.08
     },
     "recommended_greater_boons": ["Clutch", "All Knowing"],
     "recommended_lesser_boons": ["Draconic", "Calculated", "Sweet Tooth"],
@@ -145,13 +145,13 @@
     "tagline": "Rises to the moment",
     "description": "Elite performance boosts all hit types and reaching on errors. Well-rounded production.",
     "priority_stats": ["performance", "contact", "muscle"],
-    "secondary_stats": ["aiming", "speed", "insight"],
+    "secondary_stats": ["aiming", "discipline", "insight"],
     "stat_weights": {
       "performance": 0.12,
       "contact": 0.12,
       "muscle": 0.12,
       "aiming": 0.08,
-      "speed": 0.08,
+      "discipline": 0.08,
       "insight": 0.08
     },
     "recommended_greater_boons": ["Clutch", "Insider"],
@@ -225,12 +225,12 @@
     "tagline": "Launch angle power",
     "description": "Elite lift launches fly balls for home run potential. Produces sacrifice flies and deep drives.",
     "priority_stats": ["lift", "muscle", "contact"],
-    "secondary_stats": ["intimidation", "selflessness", "vision"],
+    "secondary_stats": ["discipline", "selflessness", "vision"],
     "stat_weights": {
       "lift": 0.12,
       "muscle": 0.12,
       "contact": 0.12,
-      "intimidation": 0.08,
+      "discipline": 0.08,
       "selflessness": 0.08,
       "vision": 0.08
     },
