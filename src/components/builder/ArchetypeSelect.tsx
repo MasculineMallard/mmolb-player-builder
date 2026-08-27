@@ -31,6 +31,32 @@ function getArchetypeLoader(playerType: string): () => Promise<ArchetypeMap> {
   return archetypeLoaders[playerType];
 }
 
+/**
+ * Order archetype entries best-fit-first for the dropdown.
+ * Batter: by stat-fit. Pitcher: by pitch-fit first, stat-fit as tiebreak — so the
+ * dropdown's #1 matches the arsenal-first pitcher card (PR-D). Archetypes with no
+ * pitch-fit data sort as if -1 (after any with real pitch fit). Key is the final
+ * stable tiebreak so the order is deterministic. Pure + exported for direct testing.
+ */
+export function sortArchetypeEntries(
+  entries: [string, Archetype][],
+  statFit: Map<string, number>,
+  pitchFit: Map<string, number | null>,
+  role: "pitcher" | "batter",
+): [string, Archetype][] {
+  return [...entries].sort(([ka], [kb]) => {
+    if (role === "pitcher") {
+      const pa = pitchFit.get(ka) ?? -1;
+      const pb = pitchFit.get(kb) ?? -1;
+      if (pb !== pa) return pb - pa;
+    }
+    const sa = statFit.get(ka) ?? 0;
+    const sb = statFit.get(kb) ?? 0;
+    if (sb !== sa) return sb - sa;
+    return ka.localeCompare(kb);
+  });
+}
+
 /** Get all stat names relevant for a player type */
 function getStatsForType(playerType: string): string[] {
   const hidden = playerType === "pitcher" ? ["batting", "baserunning"] : ["pitching"];
@@ -190,7 +216,6 @@ export function ArchetypeSelect({
     onArchetypeChange(arch);
   }, [onArchetypeChange]);
 
-  const entries = Object.entries(archetypes);
   const selectedArch = archetypeId === "__custom" ? customArch : archetypeId ? archetypes[archetypeId] : null;
   const selectedFitPct = selectedArch && player ? computeArchetypeFitPct(player.stats, selectedArch, player.level) : null;
 
@@ -219,6 +244,13 @@ export function ArchetypeSelect({
     ? computePitchFitPct(playerPitches, selectedArch, pitchTypes)
     : null;
 
+  // Order the dropdown best-fit-first once a player is loaded (else keep JSON order).
+  const sortedEntries = useMemo(() => {
+    const entries = Object.entries(archetypes);
+    if (!player || entries.length === 0) return entries;
+    return sortArchetypeEntries(entries, fitPcts, pitchFitPcts, playerType);
+  }, [archetypes, fitPcts, pitchFitPcts, player, playerType]);
+
   return (
     <div className="bg-card border border-border rounded-lg px-3 py-2">
       <label className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1 flex items-center gap-2">
@@ -227,6 +259,11 @@ export function ArchetypeSelect({
         {selectedArch && selectedFitPct != null && player && (
           <span className="normal-case tracking-normal font-normal text-muted-foreground">
             {selectedFitPct}% stat{selectedPitchFitPct != null && (<> · {selectedPitchFitPct}% pitch</>)} <span className="opacity-60">(Lv. {player.level})</span>
+          </span>
+        )}
+        {player && sortedEntries.length > 1 && (
+          <span className="normal-case tracking-normal font-normal text-muted-foreground/60 text-xs ml-auto">
+            sorted by fit
           </span>
         )}
       </label>
@@ -239,7 +276,7 @@ export function ArchetypeSelect({
         className="w-full bg-muted border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
       >
         <option value="">Select an archetype...</option>
-        {entries.map(([key, arch]) => {
+        {sortedEntries.map(([key, arch]) => {
           const pct = fitPcts.get(key);
           const pitchPct = pitchFitPcts.get(key);
           const pctLabel = pct != null
