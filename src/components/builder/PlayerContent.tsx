@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { NextAction } from "./NextAction";
 import { ArchetypeSelect } from "./ArchetypeSelect";
+import { BatterBaseStatsNote } from "./BatterBaseStatsNote";
 import { PlayerHeader } from "./PlayerHeader";
 import { StatGridInteractive } from "./StatGridInteractive";
 
@@ -269,6 +270,8 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
           pitchTypes={isPitcher ? pitchTypes : undefined}
           playerPitches={isPitcher ? player.pitches.map((p) => p.name) : undefined}
         />
+
+        <BatterBaseStatsNote isPitcher={isPitcher} />
 
         {hasArchetype && (
           <NextAction
