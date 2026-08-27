@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { NextAction } from "./NextAction";
 import { ArchetypeSelect } from "./ArchetypeSelect";
 import { BatterBaseStatsNote } from "./BatterBaseStatsNote";
+import { ArsenalArchetypes } from "../pitcher/ArsenalArchetypes";
 import { PlayerHeader } from "./PlayerHeader";
 import { StatGridInteractive } from "./StatGridInteractive";
 
@@ -99,6 +100,17 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
   const handleArchetypeChange = useCallback((arch: Archetype | null) => {
     setArchetype(arch);
   }, []);
+
+  // Arsenal-first card click: drive the SAME end-state as a dropdown pick — set the
+  // store archetypeId (so the dropdown value + fit% follow) AND the local archetype
+  // (so NextAction and the other archetype-gated panels react). Mirrors ArchetypeSelect's
+  // selection path rather than a raw setArchetypeId (review #6/#16).
+  const handleArsenalSelect = useCallback((key: string, arch: Archetype) => {
+    const store = usePlayerStore.getState();
+    store.setArchetypeId(key);
+    if (player.mmolbPlayerId) store.setPlayerArchetype(player.mmolbPlayerId, key);
+    setArchetype(arch);
+  }, [player.mmolbPlayerId]);
 
   const activeArchetype = archetype ?? EMPTY_ARCHETYPE;
   const hasArchetype = archetype !== null;
@@ -272,6 +284,17 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
         />
 
         <BatterBaseStatsNote isPitcher={isPitcher} />
+
+        {isPitcher && player.pitches.length > 0 && (
+          <ArsenalArchetypes
+            playerStats={player.stats}
+            playerPitches={player.pitches.map((p) => p.name)}
+            pitchTypes={pitchTypes}
+            level={player.level}
+            selectedKey={archetypeId}
+            onSelect={handleArsenalSelect}
+          />
+        )}
 
         {hasArchetype && (
           <NextAction
