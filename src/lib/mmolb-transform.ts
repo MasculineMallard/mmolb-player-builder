@@ -326,8 +326,11 @@ export function extractGameStats(
   // regular season) — it is NOT filtered to the regular season, so the fallback
   // can include exhibition/postseason stats. The normal case (active player with
   // a regular-season record) is unaffected and correct; the fallback is the only
-  // exhibition-leak vector. Whether to keep it or return null here is a ratings
-  // behaviour decision — see POP-S15-UPDATE-PLAN.md E1.
+  // exhibition-leak vector.
+  // DECISION (S15 Pass-2, PR-G, 2026-08): KEEP the fallback (do NOT return N/A) so
+  // players with no current-season regular-season record still get a stats score;
+  // the small exhibition-leak edge is accepted. Locked by mmolb-transform.test.ts
+  // ("extractGameStats E1 fallback").
   const merged = mergeRawStats(recordStats, !recordStats ? playerStats : undefined);
 
   if (role === "pitcher") {

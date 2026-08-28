@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { transformPlayer } from "../mmolb-transform";
+import { transformPlayer, extractGameStats } from "../mmolb-transform";
 import type { MmolbApiPlayer, MmolbApiPlayerRecord } from "../mmolb-api";
 
 const SEASON_14_ID = "6a5484f39e6f05425fed49c1";
@@ -119,5 +119,32 @@ describe("mid-season recomp detection", () => {
 
     expect(p.recomped).toBeUndefined();
     expect(p.gameStats?.PA).toBe(52);
+  });
+});
+
+describe("extractGameStats E1 fallback (PR-G — keep cumulative fallback, decided 2026-08)", () => {
+  const REG = (stats: Record<string, number>): MmolbApiPlayerRecord =>
+    ({ Season: 15, SeasonID: "S15", SeasonStatus: "Regular Season", Stats: { t1: stats } }) as MmolbApiPlayerRecord;
+  const line = (pa: number) => ({
+    plate_appearances: pa, at_bats: Math.round(pa * 0.9), singles: 20, doubles: 4,
+    triples: 1, home_runs: 3, walked: 6, hit_by_pitch: 1, sac_flies: 1, struck_out: 15,
+  });
+
+  it("prefers the current-season Regular Season record over the cumulative player.Stats", () => {
+    const cumulative = { t1: line(999) }; // player.Stats: cumulative / unfiltered blob
+    const gs = extractGameStats(cumulative, "batter", [REG(line(100))], "S15");
+    expect(gs?.PA).toBe(100); // from the record, NOT the cumulative 999
+  });
+
+  it("KEEPS the cumulative player.Stats fallback when there is no current-season Regular Season record", () => {
+    const cumulative = { t1: line(999) };
+    const priorSeason = REG(line(50));
+    priorSeason.SeasonID = "S14"; // not the current season -> no match -> fall back to player.Stats
+    const gs = extractGameStats(cumulative, "batter", [priorSeason], "S15");
+    expect(gs?.PA).toBe(999); // decided: keep the fallback (not N/A)
+  });
+
+  it("returns null only when there is neither a current-season record nor player.Stats", () => {
+    expect(extractGameStats(undefined, "batter", [], "S15")).toBeNull();
   });
 });
