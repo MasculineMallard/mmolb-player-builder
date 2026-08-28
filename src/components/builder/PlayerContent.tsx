@@ -18,7 +18,7 @@ import { recommendStatPriorities, recommendBoonsByLevel, scoreBoons } from "@/li
 import type { BoonData } from "@/lib/advisor";
 import { loadBoons } from "@/lib/evaluator-data";
 import { calculateProgress, generateMilestones } from "@/lib/planner-utils";
-import { optimizePitchArsenal, computePitchFitPct, computeArchetypeFitPct } from "@/lib/optimizer";
+import { optimizePitchArsenal, computePitchFitPct, computeArchetypeFitPct, computePitchChips } from "@/lib/optimizer";
 import { S11, calculateDefenseTarget } from "@/lib/mechanics";
 import { EMPTY_ARCHETYPE, STAT_CATEGORIES } from "@/lib/constants";
 import { usePitchTypes } from "@/hooks/use-pitch-types";
@@ -257,6 +257,15 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
 
   const showPitchArsenal = isPitcher && player.pitches.length > 0;
 
+  // Per-stat pitch chips: each thrown pitch's differentiating (2nd) priority stat.
+  // Pitcher-only; empty for batters and until pitch-type data is loaded.
+  const pitchChips = useMemo(
+    () => (isPitcher && player.pitches.length > 0 && Object.keys(pitchTypes).length > 0
+      ? computePitchChips(player.pitches.map((p) => p.name), pitchTypes)
+      : {}),
+    [isPitcher, player.pitches, pitchTypes],
+  );
+
   return (
     <>
     {/* Share buttons portal into nav header */}
@@ -322,6 +331,7 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
           stats={player.stats}
           highlightStats={highlightStats}
           priorityStats={priorityStatsList}
+          pitchChips={pitchChips}
           level={player.level}
           isPitcher={isPitcher}
           recommendations={hasArchetype ? recommendations : undefined}
