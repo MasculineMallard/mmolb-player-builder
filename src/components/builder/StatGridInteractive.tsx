@@ -188,7 +188,7 @@ export function StatGridInteractive({
                       {pitchChips[statName]?.map((pitchName) => (
                         <span
                           key={pitchName}
-                          className="text-[10px] leading-none normal-case px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/80 border border-primary/20 whitespace-nowrap"
+                          className="text-[11px] leading-none normal-case px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/80 border border-primary/20 whitespace-nowrap"
                           title={`Differentiating stat for ${pitchName}`}
                         >
                           {pitchName}

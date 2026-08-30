@@ -22,7 +22,7 @@ const TIER_COLORS: Record<string, string> = {
 function TierBadge({ tier }: { tier: string }) {
   return (
     <span
-      className="text-[11px] font-bold px-1 py-px rounded"
+      className="text-xs font-bold px-1 py-px rounded"
       style={{
         color: TIER_COLORS[tier] ?? "#6B7280",
         backgroundColor: `${TIER_COLORS[tier] ?? "#6B7280"}20`,
@@ -54,7 +54,7 @@ function BoonRow({ entry, rank }: { entry: BoonScore; rank?: number }) {
         <div className="text-[15px] font-bold" style={{ color: netPoints >= 0 ? "#60A5FA" : "#E8A735" }}>
           {netPoints >= 0 ? "+" : ""}{netPoints}
         </div>
-        <div className="text-[11px] text-muted-foreground">
+        <div className="text-xs text-muted-foreground">
           {Math.round(entry.score)} pts
         </div>
       </div>
