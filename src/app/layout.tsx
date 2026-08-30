@@ -49,7 +49,7 @@ export default function RootLayout({
                 </div>
               </div>
             </header>
-            <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-1 sm:py-2">
+            <main className="flex-1 flex flex-col w-full px-4 sm:px-6 lg:px-8 py-1 sm:py-2">
               <Suspense>{children}</Suspense>
             </main>
           </div>

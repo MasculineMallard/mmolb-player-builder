@@ -271,7 +271,7 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
     {/* Share buttons portal into nav header */}
     <ExportShare player={player} archetype={hasArchetype ? activeArchetype : null} />
 
-    <div data-player-content className="xl:grid xl:grid-cols-[420px_1fr] xl:gap-2 space-y-2 xl:space-y-0">
+    <div data-player-content className="lg:grid lg:grid-cols-[420px_1fr] lg:gap-2 space-y-2 lg:space-y-0">
 
       {/* LEFT PANEL: Player info + Planning/Action */}
       <div className="space-y-2 min-w-0 flex flex-col">

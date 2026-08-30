@@ -86,7 +86,7 @@ export function BoonAdvisor({ scoredBoons, takenBoons, boonEmojis, currentBoonSc
         Boon Advisor
       </h3>
 
-      <div className="grid grid-cols-[auto_auto_auto_auto] justify-between gap-y-2">
+      <div className="grid grid-cols-[auto_auto_1fr_auto] items-center gap-x-3 gap-y-2">
         {top6.map((entry, i) => (
           <BoonRow key={entry.boonName} entry={entry} rank={i + 1} />
         ))}
