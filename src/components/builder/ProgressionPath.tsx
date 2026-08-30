@@ -207,7 +207,7 @@ export function ProgressionPath({
               <span
                 className="text-center leading-tight mt-0.5 whitespace-nowrap sm:hidden"
                 style={{
-                  fontSize: 10,
+                  fontSize: 15,
                   letterSpacing: "0.01em",
                   color: isCurrent || isMax
                     ? "var(--foreground)"

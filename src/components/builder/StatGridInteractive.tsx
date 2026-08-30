@@ -126,9 +126,9 @@ export function StatGridInteractive({
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-12 gap-y-4 md:gap-y-6">
+      <div className="columns-1 md:columns-2 xl:columns-3 gap-x-12">
         {activeCategories.map(([category, statNames]) => (
-          <div key={category}>
+          <div key={category} className="break-inside-avoid mb-4 md:mb-6">
             <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1 border-b border-border pb-0.5">
               {CATEGORY_LABELS[category]}
             </h4>
@@ -188,7 +188,7 @@ export function StatGridInteractive({
                       {pitchChips[statName]?.map((pitchName) => (
                         <span
                           key={pitchName}
-                          className="text-[10px] leading-none normal-case px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/80 border border-primary/20 whitespace-nowrap"
+                          className="text-[11px] leading-none normal-case px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/80 border border-primary/20 whitespace-nowrap"
                           title={`Differentiating stat for ${pitchName}`}
                         >
                           {pitchName}
@@ -268,7 +268,7 @@ export function StatGridInteractive({
         ))}
 
         {/* Extra column slot (e.g. PitchArsenal for pitchers) */}
-        {extraColumn}
+        {extraColumn && <div className="break-inside-avoid mb-4 md:mb-6">{extraColumn}</div>}
       </div>
     </div>
   );
