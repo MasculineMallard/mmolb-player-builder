@@ -3,6 +3,8 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { NextAction } from "./NextAction";
 import { ArchetypeSelect } from "./ArchetypeSelect";
+import { BatterBaseStatsNote } from "./BatterBaseStatsNote";
+import { ArsenalArchetypes } from "../pitcher/ArsenalArchetypes";
 import { PlayerHeader } from "./PlayerHeader";
 import { StatGridInteractive } from "./StatGridInteractive";
 
@@ -16,7 +18,7 @@ import { recommendStatPriorities, recommendBoonsByLevel, scoreBoons } from "@/li
 import type { BoonData } from "@/lib/advisor";
 import { loadBoons } from "@/lib/evaluator-data";
 import { calculateProgress, generateMilestones } from "@/lib/planner-utils";
-import { optimizePitchArsenal, computePitchFitPct, computeArchetypeFitPct } from "@/lib/optimizer";
+import { optimizePitchArsenal, computePitchFitPct, computeArchetypeFitPct, computePitchChips } from "@/lib/optimizer";
 import { S11, calculateDefenseTarget } from "@/lib/mechanics";
 import { EMPTY_ARCHETYPE, STAT_CATEGORIES } from "@/lib/constants";
 import { usePitchTypes } from "@/hooks/use-pitch-types";
@@ -98,6 +100,17 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
   const handleArchetypeChange = useCallback((arch: Archetype | null) => {
     setArchetype(arch);
   }, []);
+
+  // Arsenal-first card click: drive the SAME end-state as a dropdown pick — set the
+  // store archetypeId (so the dropdown value + fit% follow) AND the local archetype
+  // (so NextAction and the other archetype-gated panels react). Mirrors ArchetypeSelect's
+  // selection path rather than a raw setArchetypeId (review #6/#16).
+  const handleArsenalSelect = useCallback((key: string, arch: Archetype) => {
+    const store = usePlayerStore.getState();
+    store.setArchetypeId(key);
+    if (player.mmolbPlayerId) store.setPlayerArchetype(player.mmolbPlayerId, key);
+    setArchetype(arch);
+  }, [player.mmolbPlayerId]);
 
   const activeArchetype = archetype ?? EMPTY_ARCHETYPE;
   const hasArchetype = archetype !== null;
@@ -244,6 +257,15 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
 
   const showPitchArsenal = isPitcher && player.pitches.length > 0;
 
+  // Per-stat pitch chips: each thrown pitch's differentiating (2nd) priority stat.
+  // Pitcher-only; empty for batters and until pitch-type data is loaded.
+  const pitchChips = useMemo(
+    () => (isPitcher && player.pitches.length > 0 && Object.keys(pitchTypes).length > 0
+      ? computePitchChips(player.pitches.map((p) => p.name), pitchTypes)
+      : {}),
+    [isPitcher, player.pitches, pitchTypes],
+  );
+
   return (
     <>
     {/* Share buttons portal into nav header */}
@@ -269,6 +291,19 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
           pitchTypes={isPitcher ? pitchTypes : undefined}
           playerPitches={isPitcher ? player.pitches.map((p) => p.name) : undefined}
         />
+
+        <BatterBaseStatsNote isPitcher={isPitcher} />
+
+        {isPitcher && player.pitches.length > 0 && (
+          <ArsenalArchetypes
+            playerStats={player.stats}
+            playerPitches={player.pitches.map((p) => p.name)}
+            pitchTypes={pitchTypes}
+            level={player.level}
+            selectedKey={archetypeId}
+            onSelect={handleArsenalSelect}
+          />
+        )}
 
         {hasArchetype && (
           <NextAction
@@ -296,6 +331,7 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
           stats={player.stats}
           highlightStats={highlightStats}
           priorityStats={priorityStatsList}
+          pitchChips={pitchChips}
           level={player.level}
           isPitcher={isPitcher}
           recommendations={hasArchetype ? recommendations : undefined}

@@ -42,3 +42,6 @@ next-env.d.ts
 
 # app cache (percentile tables etc)
 /.cache/
+
+# npm run verify screenshot artifact
+/verify-screenshot.png

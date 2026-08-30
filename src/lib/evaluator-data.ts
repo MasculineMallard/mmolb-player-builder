@@ -1,6 +1,7 @@
 /**
  * Static reference data for the roster evaluator.
- * Stat tiers from S10 regression analysis (Bagyilisk).
+ * Stat tiers = S15 canonical set, single-sourced from src/data/stat-tiers.json
+ * (shared with mmolb/sample_eval.py and percentile-builder.ts — ends the drift).
  * Percentile tables from early S11 league data.
  */
 
@@ -8,22 +9,17 @@ import type { PercentileEntry, PlayerRole } from "./evaluator-types";
 import type { Archetype } from "./types";
 import { createJsonCache, isNonArrayObject } from "./json-cache";
 import { BASE_PATH } from "./constants";
+import statTiers from "../data/stat-tiers.json";
 
 // ---------------------------------------------------------------------------
-// Stat Tiers (from S10 regression — which stats actually matter)
+// Stat Tiers (S15 regression — which stats actually matter). Sourced from the
+// shared stat-tiers.json so the app, the Python CLI, and the attribute
+// percentile builder can never drift apart. See references/s15-tier-rationale.md.
 // ---------------------------------------------------------------------------
 
 export const STAT_TIERS: Record<PlayerRole, { T1: string[]; T2: string[]; T3: string[] }> = {
-  batter: {
-    T1: ["contact", "muscle", "intimidation", "aiming", "performance"],
-    T2: ["discipline", "lift", "vision", "determination", "insight", "speed", "cunning"],
-    T3: ["selflessness", "wisdom"],
-  },
-  pitcher: {
-    T1: ["velocity", "control", "rotation", "stuff", "presence"],
-    T2: ["deception", "guts", "persuasion", "stamina", "accuracy"],
-    T3: ["intuition", "defiance"],
-  },
+  batter: statTiers.batter,
+  pitcher: statTiers.pitcher,
 };
 
 /** All role-relevant stat names (batting or pitching 12). */

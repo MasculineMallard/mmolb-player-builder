@@ -15,6 +15,8 @@ interface StatGridInteractiveProps {
   stats: Record<string, number>;
   highlightStats?: string[];
   priorityStats?: string[];
+  /** stat name -> pitch display names it differentiates (per-stat pitch chips). */
+  pitchChips?: Record<string, string[]>;
   level: number;
   isPitcher: boolean;
   recommendations?: StatRecommendation[];
@@ -34,6 +36,7 @@ export function StatGridInteractive({
   stats,
   highlightStats = [],
   priorityStats = [],
+  pitchChips = {},
   level,
   isPitcher,
   recommendations = [],
@@ -157,6 +160,7 @@ export function StatGridInteractive({
                     <div className="py-1 px-1 rounded">
                     {/* Stat name + value row */}
                     <div className="flex items-center justify-between mb-0.5">
+                      <span className="flex items-center gap-1 min-w-0 flex-wrap">
                       <Tooltip>
                         <TooltipTrigger className="text-sm capitalize text-muted-foreground text-left flex items-center gap-1">
                           {isHighlighted && (
@@ -181,6 +185,16 @@ export function StatGridInteractive({
                           )}
                         </TooltipContent>
                       </Tooltip>
+                      {pitchChips[statName]?.map((pitchName) => (
+                        <span
+                          key={pitchName}
+                          className="text-[10px] leading-none normal-case px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/80 border border-primary/20 whitespace-nowrap"
+                          title={`Differentiating stat for ${pitchName}`}
+                        >
+                          {pitchName}
+                        </span>
+                      ))}
+                      </span>
                       <span className="flex items-center gap-1.5">
                         <span
                           className="text-sm font-mono font-medium tabular-nums"

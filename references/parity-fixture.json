@@ -1,0 +1,24 @@
+{
+  "batter": {
+    "role": "batter",
+    "position": "DH",
+    "level": 18,
+    "has_stats": false,
+    "stats": {
+      "contact": 250, "performance": 200, "aiming": 180, "discipline": 150,
+      "insight": 140, "muscle": 120, "vision": 90, "lift": 80, "speed": 100,
+      "intimidation": 60, "determination": 70, "cunning": 50, "selflessness": 40, "wisdom": 30
+    }
+  },
+  "pitcher": {
+    "role": "pitcher",
+    "position": "SP",
+    "level": 22,
+    "has_stats": false,
+    "stats": {
+      "velocity": 300, "control": 250, "rotation": 200, "stuff": 220, "presence": 150,
+      "accuracy": 130, "deception": 110, "persuasion": 90, "guts": 80, "stamina": 100,
+      "intuition": 60, "defiance": 40
+    }
+  }
+}

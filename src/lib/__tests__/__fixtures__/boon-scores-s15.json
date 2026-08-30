@@ -1,0 +1,134 @@
+{
+  "batter": [
+    {
+      "boonName": "Water Elemental",
+      "bonusStat": "contact",
+      "bonusTier": "T1",
+      "penaltyStat": "intimidation",
+      "penaltyTier": "T2",
+      "score": 315
+    },
+    {
+      "boonName": "Mischievous",
+      "bonusStat": "performance",
+      "bonusTier": "T1",
+      "penaltyStat": "stealth",
+      "penaltyTier": "off-role",
+      "score": 300
+    },
+    {
+      "boonName": "Grounded",
+      "bonusStat": "contact",
+      "bonusTier": "T1",
+      "penaltyStat": "lift",
+      "penaltyTier": "T2",
+      "score": 295
+    },
+    {
+      "boonName": "Thoroughbred",
+      "bonusStat": "performance",
+      "bonusTier": "T1",
+      "penaltyStat": "cunning",
+      "penaltyTier": "T3",
+      "score": 280
+    },
+    {
+      "boonName": "Eagle-eye",
+      "bonusStat": "aiming",
+      "bonusTier": "T1",
+      "penaltyStat": "cunning",
+      "penaltyTier": "T3",
+      "score": 250
+    },
+    {
+      "boonName": "Calculated",
+      "bonusStat": "discipline",
+      "bonusTier": "T1",
+      "penaltyStat": "cunning",
+      "penaltyTier": "T3",
+      "score": 205
+    },
+    {
+      "boonName": "Deadeye",
+      "bonusStat": "aiming",
+      "bonusTier": "T1",
+      "penaltyStat": "determination",
+      "penaltyTier": "T2",
+      "score": 200
+    },
+    {
+      "boonName": "One With All",
+      "bonusStat": "contact",
+      "bonusTier": "T1",
+      "penaltyStat": "muscle",
+      "penaltyTier": "T1",
+      "score": 195
+    }
+  ],
+  "pitcher": [
+    {
+      "boonName": "Cyclist",
+      "bonusStat": "velocity",
+      "bonusTier": "T1",
+      "penaltyStat": "deception",
+      "penaltyTier": "T2",
+      "score": 340
+    },
+    {
+      "boonName": "Meteor",
+      "bonusStat": "velocity",
+      "bonusTier": "T1",
+      "penaltyStat": "accuracy",
+      "penaltyTier": "T2",
+      "score": 320
+    },
+    {
+      "boonName": "Clockwork",
+      "bonusStat": "control",
+      "bonusTier": "T1",
+      "penaltyStat": "stamina",
+      "penaltyTier": "T2",
+      "score": 275
+    },
+    {
+      "boonName": "Director",
+      "bonusStat": "control",
+      "bonusTier": "T1",
+      "penaltyStat": "accuracy",
+      "penaltyTier": "T2",
+      "score": 245
+    },
+    {
+      "boonName": "Venomous",
+      "bonusStat": "stuff",
+      "bonusTier": "T1",
+      "penaltyStat": "persuasion",
+      "penaltyTier": "T2",
+      "score": 240
+    },
+    {
+      "boonName": "Hextouch",
+      "bonusStat": "stuff",
+      "bonusTier": "T1",
+      "penaltyStat": "stamina",
+      "penaltyTier": "T2",
+      "score": 230
+    },
+    {
+      "boonName": "Shopper",
+      "bonusStat": "rotation",
+      "bonusTier": "T1",
+      "penaltyStat": "persuasion",
+      "penaltyTier": "T2",
+      "score": 210
+    },
+    {
+      "boonName": "Spotlight",
+      "bonusStat": "presence",
+      "bonusTier": "T1",
+      "penaltyStat": "intuition",
+      "penaltyTier": "T3",
+      "score": 201
+    }
+  ]
+}

@@ -7,3 +7,5 @@
 ## Visual Verification
 
 **Always verify visual changes with Playwright before reporting them as done.** Use headless Chromium to screenshot the affected component and inspect it yourself. Do not tell the user a visual change is ready until you have confirmed it looks correct via screenshot. Use element-level screenshots (`locator.screenshot()`) when possible for detail.
+
+**`npm run verify`** implements this gate: `next build && vitest run && node scripts/screenshot.mjs`. The screenshot step boots `next start`, shots the home page to `verify-screenshot.png`, and fails on any HTTP 4xx/5xx (catches basePath drift — the app is served under `/pop`, not `/`). `npm run screenshot` runs just the shot (needs a prior build). Then look at `verify-screenshot.png` yourself. One-time setup on a fresh clone: `npx playwright install chromium`.
