@@ -47,6 +47,15 @@ export function BuilderView({ playerType }: BuilderViewProps) {
     }
   }, [player, loading]);
 
+  // Reflect the loaded player's name in the browser tab title (QoL request), and
+  // restore the original page title when the player clears or the view unmounts.
+  useEffect(() => {
+    if (!player) return;
+    const original = document.title;
+    document.title = `${player.name} — POP`;
+    return () => { document.title = original; };
+  }, [player]);
+
   return (
     <div className="space-y-2">
       {/* Search: always visible when no player, collapsible when player loaded */}

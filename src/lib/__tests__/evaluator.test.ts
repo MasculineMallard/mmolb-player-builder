@@ -10,6 +10,7 @@ import {
   PITCHING_STAT_WEIGHTS,
   COMPOSITE_WEIGHTS,
   getCompositeWeights,
+  MAX_GROWTH_WEIGHT,
 } from "../evaluator-data";
 import type { PercentileEntry, GameStats } from "../evaluator-types";
 
@@ -89,10 +90,35 @@ describe("COMPOSITE_WEIGHTS / getCompositeWeights", () => {
     });
   });
 
-  it("selects the right scenario by which pillars are present", () => {
+  it("selects the right scenario by which pillars are present (uncapped scenarios pass through)", () => {
+    // statsOnly growth (0.25) is at/under the cap, so the exact table entry is returned.
     expect(getCompositeWeights("batter", true, false)).toBe(COMPOSITE_WEIGHTS.batter.statsOnly);
-    expect(getCompositeWeights("batter", false, true)).toBe(COMPOSITE_WEIGHTS.batter.fitOnly);
-    expect(getCompositeWeights("pitcher", false, false)).toBe(COMPOSITE_WEIGHTS.pitcher.neither);
+    expect(getCompositeWeights("pitcher", true, false)).toBe(COMPOSITE_WEIGHTS.pitcher.statsOnly);
+  });
+
+  it("caps the growth pillar at MAX_GROWTH_WEIGHT in every scenario", () => {
+    for (const role of ["batter", "pitcher"] as const) {
+      for (const [hasStats, hasFit] of [[true, true], [true, false], [false, true], [false, false]] as const) {
+        const w = getCompositeWeights(role, hasStats, hasFit);
+        expect(w.growth).toBeLessThanOrEqual(MAX_GROWTH_WEIGHT + 1e-9);
+        expect(w.attr + w.stats + w.fit + w.growth).toBeCloseTo(1.0, 5);
+      }
+    }
+  });
+
+  it("renormalizes freed weight proportionally when growth is capped", () => {
+    // batter fitOnly: {attr:0.40, stats:0, fit:0.30, growth:0.30} -> cap growth to 0.25,
+    // redistribute 0.05 across attr+fit (total 0.70).
+    const fit = getCompositeWeights("batter", false, true);
+    expect(fit.growth).toBeCloseTo(0.25, 5);
+    expect(fit.stats).toBe(0);
+    expect(fit.attr).toBeCloseTo(0.4 + 0.05 * (0.4 / 0.7), 5);
+    expect(fit.fit).toBeCloseTo(0.3 + 0.05 * (0.3 / 0.7), 5);
+
+    // pitcher neither: {attr:0.50, growth:0.50} -> all excess goes to attr.
+    const neither = getCompositeWeights("pitcher", false, false);
+    expect(neither.growth).toBeCloseTo(0.25, 5);
+    expect(neither.attr).toBeCloseTo(0.75, 5);
   });
 });
 

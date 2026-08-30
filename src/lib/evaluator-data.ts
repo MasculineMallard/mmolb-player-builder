@@ -219,6 +219,27 @@ export const COMPOSITE_WEIGHTS: Record<
   },
 };
 
+/**
+ * Hard cap on the growth ("levels remaining") pillar. The Mulch-o-Meter should
+ * never lean more than this on unrealized potential, regardless of which other
+ * pillars are present. Any weight above the cap is redistributed proportionally
+ * across the other present pillars so the set still sums to 1.0.
+ */
+export const MAX_GROWTH_WEIGHT = 0.25;
+
+function capGrowthWeight(w: CompositeWeights): CompositeWeights {
+  if (w.growth <= MAX_GROWTH_WEIGHT) return w;
+  const excess = w.growth - MAX_GROWTH_WEIGHT;
+  const otherTotal = w.attr + w.stats + w.fit;
+  if (otherTotal <= 0) return w; // nothing to redistribute onto (attr is always > 0 in practice)
+  return {
+    attr: w.attr + excess * (w.attr / otherTotal),
+    stats: w.stats + excess * (w.stats / otherTotal),
+    fit: w.fit + excess * (w.fit / otherTotal),
+    growth: MAX_GROWTH_WEIGHT,
+  };
+}
+
 /** Pick the composite weight set for a role given which pillars are present. */
 export function getCompositeWeights(
   role: PlayerRole,
@@ -226,10 +247,12 @@ export function getCompositeWeights(
   hasFit: boolean,
 ): CompositeWeights {
   const r = COMPOSITE_WEIGHTS[role];
-  if (hasStats && hasFit) return r.all;
-  if (hasStats) return r.statsOnly;
-  if (hasFit) return r.fitOnly;
-  return r.neither;
+  const base =
+    hasStats && hasFit ? r.all :
+    hasStats ? r.statsOnly :
+    hasFit ? r.fitOnly :
+    r.neither;
+  return capGrowthWeight(base);
 }
 
 // ---------------------------------------------------------------------------

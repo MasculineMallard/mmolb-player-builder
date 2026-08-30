@@ -18,6 +18,7 @@ import { buildRosterReport } from "@/lib/evaluator-report";
 import { RosterTable } from "@/components/evaluator/roster-table";
 import { useTeamSearch } from "@/hooks/use-team-search";
 import { BASE_PATH } from "@/lib/constants";
+import { usePlayerStore } from "@/store/player-store";
 
 interface EvalRefData {
   batterArch: Record<string, Archetype>;
@@ -103,11 +104,16 @@ export function MulchView() {
       // Store for position change re-evaluation
       evalRef.current = { batterArch: batterArchetypes, pitcherArch: pitcherArchetypes, posDef: positionDefense, boonLookup, percentileTables };
 
-      // Evaluate each player (bench batters get assigned their best-fit position)
+      // Evaluate each player. A persisted manual position override wins over both
+      // the API position and best-fit assignment; otherwise bench batters get their
+      // best-fit position (as before).
+      const positionOverrides = usePlayerStore.getState().playerPositionOverrides;
       const results: EvaluatedPlayer[] = players.map((player) => {
         let evalPlayer = player;
-        const isBench = benchPlayerIds.has(player.mmolbPlayerId);
-        if (isBench && getPlayerRole(player.position) !== "pitcher") {
+        const override = positionOverrides[player.mmolbPlayerId];
+        if (override) {
+          evalPlayer = { ...player, position: override };
+        } else if (benchPlayerIds.has(player.mmolbPlayerId) && getPlayerRole(player.position) !== "pitcher") {
           evalPlayer = { ...player, position: findBestFitPosition(player, positionDefense) };
         }
         const role = getPlayerRole(evalPlayer.position);
@@ -124,8 +130,10 @@ export function MulchView() {
     }
   }, []);
 
-  // Re-evaluate a single player with a new position
+  // Re-evaluate a single player with a new position, and persist the choice so it
+  // survives reloads/re-fetches (e.g. DHs the API mislabels as another position).
   const handlePositionChange = useCallback((playerId: string, newPosition: string) => {
+    usePlayerStore.getState().setPlayerPositionOverride(playerId, newPosition);
     const ref = evalRef.current;
     if (!ref) return;
     setEvaluated(prev => prev.map(ev => {

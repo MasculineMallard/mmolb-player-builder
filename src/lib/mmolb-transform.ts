@@ -316,7 +316,18 @@ export function extractGameStats(
     }
   }
 
-  // Merge: prefer playerrecord, fall back to player.Stats
+  // Merge: prefer the current-season Regular Season record (season-scoped,
+  // regular-season-only). Fall back to player.Stats ONLY when no such record
+  // exists (state/playerrecord fetch failed, or the player has no regular-season
+  // games yet this season).
+  //
+  // CAVEAT (verified against the live API 2026-08-25): player.Stats is a
+  // CUMULATIVE, all-game-type blob (e.g. 843 lifetime PA vs 536 for the current
+  // regular season) — it is NOT filtered to the regular season, so the fallback
+  // can include exhibition/postseason stats. The normal case (active player with
+  // a regular-season record) is unaffected and correct; the fallback is the only
+  // exhibition-leak vector. Whether to keep it or return null here is a ratings
+  // behaviour decision — see POP-S15-UPDATE-PLAN.md E1.
   const merged = mergeRawStats(recordStats, !recordStats ? playerStats : undefined);
 
   if (role === "pitcher") {

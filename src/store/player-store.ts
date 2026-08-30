@@ -30,6 +30,10 @@ interface PlayerStore {
   // Per-player archetype mapping (playerId -> archetypeId)
   playerArchetypes: Record<string, string>;
 
+  // Per-player manual position override (playerId -> position), persisted so
+  // Mulch-o-Meter re-assignments (e.g. DHs the API mislabels) stick across visits.
+  playerPositionOverrides: Record<string, string>;
+
   // Per-player + per-archetype custom stat target overrides.
   // Keyed by `${playerId}::${archetypeId}` -> { statName: target }
   playerTargetOverrides: Record<string, Record<string, number>>;
@@ -52,6 +56,7 @@ interface PlayerStore {
   setError: (error: string | null) => void;
   setArchetypeId: (id: string | null) => void;
   setPlayerArchetype: (playerId: string, archetypeId: string | null) => void;
+  setPlayerPositionOverride: (playerId: string, position: string | null) => void;
   setTargetOverride: (playerId: string, archetypeId: string, statName: string, target: number) => void;
   clearTargetOverrides: (playerId: string, archetypeId: string) => void;
   setLastTeam: (team: TeamSearchResult | null, roster: RosterPlayer[]) => void;
@@ -123,6 +128,7 @@ export const usePlayerStore = create<PlayerStore>()(
       error: null,
       archetypeId: null,
       playerArchetypes: {},
+      playerPositionOverrides: {},
       playerTargetOverrides: {},
       lastTeam: null,
       lastRoster: [],
@@ -143,6 +149,15 @@ export const usePlayerStore = create<PlayerStore>()(
           delete next[playerId];
         }
         return { playerArchetypes: next };
+      }),
+      setPlayerPositionOverride: (playerId, position) => set((state) => {
+        const next = { ...state.playerPositionOverrides };
+        if (position) {
+          next[playerId] = position;
+        } else {
+          delete next[playerId];
+        }
+        return { playerPositionOverrides: next };
       }),
       setTargetOverride: (playerId, archetypeId, statName, target) => set((state) => {
         const key = `${playerId}::${archetypeId}`;
@@ -240,33 +255,39 @@ export const usePlayerStore = create<PlayerStore>()(
     }),
     {
       name: "mmolb-player-store",
-      version: 4,
+      version: 5,
       partialize: (state) => ({
         player: state.player,
         archetypeId: state.archetypeId,
         playerArchetypes: state.playerArchetypes,
+        playerPositionOverrides: state.playerPositionOverrides,
         playerTargetOverrides: state.playerTargetOverrides,
         recentPlayers: state.recentPlayers,
       }),
       migrate: (persisted, version) => {
         const old = persisted as Record<string, unknown>;
         if (version < 2) {
-          console.warn(`[player-store] migrating from v${version} to v4`);
+          console.warn(`[player-store] migrating from v${version} to v5`);
           return {
             player: old.player ?? null,
             archetypeId: old.archetypeId ?? null,
             playerArchetypes: {},
+            playerPositionOverrides: {},
             playerTargetOverrides: {},
             recentPlayers: [],
           };
         }
         if (version < 3) {
-          console.warn(`[player-store] migrating from v${version} to v4`);
-          return { ...old, playerArchetypes: {}, playerTargetOverrides: {} };
+          console.warn(`[player-store] migrating from v${version} to v5`);
+          return { ...old, playerArchetypes: {}, playerPositionOverrides: {}, playerTargetOverrides: {} };
         }
         if (version < 4) {
-          console.warn(`[player-store] migrating from v${version} to v4`);
-          return { ...old, playerTargetOverrides: {} };
+          console.warn(`[player-store] migrating from v${version} to v5`);
+          return { ...old, playerPositionOverrides: {}, playerTargetOverrides: {} };
+        }
+        if (version < 5) {
+          console.warn(`[player-store] migrating from v${version} to v5`);
+          return { ...old, playerPositionOverrides: {} };
         }
         return persisted as Record<string, unknown>;
       },
