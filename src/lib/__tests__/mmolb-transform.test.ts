@@ -107,6 +107,39 @@ describe("mid-season recomp detection", () => {
     expect(p.gameStats?.PA).toBe(52);
   });
 
+  it("suppresses stats for a player RECOMPED in the offseason (phase-string Birthday, has prior seasons)", () => {
+    // Cosmo de Leon case: recomped during the Offseason phase, so the API puts the
+    // string "Offseason" in Birthday (not a numeric day). The current-season Regular
+    // Season record still holds the OLD build's full-season line, so it must suppress.
+    const p = transformPlayer(
+      player({ Birthseason: 14, Birthday: "Offseason" as unknown as number }),
+      "Team",
+      null,
+      [record(12, "s12"), record(13, "s13"), record(14, SEASON_14_ID)],
+      SEASON_14_ID,
+      263,
+    );
+
+    expect(p.recomped).toBe(true);
+    expect(p.gameStats).toBeNull();
+  });
+
+  it("keeps stats for a NEW player created in the offseason (phase-string Birthday, no prior seasons)", () => {
+    // Same "Offseason" Birthday but no prior-season records → a brand-new signing,
+    // not a recomp. Its stats are its own and must NOT be suppressed.
+    const p = transformPlayer(
+      player({ Birthseason: 14, Birthday: "Offseason" as unknown as number }),
+      "Team",
+      null,
+      [record(14, SEASON_14_ID)],
+      SEASON_14_ID,
+      263,
+    );
+
+    expect(p.recomped).toBeUndefined();
+    expect(p.gameStats?.PA).toBe(52);
+  });
+
   it("keeps stats when playerrecord is unavailable", () => {
     const p = transformPlayer(
       player({ Birthseason: 14, Birthday: 213 }),
