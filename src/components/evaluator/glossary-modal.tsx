@@ -43,7 +43,7 @@ export function GlossaryButton() {
                   <div><span style={{ color: "#60A5FA" }} className="font-bold">STRONG</span> (55-64) : Above average. Solid contributor.</div>
                   <div><span style={{ color: "#8B949E" }} className="font-bold">ROSTER</span> (42-54) : Playable. Does the job, nothing special.</div>
                   <div><span style={{ color: "#EAB308" }} className="font-bold">FRINGE</span> (35-41) : On the bubble. Candidate for replacement.</div>
-                  <div><span style={{ color: "#F85149" }} className="font-bold">MULCH</span> (&lt;35) : Bottom 10%. Recompose.</div>
+                  <div><span style={{ color: "#F85149" }} className="font-bold">MULCH</span> (&lt;35) : Weak build. Recompose candidate.</div>
                 </div>
               </section>
 
@@ -62,7 +62,7 @@ export function GlossaryButton() {
                   </div>
                   <div>
                     <span className="text-foreground font-medium">Position Fit</span>
-                    <p className="mt-0.5">How well your defense stats match the position. Each position has 1-3 key defense stats with fixed targets (primary: 140, secondary: 80, catcher: 200 awareness only). Total budget: 300.</p>
+                    <p className="mt-0.5">How well your defense stats match the position. Each position has 1-3 key defense stats with fixed per-stat targets (primary: 140, secondary: 80; catcher: 200 on awareness). Your fit is how close you are to those, weighted per stat.</p>
                   </div>
                   <div>
                     <span className="text-foreground font-medium">Growth</span>
@@ -89,36 +89,39 @@ export function GlossaryButton() {
                     <tr className="border-t border-border/30"><td colSpan={5} className="text-foreground font-medium pt-1">Batters</td></tr>
                     <tr><td>All available</td><td>20%</td><td>40%</td><td>20%</td><td>20%</td></tr>
                     <tr><td>No fit (DH)</td><td>25%</td><td>50%</td><td>-</td><td>25%</td></tr>
-                    <tr><td>No game stats</td><td>40%</td><td>-</td><td>30%</td><td>30%</td></tr>
-                    <tr><td>No stats + no fit</td><td>50%</td><td>-</td><td>-</td><td>50%</td></tr>
+                    <tr><td>No game stats</td><td>43%</td><td>-</td><td>32%</td><td>25%</td></tr>
+                    <tr><td>No stats + no fit</td><td>75%</td><td>-</td><td>-</td><td>25%</td></tr>
                     <tr className="border-t border-border/30"><td colSpan={5} className="text-foreground font-medium pt-1">Pitchers</td></tr>
                     <tr><td>All available</td><td>25%</td><td>25%</td><td>25%</td><td>25%</td></tr>
                     <tr><td>No fit</td><td>40%</td><td>40%</td><td>-</td><td>20%</td></tr>
-                    <tr><td>No game stats</td><td>40%</td><td>-</td><td>30%</td><td>30%</td></tr>
-                    <tr><td>No stats + no fit</td><td>50%</td><td>-</td><td>-</td><td>50%</td></tr>
+                    <tr><td>No game stats</td><td>43%</td><td>-</td><td>32%</td><td>25%</td></tr>
+                    <tr><td>No stats + no fit</td><td>75%</td><td>-</td><td>-</td><td>25%</td></tr>
                   </tbody>
                 </table>
+                <p className="mt-1 text-xs text-muted-foreground/70">Growth is capped at 25%; any excess is redistributed across the other pillars (why the last two rows aren&apos;t a raw 30/30 or 50/50).</p>
               </section>
 
               {/* Stat tiers */}
               <section>
                 <h3 className="text-foreground font-semibold mb-1">Attribute Tiers</h3>
-                <p className="mb-1">Based on Bagyilisk&apos;s S10 and S11 regression analyses. Which stats actually move outcomes.</p>
+                <p className="mb-1">Which stats actually move outcomes. Batter tiers are from the S15 regression (per Drake&apos;s tiering principles); pitcher tiers from Bagyilisk&apos;s S10/S11 analyses, unchanged in S15.</p>
                 <div className="space-y-1">
-                  <div><span className="text-foreground">Batting T1:</span> Contact, Muscle, Intimidation, Aiming, Performance</div>
-                  <div><span className="text-foreground">Batting T2:</span> Discipline, Lift, Vision, Determination, Insight, Speed, Cunning</div>
+                  <div><span className="text-foreground">Batting T1:</span> Contact, Performance, Aiming, Discipline, Insight, Muscle</div>
+                  <div><span className="text-foreground">Batting T2:</span> Vision, Lift, Speed, Intimidation, Determination</div>
+                  <div><span className="text-foreground">Batting T3 (count zero):</span> Cunning, Selflessness, Wisdom</div>
                   <div><span className="text-foreground">Pitching T1:</span> Velocity, Control, Rotation, Stuff, Presence</div>
-                  <div><span className="text-foreground">Pitching T2:</span> Deception, Guts, Persuasion, Stamina, Accuracy</div>
+                  <div><span className="text-foreground">Pitching T2:</span> Accuracy, Deception, Persuasion, Guts, Stamina</div>
+                  <div><span className="text-foreground">Pitching T3 (count zero):</span> Intuition, Defiance</div>
                 </div>
               </section>
 
               {/* Defense */}
               <section>
                 <h3 className="text-foreground font-semibold mb-1">Position Defense</h3>
-                <p className="mb-1">Blended from Discord defense graphic + OLS regression on fielding value. Target: 300 total budget, capped at 200 per stat.</p>
+                <p className="mb-1">Blended from the Discord defense graphic + OLS regression on fielding value. Per-stat targets: 140 primary / 80 secondary (catcher: 200 on awareness).</p>
                 <div className="space-y-0.5 ml-2 text-xs">
                   <div><span className="text-foreground">C:</span> Awareness</div>
-                  <div><span className="text-foreground">1B:</span> Reaction, Composure</div>
+                  <div><span className="text-foreground">1B:</span> Reaction, Composure, Awareness</div>
                   <div><span className="text-foreground">2B:</span> Reaction, Awareness, Composure</div>
                   <div><span className="text-foreground">3B:</span> Reaction, Composure, Awareness</div>
                   <div><span className="text-foreground">SS:</span> Reaction, Composure, Awareness, Arm</div>
@@ -138,6 +141,7 @@ export function GlossaryButton() {
                   <div><span className="text-foreground">BOON_CONFLICT:</span> Boon penalizes an archetype priority stat.</div>
                   <div><span className="text-foreground">DEFENSE_LOCKED:</span> Position-critical defense stat at 0, level &gt; 15.</div>
                   <div><span className="text-foreground">MAXED_BOTTOM_QUARTILE:</span> Level 30 with game stats in bottom 25%.</div>
+                  <div><span className="text-foreground">CUNNING_OBP_TRAP:</span> High Cunning but low Discipline + Contact (an OBP mirage).</div>
                 </div>
               </section>
 
@@ -156,7 +160,7 @@ export function GlossaryButton() {
               {/* Percentiles */}
               <section>
                 <h3 className="text-foreground font-semibold mb-1">Live Percentiles</h3>
-                <p>Game stats are scored against live percentile tables computed from every team in the league via the MMOLB API. Updated on demand.</p>
+                <p>Game stats are scored against live percentile tables computed from every team in the league via the MMOLB API, refreshed automatically about once a day.</p>
               </section>
             </div>
           </div>
