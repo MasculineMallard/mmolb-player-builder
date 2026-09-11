@@ -7,17 +7,17 @@
  * OFF — see mmolb-transform.buildBaseStatMap). It exists so the builder can show
  * "what a player actually has" at a glance without hand math.
  *
- * Model (from the mmolb skill references):
- *   - Boons apply ±50% to an attribute's BASE value, stacking additively
- *     (two +50% = +100% of base). boons.md: "displayed = base × (1 + Σboon%)".
- *   - Item flats add fixed points to the attribute (ItemEffect.value, display scale).
- *   - Item percents apply to the base attribute (ItemEffect.value = percent number).
- *   total = base × (1 + Σboon% + Σitem%) + Σitem_flat, clamped to [0, 1000].
- *
- * ASSUMPTION (documented, flagged for QA against the live game): boons multiply
- * BASE only, so item flats are NOT boon-amplified, and item percents are treated
- * as percent-of-base (not compounded on top of the boon). If the game turns out
- * to compound differently, it is a one-line change in the total formula below.
+ * Model (calibrated against the live game — Parallax Wolfbox, Lv22 SP, all four
+ * Equipment/Boons checkbox states, 2026-09-11; see the golden test):
+ *   - Each lesser boon applies +25% to one attribute and -10% to another, on the
+ *     base value; multiple boons on the same stat stack additively.
+ *   - Item flats add fixed points to the attribute (FlatBonus, display scale).
+ *   - Item percents are multipliers (Multiplier, ItemEffect.value = percent number).
+ *   - The flat is added to the base FIRST, then the combined percent multiplier
+ *     (items + boons) applies to that sum:
+ *       total = (base + Σitem_flat) × (1 + Σitem_pct + Σboon_pct), clamp [0, 1000].
+ *   Every calibrated stat reproduces the game's "both on" column exactly this way
+ *   (e.g. Control (341+16)×(1+0.10+0.25)=482; Deception (0+62)×(1-0.10)=56).
  */
 
 import { computeBoonMultipliers } from "./item-advisor";
@@ -80,7 +80,7 @@ export function computeEquippedStats(
     const boonPct = (boonMult[stat] ?? 1) - 1;
     const itemFlat = flat[stat] ?? 0;
     const itemPctNum = pct[stat] ?? 0;
-    const raw = base * (1 + boonPct + itemPctNum / 100) + itemFlat;
+    const raw = (base + itemFlat) * (1 + boonPct + itemPctNum / 100);
     const total = Math.max(0, Math.min(ATTR_MAX, Math.round(raw)));
     out[stat] = { base, itemFlat, itemPct: itemPctNum, boonPct, total };
   }
