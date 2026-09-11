@@ -17,7 +17,7 @@ interface StatGridInteractiveProps {
   stats: Record<string, number>;
   highlightStats?: string[];
   priorityStats?: string[];
-  /** stat name -> pitch display names it differentiates (per-stat pitch chips). */
+  /** stat name -> pitch display names it favors (per-stat pitch chips). */
   pitchChips?: Record<string, string[]>;
   level: number;
   isPitcher: boolean;
@@ -245,7 +245,7 @@ export function StatGridInteractive({
                         <span
                           key={pitchName}
                           className="text-[11px] leading-none normal-case px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/80 border border-primary/20 whitespace-nowrap"
-                          title={`Differentiating stat for ${pitchName}`}
+                          title={`Primary stat for ${pitchName}`}
                         >
                           {pitchName}
                         </span>
