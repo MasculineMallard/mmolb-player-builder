@@ -6,7 +6,7 @@
 import type { PlayerData } from "./types";
 import type { EvalFlag, PlayerRole, StructuredReasoning, ScoreExplanation } from "./evaluator-types";
 import type { PositionDefenseMap } from "./evaluator-data";
-import { STAT_TIERS, ROLE_STATS } from "./evaluator-data";
+import { STAT_TIERS, ROLE_STATS, positionFitTarget } from "./evaluator-data";
 import { calculatePrimaryPointsAtLevel, TOTAL_PRIMARY_POINTS, S11 } from "./mechanics";
 
 // ---------------------------------------------------------------------------
@@ -125,9 +125,12 @@ function explainFit(
 
   lines.push(`Position: ${entry.name ?? pos}`);
 
-  for (const [stat, weight] of Object.entries(entry.stat_weights)) {
+  // Same per-stat targets the Fit SCORE uses (140/80/200), via the shared helper,
+  // so the reasoning display can't drift from the score.
+  const primaryStats = new Set(entry.primary_stats ?? []);
+  for (const stat of Object.keys(entry.stat_weights)) {
     const value = player.stats[stat] ?? 0;
-    const target = Math.round((weight / 0.12) * 120);
+    const target = positionFitTarget(pos, stat, primaryStats);
     const gap = target - value;
     if (gap <= 0) {
       lines.push(`${stat}: ${value} (on target)`);

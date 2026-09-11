@@ -251,6 +251,25 @@ export function getCompositeWeights(
   return capGrowthWeight(base);
 }
 
+/**
+ * Per-stat position-defense target — the value a fielder's defense stat is
+ * measured against for the Position Fit score.
+ *
+ * Single source of truth shared by computePositionFitScore (the actual Fit score)
+ * AND explainFit (the reasoning display), so the two can't drift. They used to:
+ * the reasoning derived a target from the stat weight (weight/0.12*120), which
+ * disagreed with the score's fixed 140/80/200. Catcher measures every stat
+ * against 200; elsewhere primary stats target 140, others 80.
+ */
+export function positionFitTarget(
+  basePos: string,
+  stat: string,
+  primaryStats: Set<string>,
+): number {
+  if (basePos === "C") return 200;
+  return primaryStats.has(stat) ? 140 : 80;
+}
+
 // ---------------------------------------------------------------------------
 // Archetype loaders (client-side, cached)
 // ---------------------------------------------------------------------------
