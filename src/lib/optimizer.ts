@@ -88,11 +88,10 @@ export function computePitchFitPct(
 }
 
 /**
- * Map each of the player's thrown pitches to a chip on its DIFFERENTIATING stat — the
- * 2nd priority stat. The 1st priority stat is velocity for all nine pitch types
- * (universal noise), so using [1] skips it by construction. Any stat that EVERY thrown
- * pitch shares is also dropped (not differentiating for this arsenal). Returns a
- * stat -> pitch-display-names map for the stat grid to chip.
+ * Map every recognized thrown pitch to a chip on its primary non-velocity stat.
+ * Velocity is universal and therefore not useful for distinguishing pitch strengths.
+ * Pitches that share a stat intentionally share that stat's chip row, so every pitch
+ * remains visible.
  */
 export function computePitchChips(
   playerPitches: string[],
@@ -100,14 +99,10 @@ export function computePitchChips(
 ): Record<string, string[]> {
   const thrown = playerPitches.filter((p) => pitchTypesData[p]?.priority_stats?.length);
   if (thrown.length === 0) return {};
-  const firstPri = pitchTypesData[thrown[0]]!.priority_stats!;
-  const shared = new Set<string>(
-    firstPri.filter((s) => thrown.every((p) => pitchTypesData[p]?.priority_stats?.includes(s))),
-  );
   const map: Record<string, string[]> = {};
   for (const p of thrown) {
-    const stat = pitchTypesData[p]!.priority_stats![1]; // differentiating (2nd) stat
-    if (!stat || shared.has(stat)) continue;
+    const stat = pitchTypesData[p]!.priority_stats!.find((candidate) => candidate !== "velocity");
+    if (!stat) continue;
     const name = pitchTypesData[p]!.name ?? p.toUpperCase();
     (map[stat] ??= []).push(name);
   }
