@@ -1,5 +1,6 @@
 import type { EvaluatedPlayer, ScoreExplanation, GameStats } from "@/lib/evaluator-types";
 import { getPlayerRole } from "@/lib/evaluator";
+import { MULCH_MIN_PA, MULCH_MIN_IP } from "@/lib/constants";
 import { AttributeBreakdown } from "./attribute-breakdown";
 import { VerdictBadge } from "./verdict-badge";
 import { DefenseStatBars } from "./position-fit-card";
@@ -147,7 +148,14 @@ function StatsTable({ gameStats, role, liveTables }: {
     );
   }
 
+  const sampleKey = role === "pitcher" ? "IP" : "PA";
+  const sampleVal = gameStats[sampleKey as keyof GameStats] as number | undefined;
+  const minSample = role === "pitcher" ? MULCH_MIN_IP : MULCH_MIN_PA;
+  // Stats only count toward the score once the sample clears the minimum.
+  const counts = sampleVal != null && sampleVal >= minSample;
+
   return (
+    <>
     <table className="w-full text-sm">
       <thead>
         <tr className="text-[11px] text-muted-foreground/50 uppercase tracking-wider">
@@ -157,21 +165,13 @@ function StatsTable({ gameStats, role, liveTables }: {
         </tr>
       </thead>
       <tbody>
-        {(() => {
-          const sampleKey = role === "pitcher" ? "IP" : "PA";
-          const sampleVal = gameStats[sampleKey as keyof GameStats] as number | undefined;
-          const sigThreshold = role === "pitcher" ? 20 : 50;
-          const isSig = sampleVal != null && sampleVal >= sigThreshold;
-          return (
-            <tr className="border-b border-border/30">
-              <td className="text-muted-foreground py-0.5 font-medium">{sampleKey}</td>
-              <td className="text-right font-mono tabular-nums py-0.5">{sampleVal != null ? Math.round(sampleVal) : "—"}</td>
-              <td className="text-right text-[11px] py-0.5" style={{ color: isSig ? "var(--scale-good)" : "var(--scale-poor)" }}>
-                {sampleVal != null ? (isSig ? "Sig" : "Small") : "—"}
-              </td>
-            </tr>
-          );
-        })()}
+        <tr className="border-b border-border/30">
+          <td className="text-muted-foreground py-0.5 font-medium">{sampleKey}</td>
+          <td className="text-right font-mono tabular-nums py-0.5">{sampleVal != null ? Math.round(sampleVal) : "—"}</td>
+          <td className="text-right text-[11px] py-0.5" style={{ color: counts ? "var(--scale-good)" : "var(--scale-poor)" }}>
+            {sampleVal != null ? (counts ? "Counts" : "Low") : "—"}
+          </td>
+        </tr>
         {Object.keys(weights).map((key) => {
           const value = gameStats[key as keyof GameStats] as number | undefined;
           const table = tables[key];
@@ -190,6 +190,12 @@ function StatsTable({ gameStats, role, liveTables }: {
         })}
       </tbody>
     </table>
+    {sampleVal != null && !counts && (
+      <p className="mt-1.5 text-[11px] text-muted-foreground/80">
+        Below the {minSample} {sampleKey} minimum — shown for reference, not counted toward the score.
+      </p>
+    )}
+    </>
   );
 }
 

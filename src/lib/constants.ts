@@ -99,6 +99,14 @@ export const CATEGORY_LABELS: Record<string, string> = {
 /** Pitcher positions for determining player type. */
 export const PITCHER_POSITIONS = new Set(["SP", "RP", "CL", "P"]);
 
+/**
+ * Minimum sample before a player's season stats count toward their Mulch-o-Meter
+ * score. Below these, the stats pillar is treated as N/A (dropped from the
+ * composite) so a tiny sample can't inflate or deflate a rating.
+ */
+export const MULCH_MIN_PA = 30;
+export const MULCH_MIN_IP = 30;
+
 /** S11 milestone levels for progression timeline. */
 export const MILESTONE_LEVELS = [1, 5, 10, 15, 20, 25, 30] as const;
 

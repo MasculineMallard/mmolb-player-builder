@@ -6,10 +6,10 @@
       "emoji": "📒",
       "description": "This Player keeps a balanced ledger",
       "bonuses": {
-        "Accuracy": 50
+        "Accuracy": 25
       },
       "penalties": {
-        "Persuasion": 50
+        "Persuasion": 10
       }
     },
     {
@@ -18,10 +18,10 @@
       "emoji": "🚀",
       "description": "This Player is ignited",
       "bonuses": {
-        "Velocity": 50
+        "Velocity": 25
       },
       "penalties": {
-        "Stuff": 50
+        "Stuff": 10
       }
     },
     {
@@ -30,10 +30,10 @@
       "emoji": "💨",
       "description": "This Player is the air itself",
       "bonuses": {
-        "Aiming": 50
+        "Aiming": 25
       },
       "penalties": {
-        "Contact": 50
+        "Contact": 10
       }
     },
     {
@@ -42,10 +42,10 @@
       "emoji": "🎖️",
       "description": "This Player carries the banner with grace",
       "bonuses": {
-        "Persuasion": 50
+        "Persuasion": 25
       },
       "penalties": {
-        "Guts": 50
+        "Guts": 10
       }
     },
     {
@@ -54,10 +54,10 @@
       "emoji": "🐸",
       "description": "This Player adapts to land and sea",
       "bonuses": {
-        "Performance": 50
+        "Performance": 25
       },
       "penalties": {
-        "Aiming": 50
+        "Aiming": 10
       }
     },
     {
@@ -66,10 +66,10 @@
       "emoji": "📊",
       "description": "This Player knows the trends",
       "bonuses": {
-        "Wisdom": 50
+        "Wisdom": 25
       },
       "penalties": {
-        "Selflessness": 50
+        "Selflessness": 10
       }
     },
     {
@@ -78,10 +78,10 @@
       "emoji": "⚓",
       "description": "This Player is stuck in place",
       "bonuses": {
-        "Defiance": 50
+        "Defiance": 25
       },
       "penalties": {
-        "Accuracy": 50
+        "Accuracy": 10
       }
     },
     {
@@ -90,10 +90,10 @@
       "emoji": "👼",
       "description": "This Player is blessed by the heavens",
       "bonuses": {
-        "Control": 50
+        "Control": 25
       },
       "penalties": {
-        "Presence": 50
+        "Presence": 10
       }
     },
     {
@@ -102,10 +102,10 @@
       "emoji": "🕷️",
       "description": "This Player's has eight legs",
       "bonuses": {
-        "Intimidation": 50
+        "Intimidation": 25
       },
       "penalties": {
-        "Vision": 50
+        "Vision": 10
       }
     },
     {
@@ -114,10 +114,10 @@
       "emoji": "🏹",
       "description": "This Player becomes a sharpshooter",
       "bonuses": {
-        "Aiming": 50
+        "Aiming": 25
       },
       "penalties": {
-        "Discipline": 50
+        "Discipline": 10
       }
     },
     {
@@ -126,10 +126,10 @@
       "emoji": "🔋",
       "description": "This Player runs forever",
       "bonuses": {
-        "Stamina": 50
+        "Stamina": 25
       },
       "penalties": {
-        "Rotation": 50
+        "Rotation": 10
       }
     },
     {
@@ -138,10 +138,10 @@
       "emoji": "🕯️",
       "description": "This Player shines steady leadership",
       "bonuses": {
-        "Presence": 50
+        "Presence": 25
       },
       "penalties": {
-        "Control": 50
+        "Control": 10
       }
     },
     {
@@ -150,10 +150,10 @@
       "emoji": "🛡️",
       "description": "This Player raises their shield",
       "bonuses": {
-        "Determination": 50
+        "Determination": 25
       },
       "penalties": {
-        "Selflessness": 50
+        "Selflessness": 10
       }
     },
     {
@@ -162,10 +162,10 @@
       "emoji": "🧮",
       "description": "This Player refines their logic",
       "bonuses": {
-        "Discipline": 50
+        "Discipline": 25
       },
       "penalties": {
-        "Cunning": 50
+        "Cunning": 10
       }
     },
     {
@@ -174,10 +174,10 @@
       "emoji": "🪶",
       "description": "This Player flies around with their cape",
       "bonuses": {
-        "Lift": 50
+        "Lift": 25
       },
       "penalties": {
-        "Vision": 50
+        "Vision": 10
       }
     },
     {
@@ -186,10 +186,10 @@
       "emoji": "🦏",
       "description": "This Player charges ahead",
       "bonuses": {
-        "Speed": 50
+        "Speed": 25
       },
       "penalties": {
-        "Insight": 50
+        "Insight": 10
       }
     },
     {
@@ -198,10 +198,10 @@
       "emoji": "🧹",
       "description": "This Player stays completely clean",
       "bonuses": {
-        "Discipline": 50
+        "Discipline": 25
       },
       "penalties": {
-        "Determination": 50
+        "Determination": 10
       }
     },
     {
@@ -210,10 +210,10 @@
       "emoji": "🕰️",
       "description": "This Player pitches on perfect time",
       "bonuses": {
-        "Control": 50
+        "Control": 25
       },
       "penalties": {
-        "Stamina": 50
+        "Stamina": 10
       }
     },
     {
@@ -222,10 +222,10 @@
       "emoji": "🤷",
       "description": "This Player is a little mixed up",
       "bonuses": {
-        "Deception": 50
+        "Deception": 25
       },
       "penalties": {
-        "Accuracy": 50
+        "Accuracy": 10
       }
     },
     {
@@ -234,10 +234,10 @@
       "emoji": "🕊️",
       "description": "This Player carries the mail",
       "bonuses": {
-        "Persuasion": 50
+        "Persuasion": 25
       },
       "penalties": {
-        "Stuff": 50
+        "Stuff": 10
       }
     },
     {
@@ -246,10 +246,10 @@
       "emoji": "🚲",
       "description": "This Player is riding a bike",
       "bonuses": {
-        "Velocity": 50
+        "Velocity": 25
       },
       "penalties": {
-        "Deception": 50
+        "Deception": 10
       }
     },
     {
@@ -258,10 +258,10 @@
       "emoji": "🌪️",
       "description": "This Player is a rolling storm",
       "bonuses": {
-        "Rotation": 50
+        "Rotation": 25
       },
       "penalties": {
-        "Presence": 50
+        "Presence": 10
       }
     },
     {
@@ -270,10 +270,10 @@
       "emoji": "🔭",
       "description": "This Player never loses the mark",
       "bonuses": {
-        "Aiming": 50
+        "Aiming": 25
       },
       "penalties": {
-        "Determination": 50
+        "Determination": 10
       }
     },
     {
@@ -282,10 +282,10 @@
       "emoji": "😈",
       "description": "This Player is possessed by infernal power",
       "bonuses": {
-        "Defiance": 50
+        "Defiance": 25
       },
       "penalties": {
-        "Control": 50
+        "Control": 10
       }
     },
     {
@@ -294,10 +294,10 @@
       "emoji": "🎥",
       "description": "This Player is on set",
       "bonuses": {
-        "Control": 50
+        "Control": 25
       },
       "penalties": {
-        "Accuracy": 50
+        "Accuracy": 10
       }
     },
     {
@@ -306,10 +306,10 @@
       "emoji": "🌳",
       "description": "This Player's is disguising as a tree",
       "bonuses": {
-        "Deception": 50
+        "Deception": 25
       },
       "penalties": {
-        "Velocity": 50
+        "Velocity": 10
       }
     },
     {
@@ -318,10 +318,10 @@
       "emoji": "🐲",
       "description": "This Player channels draconic might",
       "bonuses": {
-        "Muscle": 50
+        "Muscle": 25
       },
       "penalties": {
-        "Aiming": 50
+        "Aiming": 10
       }
     },
     {
@@ -330,10 +330,10 @@
       "emoji": "🦅",
       "description": "This Player locks onto the target",
       "bonuses": {
-        "Aiming": 50
+        "Aiming": 25
       },
       "penalties": {
-        "Cunning": 50
+        "Cunning": 10
       }
     },
     {
@@ -342,10 +342,10 @@
       "emoji": "⛰️",
       "description": "This Player stands like stone",
       "bonuses": {
-        "Determination": 50
+        "Determination": 25
       },
       "penalties": {
-        "Stealth": 50
+        "Stealth": 10
       }
     },
     {
@@ -354,10 +354,10 @@
       "emoji": "🧝",
       "description": "This Player has pointy ears",
       "bonuses": {
-        "Intuition": 50
+        "Intuition": 25
       },
       "penalties": {
-        "Persuasion": 50
+        "Persuasion": 10
       }
     },
     {
@@ -366,10 +366,10 @@
       "emoji": "⛏️",
       "description": "This Player is digging",
       "bonuses": {
-        "Greed": 50
+        "Greed": 25
       },
       "penalties": {
-        "Muscle": 50
+        "Muscle": 10
       }
     },
     {
@@ -378,10 +378,10 @@
       "emoji": "🧚",
       "description": "This Player is touched by the Fae",
       "bonuses": {
-        "Cunning": 50
+        "Cunning": 25
       },
       "penalties": {
-        "Discipline": 50
+        "Discipline": 10
       }
     },
     {
@@ -390,10 +390,10 @@
       "emoji": "🐺",
       "description": "This Player trusts their instincts",
       "bonuses": {
-        "Intuition": 50
+        "Intuition": 25
       },
       "penalties": {
-        "Stamina": 50
+        "Stamina": 10
       }
     },
     {
@@ -402,10 +402,10 @@
       "emoji": "🔥",
       "description": "This Player burns with elemental fire",
       "bonuses": {
-        "Lift": 50
+        "Lift": 25
       },
       "penalties": {
-        "Selflessness": 50
+        "Selflessness": 10
       }
     },
     {
@@ -414,10 +414,10 @@
       "emoji": "♟️",
       "description": "This Player plays the long con",
       "bonuses": {
-        "Deception": 50
+        "Deception": 25
       },
       "penalties": {
-        "Rotation": 50
+        "Rotation": 10
       }
     },
     {
@@ -426,10 +426,10 @@
       "emoji": "📐",
       "description": "This Player has mastered geometry",
       "bonuses": {
-        "Rotation": 50
+        "Rotation": 25
       },
       "penalties": {
-        "Stamina": 50
+        "Stamina": 10
       }
     },
     {
@@ -438,10 +438,10 @@
       "emoji": "🗿",
       "description": "This Player is gigantic",
       "bonuses": {
-        "Intimidation": 50
+        "Intimidation": 25
       },
       "penalties": {
-        "Insight": 50
+        "Insight": 10
       }
     },
     {
@@ -450,10 +450,10 @@
       "emoji": "🦍",
       "description": "This Player wins with brute force",
       "bonuses": {
-        "Muscle": 50
+        "Muscle": 25
       },
       "penalties": {
-        "Cunning": 50
+        "Cunning": 10
       }
     },
     {
@@ -462,10 +462,10 @@
       "emoji": "🏔️",
       "description": "This Player is solid",
       "bonuses": {
-        "Muscle": 50
+        "Muscle": 25
       },
       "penalties": {
-        "Determination": 50
+        "Determination": 10
       }
     },
     {
@@ -474,10 +474,10 @@
       "emoji": "🌱",
       "description": "This Player stays planted in the ground",
       "bonuses": {
-        "Contact": 50
+        "Contact": 25
       },
       "penalties": {
-        "Lift": 50
+        "Lift": 10
       }
     },
     {
@@ -486,10 +486,10 @@
       "emoji": "🐑",
       "description": "This Player stands guard",
       "bonuses": {
-        "Selflessness": 50
+        "Selflessness": 25
       },
       "penalties": {
-        "Intimidation": 50
+        "Intimidation": 10
       }
     },
     {
@@ -498,10 +498,10 @@
       "emoji": "🐪",
       "description": "This Player is hardy",
       "bonuses": {
-        "Stamina": 50
+        "Stamina": 25
       },
       "penalties": {
-        "Velocity": 50
+        "Velocity": 10
       }
     },
     {
@@ -510,10 +510,10 @@
       "emoji": "🎤",
       "description": "This Player owns the stage",
       "bonuses": {
-        "Presence": 50
+        "Presence": 25
       },
       "penalties": {
-        "Velocity": 50
+        "Velocity": 10
       }
     },
     {
@@ -522,10 +522,10 @@
       "emoji": "🪄",
       "description": "This Player's pitches are cursed",
       "bonuses": {
-        "Stuff": 50
+        "Stuff": 25
       },
       "penalties": {
-        "Stamina": 50
+        "Stamina": 10
       }
     },
     {
@@ -534,10 +534,10 @@
       "emoji": "🕳️",
       "description": "This Player is full of holes",
       "bonuses": {
-        "Stealth": 50
+        "Stealth": 25
       },
       "penalties": {
-        "Greed": 50
+        "Greed": 10
       }
     },
     {
@@ -546,10 +546,10 @@
       "emoji": "🌅",
       "description": "This Player can see beyond the horizon",
       "bonuses": {
-        "Vision": 50
+        "Vision": 25
       },
       "penalties": {
-        "Wisdom": 50
+        "Wisdom": 10
       }
     },
     {
@@ -558,10 +558,10 @@
       "emoji": "🤢",
       "description": "This Player is not feeling well",
       "bonuses": {
-        "Guts": 50
+        "Guts": 25
       },
       "penalties": {
-        "Deception": 50
+        "Deception": 10
       }
     },
     {
@@ -570,10 +570,10 @@
       "emoji": "🐞",
       "description": "This Player takes on an insect form",
       "bonuses": {
-        "Cunning": 50
+        "Cunning": 25
       },
       "penalties": {
-        "Determination": 50
+        "Determination": 10
       }
     },
     {
@@ -582,10 +582,10 @@
       "emoji": "⚙️",
       "description": "This Player grinds on without pause",
       "bonuses": {
-        "Determination": 50
+        "Determination": 25
       },
       "penalties": {
-        "Greed": 50
+        "Greed": 10
       }
     },
     {
@@ -594,10 +594,10 @@
       "emoji": "💖",
       "description": "This Player lifts everyone around them",
       "bonuses": {
-        "Selflessness": 50
+        "Selflessness": 25
       },
       "penalties": {
-        "Discipline": 50
+        "Discipline": 10
       }
     },
     {
@@ -606,10 +606,10 @@
       "emoji": "🪁",
       "description": "This Player is attached to a kite",
       "bonuses": {
-        "Lift": 50
+        "Lift": 25
       },
       "penalties": {
-        "Stealth": 50
+        "Stealth": 10
       }
     },
     {
@@ -618,10 +618,10 @@
       "emoji": "🍃",
       "description": "This Player is a leaf on the wind",
       "bonuses": {
-        "Speed": 50
+        "Speed": 25
       },
       "penalties": {
-        "Intimidation": 50
+        "Intimidation": 10
       }
     },
     {
@@ -630,10 +630,10 @@
       "emoji": "🦁",
       "description": "This Player roars at pressure",
       "bonuses": {
-        "Guts": 50
+        "Guts": 25
       },
       "penalties": {
-        "Accuracy": 50
+        "Accuracy": 10
       }
     },
     {
@@ -642,10 +642,10 @@
       "emoji": "🐕",
       "description": "This Player's loyalty shines",
       "bonuses": {
-        "Selflessness": 50
+        "Selflessness": 25
       },
       "penalties": {
-        "Insight": 50
+        "Insight": 10
       }
     },
     {
@@ -654,10 +654,10 @@
       "emoji": "🧲",
       "description": "This Player attracts things to them",
       "bonuses": {
-        "Greed": 50
+        "Greed": 25
       },
       "penalties": {
-        "Performance": 50
+        "Performance": 10
       }
     },
     {
@@ -666,10 +666,10 @@
       "emoji": "🦬",
       "description": "This Player's majesty is undeniable",
       "bonuses": {
-        "Presence": 50
+        "Presence": 25
       },
       "penalties": {
-        "Accuracy": 50
+        "Accuracy": 10
       }
     },
     {
@@ -678,10 +678,10 @@
       "emoji": "🏃",
       "description": "This Player really likes running",
       "bonuses": {
-        "Speed": 50
+        "Speed": 25
       },
       "penalties": {
-        "Lift": 50
+        "Lift": 10
       }
     },
     {
@@ -690,10 +690,10 @@
       "emoji": "🧜",
       "description": "This Player embraces the tides",
       "bonuses": {
-        "Wisdom": 50
+        "Wisdom": 25
       },
       "penalties": {
-        "Stealth": 50
+        "Stealth": 10
       }
     },
     {
@@ -702,10 +702,10 @@
       "emoji": "☄️",
       "description": "This Player is a shooting star",
       "bonuses": {
-        "Velocity": 50
+        "Velocity": 25
       },
       "penalties": {
-        "Accuracy": 50
+        "Accuracy": 10
       }
     },
     {
@@ -714,10 +714,10 @@
       "emoji": "🎼",
       "description": "This Player keeps the rhythm",
       "bonuses": {
-        "Discipline": 50
+        "Discipline": 25
       },
       "penalties": {
-        "Contact": 50
+        "Contact": 10
       }
     },
     {
@@ -726,10 +726,10 @@
       "emoji": "☠️",
       "description": "This Player leaves a toxic wake",
       "bonuses": {
-        "Stuff": 50
+        "Stuff": 25
       },
       "penalties": {
-        "Presence": 50
+        "Presence": 10
       }
     },
     {
@@ -738,10 +738,10 @@
       "emoji": "🐒",
       "description": "This Player is monkeying around",
       "bonuses": {
-        "Performance": 50
+        "Performance": 25
       },
       "penalties": {
-        "Stealth": 50
+        "Stealth": 10
       }
     },
     {
@@ -750,10 +750,10 @@
       "emoji": "⛵",
       "description": "This Player charts the seas",
       "bonuses": {
-        "Control": 50
+        "Control": 25
       },
       "penalties": {
-        "Rotation": 50
+        "Rotation": 10
       }
     },
     {
@@ -762,10 +762,10 @@
       "emoji": "🪡",
       "description": "This Player can thread the needle",
       "bonuses": {
-        "Stealth": 50
+        "Stealth": 25
       },
       "penalties": {
-        "Aiming": 50
+        "Aiming": 10
       }
     },
     {
@@ -774,10 +774,10 @@
       "emoji": "🌙",
       "description": "This Player thrives in darkness",
       "bonuses": {
-        "Stealth": 50
+        "Stealth": 25
       },
       "penalties": {
-        "Speed": 50
+        "Speed": 10
       }
     },
     {
@@ -786,10 +786,10 @@
       "emoji": "🦉",
       "description": "This Player watches every detail",
       "bonuses": {
-        "Insight": 50
+        "Insight": 25
       },
       "penalties": {
-        "Muscle": 50
+        "Muscle": 10
       }
     },
     {
@@ -798,10 +798,10 @@
       "emoji": "👹",
       "description": "This Player looms large",
       "bonuses": {
-        "Intimidation": 50
+        "Intimidation": 25
       },
       "penalties": {
-        "Wisdom": 50
+        "Wisdom": 10
       }
     },
     {
@@ -810,10 +810,10 @@
       "emoji": "⚾",
       "description": "This Player trains with the basics",
       "bonuses": {
-        "Contact": 50
+        "Contact": 25
       },
       "penalties": {
-        "Muscle": 50
+        "Muscle": 10
       }
     },
     {
@@ -822,10 +822,10 @@
       "emoji": "💬",
       "description": "This Player talks a lot",
       "bonuses": {
-        "Persuasion": 50
+        "Persuasion": 25
       },
       "penalties": {
-        "Velocity": 50
+        "Velocity": 10
       }
     },
     {
@@ -834,10 +834,10 @@
       "emoji": "🤝",
       "description": "This Player smooths over every dispute",
       "bonuses": {
-        "Persuasion": 50
+        "Persuasion": 25
       },
       "penalties": {
-        "Defiance": 50
+        "Defiance": 10
       }
     },
     {
@@ -846,10 +846,10 @@
       "emoji": "📌",
       "description": "This Player has pinpoint precision",
       "bonuses": {
-        "Accuracy": 50
+        "Accuracy": 25
       },
       "penalties": {
-        "Velocity": 50
+        "Velocity": 10
       }
     },
     {
@@ -858,10 +858,10 @@
       "emoji": "🐠",
       "description": "This Player is very playful",
       "bonuses": {
-        "Performance": 50
+        "Performance": 25
       },
       "penalties": {
-        "Muscle": 50
+        "Muscle": 10
       }
     },
     {
@@ -870,10 +870,10 @@
       "emoji": "🔮",
       "description": "This Player glimpses the future",
       "bonuses": {
-        "Intuition": 50
+        "Intuition": 25
       },
       "penalties": {
-        "Rotation": 50
+        "Rotation": 10
       }
     },
     {
@@ -882,10 +882,10 @@
       "emoji": "🏈",
       "description": "This Player is a quarterback",
       "bonuses": {
-        "Accuracy": 50
+        "Accuracy": 25
       },
       "penalties": {
-        "Control": 50
+        "Control": 10
       }
     },
     {
@@ -894,10 +894,10 @@
       "emoji": "🧙",
       "description": "This Player always offers good advice",
       "bonuses": {
-        "Wisdom": 50
+        "Wisdom": 25
       },
       "penalties": {
-        "Vision": 50
+        "Vision": 10
       }
     },
     {
@@ -906,10 +906,10 @@
       "emoji": "🛰️",
       "description": "This Player can see the ball from orbit",
       "bonuses": {
-        "Vision": 50
+        "Vision": 25
       },
       "penalties": {
-        "Muscle": 50
+        "Muscle": 10
       }
     },
     {
@@ -918,10 +918,10 @@
       "emoji": "🛴",
       "description": "This Player hops on a scooter",
       "bonuses": {
-        "Speed": 50
+        "Speed": 25
       },
       "penalties": {
-        "Discipline": 50
+        "Discipline": 10
       }
     },
     {
@@ -930,10 +930,10 @@
       "emoji": "🌬️",
       "description": "This Player breathes in extra innings",
       "bonuses": {
-        "Stamina": 50
+        "Stamina": 25
       },
       "penalties": {
-        "Accuracy": 50
+        "Accuracy": 10
       }
     },
     {
@@ -942,10 +942,10 @@
       "emoji": "👁️",
       "description": "This Player reads the room at a glance",
       "bonuses": {
-        "Intuition": 50
+        "Intuition": 25
       },
       "penalties": {
-        "Presence": 50
+        "Presence": 10
       }
     },
     {
@@ -954,10 +954,10 @@
       "emoji": "🌟",
       "description": "This Player shines brightly",
       "bonuses": {
-        "Vision": 50
+        "Vision": 25
       },
       "penalties": {
-        "Performance": 50
+        "Performance": 10
       }
     },
     {
@@ -966,10 +966,10 @@
       "emoji": "🛒",
       "description": "This Player shops til' they drop",
       "bonuses": {
-        "Rotation": 50
+        "Rotation": 25
       },
       "penalties": {
-        "Persuasion": 50
+        "Persuasion": 10
       }
     },
     {
@@ -978,10 +978,10 @@
       "emoji": "🦊",
       "description": "This Player moves unseen",
       "bonuses": {
-        "Cunning": 50
+        "Cunning": 25
       },
       "penalties": {
-        "Intimidation": 50
+        "Intimidation": 10
       }
     },
     {
@@ -990,10 +990,10 @@
       "emoji": "☃️",
       "description": "This Player waits patiently",
       "bonuses": {
-        "Discipline": 50
+        "Discipline": 25
       },
       "penalties": {
-        "Aiming": 50
+        "Aiming": 10
       }
     },
     {
@@ -1002,10 +1002,10 @@
       "emoji": "🥎",
       "description": "This Player pitches with a softball",
       "bonuses": {
-        "Stuff": 50
+        "Stuff": 25
       },
       "penalties": {
-        "Rotation": 50
+        "Rotation": 10
       }
     },
     {
@@ -1014,10 +1014,10 @@
       "emoji": "🤖",
       "description": "This Player has assumed a ROBO",
       "bonuses": {
-        "Accuracy": 50
+        "Accuracy": 25
       },
       "penalties": {
-        "Deception": 50
+        "Deception": 10
       }
     },
     {
@@ -1026,10 +1026,10 @@
       "emoji": "👻",
       "description": "This Player is mostly transparent",
       "bonuses": {
-        "Stealth": 50
+        "Stealth": 25
       },
       "penalties": {
-        "Contact": 50
+        "Contact": 10
       }
     },
     {
@@ -1038,10 +1038,10 @@
       "emoji": "✨",
       "description": "This Player craves attention",
       "bonuses": {
-        "Presence": 50
+        "Presence": 25
       },
       "penalties": {
-        "Intuition": 50
+        "Intuition": 10
       }
     },
     {
@@ -1050,10 +1050,10 @@
       "emoji": "🌠",
       "description": "This Player likes looking at the stars",
       "bonuses": {
-        "Insight": 50
+        "Insight": 25
       },
       "penalties": {
-        "Discipline": 50
+        "Discipline": 10
       }
     },
     {
@@ -1062,10 +1062,10 @@
       "emoji": "🪨",
       "description": "This Player is made of stone",
       "bonuses": {
-        "Guts": 50
+        "Guts": 25
       },
       "penalties": {
-        "Control": 50
+        "Control": 10
       }
     },
     {
@@ -1074,10 +1074,10 @@
       "emoji": "🧱",
       "description": "This Player refuses to budge",
       "bonuses": {
-        "Defiance": 50
+        "Defiance": 25
       },
       "penalties": {
-        "Intuition": 50
+        "Intuition": 10
       }
     },
     {
@@ -1086,10 +1086,10 @@
       "emoji": "⛈️",
       "description": "This Player rides the storm",
       "bonuses": {
-        "Velocity": 50
+        "Velocity": 25
       },
       "penalties": {
-        "Control": 50
+        "Control": 10
       }
     },
     {
@@ -1098,10 +1098,10 @@
       "emoji": "⚽",
       "description": "This Player is good at soccer",
       "bonuses": {
-        "Insight": 50
+        "Insight": 25
       },
       "penalties": {
-        "Lift": 50
+        "Lift": 10
       }
     },
     {
@@ -1110,10 +1110,10 @@
       "emoji": "🍬",
       "description": "This Player needs more candy",
       "bonuses": {
-        "Contact": 50
+        "Contact": 25
       },
       "penalties": {
-        "Aiming": 50
+        "Aiming": 10
       }
     },
     {
@@ -1122,10 +1122,10 @@
       "emoji": "🖥️",
       "description": "This Player is knowledgeable about tech",
       "bonuses": {
-        "Insight": 50
+        "Insight": 25
       },
       "penalties": {
-        "Intimidation": 50
+        "Intimidation": 10
       }
     },
     {
@@ -1134,10 +1134,10 @@
       "emoji": "🦡",
       "description": "This Player digs in",
       "bonuses": {
-        "Guts": 50
+        "Guts": 25
       },
       "penalties": {
-        "Intuition": 50
+        "Intuition": 10
       }
     },
     {
@@ -1146,10 +1146,10 @@
       "emoji": "🚦",
       "description": "This Player sees the light",
       "bonuses": {
-        "Vision": 50
+        "Vision": 25
       },
       "penalties": {
-        "Speed": 50
+        "Speed": 10
       }
     },
     {
@@ -1158,10 +1158,10 @@
       "emoji": "🦝",
       "description": "This Player likes other people's stuff",
       "bonuses": {
-        "Greed": 50
+        "Greed": 25
       },
       "penalties": {
-        "Wisdom": 50
+        "Wisdom": 10
       }
     },
     {
@@ -1170,10 +1170,10 @@
       "emoji": "🐎",
       "description": "This Player is purebred speed",
       "bonuses": {
-        "Performance": 50
+        "Performance": 25
       },
       "penalties": {
-        "Cunning": 50
+        "Cunning": 10
       }
     },
     {
@@ -1182,10 +1182,10 @@
       "emoji": "🐜",
       "description": "This Player never tires",
       "bonuses": {
-        "Stamina": 50
+        "Stamina": 25
       },
       "penalties": {
-        "Guts": 50
+        "Guts": 10
       }
     },
     {
@@ -1194,10 +1194,10 @@
       "emoji": "🐘",
       "description": "This Player moves like a colossus",
       "bonuses": {
-        "Muscle": 50
+        "Muscle": 25
       },
       "penalties": {
-        "Contact": 50
+        "Contact": 10
       }
     },
     {
@@ -1206,10 +1206,10 @@
       "emoji": "🗺️",
       "description": "This Player has a map",
       "bonuses": {
-        "Greed": 50
+        "Greed": 25
       },
       "penalties": {
-        "Vision": 50
+        "Vision": 10
       }
     },
     {
@@ -1218,10 +1218,10 @@
       "emoji": "🐗",
       "description": "This Player tusks are on display",
       "bonuses": {
-        "Intimidation": 50
+        "Intimidation": 25
       },
       "penalties": {
-        "Performance": 50
+        "Performance": 10
       }
     },
     {
@@ -1230,10 +1230,10 @@
       "emoji": "🛸",
       "description": "This Player takes flight",
       "bonuses": {
-        "Lift": 50
+        "Lift": 25
       },
       "penalties": {
-        "Greed": 50
+        "Greed": 10
       }
     },
     {
@@ -1242,10 +1242,10 @@
       "emoji": "🧟",
       "description": "This Player rises as Undead",
       "bonuses": {
-        "Determination": 50
+        "Determination": 25
       },
       "penalties": {
-        "Speed": 50
+        "Speed": 10
       }
     },
     {
@@ -1254,10 +1254,10 @@
       "emoji": "🧛",
       "description": "This Player has a taste for blood",
       "bonuses": {
-        "Cunning": 50
+        "Cunning": 25
       },
       "penalties": {
-        "Vision": 50
+        "Vision": 10
       }
     },
     {
@@ -1266,10 +1266,10 @@
       "emoji": "🐍",
       "description": "This Player's touch is venom",
       "bonuses": {
-        "Stuff": 50
+        "Stuff": 25
       },
       "penalties": {
-        "Persuasion": 50
+        "Persuasion": 10
       }
     },
     {
@@ -1278,10 +1278,10 @@
       "emoji": "💧",
       "description": "This Player flows like water",
       "bonuses": {
-        "Contact": 50
+        "Contact": 25
       },
       "penalties": {
-        "Intimidation": 50
+        "Intimidation": 10
       }
     },
     {
@@ -1290,10 +1290,10 @@
       "emoji": "🧵",
       "description": "This Player weaves magic into each pitch",
       "bonuses": {
-        "Deception": 50
+        "Deception": 25
       },
       "penalties": {
-        "Stuff": 50
+        "Stuff": 10
       }
     },
     {
@@ -1302,10 +1302,10 @@
       "emoji": "🎡",
       "description": "This Player likes to roll around",
       "bonuses": {
-        "Rotation": 50
+        "Rotation": 25
       },
       "penalties": {
-        "Stuff": 50
+        "Stuff": 10
       }
     },
     {
@@ -1314,10 +1314,10 @@
       "emoji": "🃏",
       "description": "This Player never plays by the book",
       "bonuses": {
-        "Defiance": 50
+        "Defiance": 25
       },
       "penalties": {
-        "Deception": 50
+        "Deception": 10
       }
     },
     {
@@ -1326,10 +1326,10 @@
       "emoji": "🛩️",
       "description": "This Player boosts others into the sky",
       "bonuses": {
-        "Selflessness": 50
+        "Selflessness": 25
       },
       "penalties": {
-        "Lift": 50
+        "Lift": 10
       }
     },
     {
@@ -1338,10 +1338,10 @@
       "emoji": "🐢",
       "description": "This Player grows wise",
       "bonuses": {
-        "Wisdom": 50
+        "Wisdom": 25
       },
       "penalties": {
-        "Greed": 50
+        "Greed": 10
       }
     }
   ],

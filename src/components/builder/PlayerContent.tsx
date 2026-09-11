@@ -16,7 +16,8 @@ import { ExportShare } from "./ExportShare";
 import { useBoonEmojis } from "@/hooks/use-boon-emojis";
 import { recommendStatPriorities, recommendBoonsByLevel, scoreBoons } from "@/lib/advisor";
 import type { BoonData } from "@/lib/advisor";
-import { loadBoons } from "@/lib/evaluator-data";
+import { loadBoons, getBoonLookup } from "@/lib/evaluator-data";
+import { computeEquippedStats } from "@/lib/equipped-stats";
 import { calculateProgress, generateMilestones } from "@/lib/planner-utils";
 import { optimizePitchArsenal, computePitchFitPct, computeArchetypeFitPct, computePitchChips } from "@/lib/optimizer";
 import { S11, calculateDefenseTarget } from "@/lib/mechanics";
@@ -77,6 +78,23 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
       .catch(() => {});
     return () => { cancelled = true; };
   }, []);
+
+  // Load boon bonus/penalty lookup for the display-only "with items + boons" totals.
+  const [boonLookup, setBoonLookup] = useState<Map<string, { bonuses: Record<string, number>; penalties: Record<string, number> }>>(new Map());
+  useEffect(() => {
+    let cancelled = false;
+    getBoonLookup()
+      .then((m) => { if (!cancelled) setBoonLookup(m); }) // eslint-disable-line react-hooks/set-state-in-effect -- async load
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  // Per-stat totals with equipped items + boons folded in (display-only; drives
+  // the stat grid's Base / With-items+boons toggle, never the planning math).
+  const equippedStats = useMemo(
+    () => computeEquippedStats(player, boonLookup),
+    [player, boonLookup],
+  );
 
   // Load position defense weights for defense stat highlighting + targets
   const [posDefenseWeights, setPosDefenseWeights] = useState<Record<string, number>>({});
@@ -329,6 +347,7 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
       <div className="space-y-2 min-w-0 flex flex-col">
         <StatGridInteractive
           stats={player.stats}
+          equippedStats={equippedStats}
           highlightStats={highlightStats}
           priorityStats={priorityStatsList}
           pitchChips={pitchChips}

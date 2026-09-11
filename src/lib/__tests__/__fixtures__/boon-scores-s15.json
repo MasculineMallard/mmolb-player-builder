@@ -6,15 +6,7 @@
       "bonusTier": "T1",
       "penaltyStat": "intimidation",
       "penaltyTier": "T2",
-      "score": 315
-    },
-    {
-      "boonName": "Mischievous",
-      "bonusStat": "performance",
-      "bonusTier": "T1",
-      "penaltyStat": "stealth",
-      "penaltyTier": "off-role",
-      "score": 300
+      "score": 175.5
     },
     {
       "boonName": "Grounded",
@@ -22,39 +14,7 @@
       "bonusTier": "T1",
       "penaltyStat": "lift",
       "penaltyTier": "T2",
-      "score": 295
-    },
-    {
-      "boonName": "Thoroughbred",
-      "bonusStat": "performance",
-      "bonusTier": "T1",
-      "penaltyStat": "cunning",
-      "penaltyTier": "T3",
-      "score": 280
-    },
-    {
-      "boonName": "Eagle-eye",
-      "bonusStat": "aiming",
-      "bonusTier": "T1",
-      "penaltyStat": "cunning",
-      "penaltyTier": "T3",
-      "score": 250
-    },
-    {
-      "boonName": "Calculated",
-      "bonusStat": "discipline",
-      "bonusTier": "T1",
-      "penaltyStat": "cunning",
-      "penaltyTier": "T3",
-      "score": 205
-    },
-    {
-      "boonName": "Deadeye",
-      "bonusStat": "aiming",
-      "bonusTier": "T1",
-      "penaltyStat": "determination",
-      "penaltyTier": "T2",
-      "score": 200
+      "score": 171.5
     },
     {
       "boonName": "One With All",
@@ -62,7 +22,47 @@
       "bonusTier": "T1",
       "penaltyStat": "muscle",
       "penaltyTier": "T1",
-      "score": 195
+      "score": 151.5
+    },
+    {
+      "boonName": "Mischievous",
+      "bonusStat": "performance",
+      "bonusTier": "T1",
+      "penaltyStat": "stealth",
+      "penaltyTier": "off-role",
+      "score": 150
+    },
+    {
+      "boonName": "Thoroughbred",
+      "bonusStat": "performance",
+      "bonusTier": "T1",
+      "penaltyStat": "cunning",
+      "penaltyTier": "T3",
+      "score": 146
+    },
+    {
+      "boonName": "Sweet Tooth",
+      "bonusStat": "contact",
+      "bonusTier": "T1",
+      "penaltyStat": "aiming",
+      "penaltyTier": "T1",
+      "score": 133.5
+    },
+    {
+      "boonName": "Eagle-eye",
+      "bonusStat": "aiming",
+      "bonusTier": "T1",
+      "penaltyStat": "cunning",
+      "penaltyTier": "T3",
+      "score": 131
+    },
+    {
+      "boonName": "Deadeye",
+      "bonusStat": "aiming",
+      "bonusTier": "T1",
+      "penaltyStat": "determination",
+      "penaltyTier": "T2",
+      "score": 121
     }
   ],
   "pitcher": [
@@ -72,7 +72,7 @@
       "bonusTier": "T1",
       "penaltyStat": "deception",
       "penaltyTier": "T2",
-      "score": 340
+      "score": 203
     },
     {
       "boonName": "Meteor",
@@ -80,7 +80,7 @@
       "bonusTier": "T1",
       "penaltyStat": "accuracy",
       "penaltyTier": "T2",
-      "score": 320
+      "score": 199
     },
     {
       "boonName": "Clockwork",
@@ -88,7 +88,7 @@
       "bonusTier": "T1",
       "penaltyStat": "stamina",
       "penaltyTier": "T2",
-      "score": 275
+      "score": 167.5
     },
     {
       "boonName": "Director",
@@ -96,7 +96,23 @@
       "bonusTier": "T1",
       "penaltyStat": "accuracy",
       "penaltyTier": "T2",
-      "score": 245
+      "score": 161.5
+    },
+    {
+      "boonName": "Afterburner",
+      "bonusStat": "velocity",
+      "bonusTier": "T1",
+      "penaltyStat": "stuff",
+      "penaltyTier": "T1",
+      "score": 159
+    },
+    {
+      "boonName": "Stormrider",
+      "bonusStat": "velocity",
+      "bonusTier": "T1",
+      "penaltyStat": "control",
+      "penaltyTier": "T1",
+      "score": 150
     },
     {
       "boonName": "Venomous",
@@ -104,7 +120,7 @@
       "bonusTier": "T1",
       "penaltyStat": "persuasion",
       "penaltyTier": "T2",
-      "score": 240
+      "score": 147
     },
     {
       "boonName": "Hextouch",
@@ -112,23 +128,7 @@
       "bonusTier": "T1",
       "penaltyStat": "stamina",
       "penaltyTier": "T2",
-      "score": 230
-    },
-    {
-      "boonName": "Shopper",
-      "bonusStat": "rotation",
-      "bonusTier": "T1",
-      "penaltyStat": "persuasion",
-      "penaltyTier": "T2",
-      "score": 210
-    },
-    {
-      "boonName": "Spotlight",
-      "bonusStat": "presence",
-      "bonusTier": "T1",
-      "penaltyStat": "intuition",
-      "penaltyTier": "T3",
-      "score": 201
+      "score": 145
     }
   ]
 }
