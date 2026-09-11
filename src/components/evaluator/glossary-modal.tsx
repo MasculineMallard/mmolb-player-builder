@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MULCH_MIN_PA, MULCH_MIN_IP } from "@/lib/constants";
 
 export function GlossaryButton() {
   const [open, setOpen] = useState(false);
@@ -138,6 +139,12 @@ export function GlossaryButton() {
                   <div><span className="text-foreground">DEFENSE_LOCKED:</span> Position-critical defense stat at 0, level &gt; 15.</div>
                   <div><span className="text-foreground">MAXED_BOTTOM_QUARTILE:</span> Level 30 with game stats in bottom 25%.</div>
                 </div>
+              </section>
+
+              {/* Minimum sample */}
+              <section>
+                <h3 className="text-foreground font-semibold mb-1">Minimum Sample</h3>
+                <p>A player&apos;s game stats only count once they reach {MULCH_MIN_PA} plate appearances (batters) or {MULCH_MIN_IP} innings pitched (pitchers). Below that, the Stats pillar shows N/A and drops out of the composite, so a tiny sample (like a one-inning outing) can&apos;t swing the rating. Attributes, fit, and growth still score.</p>
               </section>
 
               {/* Recomps */}

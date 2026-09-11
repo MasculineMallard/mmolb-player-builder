@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import type { TeamSearchResult, RosterPlayer, PlayerData, Archetype } from "@/lib/types";
 import type { EvaluatedPlayer, GameStats, PlayerRole } from "@/lib/evaluator-types";
 import { GlossaryButton } from "@/components/evaluator/glossary-modal";
@@ -17,7 +17,7 @@ import {
 import { buildRosterReport } from "@/lib/evaluator-report";
 import { RosterTable } from "@/components/evaluator/roster-table";
 import { useTeamSearch } from "@/hooks/use-team-search";
-import { BASE_PATH } from "@/lib/constants";
+import { BASE_PATH, MULCH_MIN_PA, MULCH_MIN_IP } from "@/lib/constants";
 import { usePlayerStore } from "@/store/player-store";
 
 interface EvalRefData {
@@ -29,20 +29,16 @@ interface EvalRefData {
 }
 
 /**
- * Apply the user's minimum-sample gate: a player's season stats only count once
- * they clear the minimum PA (batters) / IP (pitchers). Below that, return null so
- * the stats pillar drops out of the composite (no boost from a tiny sample).
+ * Apply the fixed minimum-sample gate: a player's season stats only count once
+ * they clear MULCH_MIN_PA (batters) / MULCH_MIN_IP (pitchers). Below that, return
+ * null so the stats pillar drops out of the composite (no boost/penalty from a
+ * tiny sample). See the "How It Works" panel + player detail for the explanation.
  */
-function gateGameStats(
-  player: PlayerData,
-  role: PlayerRole,
-  minPA: number,
-  minIP: number,
-): GameStats | null {
+function gateGameStats(player: PlayerData, role: PlayerRole): GameStats | null {
   const gs = player.gameStats;
   if (!gs) return null;
-  if (role === "pitcher") return (gs.IP ?? 0) >= minIP ? gs : null;
-  return (gs.PA ?? 0) >= minPA ? gs : null;
+  if (role === "pitcher") return (gs.IP ?? 0) >= MULCH_MIN_IP ? gs : null;
+  return (gs.PA ?? 0) >= MULCH_MIN_PA ? gs : null;
 }
 
 type LoadState = "idle" | "loading" | "ready" | "error";
@@ -56,26 +52,18 @@ export function MulchView() {
   const [error, setError] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
   const evalRef = useRef<EvalRefData | null>(null);
-  // Raw fetched players + bench membership, kept so we can re-evaluate in place
-  // when the minimum-sample thresholds or a position override change (no re-fetch).
+  // Raw fetched players + bench membership, kept so a position override can
+  // re-evaluate in place without a re-fetch.
   const playersRef = useRef<PlayerData[]>([]);
   const benchIdsRef = useRef<Set<string>>(new Set());
 
-  const mulchMinPA = usePlayerStore((s) => s.mulchMinPA);
-  const mulchMinIP = usePlayerStore((s) => s.mulchMinIP);
-  const setMulchMinPA = usePlayerStore((s) => s.setMulchMinPA);
-  const setMulchMinIP = usePlayerStore((s) => s.setMulchMinIP);
-
-  // Evaluate every fetched player against the current position overrides + sample
-  // thresholds. Reads live store values so it stays correct across changes.
+  // Evaluate every fetched player against the current position overrides, applying
+  // the fixed minimum-sample gate so tiny samples don't affect the score.
   const evaluateAll = useCallback((): EvaluatedPlayer[] => {
     const ref = evalRef.current;
     const players = playersRef.current;
     if (!ref || players.length === 0) return [];
-    const store = usePlayerStore.getState();
-    const overrides = store.playerPositionOverrides;
-    const minPA = store.mulchMinPA;
-    const minIP = store.mulchMinIP;
+    const overrides = usePlayerStore.getState().playerPositionOverrides;
     return players.map((player) => {
       let evalPlayer = player;
       const override = overrides[player.mmolbPlayerId];
@@ -86,7 +74,7 @@ export function MulchView() {
       }
       const role = getPlayerRole(evalPlayer.position);
       const archetypes = role === "pitcher" ? ref.pitcherArch : ref.batterArch;
-      const gs = gateGameStats(evalPlayer, role, minPA, minIP);
+      const gs = gateGameStats(evalPlayer, role);
       return evaluatePlayer(evalPlayer, gs, archetypes, ref.posDef, ref.boonLookup, ref.percentileTables ?? undefined);
     });
   }, []);
@@ -166,15 +154,8 @@ export function MulchView() {
     }
   }, [evaluateAll]);
 
-  // Re-evaluate in place when the minimum-sample thresholds change (no re-fetch).
-  useEffect(() => {
-    if (playersRef.current.length > 0) {
-      setEvaluated(evaluateAll());
-    }
-  }, [mulchMinPA, mulchMinIP, evaluateAll]);
-
   // Persist a manual position choice (e.g. DHs the API mislabels), then re-evaluate
-  // everyone so the change (and the current sample gate) is applied consistently.
+  // everyone so the change (and the fixed sample gate) is applied consistently.
   const handlePositionChange = useCallback((playerId: string, newPosition: string) => {
     usePlayerStore.getState().setPlayerPositionOverride(playerId, newPosition);
     setEvaluated(evaluateAll());
@@ -311,36 +292,6 @@ export function MulchView() {
                 {copied ? "Copied!" : "Copy Report"}
               </button>
             </div>
-          </div>
-          {/* Minimum-sample control: below these, a player's season stats show N/A
-              and drop out of the score, so a tiny sample can't inflate a rating. */}
-          <div className="flex items-center gap-x-3 gap-y-1.5 mb-3 text-xs text-muted-foreground flex-wrap">
-            <span className="font-medium text-foreground/80">Min sample for stats:</span>
-            <label className="flex items-center gap-1">
-              <input
-                type="number"
-                min={0}
-                max={999}
-                value={mulchMinPA}
-                onChange={(e) => setMulchMinPA(e.target.value === "" ? 0 : parseInt(e.target.value, 10))}
-                className="w-14 bg-muted border border-border rounded px-1.5 py-0.5 text-right tabular-nums text-foreground focus:outline-none focus:border-primary"
-                aria-label="Minimum plate appearances for a batter's stats to count"
-              />
-              <span>PA (batters)</span>
-            </label>
-            <label className="flex items-center gap-1">
-              <input
-                type="number"
-                min={0}
-                max={999}
-                value={mulchMinIP}
-                onChange={(e) => setMulchMinIP(e.target.value === "" ? 0 : parseInt(e.target.value, 10))}
-                className="w-14 bg-muted border border-border rounded px-1.5 py-0.5 text-right tabular-nums text-foreground focus:outline-none focus:border-primary"
-                aria-label="Minimum innings pitched for a pitcher's stats to count"
-              />
-              <span>IP (pitchers)</span>
-            </label>
-            <span className="text-muted-foreground/70">Below these, stats show N/A and don&apos;t affect the score.</span>
           </div>
           {evaluated.some(ev => ev.player.recomped) && (
             <div className="text-xs text-yellow-500 bg-yellow-500/10 border border-yellow-500/20 rounded-md px-3 py-1.5 mb-3">
