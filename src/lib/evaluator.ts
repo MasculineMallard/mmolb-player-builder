@@ -20,6 +20,7 @@ import {
   BATTING_STAT_WEIGHTS,
   PITCHING_STAT_WEIGHTS,
   getCompositeWeights,
+  positionFitTarget,
   type PositionDefenseMap,
 } from "./evaluator-data";
 import { calculatePrimaryPointsAtLevel, TOTAL_PRIMARY_POINTS, S11 } from "./mechanics";
@@ -231,12 +232,12 @@ export function computePositionFitScore(
   if (totalWeight === 0) return 100;
 
   // Fixed targets: primary 140, secondary 80. Catcher special case: 200.
-  const isCatcher = basePos === "C";
+  // Shared with explainFit's reasoning display via positionFitTarget.
   let weightedScore = 0;
 
   for (const [stat, weight] of Object.entries(weights)) {
     const value = player.stats[stat.toLowerCase()] ?? 0;
-    const target = isCatcher ? 200 : primaryStats.has(stat) ? 140 : 80;
+    const target = positionFitTarget(basePos, stat, primaryStats);
     const statScore = Math.min(1, value / target);
     weightedScore += statScore * weight;
   }
