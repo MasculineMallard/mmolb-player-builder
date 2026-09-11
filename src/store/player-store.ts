@@ -38,6 +38,12 @@ interface PlayerStore {
   // Keyed by `${playerId}::${archetypeId}` -> { statName: target }
   playerTargetOverrides: Record<string, Record<string, number>>;
 
+  // Mulch-o-Meter minimum sample size before a player's season stats count
+  // toward their score (below this the stats show N/A and drop out of the
+  // composite, so a tiny sample can't inflate the rating).
+  mulchMinPA: number;
+  mulchMinIP: number;
+
   // Last loaded team roster (for quick switching)
   lastTeam: TeamSearchResult | null;
   lastRoster: RosterPlayer[];
@@ -59,6 +65,8 @@ interface PlayerStore {
   setPlayerPositionOverride: (playerId: string, position: string | null) => void;
   setTargetOverride: (playerId: string, archetypeId: string, statName: string, target: number) => void;
   clearTargetOverrides: (playerId: string, archetypeId: string) => void;
+  setMulchMinPA: (n: number) => void;
+  setMulchMinIP: (n: number) => void;
   setLastTeam: (team: TeamSearchResult | null, roster: RosterPlayer[]) => void;
   clearCompare: () => void;
 
@@ -130,6 +138,8 @@ export const usePlayerStore = create<PlayerStore>()(
       playerArchetypes: {},
       playerPositionOverrides: {},
       playerTargetOverrides: {},
+      mulchMinPA: 30,
+      mulchMinIP: 30,
       lastTeam: null,
       lastRoster: [],
       recentPlayers: [],
@@ -176,6 +186,8 @@ export const usePlayerStore = create<PlayerStore>()(
         delete next[key];
         return { playerTargetOverrides: next };
       }),
+      setMulchMinPA: (n) => set({ mulchMinPA: Number.isFinite(n) ? Math.max(0, Math.min(999, Math.round(n))) : 0 }),
+      setMulchMinIP: (n) => set({ mulchMinIP: Number.isFinite(n) ? Math.max(0, Math.min(999, Math.round(n))) : 0 }),
       setLastTeam: (lastTeam, lastRoster) => set({ lastTeam, lastRoster }),
       clearCompare: () => set({ comparePlayer: null, compareError: null }),
 
@@ -255,13 +267,15 @@ export const usePlayerStore = create<PlayerStore>()(
     }),
     {
       name: "mmolb-player-store",
-      version: 5,
+      version: 6,
       partialize: (state) => ({
         player: state.player,
         archetypeId: state.archetypeId,
         playerArchetypes: state.playerArchetypes,
         playerPositionOverrides: state.playerPositionOverrides,
         playerTargetOverrides: state.playerTargetOverrides,
+        mulchMinPA: state.mulchMinPA,
+        mulchMinIP: state.mulchMinIP,
         recentPlayers: state.recentPlayers,
       }),
       migrate: (persisted, version) => {
@@ -286,8 +300,12 @@ export const usePlayerStore = create<PlayerStore>()(
           return { ...old, playerPositionOverrides: {}, playerTargetOverrides: {} };
         }
         if (version < 5) {
-          console.warn(`[player-store] migrating from v${version} to v5`);
-          return { ...old, playerPositionOverrides: {} };
+          console.warn(`[player-store] migrating from v${version} to v6`);
+          return { ...old, playerPositionOverrides: {}, mulchMinPA: 30, mulchMinIP: 30 };
+        }
+        if (version < 6) {
+          console.warn(`[player-store] migrating from v${version} to v6`);
+          return { ...old, mulchMinPA: 30, mulchMinIP: 30 };
         }
         return persisted as Record<string, unknown>;
       },

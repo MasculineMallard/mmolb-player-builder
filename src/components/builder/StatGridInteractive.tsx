@@ -5,6 +5,8 @@ import { STAT_CATEGORIES, CATEGORY_LABELS } from "@/lib/constants";
 import { S11 } from "@/lib/mechanics";
 import { getStatColor, getStatBarColor, STAT_DISPLAY_MAX, DEFENSE_DISPLAY_MAX } from "@/lib/utils";
 import type { StatRecommendation } from "@/lib/advisor";
+import type { EquippedStat } from "@/lib/equipped-stats";
+import { hasGearEffect } from "@/lib/equipped-stats";
 import {
   Tooltip,
   TooltipContent,
@@ -24,6 +26,12 @@ interface StatGridInteractiveProps {
   onResetTargets?: () => void;
   hasOverrides?: boolean;
   extraColumn?: React.ReactNode;
+  /**
+   * Per-stat totals with equipped items + boons folded in (display-only). When
+   * present and non-trivial, a Base / With-items+boons toggle appears; flipping it
+   * shows the totals instead of base values. Never affects planning math.
+   */
+  equippedStats?: Record<string, EquippedStat>;
 }
 
 /** Categories to hide based on player type */
@@ -44,10 +52,19 @@ export function StatGridInteractive({
   onResetTargets,
   hasOverrides = false,
   extraColumn,
+  equippedStats,
 }: StatGridInteractiveProps) {
   const [editing, setEditing] = useState(false);
   const [editingStatName, setEditingStatName] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [showGear, setShowGear] = useState(false);
+
+  const hasGear = useMemo(
+    () => (equippedStats ? hasGearEffect(equippedStats) : false),
+    [equippedStats],
+  );
+  // Only show gear values when there's something to show; otherwise ignore the toggle.
+  const gearOn = showGear && hasGear && !!equippedStats;
 
   const highlightSet = useMemo(() => new Set(highlightStats), [highlightStats]);
   const prioritySet = useMemo(() => new Set(priorityStats), [priorityStats]);
@@ -94,14 +111,35 @@ export function StatGridInteractive({
 
   return (
     <div className="bg-card border border-border rounded-lg px-3 py-2">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
         <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
           <span className="w-0.5 h-3.5 bg-primary/40 rounded-full" />
           All Stats
-          <span className="normal-case tracking-normal font-medium text-amber-500 text-sm ml-1">Base Only</span>
-          <span className="normal-case tracking-normal font-normal text-muted-foreground/70 text-xs">(no boons or items)</span>
+          {hasGear ? (
+            <span className="inline-flex items-center rounded-md border border-border overflow-hidden text-xs normal-case tracking-normal font-medium">
+              <button
+                type="button"
+                onClick={() => setShowGear(false)}
+                className={`px-2 py-0.5 transition-colors ${!gearOn ? "bg-primary/20 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                Base
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowGear(true); setEditing(false); setEditingStatName(null); }}
+                className={`px-2 py-0.5 transition-colors ${gearOn ? "bg-primary/20 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                With items + boons
+              </button>
+            </span>
+          ) : (
+            <>
+              <span className="normal-case tracking-normal font-medium text-amber-500 text-sm ml-1">Base Only</span>
+              <span className="normal-case tracking-normal font-normal text-muted-foreground/70 text-xs">(no boons or items)</span>
+            </>
+          )}
         </h3>
-        {hasTargets && (
+        {hasTargets && !gearOn && (
           <div className="flex items-center gap-2">
             {hasOverrides && onResetTargets && (
               <button
@@ -141,13 +179,17 @@ export function StatGridInteractive({
                 const showLuckHeader = category === "defense" && luckStatSet.has(statName) &&
                   (statIdx === 0 || !luckStatSet.has(statNames[statIdx - 1]));
 
+                const gear = gearOn ? equippedStats?.[statName] : undefined;
+                const value = gear ? gear.total : baseValue;
+                const gearDelta = gear ? gear.total - gear.base : 0;
+
                 const rec = recMap.get(statName);
                 const target = rec?.target;
                 const gap = rec?.gap ?? 0;
                 const isHighlighted = highlightSet.has(statName);
-                const barPct = Math.min((baseValue / displayMax) * 100, 100);
-                const barColor = getStatBarColor(baseValue, displayMax);
-                const isMaxed = baseValue >= displayMax;
+                const barPct = Math.min((value / displayMax) * 100, 100);
+                const barColor = getStatBarColor(value, displayMax);
+                const isMaxed = value >= displayMax;
                 const isEditing = editingStatName === statName;
 
                 return (
@@ -172,16 +214,30 @@ export function StatGridInteractive({
                           {statName}
                         </TooltipTrigger>
                         <TooltipContent side="top" className="max-w-[240px]">
-                          <p className="capitalize font-medium">{statName}: {baseValue}/{displayMax}</p>
-                          {target !== undefined && (
-                            <p className="text-sm text-muted-foreground">
-                              Target: {target}
-                              {gap > 0 && <span style={{ color: gap > 200 ? 'var(--scale-bad)' : 'var(--scale-poor)' }}> ({-gap})</span>}
-                              {gap <= 0 && <span style={{ color: 'var(--scale-good)' }}> (on track)</span>}
-                            </p>
-                          )}
-                          {rec?.reasoning && (
-                            <p className="text-sm text-muted-foreground mt-0.5">{rec.reasoning}</p>
+                          {gear ? (
+                            <>
+                              <p className="capitalize font-medium">{statName}: {gear.total}/{displayMax}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Base {gear.base}
+                                {gear.itemFlat !== 0 && <> · items +{gear.itemFlat}{gear.itemPct !== 0 ? ` / +${gear.itemPct}%` : ""}</>}
+                                {gear.itemFlat === 0 && gear.itemPct !== 0 && <> · items +{gear.itemPct}%</>}
+                                {gear.boonPct !== 0 && <> · boon {gear.boonPct > 0 ? "+" : ""}{Math.round(gear.boonPct * 100)}%</>}
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="capitalize font-medium">{statName}: {baseValue}/{displayMax}</p>
+                              {target !== undefined && (
+                                <p className="text-sm text-muted-foreground">
+                                  Target: {target}
+                                  {gap > 0 && <span style={{ color: gap > 200 ? 'var(--scale-bad)' : 'var(--scale-poor)' }}> ({-gap})</span>}
+                                  {gap <= 0 && <span style={{ color: 'var(--scale-good)' }}> (on track)</span>}
+                                </p>
+                              )}
+                              {rec?.reasoning && (
+                                <p className="text-sm text-muted-foreground mt-0.5">{rec.reasoning}</p>
+                              )}
+                            </>
                           )}
                         </TooltipContent>
                       </Tooltip>
@@ -196,14 +252,19 @@ export function StatGridInteractive({
                       ))}
                       </span>
                       <span className="flex items-center gap-1.5">
+                        {gear && gearDelta !== 0 && (
+                          <span className={`text-[11px] font-mono tabular-nums ${gearDelta > 0 ? "text-sky-300" : "text-red-400"}`}>
+                            {gearDelta > 0 ? `+${gearDelta}` : gearDelta}
+                          </span>
+                        )}
                         <span
                           className="text-sm font-mono font-medium tabular-nums"
-                          style={{ color: getStatColor(baseValue) }}
+                          style={{ color: getStatColor(value) }}
                         >
-                          {baseValue}
+                          {value}
                         </span>
-                        {/* Target display / edit */}
-                        {editing && target !== undefined && (
+                        {/* Target display / edit (base mode only) */}
+                        {!gearOn && editing && target !== undefined && (
                           isEditing ? (
                             <input
                               type="number"
@@ -233,8 +294,8 @@ export function StatGridInteractive({
 
                     {/* Bar */}
                     <div className="h-[13px] bg-muted/80 rounded-full overflow-hidden relative">
-                      {/* Target marker — show on starred stats or in edit mode */}
-                      {target !== undefined && target > 0 && (isHighlighted || editing) && (
+                      {/* Target marker — show on starred stats or in edit mode (base mode only) */}
+                      {!gearOn && target !== undefined && target > 0 && (isHighlighted || editing) && (
                         <div
                           className="absolute w-[3px] rounded-full z-10"
                           style={{
@@ -253,7 +314,7 @@ export function StatGridInteractive({
                           backgroundColor: barColor,
                           boxShadow: isMaxed
                             ? `0 0 6px ${barColor}, 0 0 12px ${barColor}40`
-                            : baseValue >= displayMax * 0.8
+                            : value >= displayMax * 0.8
                               ? `0 0 4px ${barColor}60`
                               : "none",
                         }}
