@@ -107,6 +107,15 @@ export const PITCHER_POSITIONS = new Set(["SP", "RP", "CL", "P"]);
 export const MULCH_MIN_PA = 30;
 export const MULCH_MIN_IP = 30;
 
+/** MMOLB's API name for the between-season exhibition window. */
+export const PRESEASON_STATUS = "Offseason";
+
+/** Preseason recommendation sample gates (the Offseason schedule is short). */
+export const MIN_PA_LINEUP = 10;
+export const LOW_SAMPLE_PA = 25;
+export const MIN_OUTS_STAFF = 9;
+export const LOW_SAMPLE_OUTS = 30;
+
 /** S11 milestone levels for progression timeline. */
 export const MILESTONE_LEVELS = [1, 5, 10, 15, 20, 25, 30] as const;
 
