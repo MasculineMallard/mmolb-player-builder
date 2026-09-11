@@ -113,14 +113,18 @@ function filterPreRecompRecords(
 /**
  * Check if a player was recomposed mid-season in the CURRENT season.
  *
- * A numeric Birthday > 1 AND Birthseason matching the current season means
- * this incarnation started mid-season. The Stats field accumulates from
- * the old incarnation (same name recomp), so season stats are tainted.
+ * A Birthday other than "Preseason" (a numeric mid-season day, OR a later-phase
+ * sentinel the API also puts in this field such as "Offseason" / "Postseason ...")
+ * AND a Birthseason matching the current season means this incarnation was
+ * (re)created after the season's start. The season's playerrecord/Stats still
+ * carry the old incarnation's production (same-name recomp), so they're tainted.
  *
  * Players recomped in prior seasons have played full seasons since and
  * their stats are valid.
  *
- * Birthday = "Preseason" means they've been here since the start: not recomped.
+ * Birthday = "Preseason" (or day <= 1) means they've been here since the start:
+ * not recomped. NB the guard must NOT treat every non-numeric Birthday as benign —
+ * "Offseason"/"Postseason" are recomp-after-the-fact, not season-start.
  *
  * Birthseason/Birthday alone can't tell a recomp from a player who was simply
  * CREATED mid-season (new signings, callups) — both reset those fields. A recomp
@@ -138,7 +142,14 @@ function wasRecompedThisSeason(
   currentSeasonId?: string,
   _currentDay?: number,
 ): boolean {
-  if (typeof raw.Birthday !== "number" || raw.Birthday <= 1) return false;
+  // "Preseason" / day <= 1 / missing = present since the season's start, never a
+  // recomp. Any other value (a numeric mid-season day, or a phase sentinel like
+  // "Offseason"/"Postseason ...") means born after the season started — a recomp
+  // only if prior-season records exist (checked below).
+  const bd = raw.Birthday;
+  if (bd == null) return false;
+  if (typeof bd === "number" && bd <= 1) return false;
+  if (bd === "Preseason") return false;
   if (raw.Birthseason == null) return false;
 
   // Derive current season number from playerrecord if possible
