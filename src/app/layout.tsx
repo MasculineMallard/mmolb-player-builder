@@ -43,7 +43,7 @@ export default function RootLayout({
                   POP
                 </Link>
                 <NavLinks />
-                <div className="ml-auto hidden md:flex items-center gap-3">
+                <div className="ml-auto hidden shrink-0 items-center gap-3 xl:flex">
                   <div id="share-slot" className="flex items-center gap-2" />
                   <span className="text-sm text-muted-foreground">{CURRENT_SEASON}</span>
                 </div>

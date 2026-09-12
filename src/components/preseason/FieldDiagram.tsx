@@ -12,15 +12,15 @@ export interface FieldDiagramProps {
   onResetLocks?: () => void;
 }
 
-const FIELD_GRID: Record<string, string> = {
-  C: "col-span-4 col-start-5 row-start-4",
-  "1B": "col-span-4 col-start-9 row-start-3",
-  "2B": "col-span-4 col-start-7 row-start-2",
-  "3B": "col-span-4 col-start-1 row-start-3",
-  SS: "col-span-4 col-start-3 row-start-2",
-  LF: "col-span-4 col-start-1 row-start-1",
-  CF: "col-span-4 col-start-5 row-start-1",
-  RF: "col-span-4 col-start-9 row-start-1",
+const FIELD_COORDS: Record<string, { left: string; top: string }> = {
+  C: { left: "50%", top: "89%" },
+  "1B": { left: "80%", top: "68%" },
+  "2B": { left: "63%", top: "49%" },
+  "3B": { left: "20%", top: "68%" },
+  SS: { left: "37%", top: "49%" },
+  LF: { left: "18%", top: "23%" },
+  CF: { left: "50%", top: "13%" },
+  RF: { left: "82%", top: "23%" },
 };
 
 function fitColor(score: number | null): string {
@@ -38,11 +38,11 @@ function statLabel(stat: string): string {
 function FitStats({ stats }: { stats: PositionFitStat[] }) {
   if (stats.length === 0) return <div className="text-xs text-muted-foreground">No weighted stats</div>;
   return (
-    <div className="grid grid-cols-2 gap-1.5">
+    <div className={`grid gap-1 ${stats.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
       {stats.map((stat) => (
-        <div key={stat.stat} className="min-w-0">
-          <div className="truncate text-xs font-medium leading-tight text-muted-foreground">{statLabel(stat.stat)}</div>
-          <div className="font-mono text-base font-black leading-tight text-foreground sm:text-lg">{stat.value}</div>
+        <div key={stat.stat} className="flex min-w-0 items-baseline justify-between gap-1 rounded bg-black/20 px-1.5 py-1">
+          <span className="truncate text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{statLabel(stat.stat)}</span>
+          <strong className="shrink-0 font-mono text-base font-black leading-none text-foreground">{stat.value}</strong>
         </div>
       ))}
     </div>
@@ -71,13 +71,17 @@ function AssignmentCard({
       data-position={assignment.assignedPosition}
       data-locked={assignment.isLocked ? "true" : "false"}
       aria-label={`${assignment.assignedPosition}: ${assignment.player.name}, ${score == null ? "fit unavailable" : `${Math.round(score)} percent fit`}; ${assignment.keyStats.map((stat) => `${statLabel(stat.stat)} ${stat.value}`).join(", ")}`}
-      className={`${mobile ? "relative" : `relative z-10 self-center ${FIELD_GRID[assignment.assignedPosition] ?? "col-span-4 col-start-5"}`} rounded-lg border-2 bg-card text-foreground shadow-lg ${assignment.isPersonalBest ? "border-primary" : "border-white/25"}`}
+      className={`${mobile ? "relative" : "absolute z-10 w-[20%] -translate-x-1/2 -translate-y-1/2"} overflow-hidden rounded-[10px] border bg-background/95 text-foreground shadow-[0_8px_24px_rgb(0_0_0/0.45)] backdrop-blur-sm ${assignment.isPersonalBest ? "border-primary ring-1 ring-primary/70" : "border-white/25"}`}
+      style={mobile ? undefined : {
+        left: FIELD_COORDS[assignment.assignedPosition]?.left ?? "50%",
+        top: FIELD_COORDS[assignment.assignedPosition]?.top ?? "50%",
+      }}
       title={assignment.isPersonalBest ? "This is this player's best position" : undefined}
     >
-      <div className="px-2.5 pb-2 pt-2">
+      <div className="px-2 py-1.5">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-black tracking-wide">{assignment.assignedPosition}</span>
-          <span className="font-mono text-sm font-black sm:text-base" style={{ color: fitColor(score) }}>
+          <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-black tracking-wide text-primary">{assignment.assignedPosition}</span>
+          <span className="font-mono text-sm font-black" style={{ color: fitColor(score) }}>
             {score == null ? "N/A" : `${Math.round(score)}%`}
           </span>
         </div>
@@ -89,7 +93,7 @@ function AssignmentCard({
               aria-label={`Player assignment for ${assignment.assignedPosition}`}
               value={selectValue}
               onChange={(event) => onLockPosition(assignment.assignedPosition, event.target.value || null)}
-              className="w-full cursor-pointer rounded-md border border-border bg-secondary px-1.5 py-1 text-xs font-bold text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/25 sm:text-sm"
+              className="h-7 w-full cursor-pointer truncate rounded-md border border-border bg-secondary px-1.5 text-[11px] font-bold text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/25"
             >
               <option value="">Auto · {assignment.player.name}</option>
               {startingPlayers.map((player) => (
@@ -100,20 +104,20 @@ function AssignmentCard({
             </select>
           </label>
         ) : (
-          <div className="mt-1 truncate text-sm font-bold">{assignment.player.name}</div>
+          <div className="mt-1 truncate text-xs font-bold">{assignment.player.name}</div>
         )}
 
-        <div className="mt-2">
+        <div className="mt-1">
           <FitStats stats={assignment.keyStats} />
         </div>
       </div>
 
       {alternative && (
-        <div className="flex items-center justify-between gap-2 rounded-b-md border-t border-border bg-secondary/95 px-2.5 py-1.5 text-[10px]">
+        <div className="flex items-center justify-between gap-1 border-t border-border bg-secondary/95 px-2 py-1 text-[9px] leading-tight">
           <span className="min-w-0 truncate text-muted-foreground">
             Next fit <strong className="text-foreground">{alternative.player.name}</strong>
           </span>
-          <strong className="shrink-0 font-mono text-xs text-primary">{Math.round(alternative.fitScore)}%</strong>
+          <strong className="shrink-0 font-mono text-[10px] text-primary">{Math.round(alternative.fitScore)}%</strong>
         </div>
       )}
     </div>
@@ -148,12 +152,12 @@ export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: F
       <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Best Defensive Alignment</h2>
-          <p className="max-w-3xl text-xs text-muted-foreground">Choose a player on any card to lock that spot; every other position re-optimizes. Among the infielders, Reaction is ordered SS → 3B → 2B → 1B; the strongest outfield Arm goes to RF. A blue outline marks that player’s best fit.</p>
+          <p className="mt-1 font-mono text-[11px] text-muted-foreground">Fit % = Σ(weight × min(item-adjusted stat ÷ target, 1)) ÷ Σ(weights) × 100</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <span className={`rounded-full px-3 py-1 text-xs font-bold ${recommendation.battingOrderLocked ? "bg-green-500/15 text-green-400" : "bg-yellow-500/15 text-yellow-500"}`}>
-            {recommendation.battingOrderLocked ? "9/9 best bats locked" : "Provisional starting nine"}
-          </span>
+          {!recommendation.battingOrderLocked && (
+            <span className="rounded-full bg-yellow-500/15 px-3 py-1 text-xs font-bold text-yellow-500">Provisional starting nine</span>
+          )}
           <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
             Average position fit {averageFit}%
           </span>
@@ -174,7 +178,7 @@ export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: F
 
       <div className="mx-auto max-w-5xl rounded-xl border border-border bg-background/40 p-2">
         <div
-          className="relative hidden min-h-[640px] w-full grid-cols-12 grid-rows-4 gap-2 overflow-hidden rounded-lg bg-cover bg-center p-3 xl:grid"
+          className="relative hidden aspect-[8/5] w-full overflow-hidden rounded-lg bg-cover bg-center lg:block"
           style={{ backgroundImage: `url(${BASE_PATH}/images/preseason-field-flat.svg)` }}
         >
           {recommendation.fielders.map((assignment) => (
@@ -190,10 +194,10 @@ export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: F
 
         <div
           aria-hidden="true"
-          className="aspect-[3/2] w-full rounded-lg bg-cover bg-center xl:hidden"
+          className="aspect-[8/5] w-full rounded-lg bg-cover bg-center lg:hidden"
           style={{ backgroundImage: `url(${BASE_PATH}/images/preseason-field-flat.svg)` }}
         />
-        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:hidden">
+        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:hidden">
           {recommendation.fielders.map((assignment) => (
             <AssignmentCard
               key={`mobile-${assignment.assignedPosition}`}

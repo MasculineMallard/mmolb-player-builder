@@ -103,7 +103,7 @@ export function PreseasonGlossaryButton() {
 
               <section className="rounded-lg border border-border bg-background/45 p-4">
                 <div className="mb-3 flex items-center gap-3">
-                  <span className="rounded-md bg-blue-500/15 px-2 py-1 font-mono text-xs font-black text-blue-400">02</span>
+                  <span className="rounded-md bg-yellow-500/15 px-2 py-1 font-mono text-xs font-black text-yellow-400">02</span>
                   <h3 className="font-bold text-foreground">Pitching Staff</h3>
                 </div>
                 <ul className="list-disc space-y-1.5 pl-5">
@@ -117,7 +117,7 @@ export function PreseasonGlossaryButton() {
 
               <section className="rounded-lg border border-border bg-background/45 p-4">
                 <div className="mb-3 flex items-center gap-3">
-                  <span className="rounded-md bg-green-500/15 px-2 py-1 font-mono text-xs font-black text-green-400">03</span>
+                  <span className="rounded-md bg-primary/15 px-2 py-1 font-mono text-xs font-black text-primary">03</span>
                   <h3 className="font-bold text-foreground">Batting Order</h3>
                 </div>
                 <div className="mb-3 grid grid-cols-3 gap-2 text-center text-xs">
@@ -135,12 +135,16 @@ export function PreseasonGlossaryButton() {
 
               <section className="rounded-lg border border-primary/25 bg-primary/5 p-4">
                 <div className="mb-3 flex items-center gap-3">
-                  <span className="rounded-md bg-purple-500/15 px-2 py-1 font-mono text-xs font-black text-purple-400">04</span>
+                  <span className="rounded-md bg-yellow-500/15 px-2 py-1 font-mono text-xs font-black text-yellow-400">04</span>
                   <h3 className="font-bold text-foreground">Position Fit</h3>
                 </div>
                 <ul className="list-disc space-y-2 pl-5">
                   <li><strong className="text-foreground">The nine best bats come first.</strong> Eight field; the ninth becomes DH. Defense never swaps in a weaker bat just for glove fit.</li>
                   <li><strong className="text-foreground">Items count here.</strong> Fit uses each player’s base attributes plus equipped item flats and percentages. Boons are not added. The cards show these item-adjusted values.</li>
+                  <li>
+                    <strong className="text-foreground">Fit equation:</strong>
+                    <span className="mt-1 block rounded-md bg-background/70 px-2.5 py-2 font-mono text-[11px] text-primary">Σ(weight × min(item-adjusted stat ÷ target, 1)) ÷ Σ(weights) × 100</span>
+                  </li>
                   <li><strong className="text-foreground">Position priorities:</strong> Catcher favors Awareness. Among the four infielders, equipped Reaction is ordered SS → 3B → 2B → 1B. Outfield placement emphasizes Acrobatics/Agility and sends the strongest outfield Arm to RF.</li>
                   <li><strong className="text-foreground">Fit targets:</strong> 140 for primary stats, 80 for secondary stats, and 200 for catcher Awareness. “Next fit” shows the strongest alternative.</li>
                   <li><strong className="text-foreground">Locks win.</strong> Choosing a player fixes that spot and recomputes the best valid arrangement for every unlocked starter. “Auto” releases it.</li>
@@ -151,7 +155,7 @@ export function PreseasonGlossaryButton() {
 
               <section className="rounded-lg border border-border bg-background/45 p-4">
                 <div className="mb-3 flex items-center gap-3">
-                  <span className="rounded-md bg-orange-500/15 px-2 py-1 font-mono text-xs font-black text-orange-400">05</span>
+                  <span className="rounded-md bg-primary/15 px-2 py-1 font-mono text-xs font-black text-primary">05</span>
                   <h3 className="font-bold text-foreground">Rate Formulas</h3>
                 </div>
                 <div className="grid gap-2 text-xs sm:grid-cols-2">

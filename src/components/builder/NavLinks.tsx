@@ -7,10 +7,10 @@ import { cn } from "@/lib/utils";
 import { CURRENT_SEASON } from "@/lib/constants";
 
 const NAV_ITEMS = [
+  { href: "/preseason", label: "Perfunctory Preseason Plotter" },
+  { href: "/mulch", label: "Mulch-o-Meter" },
   { href: "/pitcher", label: "Perfect Pitcher Planner" },
   { href: "/batter", label: "Better Batter Builder" },
-  { href: "/mulch", label: "Mulch-o-Meter" },
-  { href: "/preseason", label: "Perfunctory Preseason Plotter" },
   { href: "/shop", label: "Super Slugger Sartoria" },
   { href: "/pitcher-shop", label: "Heroic Hurler Haberdashery" },
 ];
@@ -62,13 +62,13 @@ export function NavLinks() {
   return (
     <>
       {/* Desktop nav */}
-      <nav className="hidden md:flex gap-1">
+      <nav className="hidden min-w-0 flex-1 gap-1 xl:flex">
         {NAV_ITEMS.map((item) => (
           <Link
             key={item.href}
             href={item.href}
             className={cn(
-              "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+              "whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
               pathname === item.href
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground hover:bg-secondary"
@@ -83,7 +83,7 @@ export function NavLinks() {
       <button
         ref={buttonRef}
         onClick={() => setOpen((v) => !v)}
-        className="md:hidden flex items-center justify-center w-10 h-10 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+        className="flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground xl:hidden"
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
       >
@@ -105,7 +105,7 @@ export function NavLinks() {
       {open && (
         <div
           ref={menuRef}
-          className="md:hidden absolute left-0 right-0 top-full z-50 bg-card border-b border-border shadow-lg"
+          className="absolute left-0 right-0 top-full z-50 border-b border-border bg-card shadow-lg xl:hidden"
         >
           <nav className="flex flex-col px-4 py-2">
             {NAV_ITEMS.map((item) => (

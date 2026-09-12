@@ -1,14 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
-  <title id="title">Flat baseball field</title>
-  <desc id="desc">A simple top-down baseball diamond with solid colors.</desc>
-  <rect width="1200" height="800" fill="#0f1419"/>
-  <path d="M600 760 74 250Q170 72 600 52q430 20 526 198Z" fill="#173f35"/>
-  <path d="M600 742 180 322Q258 154 600 130q342 24 420 192Z" fill="#1f5a45"/>
-  <path d="m600 742-252-252 252-252 252 252Z" fill="#8b5b43"/>
-  <path d="m600 680-190-190 190-190 190 190Z" fill="#285f47"/>
-  <path d="M600 742 74 250M600 742l526-492" fill="none" stroke="#e6dfcf" stroke-width="8"/>
-  <path d="m600 716 26 26-26 26-26-26Zm0-440 20 20-20 20-20-20Zm214 194 20 20-20 20-20-20Zm-428 0 20 20-20 20-20-20Z" fill="#eee8d8"/>
-  <circle cx="600" cy="510" r="24" fill="#a87355"/>
-  <rect x="585" y="505" width="30" height="10" rx="3" fill="#eee8d8"/>
-  <path d="M552 742q48-42 96 0" fill="none" stroke="#e6dfcf" stroke-width="7"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-labelledby="title desc">
+  <title id="title">POP defensive alignment field</title>
+  <desc id="desc">A polished flat top-down baseball diamond in POP blue and gold.</desc>
+  <defs>
+    <clipPath id="field-clip">
+      <path d="M600 720 70 245Q150 42 600 30q450 12 530 215Z"/>
+    </clipPath>
+  </defs>
+
+  <rect width="1200" height="750" fill="#0b1118"/>
+  <path d="M600 728 56 249Q134 24 600 12q466 12 544 237Z" fill="#101a25" stroke="#26384a" stroke-width="4"/>
+  <path d="M600 720 70 245Q150 42 600 30q450 12 530 215Z" fill="#16364d"/>
+
+  <g clip-path="url(#field-clip)">
+    <path d="M-30 275Q117 0 600 0t630 275" fill="none" stroke="#1d4560" stroke-width="120"/>
+    <path d="M35 324Q164 90 600 82t565 242" fill="none" stroke="#173b54" stroke-width="105"/>
+    <path d="M118 381Q224 186 600 176t482 205" fill="none" stroke="#204b66" stroke-width="96"/>
+    <path d="M205 440Q292 282 600 272t395 168" fill="none" stroke="#193f58" stroke-width="86"/>
+    <path d="M292 500Q362 382 600 372t308 128" fill="none" stroke="#214c66" stroke-width="78"/>
+  </g>
+
+  <path d="M82 247Q160 58 600 46q440 12 518 201" fill="none" stroke="#987230" stroke-width="26"/>
+  <path d="M68 244Q148 38 600 26q452 12 532 218" fill="none" stroke="#3b82f6" stroke-width="7"/>
+  <path d="M100 250Q174 82 600 68q426 14 500 182" fill="none" stroke="#e4b94f" stroke-width="3" stroke-dasharray="20 16" opacity=".75"/>
+
+  <path d="m600 704-249-239 249-224 249 224Z" fill="none" stroke="#86632d" stroke-width="78" stroke-linejoin="round"/>
+  <path d="m600 664-205-199 205-184 205 184Z" fill="#173a51" stroke="#244e67" stroke-width="4"/>
+  <path d="M600 705 70 245M600 705l530-460" fill="none" stroke="#f4dfa0" stroke-width="6"/>
+  <path d="m600 693-238-228 238-214 238 214Z" fill="none" stroke="#d7a941" stroke-width="4" stroke-linejoin="round"/>
+
+  <path d="m600 224 19 19-19 19-19-19Zm235 222 19 19-19 19-19-19Zm-470 0 19 19-19 19-19-19Z" fill="#fff4cf" stroke="#d7a941" stroke-width="4"/>
+  <path d="m600 681 25 12-5 27-20 16-20-16-5-27Z" fill="#fff4cf" stroke="#d7a941" stroke-width="4"/>
+
+  <path d="m600 441 28 16v32l-28 16-28-16v-32Z" fill="#a87b32" stroke="#e4b94f" stroke-width="3"/>
+  <rect x="583" y="468" width="34" height="7" rx="3.5" fill="#fff4cf"/>
+  <path d="M551 691q49-37 98 0" fill="none" stroke="#fff4cf" stroke-width="5"/>
+  <path d="M553 680h-34v47h28M647 680h34v47h-28" fill="none" stroke="#56738a" stroke-width="3"/>
+
+  <g fill="#e4b94f">
+    <rect x="109" y="228" width="30" height="5" rx="2.5" transform="rotate(-18 124 231)"/>
+    <rect x="1061" y="228" width="30" height="5" rx="2.5" transform="rotate(18 1076 231)"/>
+    <rect x="585" y="22" width="30" height="5" rx="2.5"/>
+  </g>
 </svg>

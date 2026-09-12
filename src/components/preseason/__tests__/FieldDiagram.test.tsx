@@ -66,10 +66,12 @@ describe("FieldDiagram", () => {
     expect(fielders).toHaveLength(8);
     fielders.forEach((fielder) => {
       expect(within(fielder).getByText("Awareness")).toBeTruthy();
-      expect(within(fielder).getByText("123")).toBeTruthy();
+      expect(within(fielder).getByText("123").className).toContain("text-base");
     });
     expect(screen.getByText("Average position fit 75%")).toBeTruthy();
     expect(screen.getByText("Equipped items included")).toBeTruthy();
+    expect(screen.getByText(/Fit % = Σ\(weight × min\(item-adjusted stat ÷ target, 1\)\) ÷ Σ\(weights\) × 100/)).toBeTruthy();
+    expect(screen.queryByText("9/9 best bats locked")).toBeNull();
     expect(screen.queryByText(/!/)).toBeNull();
     expect(screen.getAllByText("Player 2").length).toBeGreaterThan(0);
 

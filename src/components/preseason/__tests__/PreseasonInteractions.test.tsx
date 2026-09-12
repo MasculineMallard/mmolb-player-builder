@@ -109,6 +109,7 @@ describe("preseason controls", () => {
     expect(screen.getByRole("dialog", { name: "How the Plotter Works" })).toBeTruthy();
     expect(screen.getByText("Position Fit")).toBeTruthy();
     expect(screen.getByText("Rate Formulas")).toBeTruthy();
+    expect(screen.getByText(/Σ\(weight × min\(item-adjusted stat ÷ target, 1\)\) ÷ Σ\(weights\) × 100/)).toBeTruthy();
     const close = screen.getByRole("button", { name: "Close methodology" });
     expect(document.activeElement).toBe(close);
     fireEvent.keyDown(close, { key: "Tab" });
