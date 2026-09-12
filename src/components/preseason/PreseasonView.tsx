@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useTeamSearch } from "@/hooks/use-team-search";
 import { BASE_PATH } from "@/lib/constants";
 import { loadPositionDefense, type PositionDefenseMap } from "@/lib/evaluator-data";
@@ -10,12 +10,20 @@ import type { TeamSearchResult } from "@/lib/types";
 import { BattingLineupCard } from "./BattingLineupCard";
 import { FieldDiagram } from "./FieldDiagram";
 import { PitchingStaffCard } from "./PitchingStaffCard";
+import { PreseasonGlossaryButton } from "./PreseasonGlossary";
 
 export interface PreseasonViewProps {
   initialTeam?: TeamSearchResult | null;
 }
 
 type LoadState = "idle" | "loading" | "ready" | "error";
+type PlotterTab = "pitching" | "batting" | "fielding";
+
+const PLOTTER_TABS: Array<{ id: PlotterTab; number: string; label: string; description: string }> = [
+  { id: "pitching", number: "01", label: "Pitching Staff", description: "5 SP · 3 RP · closer" },
+  { id: "batting", number: "02", label: "Batting Order", description: "Tall nine-slot lineup" },
+  { id: "fielding", number: "03", label: "Position Fit", description: "Field, backups & bench" },
+];
 
 function teamLabel(team: TeamSearchResult): string {
   return [team.location, team.name].filter(Boolean).join(" ");
@@ -30,6 +38,7 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
   const [seasonStatus, setSeasonStatus] = useState<string | null>(null);
   const [loadState, setLoadState] = useState<LoadState>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<PlotterTab>("pitching");
 
   const pitchers = useMemo(
     () => players.filter((player) => player.preseasonPitching != null || ["SP", "RP", "CL", "P"].includes(player.position ?? "")),
@@ -42,8 +51,14 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
   const battingRecommendation = useMemo(() => recommendBattingOrder(batters), [batters]);
   const staffRecommendation = useMemo(() => recommendPitchingStaff(pitchers), [pitchers]);
   const positionRecommendation = useMemo(
-    () => positionDefense ? recommendPositions(players, positionDefense) : null,
-    [players, positionDefense],
+    () => positionDefense
+      ? recommendPositions(
+        players,
+        positionDefense,
+        battingRecommendation.lineup.map((entry) => entry.player.mmolbPlayerId),
+      )
+      : null,
+    [battingRecommendation, players, positionDefense],
   );
   const warnings = useMemo(
     () => players.flatMap((player) => player.dataWarnings.map((warning) => `${player.name}: ${warning}`)),
@@ -51,12 +66,27 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
   );
   const hasPreseasonData = players.some((player) => player.sampleSize.PA > 0 || player.sampleSize.outs > 0);
 
+  const handleTabKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, currentTab: PlotterTab) => {
+    const currentIndex = PLOTTER_TABS.findIndex((tab) => tab.id === currentTab);
+    let nextIndex: number | null = null;
+    if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % PLOTTER_TABS.length;
+    if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + PLOTTER_TABS.length) % PLOTTER_TABS.length;
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = PLOTTER_TABS.length - 1;
+    if (nextIndex == null) return;
+    event.preventDefault();
+    const nextTab = PLOTTER_TABS[nextIndex].id;
+    setActiveTab(nextTab);
+    document.getElementById(`plotter-tab-${nextTab}`)?.focus();
+  };
+
   const loadTeam = useCallback(async (team: TeamSearchResult) => {
     setSelectedTeam(team);
     setQuery("");
     setLoadState("loading");
     setError(null);
     setPlayers([]);
+    setActiveTab("pitching");
 
     try {
       const [response, defense] = await Promise.all([
@@ -83,9 +113,12 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
 
   return (
     <div className="mx-auto w-full max-w-7xl">
-      <div className="mb-3">
-        <h1 className="text-lg font-bold text-foreground sm:text-xl">Perfunctory Preseason Plotter</h1>
-        <p className="text-sm text-muted-foreground">Turn the current Offseason exhibition sample into a staff, batting order, and field alignment.</p>
+      <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-lg font-bold text-foreground sm:text-xl">Perfunctory Preseason Plotter</h1>
+          <p className="text-sm text-muted-foreground">Turn the current Offseason exhibition sample into a staff, batting order, and field alignment.</p>
+        </div>
+        <PreseasonGlossaryButton />
       </div>
 
       <div className="relative mb-4">
@@ -168,12 +201,49 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
             <>
               {(staffRecommendation.hasLowSample || battingRecommendation.hasLowSample) && (
                 <div className="rounded-md border border-yellow-500/30 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-500">
-                  Small Offseason sample: flagged recommendations lean more heavily on underlying attributes. Pitchers below 3 IP remain Depth; batters below 10 PA stay out of the order.
+                  Small Offseason sample: pitchers below 3 IP use attribute fallback, pitchers below 10 IP are flagged as volatile, and batters below 10 PA stay out of the default order. You can still force any pitcher into an SP slot.
                 </div>
               )}
-              <PitchingStaffCard pitchers={pitchers} />
-              <BattingLineupCard recommendation={battingRecommendation} />
-              {positionRecommendation && <FieldDiagram recommendation={positionRecommendation} />}
+
+              <div
+                role="tablist"
+                aria-label="Preseason plotter sections"
+                className="grid gap-2 rounded-xl border border-border bg-card p-2 sm:grid-cols-3"
+              >
+                {PLOTTER_TABS.map((tab) => {
+                  const active = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      role="tab"
+                      id={`plotter-tab-${tab.id}`}
+                      aria-selected={active}
+                      aria-controls={`plotter-panel-${tab.id}`}
+                      tabIndex={active ? 0 : -1}
+                      onClick={() => setActiveTab(tab.id)}
+                      onKeyDown={(event) => handleTabKeyDown(event, tab.id)}
+                      className={`flex min-h-18 items-center gap-3 rounded-lg border-2 px-3 py-3 text-left transition-all ${active ? "border-primary bg-primary text-primary-foreground shadow-lg" : "border-border bg-secondary/35 text-muted-foreground hover:border-primary/60 hover:text-foreground"}`}
+                    >
+                      <span className={`font-mono text-lg font-black ${active ? "text-primary-foreground/80" : "text-primary"}`}>{tab.number}</span>
+                      <span>
+                        <span className="block text-sm font-black uppercase tracking-wide">{tab.label}</span>
+                        <span className={`block text-[11px] ${active ? "text-primary-foreground/75" : "text-muted-foreground"}`}>{tab.description}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div id="plotter-panel-pitching" role="tabpanel" aria-labelledby="plotter-tab-pitching" hidden={activeTab !== "pitching"}>
+                <PitchingStaffCard pitchers={pitchers} />
+              </div>
+              <div id="plotter-panel-batting" role="tabpanel" aria-labelledby="plotter-tab-batting" hidden={activeTab !== "batting"}>
+                <BattingLineupCard recommendation={battingRecommendation} />
+              </div>
+              <div id="plotter-panel-fielding" role="tabpanel" aria-labelledby="plotter-tab-fielding" hidden={activeTab !== "fielding"}>
+                {positionRecommendation && <FieldDiagram recommendation={positionRecommendation} />}
+              </div>
             </>
           )}
         </div>

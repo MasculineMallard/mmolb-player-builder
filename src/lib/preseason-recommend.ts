@@ -25,16 +25,19 @@ export interface PitchingStaffEntry {
   blendedScore: number;
   roleEligible: boolean;
   lowSample: boolean;
+  forcedStarter: boolean;
 }
 
 export interface PitchingStaffRec {
   entries: PitchingStaffEntry[];
   closerRank: number | null;
   eligibleCount: number;
+  rankedCount: number;
   hasLowSample: boolean;
 }
 
-export type BattingDriver = "OBP" | "SLG" | "OPS";
+export type BattingDriver = "OBP" | "SLG" | "OPS" | "SO%";
+export type BattingOrderMode = "recommended" | "OBP" | "OPS" | "SLG" | "SO%";
 
 export interface BattingOrderEntry {
   player: PreseasonPlayerData;
@@ -59,6 +62,28 @@ export interface PositionAssignment {
   personalBestPosition: string;
   fitScore: number | null;
   isPersonalBest: boolean;
+  keyStats: PositionFitStat[];
+  positionOptions: PositionFitOption[];
+}
+
+export interface PositionFitStat {
+  stat: string;
+  value: number;
+  weight: number;
+}
+
+export interface PositionFitOption {
+  position: string;
+  fitScore: number;
+  keyStats: PositionFitStat[];
+}
+
+export interface PositionAlternative {
+  position: string;
+  player: PreseasonPlayerData;
+  fitScore: number;
+  keyStats: PositionFitStat[];
+  isStarter: boolean;
 }
 
 export interface PositionAssignmentRec {
@@ -66,6 +91,9 @@ export interface PositionAssignmentRec {
   designatedHitter: PositionAssignment | null;
   bench: PositionAssignment[];
   pitchers: PreseasonPlayerData[];
+  alternatives: PositionAlternative[];
+  startingBatterIds: string[];
+  battingOrderLocked: boolean;
   totalFit: number;
 }
 
@@ -116,6 +144,7 @@ function rankMetric(
 export function recommendPitchingStaff(
   pitchers: PreseasonPlayerData[],
   closerRank = 4,
+  forcedStarterIds: ReadonlySet<string> = new Set(),
 ): PitchingStaffRec {
   const pitcherRows = pitchers.filter((player) => getPlayerRole(player.position) === "pitcher");
   const qualifying = pitcherRows.filter(
@@ -140,32 +169,13 @@ export function recommendPitchingStaff(
       blendedScore: (0.75 * performanceScore) + (0.25 * attributeScore),
       roleEligible: true,
       lowSample: player.sampleSize.outs < LOW_SAMPLE_OUTS,
+      forcedStarter: false,
     };
   }).sort((a, b) =>
     (b.blendedScore - a.blendedScore) ||
     (b.attributeScore - a.attributeScore) ||
     a.player.mmolbPlayerId.localeCompare(b.player.mmolbPlayerId),
   );
-
-  const effectiveCloserRank = eligibleEntries.length > 0
-    ? Math.min(Math.max(Math.trunc(closerRank) || 1, 1), eligibleEntries.length)
-    : null;
-  let startersAssigned = 0;
-  let relieversAssigned = 0;
-
-  for (let index = 0; index < eligibleEntries.length; index += 1) {
-    const entry = eligibleEntries[index];
-    entry.rank = index + 1;
-    if (entry.rank === effectiveCloserRank) {
-      entry.role = "Closer";
-    } else if (startersAssigned < 5) {
-      entry.role = "Starter";
-      startersAssigned += 1;
-    } else if (relieversAssigned < 3) {
-      entry.role = "Reliever";
-      relieversAssigned += 1;
-    }
-  }
 
   const belowFloorEntries = pitcherRows
     .filter((player) => !qualifying.includes(player))
@@ -180,6 +190,7 @@ export function recommendPitchingStaff(
         blendedScore: attributeScore,
         roleEligible: false,
         lowSample: true,
+        forcedStarter: false,
       };
     })
     .sort((a, b) =>
@@ -187,16 +198,63 @@ export function recommendPitchingStaff(
       a.player.mmolbPlayerId.localeCompare(b.player.mmolbPlayerId),
     );
 
+  // Qualified arms stay ahead of attribute-only fallbacks. This preserves the
+  // sample floor for ranking while still filling a complete 5 SP / 3 RP / 1 CL
+  // staff whenever the roster has nine pitchers.
   const entries = [...eligibleEntries, ...belowFloorEntries];
+  entries.forEach((entry, index) => {
+    entry.rank = index + 1;
+  });
+
+  const forcedEntries = entries
+    .filter((entry) => forcedStarterIds.has(entry.player.mmolbPlayerId))
+    .slice(0, 5);
+  const forcedIds = new Set(forcedEntries.map((entry) => entry.player.mmolbPlayerId));
+  forcedEntries.forEach((entry) => {
+    entry.role = "Starter";
+    entry.forcedStarter = true;
+  });
+
+  const closerCandidates = entries.filter((entry) => !forcedIds.has(entry.player.mmolbPlayerId));
+  const requestedCloserRank = Math.max(Math.trunc(closerRank) || 1, 1);
+  const closer = closerCandidates.length > 0
+    ? [...closerCandidates].sort((a, b) => {
+      const aDistance = Math.abs((a.rank ?? 1) - requestedCloserRank);
+      const bDistance = Math.abs((b.rank ?? 1) - requestedCloserRank);
+      return aDistance - bDistance || (a.rank ?? 1) - (b.rank ?? 1);
+    })[0]
+    : null;
+  if (closer) closer.role = "Closer";
+
+  let startersAssigned = forcedEntries.length;
+  for (const entry of entries) {
+    if (entry.role !== "Depth") continue;
+    if (startersAssigned < 5) {
+      entry.role = "Starter";
+      startersAssigned += 1;
+    }
+  }
+
+  let relieversAssigned = 0;
+  for (const entry of entries) {
+    if (entry.role !== "Depth") continue;
+    if (relieversAssigned < 3) {
+      entry.role = "Reliever";
+      relieversAssigned += 1;
+    }
+  }
+
   return {
     entries,
-    closerRank: effectiveCloserRank,
+    closerRank: closer?.rank ?? null,
     eligibleCount: eligibleEntries.length,
+    rankedCount: entries.length,
     hasLowSample: entries.some((entry) => entry.lowSample),
   };
 }
 
 function battingMetric(player: PreseasonPlayerData, driver: BattingDriver): number | null {
+  if (driver === "SO%") return player.preseasonBatting?.SO_PCT ?? null;
   return player.preseasonBatting?.[driver] ?? null;
 }
 
@@ -209,13 +267,16 @@ function sortBatters(
     const bValue = battingMetric(b, driver);
     if (aValue == null && bValue != null) return 1;
     if (aValue != null && bValue == null) return -1;
-    if (aValue != null && bValue != null && aValue !== bValue) return bValue - aValue;
+    if (aValue != null && bValue != null && aValue !== bValue) {
+      return driver === "SO%" ? aValue - bValue : bValue - aValue;
+    }
     return tieBreakByAttribute(a, b, "batter");
   });
 }
 
 export function recommendBattingOrder(
   batters: PreseasonPlayerData[],
+  mode: BattingOrderMode = "recommended",
 ): BattingOrderRec {
   const batterRows = batters.filter((player) => getPlayerRole(player.position) === "batter");
   const qualified = batterRows.filter(
@@ -223,7 +284,9 @@ export function recommendBattingOrder(
   );
   const remaining = [...qualified];
   const lineup: BattingOrderEntry[] = [];
-  const drivers: BattingDriver[] = ["OBP", "OBP", "SLG", "SLG", "OPS", "OPS", "OPS", "OPS", "OPS"];
+  const drivers: BattingDriver[] = mode === "recommended"
+    ? ["OBP", "OBP", "SLG", "SLG", "OPS", "OPS", "OPS", "OPS", "OPS"]
+    : Array.from({ length: 9 }, () => mode);
 
   for (const driver of drivers) {
     if (remaining.length === 0) break;
@@ -316,15 +379,64 @@ function solveOptimalAssignment(scores: number[][]): AssignmentSolution {
   return solve(0, 0);
 }
 
+function keyStatsForPosition(
+  player: PreseasonPlayerData,
+  position: string,
+  positionDefense: PositionDefenseMap,
+): PositionFitStat[] {
+  return Object.entries(positionDefense[position]?.stat_weights ?? {})
+    .sort(([aStat, aWeight], [bStat, bWeight]) => bWeight - aWeight || aStat.localeCompare(bStat))
+    .slice(0, 2)
+    .map(([stat, weight]) => ({
+      stat,
+      value: Number(player.stats[stat] ?? 0),
+      weight,
+    }));
+}
+
+function positionOptionsFor(
+  player: PreseasonPlayerData,
+  positionDefense: PositionDefenseMap,
+): PositionFitOption[] {
+  return FIELDING_POSITIONS
+    .map((position) => ({
+      position,
+      fitScore: computePositionFitScore({ ...player, position }, "batter", positionDefense) ?? 0,
+      keyStats: keyStatsForPosition(player, position, positionDefense),
+    }))
+    .sort((a, b) =>
+      b.fitScore - a.fitScore ||
+      FIELDING_POSITIONS.indexOf(a.position as typeof FIELDING_POSITIONS[number]) -
+        FIELDING_POSITIONS.indexOf(b.position as typeof FIELDING_POSITIONS[number]),
+    );
+}
+
 export function recommendPositions(
   players: PreseasonPlayerData[],
   positionDefense: PositionDefenseMap,
+  battingOrderIds?: readonly string[],
 ): PositionAssignmentRec {
   const pitchers = players.filter((player) => getPlayerRole(player.position) === "pitcher");
   const batters = players
     .filter((player) => getPlayerRole(player.position) === "batter")
     .sort((a, b) => a.mmolbPlayerId.localeCompare(b.mmolbPlayerId));
-  const scoreMatrix = batters.map((player) =>
+
+  const recommendedIds = battingOrderIds ?? recommendBattingOrder(batters).lineup.map((entry) => entry.player.mmolbPlayerId);
+  const batterById = new Map(batters.map((player) => [player.mmolbPlayerId, player]));
+  const preferredStarters = [...new Set(recommendedIds)]
+    .map((id) => batterById.get(id))
+    .filter((player): player is PreseasonPlayerData => player != null);
+  const preferredIds = new Set(preferredStarters.map((player) => player.mmolbPlayerId));
+  const fallbackStarters = sortBatters(
+    batters.filter((player) => !preferredIds.has(player.mmolbPlayerId)),
+    "OPS",
+  );
+  const starterCount = Math.min(9, batters.length);
+  const startingBatters = [...preferredStarters, ...fallbackStarters].slice(0, starterCount);
+  const startingIds = new Set(startingBatters.map((player) => player.mmolbPlayerId));
+  const battingOrderLocked = starterCount === 9 && preferredStarters.slice(0, 9).length === 9;
+
+  const scoreMatrix = startingBatters.map((player) =>
     FIELDING_POSITIONS.map((position) =>
       computePositionFitScore({ ...player, position }, "batter", positionDefense) ?? 0,
     ),
@@ -332,7 +444,7 @@ export function recommendPositions(
   const solution = solveOptimalAssignment(scoreMatrix);
   const fielders = solution.pairs
     .map(({ playerIndex, positionIndex }): PositionAssignment => {
-      const player = batters[playerIndex];
+      const player = startingBatters[playerIndex];
       const assignedPosition = FIELDING_POSITIONS[positionIndex];
       const personalBestPosition = findBestFitPosition(player, positionDefense);
       return {
@@ -341,6 +453,8 @@ export function recommendPositions(
         personalBestPosition,
         fitScore: scoreMatrix[playerIndex][positionIndex],
         isPersonalBest: assignedPosition === personalBestPosition,
+        keyStats: keyStatsForPosition(player, assignedPosition, positionDefense),
+        positionOptions: positionOptionsFor(player, positionDefense),
       };
     })
     .sort((a, b) =>
@@ -348,27 +462,46 @@ export function recommendPositions(
       FIELDING_POSITIONS.indexOf(b.assignedPosition as typeof FIELDING_POSITIONS[number]),
     );
   const fieldedIds = new Set(fielders.map((assignment) => assignment.player.mmolbPlayerId));
-  const spillover = batters
-    .filter((player) => !fieldedIds.has(player.mmolbPlayerId))
-    .sort((a, b) => {
-      const positionPreference = Number(b.position === "DH") - Number(a.position === "DH");
-      if (positionPreference) return positionPreference;
-      const opsDifference = (b.preseasonBatting?.OPS ?? -1) - (a.preseasonBatting?.OPS ?? -1);
-      return opsDifference || tieBreakByAttribute(a, b, "batter");
-    });
+  const designatedHitter = startingBatters.find((player) => !fieldedIds.has(player.mmolbPlayerId)) ?? null;
+  const benchBatters = batters.filter((player) => !startingIds.has(player.mmolbPlayerId));
   const asSpillover = (player: PreseasonPlayerData, assignedPosition: "DH" | "Bench"): PositionAssignment => ({
     player,
     assignedPosition,
     personalBestPosition: findBestFitPosition(player, positionDefense),
     fitScore: null,
     isPersonalBest: false,
+    keyStats: [],
+    positionOptions: positionOptionsFor(player, positionDefense).slice(0, 3),
+  });
+
+  const assignmentByPosition = new Map(fielders.map((assignment) => [assignment.assignedPosition, assignment]));
+  const alternatives = FIELDING_POSITIONS.flatMap((position): PositionAlternative[] => {
+    const assignedId = assignmentByPosition.get(position)?.player.mmolbPlayerId;
+    const alternate = batters
+      .filter((player) => player.mmolbPlayerId !== assignedId)
+      .map((player) => ({
+        player,
+        fitScore: computePositionFitScore({ ...player, position }, "batter", positionDefense) ?? 0,
+      }))
+      .sort((a, b) => b.fitScore - a.fitScore || tieBreakByAttribute(a.player, b.player, "batter"))[0];
+    if (!alternate) return [];
+    return [{
+      position,
+      player: alternate.player,
+      fitScore: alternate.fitScore,
+      keyStats: keyStatsForPosition(alternate.player, position, positionDefense),
+      isStarter: startingIds.has(alternate.player.mmolbPlayerId),
+    }];
   });
 
   return {
     fielders,
-    designatedHitter: spillover[0] ? asSpillover(spillover[0], "DH") : null,
-    bench: spillover.slice(1).map((player) => asSpillover(player, "Bench")),
+    designatedHitter: designatedHitter ? asSpillover(designatedHitter, "DH") : null,
+    bench: benchBatters.map((player) => asSpillover(player, "Bench")),
     pitchers,
+    alternatives,
+    startingBatterIds: startingBatters.map((player) => player.mmolbPlayerId),
+    battingOrderLocked,
     totalFit: solution.score,
   };
 }

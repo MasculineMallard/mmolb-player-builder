@@ -23,6 +23,7 @@ function player(
     ERA?: number | null;
     WHIP?: number | null;
     K9?: number | null;
+    SO_PCT?: number | null;
     stats?: Record<string, number>;
   } = {},
 ): PreseasonPlayerData {
@@ -40,10 +41,12 @@ function player(
     walks: 0,
     hitByPitch: 0,
     sacrificeFlies: 0,
+    strikeouts: Math.round(PA * (options.SO_PCT ?? 0.2)),
     totalBases: 0,
     OBP: options.OBP ?? 0,
     SLG: options.SLG ?? 0,
     OPS: options.OPS ?? ((options.OBP ?? 0) + (options.SLG ?? 0)),
+    SO_PCT: options.SO_PCT ?? 0.2,
   };
   const pitching: PreseasonPitchingStats | null = isPitcher ? {
     outs,
@@ -131,7 +134,7 @@ describe("recommendPitchingStaff", () => {
     });
   });
 
-  it("clamps closer rank, handles overflow, and excludes below-floor arms", () => {
+  it("clamps closer rank, fills roster roles, and flags below-floor fallbacks", () => {
     const three = recommendPitchingStaff([
       player("p1", "SP", { ERA: 1 }),
       player("p2", "SP", { ERA: 2 }),
@@ -149,9 +152,9 @@ describe("recommendPitchingStaff", () => {
 
     const tiny = player("tiny", "SP", { outs: 8, stats: { velocity: 1000 } });
     const regular = player("regular", "SP", { outs: 9, stats: { accuracy: 100 } });
-    const floor = recommendPitchingStaff([tiny, regular]);
+    const floor = recommendPitchingStaff([tiny, regular], 1);
     expect(floor.entries.find((entry) => entry.player.mmolbPlayerId === "tiny")).toMatchObject({
-      role: "Depth", roleEligible: false, rank: null, lowSample: true,
+      role: "Starter", roleEligible: false, rank: 2, lowSample: true,
     });
     expect(floor.entries.find((entry) => entry.player.mmolbPlayerId === "regular")?.role).toBe("Closer");
 
@@ -161,6 +164,26 @@ describe("recommendPitchingStaff", () => {
     ]);
     expect(softBoundary.entries.find((entry) => entry.player.mmolbPlayerId === "outs29")?.lowSample).toBe(true);
     expect(softBoundary.entries.find((entry) => entry.player.mmolbPlayerId === "outs30")?.lowSample).toBe(false);
+  });
+
+  it("always allocates three relievers when nine arms exist and can force a below-floor SP", () => {
+    const qualified = Array.from({ length: 9 }, (_, index) => player(`q${index + 1}`, "SP", {
+      ERA: index + 1,
+      WHIP: index + 1,
+      K9: 20 - index,
+    }));
+    const tiny = player("tiny", "SP", { outs: 0, stats: { velocity: 1000 } });
+    const result = recommendPitchingStaff([...qualified, tiny], 4, new Set(["tiny"]));
+
+    expect(result.entries.filter((entry) => entry.role === "Starter")).toHaveLength(5);
+    expect(result.entries.filter((entry) => entry.role === "Reliever")).toHaveLength(3);
+    expect(result.entries.filter((entry) => entry.role === "Closer")).toHaveLength(1);
+    expect(result.entries.find((entry) => entry.player.mmolbPlayerId === "tiny")).toMatchObject({
+      role: "Starter",
+      forcedStarter: true,
+      roleEligible: false,
+      lowSample: true,
+    });
   });
 
   it("uses attribute score then player id as deterministic tie-breaks", () => {
@@ -213,6 +236,19 @@ describe("recommendBattingOrder", () => {
       "z-high", "a-low", "a", "b",
     ]);
   });
+
+  it("supports OBP, OPS, SLG, and lowest-SO% alternate sorts", () => {
+    const batters = [
+      player("a", "C", { OBP: 0.5, SLG: 0.3, OPS: 0.8, SO_PCT: 0.3 }),
+      player("b", "C", { OBP: 0.4, SLG: 0.8, OPS: 1.2, SO_PCT: 0.1 }),
+      player("c", "C", { OBP: 0.3, SLG: 0.6, OPS: 0.9, SO_PCT: 0.2 }),
+    ];
+
+    expect(recommendBattingOrder(batters, "OBP").lineup.map((entry) => entry.player.mmolbPlayerId)).toEqual(["a", "b", "c"]);
+    expect(recommendBattingOrder(batters, "OPS").lineup.map((entry) => entry.player.mmolbPlayerId)).toEqual(["b", "c", "a"]);
+    expect(recommendBattingOrder(batters, "SLG").lineup.map((entry) => entry.player.mmolbPlayerId)).toEqual(["b", "c", "a"]);
+    expect(recommendBattingOrder(batters, "SO%").lineup.map((entry) => entry.player.mmolbPlayerId)).toEqual(["b", "c", "a"]);
+  });
 });
 
 const defense: PositionDefenseMap = {
@@ -263,11 +299,38 @@ describe("recommendPositions", () => {
     missing.gameStats = { PA: 999, OBP: 1, SLG: 4, OPS: 5 };
     const bench = player("bench", "C", { stats: {}, OPS: 1 });
     const pitcher = player("pitcher", "SP");
-    const result = recommendPositions([...base, missing, bench, pitcher], defense);
+    const startingNine = [...base.map((entry) => entry.mmolbPlayerId), missing.mmolbPlayerId];
+    const result = recommendPositions([...base, missing, bench, pitcher], defense, startingNine);
 
     expect(result.fielders).toHaveLength(8);
     expect(result.designatedHitter?.player.mmolbPlayerId).toBe("missing");
     expect(result.bench.map((assignment) => assignment.player.mmolbPlayerId)).toContain("bench");
     expect(result.pitchers.map((entry) => entry.mmolbPlayerId)).toEqual(["pitcher"]);
+    expect(new Set(result.startingBatterIds)).toEqual(new Set(startingNine));
+    expect(result.battingOrderLocked).toBe(true);
+    expect(result.alternatives).toHaveLength(8);
+    expect(result.bench[0].positionOptions).toHaveLength(3);
+  });
+
+  it("exposes the two highest-weighted raw stats for each assigned position", () => {
+    const weightedDefense: PositionDefenseMap = {
+      ...defense,
+      "1B": {
+        stat_weights: { reaction: 0.12, composure: 0.07, awareness: 0.05 },
+        primary_stats: ["reaction"],
+        secondary_stats: ["composure", "awareness"],
+      },
+    };
+    const players = Array.from({ length: 8 }, (_, index) => player(`raw-${index}`, "C", {
+      stats: { reaction: 321 - index, composure: 210 - index, awareness: 99 },
+    }));
+    const result = recommendPositions(players, weightedDefense, players.map((entry) => entry.mmolbPlayerId));
+    const firstBase = result.fielders.find((entry) => entry.assignedPosition === "1B");
+
+    expect(firstBase?.keyStats.map((entry) => entry.stat)).toEqual(["reaction", "composure"]);
+    expect(firstBase?.keyStats.map((entry) => entry.value)).toEqual([
+      firstBase?.player.stats.reaction,
+      firstBase?.player.stats.composure,
+    ]);
   });
 });

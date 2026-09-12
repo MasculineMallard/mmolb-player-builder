@@ -66,6 +66,7 @@ describe("computePreseasonBatting", () => {
       walked: 4,
       hit_by_pitch: 1,
       sac_flies: 1,
+      strikeouts: 6,
     });
 
     expect(result).not.toBeNull();
@@ -74,6 +75,7 @@ describe("computePreseasonBatting", () => {
     expect(result?.OBP).toBeCloseTo(13 / 26);
     expect(result?.SLG).toBeCloseTo(15 / 20);
     expect(result?.OPS).toBeCloseTo((13 / 26) + (15 / 20));
+    expect(result?.SO_PCT).toBeCloseTo(6 / 30);
   });
 
   it("guards a zero OBP denominator and permits OBP when AB is zero", () => {
@@ -81,6 +83,7 @@ describe("computePreseasonBatting", () => {
     expect(empty?.OBP).toBeNull();
     expect(empty?.SLG).toBeNull();
     expect(empty?.OPS).toBeNull();
+    expect(empty?.SO_PCT).toBeNull();
 
     const walksOnly = computePreseasonBatting({ plate_appearances: 2, walked: 2 });
     expect(walksOnly?.OBP).toBe(1);

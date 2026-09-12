@@ -14,10 +14,12 @@ export interface PreseasonBattingStats {
   walks: number;
   hitByPitch: number;
   sacrificeFlies: number;
+  strikeouts: number;
   totalBases: number;
   OBP: number | null;
   SLG: number | null;
   OPS: number | null;
+  SO_PCT: number | null;
 }
 
 export interface PreseasonPitchingStats {
@@ -96,6 +98,7 @@ export function computePreseasonBatting(
   const walks = stat(stats, "walked");
   const hitByPitch = stat(stats, "hit_by_pitch");
   const sacrificeFlies = stat(stats, "sac_flies");
+  const strikeouts = stat(stats, "strikeouts");
   const H = singles + doubles + triples + homeRuns;
   const totalBases = singles + (2 * doubles) + (3 * triples) + (4 * homeRuns);
   const obpDenominator = AB + walks + hitByPitch + sacrificeFlies;
@@ -115,10 +118,12 @@ export function computePreseasonBatting(
     walks,
     hitByPitch,
     sacrificeFlies,
+    strikeouts,
     totalBases,
     OBP,
     SLG,
     OPS: OBP != null && SLG != null ? OBP + SLG : null,
+    SO_PCT: PA > 0 ? strikeouts / PA : null,
   };
 }
 
