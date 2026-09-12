@@ -216,12 +216,6 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
             </div>
           ) : (
             <>
-              {(staffRecommendation.hasLowSample || battingRecommendation.hasLowSample) && (
-                <div className="rounded-md border border-yellow-500/30 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-500">
-                  Small Offseason sample: pitchers below 3 IP use attribute fallback, pitchers below 10 IP are flagged as volatile, and batters below 10 PA stay out of the default order. You can still force any pitcher into an SP slot.
-                </div>
-              )}
-
               <div
                 role="tablist"
                 aria-label="Preseason plotter sections"
@@ -253,6 +247,11 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
               </div>
 
               <div id="plotter-panel-pitching" role="tabpanel" aria-labelledby="plotter-tab-pitching" hidden={activeTab !== "pitching"}>
+                {activeTab === "pitching" && (staffRecommendation.hasLowSample || battingRecommendation.hasLowSample) && (
+                  <div className="mb-3 rounded-md border border-yellow-500/30 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-500">
+                    Small Offseason sample: pitchers below 3 IP use attribute fallback, pitchers below 10 IP are flagged as volatile, and batters below 10 PA stay out of the default order. You can still force any pitcher into an SP slot.
+                  </div>
+                )}
                 <PitchingStaffCard pitchers={pitchers} />
               </div>
               <div id="plotter-panel-batting" role="tabpanel" aria-labelledby="plotter-tab-batting" hidden={activeTab !== "batting"}>

@@ -131,6 +131,7 @@ describe("PreseasonView tabs", () => {
     render(<PreseasonView />);
     fireEvent.click(screen.getByRole("button", { name: /Fixture Foxes/ }));
     await waitFor(() => expect(screen.getByTestId("pitching-staff-card")).toBeTruthy());
+    expect(screen.getByText(/^Small Offseason sample:/)).toBeTruthy();
 
     const tiny = screen.getByTestId("pitcher-tile-tiny");
     fireEvent.click(within(tiny).getByRole("button", { name: "Force as SP" }));
@@ -141,8 +142,10 @@ describe("PreseasonView tabs", () => {
     fireEvent.keyDown(pitchingTab, { key: "ArrowRight" });
     expect(battingTab.getAttribute("aria-selected")).toBe("true");
     expect(document.activeElement).toBe(battingTab);
+    expect(screen.queryByText(/^Small Offseason sample:/)).toBeNull();
 
     fireEvent.click(pitchingTab);
+    expect(screen.getByText(/^Small Offseason sample:/)).toBeTruthy();
     expect(within(screen.getByTestId("pitcher-tile-tiny")).getByRole("button", { pressed: true })).toBeTruthy();
   });
 
