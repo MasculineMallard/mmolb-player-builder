@@ -3,6 +3,7 @@
 import type { SlotRecommendation } from "@/lib/item-advisor";
 import type { StatNeed } from "@/lib/item-advisor";
 import type { EquipmentSlot } from "@/lib/types";
+import { ResponsiveStatLabel } from "./ResponsiveStatLabel";
 
 interface SlotCardProps {
   recommendation: SlotRecommendation;
@@ -12,31 +13,6 @@ interface SlotCardProps {
   equipment?: EquipmentSlot;
   isStatPriority: boolean;
   isShopPriority: boolean;
-}
-
-const COMPACT_STAT_LABELS: Record<string, string> = {
-  accuracy: "Acc",
-  acrobatics: "Acro",
-  awareness: "Aware",
-  composure: "Comp",
-  control: "Ctrl",
-  deception: "Decep",
-  determination: "Determ",
-  dexterity: "Dex",
-  discipline: "Disc",
-  intimidation: "Intim",
-  intuition: "Intuit",
-  performance: "Perf",
-  persuasion: "Pers",
-  presence: "Pres",
-  reaction: "React",
-  rotation: "Rot",
-  stamina: "Stam",
-  velocity: "Velo",
-};
-
-function statLabel(stat: string): string {
-  return COMPACT_STAT_LABELS[stat] ?? stat;
 }
 
 function preferredType(stat: string, statNeeds: StatNeed[], flatMax: number, pctMax: number): "flat" | "pct" {
@@ -89,15 +65,15 @@ function StatRow({ stat, isDefense, pref, flatMax, pctMax, equipment }: {
   const diff = equipment ? computeDiff(stat, pref, idealValue, equipment) : null;
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_minmax(38px,1.2fr)_minmax(34px,1fr)_minmax(34px,1fr)] items-center text-[11px] min-h-[22px] py-0.5 px-0.5">
-      <span aria-label={stat} title={stat} className={`capitalize font-medium ${isDefense ? "text-yellow-400" : "text-gray-100"}`}>
-        {statLabel(stat)}
+    <div className="grid min-h-[22px] grid-cols-[minmax(0,1fr)_minmax(38px,1.2fr)_minmax(34px,1fr)_minmax(34px,1fr)] items-center px-0.5 py-0.5 text-[11px] sm:text-xs">
+      <span className={`capitalize font-medium ${isDefense ? "text-yellow-400" : "text-gray-100"}`}>
+        <ResponsiveStatLabel stat={stat} />
       </span>
       {has !== null ? (
         <span
           aria-label={`Current ${stat}: ${has}`}
           title={has}
-          className="text-right font-mono text-gray-400 leading-tight break-all"
+          className="overflow-hidden text-ellipsis whitespace-nowrap text-right font-mono leading-tight text-gray-400"
         >
           {has}
         </span>
@@ -133,7 +109,7 @@ export function SlotCard({ recommendation: rec, flatMax, pctMax, statNeeds, equi
 
       {/* Column headers */}
       {hasEquipment && (
-        <div className="grid grid-cols-[minmax(0,1fr)_minmax(38px,1.2fr)_minmax(34px,1fr)_minmax(34px,1fr)] items-center px-3 pt-1 text-[10px] text-gray-500 uppercase tracking-wide">
+        <div className="grid grid-cols-[minmax(0,1fr)_minmax(38px,1.2fr)_minmax(34px,1fr)_minmax(34px,1fr)] items-center px-3 pt-1 text-[10px] uppercase tracking-wide text-gray-400 sm:text-[11px]">
           <span>stat</span>
           <span className="text-right">has</span>
           <span className="text-right">ideal</span>

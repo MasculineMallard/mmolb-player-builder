@@ -151,7 +151,7 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
   const hasRecent = recentPlayers.length > 0;
 
   return (
-    <div className="space-y-2">
+    <div data-testid="shop-view" className="mx-auto w-full max-w-[1400px] space-y-2">
       {/* Search */}
       {(!player || searchOpen) && (
         <div className="bg-card border border-border rounded-lg px-3 py-2">
@@ -230,10 +230,16 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
 
       {/* Main content — two column layout */}
       {player && !loading && (
-        <div className="xl:grid xl:grid-cols-[420px_1fr] xl:gap-2 space-y-2 xl:space-y-0">
+        <div
+          data-testid="shop-main-layout"
+          className="space-y-2 2xl:grid 2xl:grid-cols-[360px_minmax(0,1fr)] 2xl:gap-4 2xl:space-y-0"
+        >
 
           {/* LEFT PANEL */}
-          <div className="space-y-2 min-w-0 flex flex-col">
+          <div
+            data-testid="shop-controls-panel"
+            className="mx-auto flex w-full max-w-[640px] min-w-0 flex-col space-y-2 2xl:max-w-none"
+          >
 
             {/* Player header — shared with the builder */}
             <PlayerHeader
@@ -325,7 +331,10 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
           </div>
 
           {/* RIGHT PANEL: Item cards + Stat bars */}
-          <div className="space-y-2 min-w-0 flex flex-col">
+          <div
+            data-testid="shop-results-panel"
+            className="mx-auto flex w-full max-w-[1040px] min-w-0 flex-col space-y-2 2xl:max-w-none"
+          >
             {archetype && recommendations.length > 0 && (
               <>
                 {/* Summary + Item cards in a row */}

@@ -6,6 +6,7 @@ import type { Archetype } from "@/lib/types";
 import { calculateStatTargets } from "@/lib/optimizer";
 import { STAT_CATEGORIES, CATEGORY_LABELS } from "@/lib/constants";
 import { STAT_DISPLAY_MAX, DEFENSE_DISPLAY_MAX } from "@/lib/utils";
+import { ResponsiveStatLabel } from "./ResponsiveStatLabel";
 
 interface StatBarPanelProps {
   recommendations: SlotRecommendation[];
@@ -29,19 +30,6 @@ interface StatBar {
   itemSlots: number;
   group: "batting" | "pitching" | "baserunning" | "defense";
 }
-
-const MOBILE_STAT_LABELS: Record<string, string> = {
-  acrobatics: "Acro",
-  awareness: "Aware",
-  composure: "Comp",
-  determination: "Determ",
-  dexterity: "Dex",
-  discipline: "Disc",
-  intimidation: "Intim",
-  performance: "Perf",
-  persuasion: "Pers",
-  reaction: "React",
-};
 
 export function StatBarPanel({
   recommendations,
@@ -119,7 +107,10 @@ export function StatBarPanel({
   const primaryLabel = isPitcher ? CATEGORY_LABELS.pitching : CATEGORY_LABELS.batting;
 
   return (
-    <div className="bg-card border border-border rounded-lg px-3 py-2">
+    <div
+      data-testid="projected-build-panel"
+      className="w-full max-w-[680px] rounded-lg border border-border bg-card px-3 py-2"
+    >
       <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2 mb-2">
         <span className="w-0.5 h-3.5 bg-primary/40 rounded-full" />
         Projected Build
@@ -128,13 +119,16 @@ export function StatBarPanel({
         </span>
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-12 gap-y-4 md:gap-y-6">
+      <div
+        data-testid="projected-build-sections"
+        className="space-y-3"
+      >
         {bars.primary.length > 0 && (
           <div>
             <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1 border-b border-border pb-0.5">
               {primaryLabel}
             </h4>
-            <div className="space-y-0.5">
+            <div data-testid="projected-build-primary-rows" className="space-y-0.5">
               {bars.primary.map((b) => (
                 <BarRow key={b.stat} bar={b} displayMax={STAT_DISPLAY_MAX} isPriority={prioritySet.has(b.stat)} isSecondary={secondarySet.has(b.stat)} />
               ))}
@@ -147,7 +141,7 @@ export function StatBarPanel({
             <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1 border-b border-border pb-0.5">
               {CATEGORY_LABELS.baserunning}
             </h4>
-            <div className="space-y-0.5">
+            <div data-testid="projected-build-baserunning-rows" className="space-y-0.5">
               {bars.baserunning.map((b) => (
                 <BarRow key={b.stat} bar={b} displayMax={STAT_DISPLAY_MAX} isPriority={prioritySet.has(b.stat)} isSecondary={secondarySet.has(b.stat)} />
               ))}
@@ -160,7 +154,7 @@ export function StatBarPanel({
             <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1 border-b border-border pb-0.5">
               {CATEGORY_LABELS.defense}
             </h4>
-            <div className="space-y-0.5">
+            <div data-testid="projected-build-defense-rows" className="space-y-0.5">
               {bars.defense.map((b) => (
                 <BarRow key={b.stat} bar={b} displayMax={DEFENSE_DISPLAY_MAX} isPriority={false} isSecondary={false} />
               ))}
@@ -208,10 +202,7 @@ function BarRow({ bar, displayMax, isPriority, isSecondary }: {
           {isHighlighted && (
             <span className={`text-sm ${isPriority ? 'text-primary' : 'text-foreground/60'}`}>★</span>
           )}
-          <span aria-label={bar.stat} title={bar.stat}>
-            <span className="sm:hidden">{MOBILE_STAT_LABELS[bar.stat] ?? bar.stat}</span>
-            <span className="hidden sm:inline">{bar.stat}</span>
-          </span>
+          <ResponsiveStatLabel stat={bar.stat} />
         </span>
         <span className="flex items-center text-sm font-mono tabular-nums shrink-0">
           <span className="text-gray-400 w-10 text-right">{bar.current}</span>

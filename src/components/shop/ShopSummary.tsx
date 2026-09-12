@@ -2,6 +2,7 @@
 
 import type { SlotRecommendation, StatNeed, SlotName } from "@/lib/item-advisor";
 import { SLOT_META } from "@/lib/item-advisor";
+import { ResponsiveStatLabel } from "./ResponsiveStatLabel";
 
 interface ShopSummaryProps {
   recommendations: SlotRecommendation[];
@@ -46,7 +47,7 @@ export function ShopSummary({ recommendations, statNeeds, flatMax, pctMax }: Sho
   if (rows.length === 0) return null;
 
   return (
-    <div className="bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-lg overflow-hidden flex flex-col">
+    <div className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-gray-700 bg-gray-900/90 backdrop-blur-sm">
       {/* Header */}
       <div className="bg-gray-800/80 px-3 py-1.5 border-b border-gray-700 text-center">
         <span className="text-sm font-semibold text-gray-200">Shopping List</span>
@@ -57,7 +58,9 @@ export function ShopSummary({ recommendations, statNeeds, flatMax, pctMax }: Sho
         {rows.map((row) => (
           <div key={row.stat} className="grid grid-cols-[1fr_auto_auto] items-center text-sm h-[22px] gap-x-3">
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="capitalize font-medium text-gray-100 truncate">{row.stat}</span>
+              <span className="truncate capitalize font-medium text-gray-100">
+                <ResponsiveStatLabel stat={row.stat} />
+              </span>
               {row.gap > 0 && <span className="text-xs text-gray-500">-{Math.round(row.gap)}</span>}
             </div>
             <span className={`text-xs font-mono text-center min-w-[32px] ${row.pref === "flat" ? "text-sky-200" : "text-blue-400"}`}>

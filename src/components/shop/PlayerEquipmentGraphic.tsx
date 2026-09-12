@@ -58,27 +58,29 @@ export function PlayerEquipmentGraphic({
   );
 
   return (
-    <div data-testid="player-equipment-grid" className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-5">
-      <div data-testid="shop-summary-row" className="col-span-2 sm:col-span-3 xl:col-span-5">
+    <div data-testid="player-equipment-layout" className="space-y-2">
+      <div data-testid="shop-summary-row" className="w-full lg:max-w-[341px]">
         <ShopSummary recommendations={recommendations} statNeeds={statNeeds} flatMax={flatMax} pctMax={pctMax} />
       </div>
-      {SLOT_ORDER.map((slot) => {
-        const rec = recMap.get(slot);
-        if (!rec) return null;
-        return (
-          <div key={slot} className="min-w-0">
-            <SlotCard
-              recommendation={rec}
-              flatMax={flatMax}
-              pctMax={pctMax}
-              statNeeds={statNeeds}
-              equipment={equipment?.[slot]}
-              isStatPriority={topStatSlots.has(slot)}
-              isShopPriority={topShopSlots.has(slot)}
-            />
-          </div>
-        );
-      })}
+      <div data-testid="player-equipment-grid" className="grid grid-cols-2 items-start gap-2 lg:grid-cols-3">
+        {SLOT_ORDER.map((slot) => {
+          const rec = recMap.get(slot);
+          if (!rec) return null;
+          return (
+            <div key={slot} className="min-w-0 self-start">
+              <SlotCard
+                recommendation={rec}
+                flatMax={flatMax}
+                pctMax={pctMax}
+                statNeeds={statNeeds}
+                equipment={equipment?.[slot]}
+                isStatPriority={topStatSlots.has(slot)}
+                isShopPriority={topShopSlots.has(slot)}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -31,8 +31,8 @@ const statNeeds: StatNeed[] = [
   },
 ];
 
-describe("PlayerEquipmentGraphic mobile layout", () => {
-  it("gives the shopping list its own row and uses readable compact stat labels", () => {
+describe("PlayerEquipmentGraphic responsive layout", () => {
+  it("separates the shopping list from the slot grid and uses shared labels", () => {
     render(
       <PlayerEquipmentGraphic
         recommendations={[recommendation]}
@@ -43,8 +43,10 @@ describe("PlayerEquipmentGraphic mobile layout", () => {
     );
 
     expect(screen.getByTestId("player-equipment-grid").className).toContain("grid-cols-2");
-    expect(screen.getByTestId("shop-summary-row").className).toContain("col-span-2");
-    expect(screen.getByLabelText("intimidation").textContent).toBe("Intim");
-    expect(screen.getByLabelText("awareness").textContent).toBe("Aware");
+    expect(screen.getByTestId("player-equipment-grid").className).toContain("items-start");
+    expect(screen.getByTestId("player-equipment-grid").className).toContain("lg:grid-cols-3");
+    expect(screen.getByTestId("shop-summary-row").className).toContain("lg:max-w-[341px]");
+    expect(screen.getAllByLabelText("intimidation").every((label) => label.textContent === "Intimintimidation")).toBe(true);
+    expect(screen.getByLabelText("awareness").textContent).toBe("Awareawareness");
   });
 });
