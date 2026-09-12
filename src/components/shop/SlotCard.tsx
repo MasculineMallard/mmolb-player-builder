@@ -15,16 +15,24 @@ interface SlotCardProps {
 }
 
 const COMPACT_STAT_LABELS: Record<string, string> = {
+  accuracy: "Acc",
   acrobatics: "Acro",
   awareness: "Aware",
   composure: "Comp",
+  control: "Ctrl",
+  deception: "Decep",
   determination: "Determ",
   dexterity: "Dex",
   discipline: "Disc",
   intimidation: "Intim",
+  intuition: "Intuit",
   performance: "Perf",
   persuasion: "Pers",
+  presence: "Pres",
   reaction: "React",
+  rotation: "Rot",
+  stamina: "Stam",
+  velocity: "Velo",
 };
 
 function statLabel(stat: string): string {
