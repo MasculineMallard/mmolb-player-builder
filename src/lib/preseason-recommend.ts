@@ -5,6 +5,7 @@ import {
   getPlayerRole,
 } from "./evaluator";
 import type { PositionDefenseMap } from "./evaluator-data";
+import { computeItemAdjustedStats } from "./equipped-stats";
 import {
   FIELDING_POSITIONS,
   LOW_SAMPLE_OUTS,
@@ -325,6 +326,37 @@ interface AssignmentSolution {
   pairs: AssignmentPair[];
 }
 
+function itemAdjustedPlayer(player: PreseasonPlayerData): PreseasonPlayerData {
+  return { ...player, stats: computeItemAdjustedStats(player) };
+}
+
+interface AssignmentPriorityGroup {
+  stat: string;
+  positions: Array<{ position: string; rank: number }>;
+}
+
+function assignmentPriorityGroups(
+  positionDefense: PositionDefenseMap,
+  availablePositions: readonly string[],
+): AssignmentPriorityGroup[] {
+  const available = new Set(availablePositions);
+  const byStat = new Map<string, Array<{ position: string; rank: number }>>();
+  for (const [position, entry] of Object.entries(positionDefense)) {
+    const priority = entry.assignment_priority;
+    if (!priority || !available.has(position)) continue;
+    const group = byStat.get(priority.stat) ?? [];
+    group.push({ position, rank: priority.rank });
+    byStat.set(priority.stat, group);
+  }
+  return [...byStat.entries()].flatMap(([stat, entries]) => {
+    if (entries.length < 2) return [];
+    return [{
+      stat,
+      positions: entries.sort((a, b) => b.rank - a.rank),
+    }];
+  });
+}
+
 /** Exact small bipartite optimizer; at roster sizes this explores at most 8 * 2^13 states. */
 function solveOptimalAssignment(scores: number[][]): AssignmentSolution {
   const playerCount = scores.length;
@@ -380,13 +412,81 @@ function solveOptimalAssignment(scores: number[][]): AssignmentSolution {
   return solve(0, 0);
 }
 
+/** Exact assignment search with data-defined ordinal placement constraints. */
+function solvePriorityConstrainedAssignment(
+  scores: number[][],
+  players: PreseasonPlayerData[],
+  positions: string[],
+  priorityGroups: AssignmentPriorityGroup[],
+): AssignmentSolution {
+  if (priorityGroups.length === 0 || players.length < positions.length) {
+    return solveOptimalAssignment(scores);
+  }
+
+  let best: AssignmentSolution = { score: Number.NEGATIVE_INFINITY, pairs: [] };
+  const pairs: AssignmentPair[] = [];
+
+  const respectsPriorities = (): boolean => {
+    const playerIndexByPosition = new Map(
+      pairs.map((pair) => [positions[pair.positionIndex], pair.playerIndex]),
+    );
+    return priorityGroups.every((group) => {
+      for (const higher of group.positions) {
+        for (const lower of group.positions) {
+          if (higher.rank <= lower.rank) continue;
+          const higherPlayer = playerIndexByPosition.get(higher.position);
+          const lowerPlayer = playerIndexByPosition.get(lower.position);
+          if (higherPlayer == null || lowerPlayer == null) continue;
+          const higherValue = Number(players[higherPlayer].stats[group.stat] ?? 0);
+          const lowerValue = Number(players[lowerPlayer].stats[group.stat] ?? 0);
+          if (higherValue < lowerValue) return false;
+        }
+      }
+      return true;
+    });
+  };
+
+  const visit = (positionIndex: number, usedPlayers: number, score: number) => {
+    if (positionIndex === positions.length) {
+      if (score > best.score && respectsPriorities()) {
+        best = { score, pairs: [...pairs] };
+      }
+      return;
+    }
+    for (let playerIndex = 0; playerIndex < players.length; playerIndex += 1) {
+      if ((usedPlayers & (1 << playerIndex)) !== 0) continue;
+      pairs.push({ playerIndex, positionIndex });
+      visit(
+        positionIndex + 1,
+        usedPlayers | (1 << playerIndex),
+        score + scores[playerIndex][positionIndex],
+      );
+      pairs.pop();
+    }
+  };
+
+  visit(0, 0, 0);
+  return Number.isFinite(best.score) ? best : solveOptimalAssignment(scores);
+}
+
 function keyStatsForPosition(
   player: PreseasonPlayerData,
   position: string,
   positionDefense: PositionDefenseMap,
 ): PositionFitStat[] {
+  const priority = positionDefense[position]?.assignment_priority;
+  const highestPriorityRank = priority
+    ? Math.max(...Object.values(positionDefense)
+      .filter((entry) => entry.assignment_priority?.stat === priority.stat)
+      .map((entry) => entry.assignment_priority?.rank ?? Number.NEGATIVE_INFINITY))
+    : Number.NEGATIVE_INFINITY;
+  const preferredTieStat = priority?.rank === highestPriorityRank ? priority.stat : null;
   return Object.entries(positionDefense[position]?.stat_weights ?? {})
-    .sort(([aStat, aWeight], [bStat, bWeight]) => bWeight - aWeight || aStat.localeCompare(bStat))
+    .sort(([aStat, aWeight], [bStat, bWeight]) =>
+      bWeight - aWeight ||
+      Number(bStat === preferredTieStat) - Number(aStat === preferredTieStat) ||
+      aStat.localeCompare(bStat),
+    )
     .slice(0, 2)
     .map(([stat, weight]) => ({
       stat,
@@ -418,6 +518,7 @@ export function recommendPositions(
   battingOrderIds?: readonly string[],
   positionLocks: Readonly<Partial<Record<string, string>>> = {},
 ): PositionAssignmentRec {
+  const fitModel = positionDefense;
   const pitchers = players.filter((player) => getPlayerRole(player.position) === "pitcher");
   const batters = players
     .filter((player) => getPlayerRole(player.position) === "batter")
@@ -438,22 +539,28 @@ export function recommendPositions(
   const startingIds = new Set(startingBatters.map((player) => player.mmolbPlayerId));
   const battingOrderLocked = starterCount === 9 && preferredStarters.slice(0, 9).length === 9;
   const starterById = new Map(startingBatters.map((player) => [player.mmolbPlayerId, player]));
+  const fitPlayerById = new Map(batters.map((player) => [
+    player.mmolbPlayerId,
+    itemAdjustedPlayer(player),
+  ]));
+  const fitPlayer = (player: PreseasonPlayerData) => fitPlayerById.get(player.mmolbPlayerId) ?? player;
   const lockedPlayerIds = new Set<string>();
   const makeAssignment = (
     player: PreseasonPlayerData,
     assignedPosition: string,
     isLocked: boolean,
   ): PositionAssignment => {
-    const personalBestPosition = findBestFitPosition(player, positionDefense);
+    const adjustedPlayer = fitPlayer(player);
+    const personalBestPosition = findBestFitPosition(adjustedPlayer, fitModel);
     return {
       player,
       assignedPosition,
       personalBestPosition,
-      fitScore: computePositionFitScore({ ...player, position: assignedPosition }, "batter", positionDefense) ?? 0,
+      fitScore: computePositionFitScore({ ...adjustedPlayer, position: assignedPosition }, "batter", fitModel) ?? 0,
       isPersonalBest: assignedPosition === personalBestPosition,
       isLocked,
-      keyStats: keyStatsForPosition(player, assignedPosition, positionDefense),
-      positionOptions: positionOptionsFor(player, positionDefense),
+      keyStats: keyStatsForPosition(adjustedPlayer, assignedPosition, fitModel),
+      positionOptions: positionOptionsFor(adjustedPlayer, fitModel),
     };
   };
   const lockedAssignments = FIELDING_POSITIONS.flatMap((position): PositionAssignment[] => {
@@ -468,10 +575,16 @@ export function recommendPositions(
   const remainingPlayers = startingBatters.filter((player) => !lockedPlayerIds.has(player.mmolbPlayerId));
   const scoreMatrix = remainingPlayers.map((player) =>
     remainingPositions.map((position) =>
-      computePositionFitScore({ ...player, position }, "batter", positionDefense) ?? 0,
+      computePositionFitScore({ ...fitPlayer(player), position }, "batter", fitModel) ?? 0,
     ),
   );
-  const solution = solveOptimalAssignment(scoreMatrix);
+  const adjustedRemainingPlayers = remainingPlayers.map((player) => fitPlayer(player));
+  const solution = solvePriorityConstrainedAssignment(
+    scoreMatrix,
+    adjustedRemainingPlayers,
+    remainingPositions,
+    assignmentPriorityGroups(fitModel, remainingPositions),
+  );
   const optimizedAssignments = solution.pairs
     .map(({ playerIndex, positionIndex }): PositionAssignment => {
       const player = remainingPlayers[playerIndex];
@@ -489,12 +602,12 @@ export function recommendPositions(
   const asSpillover = (player: PreseasonPlayerData, assignedPosition: "DH" | "Bench"): PositionAssignment => ({
     player,
     assignedPosition,
-    personalBestPosition: findBestFitPosition(player, positionDefense),
+    personalBestPosition: findBestFitPosition(fitPlayer(player), fitModel),
     fitScore: null,
     isPersonalBest: false,
     isLocked: false,
     keyStats: [],
-    positionOptions: positionOptionsFor(player, positionDefense).slice(0, 3),
+    positionOptions: positionOptionsFor(fitPlayer(player), fitModel).slice(0, 3),
   });
 
   const assignmentByPosition = new Map(fielders.map((assignment) => [assignment.assignedPosition, assignment]));
@@ -504,7 +617,7 @@ export function recommendPositions(
       .filter((player) => player.mmolbPlayerId !== assignedId)
       .map((player) => ({
         player,
-        fitScore: computePositionFitScore({ ...player, position }, "batter", positionDefense) ?? 0,
+        fitScore: computePositionFitScore({ ...fitPlayer(player), position }, "batter", fitModel) ?? 0,
       }))
       .sort((a, b) => b.fitScore - a.fitScore || tieBreakByAttribute(a.player, b.player, "batter"))[0];
     if (!alternate) return [];
@@ -512,7 +625,7 @@ export function recommendPositions(
       position,
       player: alternate.player,
       fitScore: alternate.fitScore,
-      keyStats: keyStatsForPosition(alternate.player, position, positionDefense),
+      keyStats: keyStatsForPosition(fitPlayer(alternate.player), position, fitModel),
       isStarter: startingIds.has(alternate.player.mmolbPlayerId),
     }];
   });

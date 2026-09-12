@@ -69,6 +69,7 @@ describe("FieldDiagram", () => {
       expect(within(fielder).getByText("123")).toBeTruthy();
     });
     expect(screen.getByText("Average position fit 75%")).toBeTruthy();
+    expect(screen.getByText("Equipped items included")).toBeTruthy();
     expect(screen.queryByText(/!/)).toBeNull();
     expect(screen.getAllByText("Player 2").length).toBeGreaterThan(0);
 

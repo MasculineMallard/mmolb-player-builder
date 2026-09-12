@@ -89,45 +89,80 @@ export function PreseasonGlossaryButton() {
               </button>
             </div>
 
-            <div className="space-y-5 px-4 py-4 text-sm text-muted-foreground">
-              <section>
-                <h3 className="mb-1 font-semibold text-foreground">Data Window</h3>
-                <p>Only the first player record matching both the live SeasonID and <strong className="text-foreground">Offseason</strong> status is used. Missing counters inside that record count as zero; a missing matching record means no sample.</p>
+            <div className="grid gap-3 px-4 py-4 text-sm text-muted-foreground">
+              <section className="rounded-lg border border-border bg-background/45 p-4">
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="rounded-md bg-primary/15 px-2 py-1 font-mono text-xs font-black text-primary">01</span>
+                  <h3 className="font-bold text-foreground">Data Window</h3>
+                </div>
+                <ul className="list-disc space-y-1.5 pl-5">
+                  <li>Uses the <strong className="text-foreground">first record</strong> matching both the live SeasonID and <strong className="text-foreground">Offseason</strong> status.</li>
+                  <li>Missing counters in a matching record count as zero. No matching record means no sample.</li>
+                </ul>
               </section>
 
-              <section>
-                <h3 className="mb-1 font-semibold text-foreground">Pitching Staff</h3>
-                <p>Qualified pitchers need {MIN_OUTS_STAFF / 3} IP. Their team-relative ERA, WHIP, and K/9 ranks are combined at 34% / 33% / 33%, then blended with underlying pitcher attributes at 75% performance / 25% attributes. Ties use their occupied mid-rank.</p>
-                <p className="mt-1">When at least nine pitchers are available, the roster is filled as <strong className="text-foreground">5 SP, 3 RP, and 1 closer</strong>. With fewer than nine, the selected closer is assigned first; remaining arms fill SP slots, then RP slots, and open RP slots remain visible. Qualified arms rank first, while below-floor arms fill remaining slots by attribute score. “Force as SP” locks up to five pitchers into the rotation even below the IP floor and recalculates the other roles. The closer selector chooses by displayed staff rank and skips forced starters.</p>
-                <p className="mt-1 text-xs">Pitchers below {LOW_SAMPLE_OUTS / 3} IP are marked low sample.</p>
+              <section className="rounded-lg border border-border bg-background/45 p-4">
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="rounded-md bg-blue-500/15 px-2 py-1 font-mono text-xs font-black text-blue-400">02</span>
+                  <h3 className="font-bold text-foreground">Pitching Staff</h3>
+                </div>
+                <ul className="list-disc space-y-1.5 pl-5">
+                  <li><strong className="text-foreground">Ranking floor:</strong> {MIN_OUTS_STAFF / 3} IP. Qualified arms rank on ERA / WHIP / K/9 at 34% / 33% / 33%.</li>
+                  <li><strong className="text-foreground">Final score:</strong> 75% performance rank + 25% underlying pitching attributes. Ties share their occupied mid-rank.</li>
+                  <li><strong className="text-foreground">Staff shape:</strong> 5 SP, 3 RP, and 1 closer when nine arms are available. Below-floor arms can fill vacancies by attribute score.</li>
+                  <li><strong className="text-foreground">Overrides:</strong> “Force as SP” can lock up to five starters, even below the floor. The closer selection skips forced starters.</li>
+                </ul>
+                <div className="mt-3 rounded-md bg-yellow-500/10 px-3 py-2 text-xs text-yellow-500">Below {LOW_SAMPLE_OUTS / 3} IP is marked <strong>low sample</strong>.</div>
               </section>
 
-              <section>
-                <h3 className="mb-1 font-semibold text-foreground">Batting Order</h3>
-                <p>Batters need {MIN_PA_LINEUP} PA. The default order greedily selects the best remaining OBP for slots 1–2, SLG for 3–4, and OPS for 5–9, removing each selected batter before the next slot. Attribute score and player ID break ties.</p>
-                <p className="mt-1">The sort menu can instead show descending OBP, OPS, or SLG, or ascending SO%. These are alternate views; they do not change the defensive tab’s default starting nine.</p>
-                <p className="mt-1 text-xs">Batters below {LOW_SAMPLE_PA} PA are marked low sample. SO% is strikeouts divided by plate appearances.</p>
+              <section className="rounded-lg border border-border bg-background/45 p-4">
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="rounded-md bg-green-500/15 px-2 py-1 font-mono text-xs font-black text-green-400">03</span>
+                  <h3 className="font-bold text-foreground">Batting Order</h3>
+                </div>
+                <div className="mb-3 grid grid-cols-3 gap-2 text-center text-xs">
+                  <div className="rounded-md bg-secondary p-2"><strong className="block text-primary">1–2</strong> best OBP</div>
+                  <div className="rounded-md bg-secondary p-2"><strong className="block text-primary">3–4</strong> best SLG</div>
+                  <div className="rounded-md bg-secondary p-2"><strong className="block text-primary">5–9</strong> best OPS</div>
+                </div>
+                <ul className="list-disc space-y-1.5 pl-5">
+                  <li>Batters need <strong className="text-foreground">{MIN_PA_LINEUP} PA</strong>. Each selected batter is removed before the next slot; attributes and player ID break ties.</li>
+                  <li>Every row shows SO%. The menu can also re-sort the view by OBP, OPS, SLG, or lowest SO%.</li>
+                  <li>Alternate sorts <strong className="text-foreground">do not replace</strong> the default nine used by Position Fit.</li>
+                </ul>
+                <div className="mt-3 rounded-md bg-yellow-500/10 px-3 py-2 text-xs text-yellow-500">Below {LOW_SAMPLE_PA} PA is marked <strong>low sample</strong>.</div>
               </section>
 
-              <section>
-                <h3 className="mb-1 font-semibold text-foreground">Position Fit</h3>
-                <p>The default batting-order nine are selected first. An exact optimizer then maximizes the combined fit of eight of those nine across C, 1B, 2B, 3B, SS, LF, CF, and RF; the ninth hitter becomes DH. This guarantees the defense graphic does not substitute a weaker bat solely for glove fit.</p>
-                <p className="mt-1">Position fit reuses POP’s defense model: primary-stat target 140, secondary-stat target 80, and catcher Awareness target 200. Each field card shows the two highest-weighted defensive attributes available for that position and the player’s raw values. Its attached “Next fit” box shows the strongest alternative at that spot. The summary is the average fit percentage across the displayed fielding assignments.</p>
-                <p className="mt-1">Choosing a player on a position card locks that starter to that spot. The optimizer immediately rearranges every unlocked starter for the best remaining combined fit; choosing “Auto” releases the lock. A player can only be locked at one position. Every bench bat still shows their three highest-fit playable positions.</p>
-                <p className="mt-1 text-xs">When fewer than nine batters clear the PA floor, missing starting spots are provisionally filled by OPS and then batting attributes; the tab says so explicitly.</p>
+              <section className="rounded-lg border border-primary/25 bg-primary/5 p-4">
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="rounded-md bg-purple-500/15 px-2 py-1 font-mono text-xs font-black text-purple-400">04</span>
+                  <h3 className="font-bold text-foreground">Position Fit</h3>
+                </div>
+                <ul className="list-disc space-y-2 pl-5">
+                  <li><strong className="text-foreground">The nine best bats come first.</strong> Eight field; the ninth becomes DH. Defense never swaps in a weaker bat just for glove fit.</li>
+                  <li><strong className="text-foreground">Items count here.</strong> Fit uses each player’s base attributes plus equipped item flats and percentages. Boons are not added. The cards show these item-adjusted values.</li>
+                  <li><strong className="text-foreground">Position priorities:</strong> Catcher favors Awareness. Among the four infielders, equipped Reaction is ordered SS → 3B → 2B → 1B. Outfield placement emphasizes Acrobatics/Agility and sends the strongest outfield Arm to RF.</li>
+                  <li><strong className="text-foreground">Fit targets:</strong> 140 for primary stats, 80 for secondary stats, and 200 for catcher Awareness. “Next fit” shows the strongest alternative.</li>
+                  <li><strong className="text-foreground">Locks win.</strong> Choosing a player fixes that spot and recomputes the best valid arrangement for every unlocked starter. “Auto” releases it.</li>
+                  <li>Bench bats keep their three best playable positions. The summary is the average fit percentage across all eight fielders.</li>
+                </ul>
+                <div className="mt-3 rounded-md border border-border bg-background/60 px-3 py-2 text-xs italic">If fewer than nine batters clear the PA floor, OPS and then batting attributes provisionally fill the missing starters.</div>
               </section>
 
-              <section>
-                <h3 className="mb-1 font-semibold text-foreground">Rate Formulas</h3>
-                <div className="grid gap-1 text-xs sm:grid-cols-2">
-                  <div><strong className="text-foreground">OBP</strong> = (H + BB + HBP) / (AB + BB + HBP + SF)</div>
-                  <div><strong className="text-foreground">SLG</strong> = total bases / AB</div>
-                  <div><strong className="text-foreground">OPS</strong> = OBP + SLG</div>
-                  <div><strong className="text-foreground">SO%</strong> = strikeouts / PA</div>
-                  <div><strong className="text-foreground">ERA</strong> = 9 × ER / IP</div>
-                  <div><strong className="text-foreground">WHIP</strong> = (BB + H) / IP</div>
-                  <div><strong className="text-foreground">K/9</strong> = 9 × K / IP</div>
-                  <div><strong className="text-foreground">IP</strong> = recorded outs / 3</div>
+              <section className="rounded-lg border border-border bg-background/45 p-4">
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="rounded-md bg-orange-500/15 px-2 py-1 font-mono text-xs font-black text-orange-400">05</span>
+                  <h3 className="font-bold text-foreground">Rate Formulas</h3>
+                </div>
+                <div className="grid gap-2 text-xs sm:grid-cols-2">
+                  <div className="rounded-md bg-secondary p-2"><strong className="text-foreground">OBP</strong><span className="block font-mono">(H + BB + HBP) / (AB + BB + HBP + SF)</span></div>
+                  <div className="rounded-md bg-secondary p-2"><strong className="text-foreground">SLG</strong><span className="block font-mono">total bases / AB</span></div>
+                  <div className="rounded-md bg-secondary p-2"><strong className="text-foreground">OPS</strong><span className="block font-mono">OBP + SLG</span></div>
+                  <div className="rounded-md bg-secondary p-2"><strong className="text-foreground">SO%</strong><span className="block font-mono">strikeouts / PA</span></div>
+                  <div className="rounded-md bg-secondary p-2"><strong className="text-foreground">ERA</strong><span className="block font-mono">9 × ER / IP</span></div>
+                  <div className="rounded-md bg-secondary p-2"><strong className="text-foreground">WHIP</strong><span className="block font-mono">(BB + H) / IP</span></div>
+                  <div className="rounded-md bg-secondary p-2"><strong className="text-foreground">K/9</strong><span className="block font-mono">9 × K / IP</span></div>
+                  <div className="rounded-md bg-secondary p-2"><strong className="text-foreground">IP</strong><span className="block font-mono">recorded outs / 3</span></div>
                 </div>
               </section>
             </div>

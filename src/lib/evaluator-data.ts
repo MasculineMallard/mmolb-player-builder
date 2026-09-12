@@ -293,6 +293,8 @@ interface PositionDefenseEntry {
   stat_weights: Record<string, number>;
   primary_stats: string[];
   secondary_stats: string[];
+  /** Optional roster-placement ordering; does not change the player's fit score. */
+  assignment_priority?: { stat: string; rank: number };
 }
 export type PositionDefenseMap = Record<string, PositionDefenseEntry>;
 

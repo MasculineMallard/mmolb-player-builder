@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { MmolbApiPlayerRecord } from "@/lib/mmolb-api";
+import type { MmolbApiPlayer, MmolbApiPlayerRecord } from "@/lib/mmolb-api";
+import type { RosterPlayer } from "@/lib/types";
 import {
+  buildPreseasonPlayerData,
   computePreseasonBatting,
   computePreseasonPitching,
   extractPreseasonStats,
@@ -66,7 +68,8 @@ describe("computePreseasonBatting", () => {
       walked: 4,
       hit_by_pitch: 1,
       sac_flies: 1,
-      strikeouts: 6,
+      struck_out: 6,
+      strikeouts: 99,
     });
 
     expect(result).not.toBeNull();
@@ -89,6 +92,11 @@ describe("computePreseasonBatting", () => {
     expect(walksOnly?.OBP).toBe(1);
     expect(walksOnly?.SLG).toBeNull();
     expect(walksOnly?.OPS).toBeNull();
+  });
+
+  it("uses the batter strikeout field while pitching keeps its separate field", () => {
+    expect(computePreseasonBatting({ plate_appearances: 10, struck_out: 2, strikeouts: 9 })?.SO_PCT).toBe(0.2);
+    expect(computePreseasonPitching({ outs: 27, strikeouts: 9 })?.K9).toBe(9);
   });
 });
 
@@ -114,5 +122,54 @@ describe("computePreseasonPitching", () => {
 
     const scoreless = computePreseasonPitching({ outs: 9, hits_allowed: 2, strikeouts: 4 });
     expect(scoreless).toMatchObject({ earnedRuns: 0, walks: 0, ERA: 0 });
+  });
+});
+
+describe("buildPreseasonPlayerData", () => {
+  it("preserves normalized equipment without applying it to base stats", () => {
+    const rosterPlayer: RosterPlayer = {
+      mmolbPlayerId: "player-1",
+      firstName: "Test",
+      lastName: "Fielder",
+      name: "Test Fielder",
+      level: 20,
+      slot: "Lineup",
+      position: "SS",
+      isBench: false,
+    };
+    const raw = {
+      _id: "player-1",
+      FirstName: "Test",
+      LastName: "Fielder",
+      Level: 20,
+      Position: "SS",
+      PositionType: "Batter",
+      TeamID: TEAM_ID,
+      BaseAttributeBonuses: [{ attribute: "Reaction", amount: 0.1, source: "base" }],
+      ScheduledLevelUps: [],
+      AugmentHistory: [],
+      PitchTypes: [],
+      PitchSelection: [],
+      LesserDurability: 5,
+      GreaterDurability: 5,
+      Equipment: {
+        Hands: {
+          Slot: "Hands",
+          Name: "Quick Glove",
+          Emoji: "",
+          Effects: [{ Attribute: "Reaction", Tier: 4, Type: "FlatBonus", Value: 0.5 }],
+        },
+      },
+    } as MmolbApiPlayer;
+
+    const result = buildPreseasonPlayerData(rosterPlayer, raw, [], CURRENT_SEASON_ID, TEAM_ID);
+
+    expect(result.stats.reaction).toBe(10);
+    expect(result.equipment?.hands.effects[0]).toEqual({
+      attribute: "reaction",
+      tier: 4,
+      type: "flat",
+      value: 50,
+    });
   });
 });

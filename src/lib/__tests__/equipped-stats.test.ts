@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { computeEquippedStats, hasGearEffect } from "../equipped-stats";
+import { computeEquippedStats, computeItemAdjustedStats, hasGearEffect } from "../equipped-stats";
 import type { PlayerData, ItemEffect } from "../types";
 
 type BoonEffect = { bonuses: Record<string, number>; penalties: Record<string, number> };
@@ -129,6 +129,19 @@ describe("computeEquippedStats — formula", () => {
     // vision has both a -50% test penalty twice; never goes negative
     const visionPlayer = makePlayer({ vision: 300 }, { lesserBoons: ["Weak1", "Weak2"] });
     expect(computeEquippedStats(visionPlayer, boonLookup).vision.total).toBe(0);
+  });
+
+  it("builds an item-only map without applying a player's boons", () => {
+    const boonLookup = new Map<string, BoonEffect>([
+      ["Quick", { bonuses: { reaction: 25 }, penalties: {} }],
+    ]);
+    const player = makePlayer(
+      { reaction: 100 },
+      { lesserBoons: ["Quick"], equipment: { hands: [flat("reaction", 20), pct("reaction", 10)] } },
+    );
+
+    expect(computeItemAdjustedStats(player).reaction).toBe(132);
+    expect(computeEquippedStats(player, boonLookup).reaction.total).toBe(162);
   });
 });
 

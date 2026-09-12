@@ -88,9 +88,15 @@ describe("preseason controls", () => {
     const batters = Array.from({ length: 9 }, (_, index) => makePlayer(`b${index + 1}`, "C", index));
     render(<BattingLineupCard recommendation={recommendBattingOrder(batters)} />);
 
+    const defaultRows = within(screen.getByRole("list")).getAllByRole("listitem");
+    expect(defaultRows[0].textContent).toContain("SO%");
+    expect(defaultRows[0].textContent).toContain("3.3%");
+
     fireEvent.change(screen.getByLabelText("Batting order sort"), { target: { value: "SO%" } });
     const rows = within(screen.getByRole("list")).getAllByRole("listitem");
     expect(rows[0].textContent).toContain("b1");
+    expect(rows[0].textContent).toContain("SO%");
+    expect(rows[0].textContent).toContain("3.3%");
     expect(rows[8].textContent).toContain("b9");
     expect(screen.getByText(/defensive tab keeps the default recommended starting nine/i)).toBeTruthy();
   });

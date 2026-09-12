@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import type { PositionDefenseMap } from "@/lib/evaluator-data";
 import type {
   PreseasonBattingStats,
@@ -262,6 +264,22 @@ const defense: PositionDefenseMap = {
   RF: { stat_weights: { patience: 1 }, primary_stats: ["patience"], secondary_stats: [] },
 };
 
+const realDefense = JSON.parse(
+  readFileSync(join(process.cwd(), "public/data/archetypes/position_defense_weights.json"), "utf-8"),
+) as PositionDefenseMap;
+
+function equipFlat(playerData: PreseasonPlayerData, attribute: string, value: number): PreseasonPlayerData {
+  playerData.equipment = {
+    hands: {
+      slot: "hands",
+      name: "Test glove",
+      emoji: "",
+      effects: [{ attribute, tier: 5, type: "flat", value }],
+    },
+  };
+  return playerData;
+}
+
 describe("recommendPositions", () => {
   it("uses per-cell position overrides and finds a known non-greedy optimum", () => {
     const players = [
@@ -359,5 +377,64 @@ describe("recommendPositions", () => {
       firstBase?.player.stats.reaction,
       firstBase?.player.stats.composure,
     ]);
+  });
+
+  it("uses equipped items and enforces the saved Reaction and outfield Arm placement order", () => {
+    const players = [
+      player("catcher", "C", { stats: { awareness: 200 } }),
+      equipFlat(player("if-gear", "SS", { stats: { reaction: 10, composure: 80, awareness: 80 } }), "reaction", 140),
+      player("if-high", "3B", { stats: { reaction: 130, composure: 80, awareness: 80 } }),
+      player("if-mid", "2B", { stats: { reaction: 110, composure: 80, awareness: 80 } }),
+      player("if-low", "1B", { stats: { reaction: 90, composure: 80, awareness: 80 } }),
+      player("of-high", "RF", { stats: { acrobatics: 140, agility: 80, arm: 120 } }),
+      player("of-mid", "CF", { stats: { acrobatics: 140, agility: 80, arm: 90 } }),
+      player("of-low", "LF", { stats: { acrobatics: 140, agility: 80, arm: 60 } }),
+      player("dh", "DH", { stats: { contact: 300 } }),
+    ];
+    const startingNine = players.map((entry) => entry.mmolbPlayerId);
+    const before = JSON.stringify(players);
+    const result = recommendPositions(players, realDefense, startingNine);
+    const repeated = recommendPositions(players, realDefense, startingNine);
+    const byPosition = Object.fromEntries(result.fielders.map((entry) => [entry.assignedPosition, entry]));
+
+    expect(byPosition.SS.player.mmolbPlayerId).toBe("if-gear");
+    expect(byPosition["3B"].player.mmolbPlayerId).toBe("if-high");
+    expect(byPosition["2B"].player.mmolbPlayerId).toBe("if-mid");
+    expect(byPosition["1B"].player.mmolbPlayerId).toBe("if-low");
+    expect(byPosition.RF.player.mmolbPlayerId).toBe("of-high");
+    expect(new Set([byPosition.CF.player.mmolbPlayerId, byPosition.LF.player.mmolbPlayerId]))
+      .toEqual(new Set(["of-mid", "of-low"]));
+    expect(byPosition.SS.keyStats[0]).toMatchObject({ stat: "reaction", value: 150 });
+    expect(byPosition.RF.keyStats.map((entry: { stat: string }) => entry.stat)).toEqual(["acrobatics", "arm"]);
+    expect(repeated.fielders.map((entry) => [entry.assignedPosition, entry.player.mmolbPlayerId]))
+      .toEqual(result.fielders.map((entry) => [entry.assignedPosition, entry.player.mmolbPlayerId]));
+    expect(JSON.stringify(players)).toBe(before);
+    expect(players[1].stats.reaction).toBe(10);
+  });
+
+  it("lets a lock override the Reaction order and prioritizes the remaining infield spots", () => {
+    const players = [
+      player("catcher", "C", { stats: { awareness: 200 } }),
+      equipFlat(player("if-gear", "SS", { stats: { reaction: 10, composure: 80, awareness: 80 } }), "reaction", 140),
+      player("if-high", "3B", { stats: { reaction: 130, composure: 80, awareness: 80 } }),
+      player("if-mid", "2B", { stats: { reaction: 110, composure: 80, awareness: 80 } }),
+      player("if-low", "1B", { stats: { reaction: 90, composure: 80, awareness: 80 } }),
+      player("of-high", "RF", { stats: { acrobatics: 140, agility: 80, arm: 120 } }),
+      player("of-mid", "CF", { stats: { acrobatics: 140, agility: 80, arm: 90 } }),
+      player("of-low", "LF", { stats: { acrobatics: 140, agility: 80, arm: 60 } }),
+      player("dh", "DH", { stats: { contact: 300 } }),
+    ];
+    const result = recommendPositions(
+      players,
+      realDefense,
+      players.map((entry) => entry.mmolbPlayerId),
+      { SS: "if-low" },
+    );
+    const byPosition = Object.fromEntries(result.fielders.map((entry) => [entry.assignedPosition, entry]));
+
+    expect(byPosition.SS).toMatchObject({ isLocked: true, player: { mmolbPlayerId: "if-low" } });
+    expect(byPosition["3B"].player.mmolbPlayerId).toBe("if-gear");
+    expect(byPosition["2B"].player.mmolbPlayerId).toBe("if-high");
+    expect(byPosition["1B"].player.mmolbPlayerId).toBe("if-mid");
   });
 });

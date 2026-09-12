@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Flat baseball field</title>
+  <desc id="desc">A simple top-down baseball diamond with solid colors.</desc>
+  <rect width="1200" height="800" fill="#0f1419"/>
+  <path d="M600 760 74 250Q170 72 600 52q430 20 526 198Z" fill="#173f35"/>
+  <path d="M600 742 180 322Q258 154 600 130q342 24 420 192Z" fill="#1f5a45"/>
+  <path d="m600 742-252-252 252-252 252 252Z" fill="#8b5b43"/>
+  <path d="m600 680-190-190 190-190 190 190Z" fill="#285f47"/>
+  <path d="M600 742 74 250M600 742l526-492" fill="none" stroke="#e6dfcf" stroke-width="8"/>
+  <path d="m600 716 26 26-26 26-26-26Zm0-440 20 20-20 20-20-20Zm214 194 20 20-20 20-20-20Zm-428 0 20 20-20 20-20-20Z" fill="#eee8d8"/>
+  <circle cx="600" cy="510" r="24" fill="#a87355"/>
+  <rect x="585" y="505" width="30" height="10" rx="3" fill="#eee8d8"/>
+  <path d="M552 742q48-42 96 0" fill="none" stroke="#e6dfcf" stroke-width="7"/>
+</svg>

@@ -169,7 +169,7 @@ const SLOT_KEY_MAP: Record<string, string> = {
   Accessory: "charm", // batter accessory = charm
 };
 
-function transformEquipment(raw: MmolbApiPlayer): PlayerEquipment | undefined {
+export function transformEquipment(raw: MmolbApiPlayer): PlayerEquipment | undefined {
   if (!raw.Equipment) return undefined;
   const equipment: PlayerEquipment = {};
   for (const [apiKey, item] of Object.entries(raw.Equipment)) {

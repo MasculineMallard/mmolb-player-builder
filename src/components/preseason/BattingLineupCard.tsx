@@ -32,6 +32,11 @@ function formatValue(entry: BattingOrderEntry): string {
   return entry.driver === "SO%" ? `${(entry.value * 100).toFixed(1)}%` : entry.value.toFixed(3);
 }
 
+function formatStrikeoutRate(entry: BattingOrderEntry): string {
+  const value = entry.player.preseasonBatting?.SO_PCT;
+  return value == null ? "—" : `${(value * 100).toFixed(1)}%`;
+}
+
 export function BattingLineupCard({ recommendation }: BattingLineupCardProps) {
   const [mode, setMode] = useState<BattingOrderMode>("recommended");
   const allBatters = useMemo(
@@ -100,6 +105,9 @@ export function BattingLineupCard({ recommendation }: BattingLineupCardProps) {
                   <div className="truncate text-base font-semibold text-foreground">{entry.player.name}</div>
                   <div className="text-xs text-muted-foreground">
                     {entry.lowSample ? "Low sample · " : ""}{entry.player.sampleSize.PA} PA
+                    <span className="ml-2 border-l border-border pl-2">
+                      SO% <strong className="font-mono text-foreground">{formatStrikeoutRate(entry)}</strong>
+                    </span>
                   </div>
                 </div>
                 <div className="min-w-16 text-right">

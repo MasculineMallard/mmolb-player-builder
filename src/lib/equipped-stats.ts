@@ -87,6 +87,25 @@ export function computeEquippedStats(
   return out;
 }
 
+/**
+ * Build the attribute map used for an owned player's defensive placement.
+ * Equipment is included, while boons are deliberately excluded: this is the
+ * plotter's "items on" view, not a replacement for the base-stat evaluator.
+ */
+export function computeItemAdjustedStats(player: PlayerData): Record<string, number> {
+  const itemOnlyPlayer: PlayerData = {
+    ...player,
+    lesserBoons: [],
+    greaterBoons: [],
+  };
+  return Object.fromEntries(
+    Object.entries(computeEquippedStats(itemOnlyPlayer, new Map())).map(([stat, value]) => [
+      stat,
+      value.total,
+    ]),
+  );
+}
+
 /** True if any stat's total differs from its base (i.e. the toggle is meaningful). */
 export function hasGearEffect(equipped: Record<string, EquippedStat>): boolean {
   for (const s of Object.values(equipped)) {

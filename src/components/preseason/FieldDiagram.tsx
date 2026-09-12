@@ -12,15 +12,15 @@ export interface FieldDiagramProps {
   onResetLocks?: () => void;
 }
 
-const FIELD_COORDS: Record<string, { left: string; top: string }> = {
-  C: { left: "50%", top: "86%" },
-  "1B": { left: "84%", top: "68%" },
-  "2B": { left: "63%", top: "49%" },
-  "3B": { left: "16%", top: "68%" },
-  SS: { left: "37%", top: "49%" },
-  LF: { left: "19%", top: "25%" },
-  CF: { left: "50%", top: "15%" },
-  RF: { left: "81%", top: "25%" },
+const FIELD_GRID: Record<string, string> = {
+  C: "col-span-4 col-start-5 row-start-4",
+  "1B": "col-span-4 col-start-9 row-start-3",
+  "2B": "col-span-4 col-start-7 row-start-2",
+  "3B": "col-span-4 col-start-1 row-start-3",
+  SS: "col-span-4 col-start-3 row-start-2",
+  LF: "col-span-4 col-start-1 row-start-1",
+  CF: "col-span-4 col-start-5 row-start-1",
+  RF: "col-span-4 col-start-9 row-start-1",
 };
 
 function fitColor(score: number | null): string {
@@ -41,8 +41,8 @@ function FitStats({ stats }: { stats: PositionFitStat[] }) {
     <div className="grid grid-cols-2 gap-1.5">
       {stats.map((stat) => (
         <div key={stat.stat} className="min-w-0">
-          <div className="truncate text-[10px] leading-tight text-muted-foreground">{statLabel(stat.stat)}</div>
-          <div className="font-mono text-sm font-black leading-tight text-foreground sm:text-base">{stat.value}</div>
+          <div className="truncate text-xs font-medium leading-tight text-muted-foreground">{statLabel(stat.stat)}</div>
+          <div className="font-mono text-base font-black leading-tight text-foreground sm:text-lg">{stat.value}</div>
         </div>
       ))}
     </div>
@@ -71,11 +71,7 @@ function AssignmentCard({
       data-position={assignment.assignedPosition}
       data-locked={assignment.isLocked ? "true" : "false"}
       aria-label={`${assignment.assignedPosition}: ${assignment.player.name}, ${score == null ? "fit unavailable" : `${Math.round(score)} percent fit`}; ${assignment.keyStats.map((stat) => `${statLabel(stat.stat)} ${stat.value}`).join(", ")}`}
-      className={`${mobile ? "relative" : "absolute w-[24%] -translate-x-1/2 -translate-y-1/2 md:w-[21%]"} rounded-lg border-2 bg-card/95 text-foreground ${assignment.isPersonalBest ? "border-primary" : "border-white/25"}`}
-      style={mobile ? undefined : {
-        left: FIELD_COORDS[assignment.assignedPosition]?.left ?? "50%",
-        top: FIELD_COORDS[assignment.assignedPosition]?.top ?? "50%",
-      }}
+      className={`${mobile ? "relative" : `relative z-10 self-center ${FIELD_GRID[assignment.assignedPosition] ?? "col-span-4 col-start-5"}`} rounded-lg border-2 bg-card text-foreground shadow-lg ${assignment.isPersonalBest ? "border-primary" : "border-white/25"}`}
       title={assignment.isPersonalBest ? "This is this player's best position" : undefined}
     >
       <div className="px-2.5 pb-2 pt-2">
@@ -152,7 +148,7 @@ export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: F
       <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Best Defensive Alignment</h2>
-          <p className="text-xs text-muted-foreground">Choose a player on any position card to lock that spot; every other position re-optimizes automatically. A blue outline marks that player’s best position.</p>
+          <p className="max-w-3xl text-xs text-muted-foreground">Choose a player on any card to lock that spot; every other position re-optimizes. Among the infielders, Reaction is ordered SS → 3B → 2B → 1B; the strongest outfield Arm goes to RF. A blue outline marks that player’s best fit.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className={`rounded-full px-3 py-1 text-xs font-bold ${recommendation.battingOrderLocked ? "bg-green-500/15 text-green-400" : "bg-yellow-500/15 text-yellow-500"}`}>
@@ -160,6 +156,9 @@ export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: F
           </span>
           <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
             Average position fit {averageFit}%
+          </span>
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+            Equipped items included
           </span>
           {lockedCount > 0 && onResetLocks && (
             <button
@@ -173,18 +172,10 @@ export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: F
         </div>
       </div>
 
-      {recommendation.designatedHitter && (
-        <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-xs">
-          <strong className="uppercase tracking-wide text-primary">DH</strong>
-          <span className="font-semibold text-foreground">{recommendation.designatedHitter.player.name}</span>
-          <span className="text-muted-foreground">Best field fit: {recommendation.designatedHitter.personalBestPosition}</span>
-        </div>
-      )}
-
-      <div className="mx-auto max-w-4xl rounded-xl border border-border bg-background/40 p-2">
+      <div className="mx-auto max-w-5xl rounded-xl border border-border bg-background/40 p-2">
         <div
-          className="relative hidden aspect-[3/2] w-full overflow-hidden rounded-lg bg-cover bg-center lg:block"
-          style={{ backgroundImage: `linear-gradient(rgb(15 20 25 / 0.08), rgb(15 20 25 / 0.18)), url(${BASE_PATH}/images/preseason-field.webp)` }}
+          className="relative hidden min-h-[640px] w-full grid-cols-12 grid-rows-4 gap-2 overflow-hidden rounded-lg bg-cover bg-center p-3 xl:grid"
+          style={{ backgroundImage: `url(${BASE_PATH}/images/preseason-field-flat.svg)` }}
         >
           {recommendation.fielders.map((assignment) => (
             <AssignmentCard
@@ -199,10 +190,10 @@ export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: F
 
         <div
           aria-hidden="true"
-          className="aspect-[4/3] w-full rounded-lg bg-cover bg-center lg:hidden"
-          style={{ backgroundImage: `url(${BASE_PATH}/images/preseason-field.webp)` }}
+          className="aspect-[3/2] w-full rounded-lg bg-cover bg-center xl:hidden"
+          style={{ backgroundImage: `url(${BASE_PATH}/images/preseason-field-flat.svg)` }}
         />
-        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:hidden">
+        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:hidden">
           {recommendation.fielders.map((assignment) => (
             <AssignmentCard
               key={`mobile-${assignment.assignedPosition}`}
@@ -215,6 +206,16 @@ export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: F
           ))}
         </div>
       </div>
+
+      {recommendation.designatedHitter && (
+        <div className="mt-4 max-w-sm rounded-lg border border-primary/35 bg-primary/5 p-3">
+          <div className="text-[11px] font-black uppercase tracking-wider text-primary">Designated hitter</div>
+          <div className="mt-1 truncate text-sm font-bold text-foreground">{recommendation.designatedHitter.player.name}</div>
+          <div className="mt-0.5 text-xs text-muted-foreground">
+            Best field fit: <strong className="text-foreground">{recommendation.designatedHitter.personalBestPosition}</strong>
+          </div>
+        </div>
+      )}
 
       {recommendation.bench.length > 0 && (
         <div className="mt-5 border-t border-border pt-4">

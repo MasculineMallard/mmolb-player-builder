@@ -1,5 +1,5 @@
 import { PRESEASON_STATUS, PITCHER_POSITIONS } from "./constants";
-import { buildBaseStatMap } from "./mmolb-transform";
+import { buildBaseStatMap, transformEquipment } from "./mmolb-transform";
 import type { MmolbApiPlayer, MmolbApiPlayerRecord } from "./mmolb-api";
 import type { PlayerData, RosterPlayer } from "./types";
 
@@ -98,7 +98,7 @@ export function computePreseasonBatting(
   const walks = stat(stats, "walked");
   const hitByPitch = stat(stats, "hit_by_pitch");
   const sacrificeFlies = stat(stats, "sac_flies");
-  const strikeouts = stat(stats, "strikeouts");
+  const strikeouts = stat(stats, "struck_out");
   const H = singles + doubles + triples + homeRuns;
   const totalBases = singles + (2 * doubles) + (3 * triples) + (4 * homeRuns);
   const obpDenominator = AB + walks + hitByPitch + sacrificeFlies;
@@ -198,6 +198,7 @@ export function buildPreseasonPlayerData(
     position,
     durability: Math.min(Math.max(Math.round(raw?.LesserDurability ?? 5), 0), 5),
     stats: raw ? buildBaseStatMap(raw) : {},
+    equipment: raw ? transformEquipment(raw) : undefined,
     lesserBoons,
     greaterBoons,
     mmolbPlayerId: raw?._id ?? rosterPlayer.mmolbPlayerId,
