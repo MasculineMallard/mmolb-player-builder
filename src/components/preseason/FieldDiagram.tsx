@@ -53,10 +53,10 @@ function FitStats({ stats }: { stats: PositionFitStat[] }) {
           key={stat.stat}
           className={`min-w-0 px-1 py-1 text-center ${index > 0 ? "border-l border-white/15" : ""}`}
         >
-          <span data-testid="fit-stat-label" className="whitespace-nowrap text-[10px] font-semibold text-muted-foreground">
+          <span data-testid="fit-stat-label" className="whitespace-nowrap text-[11px] font-semibold leading-none text-muted-foreground">
             {cardStatLabel(stat.stat)}
           </span>
-          <strong className="ml-1 font-mono text-[11px] font-black leading-none text-foreground">{stat.value}</strong>
+          <strong className="ml-1 font-mono text-[13px] font-black leading-none text-foreground">{stat.value}</strong>
         </div>
       ))}
     </div>
@@ -84,7 +84,7 @@ function AssignmentCard({
       data-position={assignment.assignedPosition}
       data-locked={assignment.isLocked ? "true" : "false"}
       aria-label={`${assignment.assignedPosition}: ${assignment.player.name}, ${score == null ? "fit unavailable" : `${Math.round(score)} percent fit`}; ${assignment.keyStats.map((stat) => `${statLabel(stat.stat)} ${stat.value}`).join(", ")}${assignment.isPersonalBest ? "; best position for this player" : ""}`}
-      className="absolute z-10 w-[172px] -translate-x-1/2 -translate-y-1/2 text-foreground drop-shadow-[0_4px_7px_rgb(0_0_0/0.5)]"
+      className="absolute z-10 w-[180px] -translate-x-1/2 -translate-y-1/2 text-foreground drop-shadow-[0_4px_7px_rgb(0_0_0/0.5)]"
       style={{
         left: FIELD_COORDS[assignment.assignedPosition]?.left ?? "50%",
         top: FIELD_COORDS[assignment.assignedPosition]?.top ?? "50%",
@@ -92,13 +92,13 @@ function AssignmentCard({
       title={assignment.isPersonalBest ? "This is this player's best position" : undefined}
     >
       <div className={`overflow-hidden rounded-[5px] border bg-background/95 backdrop-blur-sm ${assignment.isPersonalBest ? "border-primary" : "border-white/25"}`}>
-        <div data-testid="fielder-card-header" className="grid min-h-[30px] grid-cols-[22px_minmax(0,1fr)_auto] items-center gap-1 px-[5px] py-px pl-[3px]">
-          <span className="grid h-[18px] place-items-center rounded-[3px] bg-primary/20 font-mono text-[10px] font-black tracking-wide text-primary">{assignment.assignedPosition}</span>
+        <div data-testid="fielder-card-header" className="grid min-h-[30px] grid-cols-[24px_minmax(0,1fr)_auto] items-center gap-1 px-[5px] py-px pl-[3px]">
+          <span className="grid h-5 place-items-center rounded-[3px] bg-primary/20 font-mono text-[11px] font-black leading-none tracking-wide text-primary">{assignment.assignedPosition}</span>
           {onLockPosition ? (
             <label className="relative flex h-6 min-w-0 cursor-pointer items-center gap-1 rounded-sm px-0.5 focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-primary">
               <span className="sr-only">Player assignment for {assignment.assignedPosition}</span>
-              <span className="min-w-0 flex-1 truncate text-[11px] font-extrabold">{assignment.player.name}</span>
-              <span aria-hidden="true" className="shrink-0 text-[10px] text-muted-foreground">▾</span>
+              <span className="min-w-0 flex-1 truncate text-[13px] font-extrabold leading-none">{assignment.player.name}</span>
+              <span aria-hidden="true" className="shrink-0 text-[11px] text-muted-foreground">▾</span>
               <select
                 aria-label={`Player assignment for ${assignment.assignedPosition}; current player ${assignment.player.name}`}
                 value={selectValue}
@@ -114,9 +114,9 @@ function AssignmentCard({
               </select>
             </label>
           ) : (
-            <span className="min-w-0 truncate text-[11px] font-extrabold">{assignment.player.name}</span>
+            <span className="min-w-0 truncate text-[13px] font-extrabold leading-none">{assignment.player.name}</span>
           )}
-          <span className="font-mono text-[13px] font-black" style={{ color: fitColor(score) }}>
+          <span className="font-mono text-[15px] font-black leading-none" style={{ color: fitColor(score) }}>
             {score == null ? "N/A" : `${Math.round(score)}%`}
           </span>
         </div>

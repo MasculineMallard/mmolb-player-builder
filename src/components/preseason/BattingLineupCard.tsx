@@ -67,6 +67,14 @@ export function BattingLineupCard({ recommendation }: BattingLineupCardProps) {
 
   return (
     <section data-testid="batting-lineup-card" className="rounded-xl border border-border bg-card p-4 sm:p-5">
+      <svg aria-hidden="true" focusable="false" className="absolute h-0 w-0">
+        <defs>
+          <filter id="batting-fire-warp" x="-10%" y="-24%" width="120%" height="148%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.014 0.085" numOctaves="2" seed="7" result="fireNoise" />
+            <feDisplacementMap in="SourceGraphic" in2="fireNoise" scale="16" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </defs>
+      </svg>
       <div className="mx-auto max-w-3xl">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -122,7 +130,6 @@ export function BattingLineupCard({ recommendation }: BattingLineupCardProps) {
                   </div>
                 </div>
                 <div className="min-w-16 text-right">
-                  {isOnFire(entry) && <div className="batting-fire-badge">On fire</div>}
                   <div className="text-[11px] font-bold uppercase tracking-wide text-primary">{entry.driver}</div>
                   <div className="font-mono text-base font-bold text-foreground">{formatValue(entry)}</div>
                 </div>

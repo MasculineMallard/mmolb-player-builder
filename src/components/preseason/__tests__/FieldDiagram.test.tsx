@@ -68,12 +68,15 @@ describe("FieldDiagram", () => {
     renderedFielders.forEach((fielder) => {
       expect(within(fielder).getByText("Aware")).toBeTruthy();
       expect(within(fielder).getByTestId("fit-stat-label").className).not.toContain("truncate");
-      expect(within(fielder).getByText("123").className).toContain("text-[11px]");
+      expect(within(fielder).getByTestId("fit-stat-label").className).toContain("text-[11px]");
+      expect(within(fielder).getByText("123").className).toContain("text-[13px]");
       expect(within(fielder).getByTestId("fielder-card-header").textContent).toContain("Player");
       expect(fielder.getAttribute("aria-label")).toContain("Awareness 123");
       expect(fielder.getAttribute("aria-label")).toContain("best position for this player");
     });
     expect(screen.getAllByTestId("defensive-field")).toHaveLength(1);
+    expect(renderedFielders[0].className).toContain("w-[180px]");
+    expect(within(renderedFielders[0]).getByTestId("fielder-card-header").className).toContain("grid-cols-[24px_minmax(0,1fr)_auto]");
     expect(screen.getByTestId("defensive-field").getAttribute("style")).toContain("/images/field-options-ai/field-ai-02.png");
     expect(screen.getByTestId("defensive-field").className).toContain("min-w-[700px]");
     expect(screen.getByText("Average position fit 75%")).toBeTruthy();
