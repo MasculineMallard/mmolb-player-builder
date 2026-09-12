@@ -42,7 +42,10 @@ describe("FieldDiagram", () => {
       fitScore: 75,
       isPersonalBest: true,
       isLocked: false,
-      keyStats: [{ stat: "awareness", value: 123, weight: 0.12 }],
+      keyStats: [
+        { stat: "awareness", value: 123, weight: 0.12 },
+        { stat: "reaction", value: 100, weight: 0.1 },
+      ],
       positionOptions: [],
     }));
     const recommendation: PositionAssignmentRec = {
@@ -67,9 +70,12 @@ describe("FieldDiagram", () => {
     expect(renderedFielders).toHaveLength(8);
     renderedFielders.forEach((fielder) => {
       expect(within(fielder).getByText("Aware")).toBeTruthy();
-      expect(within(fielder).getByTestId("fit-stat-label").className).not.toContain("truncate");
-      expect(within(fielder).getByTestId("fit-stat-label").className).toContain("text-[11px]");
-      expect(within(fielder).getByText("123").className).toContain("text-[13px]");
+      within(fielder).getAllByTestId("fit-stat-label").forEach((label) => {
+        expect(label.className).not.toContain("truncate");
+        expect(label.className).toContain("text-[12px]");
+      });
+      expect(within(fielder).getByText("123").className).toContain("text-[14px]");
+      expect(within(fielder).getByTestId("fielder-menu-cue").className).toContain("bg-primary/20");
       expect(within(fielder).getByTestId("fielder-card-header").textContent).toContain("Player");
       expect(fielder.getAttribute("aria-label")).toContain("Awareness 123");
       expect(fielder.getAttribute("aria-label")).toContain("best position for this player");
@@ -85,6 +91,7 @@ describe("FieldDiagram", () => {
     expect(screen.queryByText("9/9 best bats locked")).toBeNull();
     expect(screen.queryByText(/!/)).toBeNull();
     expect(screen.getAllByText("Player 2").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("React").length).toBeGreaterThan(0);
     const reserveGrid = screen.getByTestId("reserve-bats-grid");
     expect(reserveGrid.className).toContain("lg:grid-cols-5");
     expect(within(reserveGrid).getByTestId("designated-hitter-card").textContent).toContain("Player dh");

@@ -58,15 +58,15 @@ export function PlayerEquipmentGraphic({
   );
 
   return (
-    <div className="flex gap-2 flex-wrap">
-      <div className="flex-1 min-w-[140px]">
+    <div data-testid="player-equipment-grid" className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-5">
+      <div data-testid="shop-summary-row" className="col-span-2 sm:col-span-3 xl:col-span-5">
         <ShopSummary recommendations={recommendations} statNeeds={statNeeds} flatMax={flatMax} pctMax={pctMax} />
       </div>
       {SLOT_ORDER.map((slot) => {
         const rec = recMap.get(slot);
         if (!rec) return null;
         return (
-          <div key={slot} className="flex-1 min-w-[160px]">
+          <div key={slot} className="min-w-0">
             <SlotCard
               recommendation={rec}
               flatMax={flatMax}

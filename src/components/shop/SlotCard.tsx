@@ -14,6 +14,23 @@ interface SlotCardProps {
   isShopPriority: boolean;
 }
 
+const COMPACT_STAT_LABELS: Record<string, string> = {
+  acrobatics: "Acro",
+  awareness: "Aware",
+  composure: "Comp",
+  determination: "Determ",
+  dexterity: "Dex",
+  discipline: "Disc",
+  intimidation: "Intim",
+  performance: "Perf",
+  persuasion: "Pers",
+  reaction: "React",
+};
+
+function statLabel(stat: string): string {
+  return COMPACT_STAT_LABELS[stat] ?? stat;
+}
+
 function preferredType(stat: string, statNeeds: StatNeed[], flatMax: number, pctMax: number): "flat" | "pct" {
   const need = statNeeds.find((n) => n.stat === stat);
   if (!need) return "flat";
@@ -65,8 +82,8 @@ function StatRow({ stat, isDefense, pref, flatMax, pctMax, equipment }: {
 
   return (
     <div className="grid grid-cols-4 items-center text-[12px] h-[22px] px-0.5">
-      <span className={`capitalize font-medium truncate ${isDefense ? "text-yellow-400" : "text-gray-100"}`}>
-        {stat}
+      <span aria-label={stat} title={stat} className={`capitalize font-medium ${isDefense ? "text-yellow-400" : "text-gray-100"}`}>
+        {statLabel(stat)}
       </span>
       {has !== null ? (
         <span className="text-right font-mono text-gray-500 truncate">{has}</span>

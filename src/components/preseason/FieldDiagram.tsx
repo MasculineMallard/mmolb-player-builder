@@ -40,6 +40,7 @@ function cardStatLabel(stat: string): string {
     acrobatics: "Acro",
     composure: "Comp",
     awareness: "Aware",
+    reaction: "React",
   };
   return abbreviations[stat.toLowerCase()] ?? statLabel(stat);
 }
@@ -53,10 +54,10 @@ function FitStats({ stats }: { stats: PositionFitStat[] }) {
           key={stat.stat}
           className={`min-w-0 px-1 py-1 text-center ${index > 0 ? "border-l border-white/15" : ""}`}
         >
-          <span data-testid="fit-stat-label" className="whitespace-nowrap text-[11px] font-semibold leading-none text-muted-foreground">
+          <span data-testid="fit-stat-label" className="whitespace-nowrap text-[12px] font-semibold leading-none text-muted-foreground">
             {cardStatLabel(stat.stat)}
           </span>
-          <strong className="ml-1 font-mono text-[13px] font-black leading-none text-foreground">{stat.value}</strong>
+          <strong className="ml-1 font-mono text-[14px] font-black leading-none text-foreground">{stat.value}</strong>
         </div>
       ))}
     </div>
@@ -98,7 +99,7 @@ function AssignmentCard({
             <label className="relative flex h-6 min-w-0 cursor-pointer items-center gap-1 rounded-sm px-0.5 focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-primary">
               <span className="sr-only">Player assignment for {assignment.assignedPosition}</span>
               <span className="min-w-0 flex-1 truncate text-[13px] font-extrabold leading-none">{assignment.player.name}</span>
-              <span aria-hidden="true" className="shrink-0 text-[11px] text-muted-foreground">▾</span>
+              <span data-testid="fielder-menu-cue" aria-hidden="true" className="grid h-5 w-5 shrink-0 place-items-center rounded border border-primary/50 bg-primary/20 text-[12px] font-black leading-none text-primary shadow-sm">▼</span>
               <select
                 aria-label={`Player assignment for ${assignment.assignedPosition}; current player ${assignment.player.name}`}
                 value={selectValue}

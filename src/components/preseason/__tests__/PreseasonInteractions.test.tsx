@@ -118,6 +118,7 @@ describe("preseason controls", () => {
     expect(screen.getByTestId("batting-bar-b9").getAttribute("style")).toContain("width: 100%");
     expect(screen.getByTestId("batting-row-b9").getAttribute("data-on-fire")).toBe("true");
     expect(screen.getByTestId("batting-bar-b9").className).toContain("batting-fire-bar");
+    expect(within(screen.getByTestId("batting-row-b9")).getByTestId("batting-fire-edge").getAttribute("style")).toContain("width: 100%");
     expect(screen.queryByText("On fire")).toBeNull();
     expect(screen.getByTestId("batting-row-b9").textContent).toContain("1.040");
     expect(screen.getByTestId("batting-bar-b7").getAttribute("style")).toContain("width: 100%");

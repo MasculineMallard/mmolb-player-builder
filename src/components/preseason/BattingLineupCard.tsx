@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { BattingFireEdge } from "@/components/preseason/BattingFireEdge";
 import {
   recommendBattingOrder,
   type BattingOrderEntry,
@@ -67,14 +68,6 @@ export function BattingLineupCard({ recommendation }: BattingLineupCardProps) {
 
   return (
     <section data-testid="batting-lineup-card" className="rounded-xl border border-border bg-card p-4 sm:p-5">
-      <svg aria-hidden="true" focusable="false" className="absolute h-0 w-0">
-        <defs>
-          <filter id="batting-fire-warp" x="-10%" y="-24%" width="120%" height="148%" colorInterpolationFilters="sRGB">
-            <feTurbulence type="fractalNoise" baseFrequency="0.014 0.085" numOctaves="2" seed="7" result="fireNoise" />
-            <feDisplacementMap in="SourceGraphic" in2="fireNoise" scale="16" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-        </defs>
-      </svg>
       <div className="mx-auto max-w-3xl">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -102,21 +95,26 @@ export function BattingLineupCard({ recommendation }: BattingLineupCardProps) {
           </div>
         )}
 
-        <ol className="space-y-2">
-          {displayedRecommendation.lineup.map((entry) => (
+        <ol className="space-y-7 pt-7">
+          {displayedRecommendation.lineup.map((entry) => {
+            const fire = isOnFire(entry);
+            const width = barWidth(entry);
+            return (
             <li
               key={entry.player.mmolbPlayerId}
               data-testid={`batting-row-${entry.player.mmolbPlayerId}`}
-              data-on-fire={isOnFire(entry) ? "true" : "false"}
-              className={`relative min-h-16 overflow-hidden rounded-lg border bg-secondary/40 px-3 py-3 sm:min-h-18 sm:px-4 ${isOnFire(entry) ? "batting-on-fire" : "border-border"}`}
+              data-on-fire={fire ? "true" : "false"}
+              className={`relative min-h-16 rounded-lg border bg-secondary/40 px-3 py-3 sm:min-h-18 sm:px-4 ${fire ? "batting-on-fire" : "border-border"}`}
             >
-              <div
-                aria-hidden="true"
-                data-testid={`batting-bar-${entry.player.mmolbPlayerId}`}
-                className={`absolute inset-y-0 left-0 bg-primary/10 ${isOnFire(entry) ? "batting-fire-bar" : ""}`}
-                style={{ width: `${barWidth(entry)}%` }}
-              />
-              <div className="relative flex items-center gap-3">
+              <div aria-hidden="true" className="absolute inset-0 overflow-hidden rounded-[inherit]">
+                <div
+                  data-testid={`batting-bar-${entry.player.mmolbPlayerId}`}
+                  className={`absolute inset-y-0 left-0 bg-primary/10 ${fire ? "batting-fire-bar" : ""}`}
+                  style={{ width: `${width}%` }}
+                />
+              </div>
+              {fire && <BattingFireEdge width={width} />}
+              <div className="relative z-10 flex items-center gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-base font-black text-primary-foreground shadow-sm">
                   {entry.slot}
                 </span>
@@ -135,7 +133,8 @@ export function BattingLineupCard({ recommendation }: BattingLineupCardProps) {
                 </div>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ol>
 
         {displayedRecommendation.incomplete && (
