@@ -67,9 +67,12 @@ describe("FieldDiagram", () => {
     fielders.forEach((fielder) => {
       expect(within(fielder).getByText("Awareness")).toBeTruthy();
       expect(within(fielder).getByTestId("fit-stat-label").className).not.toContain("truncate");
-      expect(within(fielder).getByText("123").className).toContain("text-base");
+      expect(within(fielder).getByText("123").className).toContain("text-[9px]");
       expect(within(fielder).getByTestId("fielder-card-header").textContent).toContain("Player");
+      expect(fielder.getAttribute("aria-label")).toContain("best position for this player");
     });
+    expect(screen.getAllByTestId("defensive-field")).toHaveLength(1);
+    expect(screen.getByTestId("defensive-field").getAttribute("style")).toContain("/images/field-options-ai/field-ai-02.png");
     expect(screen.getByText("Average position fit 75%")).toBeTruthy();
     expect(screen.getByText("Equipped items included")).toBeTruthy();
     expect(screen.getByText(/Fit % = Σ\(weight × min\(item-adjusted stat ÷ target, 1\)\) ÷ Σ\(weights\) × 100/)).toBeTruthy();
@@ -77,7 +80,17 @@ describe("FieldDiagram", () => {
     expect(screen.queryByText(/!/)).toBeNull();
     expect(screen.getAllByText("Player 2").length).toBeGreaterThan(0);
 
-    fireEvent.change(screen.getAllByLabelText("Player assignment for C")[0], { target: { value: "2" } });
+    const catcherSelect = screen.getByLabelText("Player assignment for C; current player Player 1");
+    const catcherOptions = within(catcherSelect).getAllByRole("option");
+    expect(catcherOptions[0].textContent).toBe("Auto · Player 1");
+    expect(catcherOptions[1].textContent).toBe("Lock · Player 1");
+
+    fireEvent.change(catcherSelect, { target: { value: "1" } });
+    expect(onLockPosition).toHaveBeenCalledWith("C", "1");
+    fireEvent.change(catcherSelect, { target: { value: "" } });
+    expect(onLockPosition).toHaveBeenCalledWith("C", null);
+    fireEvent.change(catcherSelect, { target: { value: "2" } });
     expect(onLockPosition).toHaveBeenCalledWith("C", "2");
+    expect(screen.getByText("Next").parentElement?.className).toContain("w-[84%]");
   });
 });

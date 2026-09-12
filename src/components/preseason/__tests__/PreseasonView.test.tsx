@@ -157,17 +157,17 @@ describe("PreseasonView tabs", () => {
     await waitFor(() => expect(screen.getByTestId("pitching-staff-card")).toBeTruthy());
     fireEvent.click(screen.getByRole("tab", { name: /Position Fit/ }));
 
-    fireEvent.change(screen.getAllByLabelText("Player assignment for CF")[0], { target: { value: "b1" } });
+    fireEvent.change(screen.getAllByLabelText(/^Player assignment for CF;/)[0], { target: { value: "b1" } });
     await waitFor(() => {
       const centerField = screen.getAllByTestId("fielder-node")
         .find((node) => node.getAttribute("data-position") === "CF");
       expect(centerField?.getAttribute("data-locked")).toBe("true");
-      expect((within(centerField!).getByLabelText("Player assignment for CF") as HTMLSelectElement).value).toBe("b1");
+      expect((within(centerField!).getByLabelText(/^Player assignment for CF;/) as HTMLSelectElement).value).toBe("b1");
     });
 
     const rightField = screen.getAllByTestId("fielder-node")
       .find((node) => node.getAttribute("data-position") === "RF");
-    fireEvent.change(within(rightField!).getByLabelText("Player assignment for RF"), { target: { value: "b1" } });
+    fireEvent.change(within(rightField!).getByLabelText(/^Player assignment for RF;/), { target: { value: "b1" } });
     await waitFor(() => {
       const fielders = screen.getAllByTestId("fielder-node");
       expect(fielders.find((node) => node.getAttribute("data-position") === "CF")?.getAttribute("data-locked")).toBe("false");
@@ -176,10 +176,10 @@ describe("PreseasonView tabs", () => {
 
     const lockedRightField = screen.getAllByTestId("fielder-node")
       .find((node) => node.getAttribute("data-position") === "RF");
-    fireEvent.change(within(lockedRightField!).getByLabelText("Player assignment for RF"), { target: { value: "" } });
+    fireEvent.change(within(lockedRightField!).getByLabelText(/^Player assignment for RF;/), { target: { value: "" } });
     await waitFor(() => expect(screen.queryByRole("button", { name: /Reset 1 lock/ })).toBeNull());
 
-    fireEvent.change(screen.getAllByLabelText("Player assignment for CF")[0], { target: { value: "b1" } });
+    fireEvent.change(screen.getAllByLabelText(/^Player assignment for CF;/)[0], { target: { value: "b1" } });
     const reset = await screen.findByRole("button", { name: "Reset 1 lock" });
     fireEvent.click(reset);
     await waitFor(() => {

@@ -13,14 +13,14 @@ export interface FieldDiagramProps {
 }
 
 const FIELD_COORDS: Record<string, { left: string; top: string }> = {
-  C: { left: "50%", top: "89%" },
+  C: { left: "50%", top: "87%" },
   "1B": { left: "80%", top: "68%" },
-  "2B": { left: "63%", top: "49%" },
+  "2B": { left: "65%", top: "49%" },
   "3B": { left: "20%", top: "68%" },
-  SS: { left: "37%", top: "49%" },
-  LF: { left: "18%", top: "23%" },
-  CF: { left: "50%", top: "13%" },
-  RF: { left: "82%", top: "23%" },
+  SS: { left: "35%", top: "49%" },
+  LF: { left: "19%", top: "24%" },
+  CF: { left: "50%", top: "14%" },
+  RF: { left: "81%", top: "24%" },
 };
 
 function fitColor(score: number | null): string {
@@ -38,11 +38,16 @@ function statLabel(stat: string): string {
 function FitStats({ stats }: { stats: PositionFitStat[] }) {
   if (stats.length === 0) return <div className="text-xs text-muted-foreground">No weighted stats</div>;
   return (
-    <div className={`grid gap-1 ${stats.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
-      {stats.map((stat) => (
-        <div key={stat.stat} className="min-w-0 rounded bg-black/20 px-1.5 py-1 text-center">
-          <span data-testid="fit-stat-label" className="block whitespace-nowrap text-[10px] font-semibold text-muted-foreground">{statLabel(stat.stat)}</span>
-          <strong className="mt-0.5 block font-mono text-base font-black leading-none text-foreground">{stat.value}</strong>
+    <div className={`grid border-t border-white/15 ${stats.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+      {stats.map((stat, index) => (
+        <div
+          key={stat.stat}
+          className={`min-w-0 px-1 py-1 text-center ${index > 0 ? "border-l border-white/15" : ""}`}
+        >
+          <span data-testid="fit-stat-label" className="whitespace-nowrap text-[8px] font-semibold text-muted-foreground">
+            {statLabel(stat.stat)}
+          </span>
+          <strong className="ml-1 font-mono text-[9px] font-black leading-none text-foreground">{stat.value}</strong>
         </div>
       ))}
     </div>
@@ -54,41 +59,42 @@ function AssignmentCard({
   alternative,
   startingPlayers,
   onLockPosition,
-  mobile = false,
 }: {
   assignment: PositionAssignment;
   alternative?: PositionAlternative;
   startingPlayers: PositionAssignment["player"][];
   onLockPosition?: (position: string, playerId: string | null) => void;
-  mobile?: boolean;
 }) {
   const score = assignment.fitScore;
   const selectValue = assignment.isLocked ? assignment.player.mmolbPlayerId : "";
 
   return (
     <div
-      data-testid={mobile ? undefined : "fielder-node"}
+      role="group"
+      data-testid="fielder-node"
       data-position={assignment.assignedPosition}
       data-locked={assignment.isLocked ? "true" : "false"}
-      aria-label={`${assignment.assignedPosition}: ${assignment.player.name}, ${score == null ? "fit unavailable" : `${Math.round(score)} percent fit`}; ${assignment.keyStats.map((stat) => `${statLabel(stat.stat)} ${stat.value}`).join(", ")}`}
-      className={`${mobile ? "relative" : "absolute z-10 w-[20%] -translate-x-1/2 -translate-y-1/2"} overflow-hidden rounded-[10px] border bg-background/95 text-foreground shadow-[0_8px_24px_rgb(0_0_0/0.45)] backdrop-blur-sm ${assignment.isPersonalBest ? "border-primary ring-1 ring-primary/70" : "border-white/25"}`}
-      style={mobile ? undefined : {
+      aria-label={`${assignment.assignedPosition}: ${assignment.player.name}, ${score == null ? "fit unavailable" : `${Math.round(score)} percent fit`}; ${assignment.keyStats.map((stat) => `${statLabel(stat.stat)} ${stat.value}`).join(", ")}${assignment.isPersonalBest ? "; best position for this player" : ""}`}
+      className="absolute z-10 w-[clamp(125px,19%,142px)] -translate-x-1/2 -translate-y-1/2 text-foreground drop-shadow-[0_4px_7px_rgb(0_0_0/0.5)]"
+      style={{
         left: FIELD_COORDS[assignment.assignedPosition]?.left ?? "50%",
         top: FIELD_COORDS[assignment.assignedPosition]?.top ?? "50%",
       }}
       title={assignment.isPersonalBest ? "This is this player's best position" : undefined}
     >
-      <div className="px-2 py-1.5">
-        <div data-testid="fielder-card-header" className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-1.5">
-          <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-black tracking-wide text-primary">{assignment.assignedPosition}</span>
+      <div className={`overflow-hidden rounded-[5px] border bg-background/95 backdrop-blur-sm ${assignment.isPersonalBest ? "border-primary" : "border-white/25"}`}>
+        <div data-testid="fielder-card-header" className="grid min-h-[27px] grid-cols-[20px_minmax(0,1fr)_auto] items-center gap-1 px-[5px] py-px pl-[3px]">
+          <span className="grid h-[15px] place-items-center rounded-[3px] bg-primary/20 font-mono text-[8px] font-black tracking-wide text-primary">{assignment.assignedPosition}</span>
           {onLockPosition ? (
-            <label className="min-w-0">
+            <label className="relative flex h-6 min-w-0 cursor-pointer items-center gap-1 rounded-sm px-0.5 focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-primary">
               <span className="sr-only">Player assignment for {assignment.assignedPosition}</span>
+              <span className="min-w-0 flex-1 truncate text-[9px] font-extrabold">{assignment.player.name}</span>
+              <span aria-hidden="true" className="shrink-0 text-[8px] text-muted-foreground">▾</span>
               <select
-                aria-label={`Player assignment for ${assignment.assignedPosition}`}
+                aria-label={`Player assignment for ${assignment.assignedPosition}; current player ${assignment.player.name}`}
                 value={selectValue}
                 onChange={(event) => onLockPosition(assignment.assignedPosition, event.target.value || null)}
-                className="h-7 w-full cursor-pointer truncate rounded-md border border-border bg-secondary px-1.5 text-[11px] font-bold text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/25"
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
               >
                 <option value="">Auto · {assignment.player.name}</option>
                 {startingPlayers.map((player) => (
@@ -99,24 +105,23 @@ function AssignmentCard({
               </select>
             </label>
           ) : (
-            <span className="min-w-0 truncate text-xs font-bold">{assignment.player.name}</span>
+            <span className="min-w-0 truncate text-[9px] font-extrabold">{assignment.player.name}</span>
           )}
-          <span className="font-mono text-sm font-black" style={{ color: fitColor(score) }}>
+          <span className="font-mono text-[10px] font-black" style={{ color: fitColor(score) }}>
             {score == null ? "N/A" : `${Math.round(score)}%`}
           </span>
         </div>
 
-        <div className="mt-1">
-          <FitStats stats={assignment.keyStats} />
-        </div>
+        <FitStats stats={assignment.keyStats} />
       </div>
 
       {alternative && (
-        <div className="flex items-center justify-between gap-1 border-t border-border bg-secondary/95 px-2 py-1 text-[9px] leading-tight">
+        <div className="mx-auto -mt-px grid w-[84%] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-[3px] rounded-b-[4px] border border-t-0 border-white/20 bg-secondary/95 px-[5px] py-[3px] text-[8px] leading-none">
+          <span className="text-muted-foreground">Next</span>
           <span className="min-w-0 truncate text-muted-foreground">
-            Next fit <strong className="text-foreground">{alternative.player.name}</strong>
+            <strong className="text-foreground">{alternative.player.name}</strong>
           </span>
-          <strong className="shrink-0 font-mono text-[10px] text-primary">{Math.round(alternative.fitScore)}%</strong>
+          <strong className="shrink-0 font-mono text-[8px] text-primary">{Math.round(alternative.fitScore)}%</strong>
         </div>
       )}
     </div>
@@ -176,37 +181,24 @@ export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: F
       </div>
 
       <div className="mx-auto max-w-5xl rounded-xl border border-border bg-background/40 p-2">
-        <div
-          className="relative hidden aspect-[8/5] w-full overflow-hidden rounded-lg bg-cover bg-center lg:block"
-          style={{ backgroundImage: `url(${BASE_PATH}/images/preseason-field-flat.svg)` }}
-        >
-          {recommendation.fielders.map((assignment) => (
-            <AssignmentCard
-              key={assignment.assignedPosition}
-              assignment={assignment}
-              alternative={alternativeByPosition.get(assignment.assignedPosition)}
-              startingPlayers={startingPlayers}
-              onLockPosition={onLockPosition}
-            />
-          ))}
-        </div>
-
-        <div
-          aria-hidden="true"
-          className="aspect-[8/5] w-full rounded-lg bg-cover bg-center lg:hidden"
-          style={{ backgroundImage: `url(${BASE_PATH}/images/preseason-field-flat.svg)` }}
-        />
-        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:hidden">
-          {recommendation.fielders.map((assignment) => (
-            <AssignmentCard
-              key={`mobile-${assignment.assignedPosition}`}
-              assignment={assignment}
-              alternative={alternativeByPosition.get(assignment.assignedPosition)}
-              startingPlayers={startingPlayers}
-              onLockPosition={onLockPosition}
-              mobile
-            />
-          ))}
+        <div className="overflow-x-auto rounded-lg">
+          <div
+            role="region"
+            data-testid="defensive-field"
+            aria-label="Defensive alignment by field position"
+            className="relative aspect-[8/5] w-full min-w-[640px] overflow-hidden rounded-lg bg-cover bg-center"
+            style={{ backgroundImage: `url(${BASE_PATH}/images/field-options-ai/field-ai-02.png)` }}
+          >
+            {recommendation.fielders.map((assignment) => (
+              <AssignmentCard
+                key={assignment.assignedPosition}
+                assignment={assignment}
+                alternative={alternativeByPosition.get(assignment.assignedPosition)}
+                startingPlayers={startingPlayers}
+                onLockPosition={onLockPosition}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
