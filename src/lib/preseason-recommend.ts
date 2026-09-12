@@ -561,9 +561,8 @@ export function recommendPositions(
   );
   const starterCount = Math.min(9, batters.length);
   const startingBatters = [...preferredStarters, ...fallbackStarters].slice(0, starterCount);
-  const startingIds = new Set(startingBatters.map((player) => player.mmolbPlayerId));
-  const battingOrderLocked = starterCount === 9 && preferredStarters.slice(0, 9).length === 9;
-  const starterById = new Map(startingBatters.map((player) => [player.mmolbPlayerId, player]));
+  const defaultStartingIds = new Set(startingBatters.map((player) => player.mmolbPlayerId));
+  const defaultBattingOrderLocked = starterCount === 9 && preferredStarters.slice(0, 9).length === 9;
   const fitPlayerById = new Map(batters.map((player) => [
     player.mmolbPlayerId,
     itemAdjustedPlayer(player, modifierLookup),
@@ -590,7 +589,9 @@ export function recommendPositions(
   };
   const lockedAssignments = FIELDING_POSITIONS.flatMap((position): PositionAssignment[] => {
     const playerId = positionLocks[position];
-    const player = playerId ? starterById.get(playerId) : null;
+    // Manual defense is intentionally broader than the default best-nine-bats
+    // lineup: a user may promote the current DH or any bench batter to a spot.
+    const player = playerId ? batterById.get(playerId) : null;
     if (!player || lockedPlayerIds.has(player.mmolbPlayerId)) return [];
     lockedPlayerIds.add(player.mmolbPlayerId);
     return [makeAssignment(player, position, true)];
@@ -623,7 +624,20 @@ export function recommendPositions(
     );
   const fieldedIds = new Set(fielders.map((assignment) => assignment.player.mmolbPlayerId));
   const designatedHitter = startingBatters.find((player) => !fieldedIds.has(player.mmolbPlayerId)) ?? null;
-  const benchBatters = batters.filter((player) => !startingIds.has(player.mmolbPlayerId));
+  const activeStartingIds = new Set([
+    ...fieldedIds,
+    ...(designatedHitter ? [designatedHitter.mmolbPlayerId] : []),
+  ]);
+  const benchBatters = batters.filter((player) => !activeStartingIds.has(player.mmolbPlayerId));
+  const activeStartingBatters = [
+    ...startingBatters.filter((player) => activeStartingIds.has(player.mmolbPlayerId)),
+    ...batters.filter((player) =>
+      activeStartingIds.has(player.mmolbPlayerId) && !defaultStartingIds.has(player.mmolbPlayerId),
+    ),
+  ];
+  const battingOrderLocked = defaultBattingOrderLocked
+    && activeStartingBatters.length === startingBatters.length
+    && activeStartingBatters.every((player) => defaultStartingIds.has(player.mmolbPlayerId));
   const asSpillover = (player: PreseasonPlayerData, assignedPosition: "DH" | "Bench"): PositionAssignment => ({
     player,
     assignedPosition,
@@ -651,7 +665,7 @@ export function recommendPositions(
       player: alternate.player,
       fitScore: alternate.fitScore,
       keyStats: keyStatsForPosition(fitPlayer(alternate.player), position, fitModel),
-      isStarter: startingIds.has(alternate.player.mmolbPlayerId),
+      isStarter: activeStartingIds.has(alternate.player.mmolbPlayerId),
     }];
   });
 
@@ -661,7 +675,7 @@ export function recommendPositions(
     bench: benchBatters.map((player) => asSpillover(player, "Bench")),
     pitchers,
     alternatives,
-    startingBatterIds: startingBatters.map((player) => player.mmolbPlayerId),
+    startingBatterIds: activeStartingBatters.map((player) => player.mmolbPlayerId),
     battingOrderLocked,
     totalFit: fielders.reduce((sum, assignment) => sum + (assignment.fitScore ?? 0), 0),
   };

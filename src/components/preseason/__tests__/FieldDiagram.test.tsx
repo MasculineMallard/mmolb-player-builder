@@ -100,7 +100,9 @@ describe("FieldDiagram", () => {
     const catcherSelect = screen.getByLabelText("Player assignment for C; current player Player 1");
     const catcherOptions = within(catcherSelect).getAllByRole("option");
     expect(catcherOptions[0].textContent).toBe("Auto · Player 1");
-    expect(catcherOptions[1].textContent).toBe("Lock · Player 1");
+    expect(catcherOptions[1].textContent).toBe("Lock · Player 1 · Field");
+    expect(catcherOptions.some((option) => option.textContent === "Lock · Player dh · DH")).toBe(true);
+    expect(catcherOptions.some((option) => option.textContent === "Lock · Player bench · Bench")).toBe(true);
 
     fireEvent.change(catcherSelect, { target: { value: "1" } });
     expect(onLockPosition).toHaveBeenCalledWith("C", "1");
@@ -108,6 +110,10 @@ describe("FieldDiagram", () => {
     expect(onLockPosition).toHaveBeenCalledWith("C", null);
     fireEvent.change(catcherSelect, { target: { value: "2" } });
     expect(onLockPosition).toHaveBeenCalledWith("C", "2");
+    fireEvent.change(catcherSelect, { target: { value: "dh" } });
+    expect(onLockPosition).toHaveBeenCalledWith("C", "dh");
+    fireEvent.change(catcherSelect, { target: { value: "bench" } });
+    expect(onLockPosition).toHaveBeenCalledWith("C", "bench");
     expect(screen.getByText("Next").parentElement?.className).toContain("w-[84%]");
   });
 });

@@ -69,12 +69,12 @@ function FitStats({ stats }: { stats: PositionFitStat[] }) {
 function AssignmentCard({
   assignment,
   alternative,
-  startingPlayers,
+  selectablePlayers,
   onLockPosition,
 }: {
   assignment: PositionAssignment;
   alternative?: PositionAlternative;
-  startingPlayers: PositionAssignment["player"][];
+  selectablePlayers: Array<{ player: PositionAssignment["player"]; rosterRole: "Field" | "DH" | "Bench" }>;
   onLockPosition?: (position: string, playerId: string | null) => void;
 }) {
   const score = assignment.fitScore;
@@ -109,9 +109,9 @@ function AssignmentCard({
                 className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
               >
                 <option value="">Auto · {assignment.player.name}</option>
-                {startingPlayers.map((player) => (
+                {selectablePlayers.map(({ player, rosterRole }) => (
                   <option key={player.mmolbPlayerId} value={player.mmolbPlayerId}>
-                    Lock · {player.name}
+                    Lock · {player.name} · {rosterRole}
                   </option>
                 ))}
               </select>
@@ -150,13 +150,13 @@ export function FieldDiagram({ recommendation, modifierSourceStatus = "canonical
     );
   }
 
-  const playerById = new Map(
-    [...recommendation.fielders, ...(recommendation.designatedHitter ? [recommendation.designatedHitter] : [])]
-      .map((assignment) => [assignment.player.mmolbPlayerId, assignment.player]),
-  );
-  const startingPlayers = recommendation.startingBatterIds
-    .map((playerId) => playerById.get(playerId))
-    .filter((player): player is PositionAssignment["player"] => player != null);
+  const selectablePlayers = [
+    ...recommendation.fielders.map((assignment) => ({ player: assignment.player, rosterRole: "Field" as const })),
+    ...(recommendation.designatedHitter
+      ? [{ player: recommendation.designatedHitter.player, rosterRole: "DH" as const }]
+      : []),
+    ...recommendation.bench.map((assignment) => ({ player: assignment.player, rosterRole: "Bench" as const })),
+  ];
   const alternativeByPosition = new Map(
     recommendation.alternatives.map((alternative) => [alternative.position, alternative]),
   );
@@ -224,7 +224,7 @@ export function FieldDiagram({ recommendation, modifierSourceStatus = "canonical
                 key={assignment.assignedPosition}
                 assignment={assignment}
                 alternative={alternativeByPosition.get(assignment.assignedPosition)}
-                startingPlayers={startingPlayers}
+                selectablePlayers={selectablePlayers}
                 onLockPosition={onLockPosition}
               />
             ))}

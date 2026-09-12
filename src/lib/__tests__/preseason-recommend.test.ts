@@ -370,6 +370,49 @@ describe("recommendPositions", () => {
     expect(result.bench[0].positionOptions).toHaveLength(3);
   });
 
+  it("allows manual field locks to promote the DH or a bench batter and reflows reserves", () => {
+    const base = [
+      player("a", "C", { stats: { awareness: 200 } }),
+      player("b", "1B", { stats: { arm: 140 } }),
+      player("c", "2B", { stats: { agility: 140 } }),
+      player("d", "3B", { stats: { reaction: 140 } }),
+      player("e", "SS", { stats: { dexterity: 140 } }),
+      player("f", "LF", { stats: { acrobatics: 140 } }),
+      player("g", "CF", { stats: { composure: 140 } }),
+      player("h", "RF", { stats: { patience: 140 } }),
+    ];
+    const dh = player("dh", "DH", { stats: {}, OPS: 2 });
+    const bench = player("bench", "C", { stats: { awareness: 50 }, OPS: 1 });
+    const startingNine = [...base.map((entry) => entry.mmolbPlayerId), dh.mmolbPlayerId];
+
+    const dhLocked = recommendPositions([...base, dh, bench], defense, startingNine, { C: "dh" });
+    expect(dhLocked.fielders.find((entry) => entry.assignedPosition === "C")).toMatchObject({
+      isLocked: true,
+      player: { mmolbPlayerId: "dh" },
+    });
+    expect(dhLocked.designatedHitter?.player.mmolbPlayerId).not.toBe("dh");
+
+    const benchLocked = recommendPositions([...base, dh, bench], defense, startingNine, { C: "bench" });
+    expect(benchLocked.fielders.find((entry) => entry.assignedPosition === "C")).toMatchObject({
+      isLocked: true,
+      player: { mmolbPlayerId: "bench" },
+    });
+    expect(benchLocked.fielders).toHaveLength(8);
+    expect(new Set(benchLocked.fielders.map((entry) => entry.player.mmolbPlayerId)).size).toBe(8);
+    expect(benchLocked.startingBatterIds).toHaveLength(9);
+    expect(benchLocked.startingBatterIds).toContain("bench");
+    expect(benchLocked.bench.map((entry) => entry.player.mmolbPlayerId)).not.toContain("bench");
+    expect(benchLocked.bench.some((entry) => startingNine.includes(entry.player.mmolbPlayerId))).toBe(true);
+    expect(benchLocked.battingOrderLocked).toBe(false);
+    const rosterPartition = [
+      ...benchLocked.fielders.map((entry) => entry.player.mmolbPlayerId),
+      ...(benchLocked.designatedHitter ? [benchLocked.designatedHitter.player.mmolbPlayerId] : []),
+      ...benchLocked.bench.map((entry) => entry.player.mmolbPlayerId),
+    ];
+    expect(new Set(rosterPartition).size).toBe(rosterPartition.length);
+    expect([...rosterPartition].sort()).toEqual([...base, dh, bench].map((entry) => entry.mmolbPlayerId).sort());
+  });
+
   it("exposes the two highest-weighted raw stats for each assigned position", () => {
     const weightedDefense: PositionDefenseMap = {
       ...defense,

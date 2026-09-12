@@ -145,7 +145,7 @@ export function PreseasonGlossaryButton() {
                   <h3 className="font-bold text-foreground">Position Fit</h3>
                 </div>
                 <ul className="list-disc space-y-2 pl-5">
-                  <li><strong className="text-foreground">The nine best bats come first.</strong> Eight field; the ninth becomes DH. Defense never swaps in a weaker bat just for glove fit.</li>
+                  <li><strong className="text-foreground">The nine best bats come first.</strong> Eight field; the ninth becomes DH. Auto defense never swaps in a weaker bat just for glove fit, but a manual lock can promote the DH or any bench bat.</li>
                   <li><strong className="text-foreground">Items and current player modifiers count here.</strong> Fit uses base attributes plus equipped-item and available canonical modifier effects. Boons are not added. The cards show these adjusted values.</li>
                   <li><strong className="text-foreground">Modifier source:</strong> numeric effects use the active date window from the <a className="text-primary underline underline-offset-2" href="https://github.com/anodoze/mmolb-modifiers" target="_blank" rel="noreferrer">anodoze/mmolb-modifiers list</a>. If that source cannot be reached, Pop labels the field and leaves player-modifier effects out instead of guessing.</li>
                   <li>
@@ -154,7 +154,7 @@ export function PreseasonGlossaryButton() {
                   </li>
                   <li><strong className="text-foreground">Position priorities:</strong> Catcher favors Awareness. Among the four infielders, equipped Reaction is ordered SS → 3B → 2B → 1B. Outfield placement emphasizes Acrobatics/Agility and sends the strongest outfield Arm to RF.</li>
                   <li><strong className="text-foreground">Fit targets:</strong> 140 for primary stats, 80 for secondary stats, and 200 for catcher Awareness. “Next fit” shows the strongest alternative.</li>
-                  <li><strong className="text-foreground">Locks win.</strong> Choosing a player fixes that spot and recomputes the best valid arrangement for every unlocked starter. “Auto” releases it.</li>
+                  <li><strong className="text-foreground">Locks win.</strong> Choosing any field, DH, or bench batter fixes that player to the spot and recomputes the best valid arrangement everywhere else. “Auto” releases it.</li>
                   <li>Bench bats keep their three best playable positions. The summary is the average fit percentage across all eight fielders.</li>
                 </ul>
                 <div className="mt-3 rounded-md border border-border bg-background/60 px-3 py-2 text-xs italic">If fewer than nine batters clear the PA floor, OPS and then batting attributes provisionally fill the missing starters.</div>
