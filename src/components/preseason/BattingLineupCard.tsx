@@ -23,8 +23,16 @@ const ORDER_MODES: Array<{ value: BattingOrderMode; label: string }> = [
 function barWidth(entry: BattingOrderEntry): number {
   if (entry.value == null) return 0;
   if (entry.driver === "SO%") return Math.min(100, Math.max(3, 100 - ((entry.value / 0.5) * 100)));
-  const visualCeiling = entry.driver === "OBP" ? 0.55 : entry.driver === "SLG" ? 0.85 : 1.35;
+  const visualCeiling = entry.driver === "OBP" ? 0.55 : entry.driver === "SLG" ? 0.85 : 1;
   return Math.min(100, Math.max(3, (entry.value / visualCeiling) * 100));
+}
+
+function isOnFire(entry: BattingOrderEntry): boolean {
+  if (entry.value == null) return false;
+  if (entry.driver === "OPS") return entry.value > 1;
+  if (entry.driver === "OBP") return entry.value >= 0.45;
+  if (entry.driver === "SLG") return entry.value >= 0.7;
+  return entry.value <= 0.1;
 }
 
 function formatValue(entry: BattingOrderEntry): string {
@@ -90,11 +98,14 @@ export function BattingLineupCard({ recommendation }: BattingLineupCardProps) {
           {displayedRecommendation.lineup.map((entry) => (
             <li
               key={entry.player.mmolbPlayerId}
-              className="relative min-h-16 overflow-hidden rounded-lg border border-border bg-secondary/40 px-3 py-3 sm:min-h-18 sm:px-4"
+              data-testid={`batting-row-${entry.player.mmolbPlayerId}`}
+              data-on-fire={isOnFire(entry) ? "true" : "false"}
+              className={`relative min-h-16 overflow-hidden rounded-lg border bg-secondary/40 px-3 py-3 sm:min-h-18 sm:px-4 ${isOnFire(entry) ? "batting-on-fire" : "border-border"}`}
             >
               <div
                 aria-hidden="true"
-                className="absolute inset-y-0 left-0 bg-primary/10"
+                data-testid={`batting-bar-${entry.player.mmolbPlayerId}`}
+                className={`absolute inset-y-0 left-0 bg-primary/10 ${isOnFire(entry) ? "batting-fire-bar" : ""}`}
                 style={{ width: `${barWidth(entry)}%` }}
               />
               <div className="relative flex items-center gap-3">
@@ -111,6 +122,7 @@ export function BattingLineupCard({ recommendation }: BattingLineupCardProps) {
                   </div>
                 </div>
                 <div className="min-w-16 text-right">
+                  {isOnFire(entry) && <div className="batting-fire-badge">On fire</div>}
                   <div className="text-[11px] font-bold uppercase tracking-wide text-primary">{entry.driver}</div>
                   <div className="font-mono text-base font-bold text-foreground">{formatValue(entry)}</div>
                 </div>

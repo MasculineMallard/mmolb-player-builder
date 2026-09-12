@@ -132,6 +132,73 @@
   50% { opacity: 0.5; transform: scale(1.08); }
 }
 
+@keyframes batting-fire-glow {
+  0%, 100% {
+    box-shadow: inset 0 2px 0 rgb(228 185 79 / 0.4), 0 0 0 rgb(59 130 246 / 0);
+  }
+  50% {
+    box-shadow: inset 0 2px 0 rgb(228 185 79 / 0.95), 0 0 16px rgb(59 130 246 / 0.22);
+  }
+}
+
+@keyframes batting-fire-flicker {
+  0%, 100% { opacity: 0.6; transform: translateY(1px) rotate(5deg) scale(0.88); }
+  40% { opacity: 1; transform: translateY(-2px) rotate(-4deg) scale(1.08); }
+  70% { opacity: 0.78; transform: translateY(0) rotate(2deg) scale(0.96); }
+}
+
+.batting-on-fire {
+  border-color: rgb(228 185 79 / 0.7);
+  animation: batting-fire-glow 1.45s ease-in-out infinite;
+}
+
+.batting-fire-bar {
+  background: linear-gradient(90deg, rgb(59 130 246 / 0.1), rgb(228 185 79 / 0.18));
+}
+
+.batting-fire-bar::after {
+  position: absolute;
+  top: 7px;
+  right: 5px;
+  bottom: 7px;
+  width: 20px;
+  border-radius: 60% 35% 55% 40%;
+  background: radial-gradient(circle at 55% 72%, rgb(232 241 242 / 0.75) 0 14%, rgb(228 185 79 / 0.82) 15% 42%, rgb(59 130 246 / 0.5) 43% 64%, transparent 65%);
+  content: "";
+  animation: batting-fire-flicker 0.9s ease-in-out infinite;
+}
+
+.batting-fire-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  color: #e4b94f;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.batting-fire-badge::before {
+  width: 7px;
+  height: 9px;
+  border: 1px solid rgb(228 185 79 / 0.85);
+  border-radius: 65% 35% 60% 40%;
+  background: rgb(59 130 246 / 0.75);
+  content: "";
+  animation: batting-fire-flicker 0.8s ease-in-out infinite reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .batting-on-fire,
+  .batting-fire-bar::after,
+  .batting-fire-badge::before {
+    animation: none;
+  }
+}
+
 
 @layer base {
   * {

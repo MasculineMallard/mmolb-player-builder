@@ -25,6 +25,7 @@ function player(
     ERA?: number | null;
     WHIP?: number | null;
     K9?: number | null;
+    HR9?: number | null;
     SO_PCT?: number | null;
     stats?: Record<string, number>;
   } = {},
@@ -57,9 +58,11 @@ function player(
     hitsAllowed: 0,
     walks: 0,
     strikeouts: 0,
+    homeRunsAllowed: 0,
     ERA: options.ERA ?? 3,
     WHIP: options.WHIP ?? 1,
     K9: options.K9 ?? 9,
+    HR9: options.HR9 ?? 0,
   } : null;
 
   return {
@@ -96,7 +99,7 @@ function roleMap(count: number, closerRank: number) {
 }
 
 describe("recommendPitchingStaff", () => {
-  it("computes exact rank-weighted performance and 75/25 blend values", () => {
+  it("computes the exact 50% WHIP, 25% ERA, 25% K/9 pitching score", () => {
     const result = recommendPitchingStaff([
       player("a", "SP", { ERA: 1, WHIP: 2, K9: 1 }),
       player("b", "SP", { ERA: 2, WHIP: 3, K9: 3 }),
@@ -104,21 +107,21 @@ describe("recommendPitchingStaff", () => {
     ]);
     const byId = Object.fromEntries(result.entries.map((entry) => [entry.player.mmolbPlayerId, entry]));
 
-    expect(byId.a.performanceScore).toBeCloseTo(50.5);
-    expect(byId.b.performanceScore).toBeCloseTo(50);
-    expect(byId.c.performanceScore).toBeCloseTo(49.5);
-    expect(byId.a.blendedScore).toBeCloseTo(62.875);
-    expect(byId.b.blendedScore).toBeCloseTo(62.5);
-    expect(byId.c.blendedScore).toBeCloseTo(62.125);
+    expect(byId.a.scoreBreakdown).toEqual({ whip: 50, era: 100, strikeouts: 0 });
+    expect(byId.b.scoreBreakdown).toEqual({ whip: 0, era: 50, strikeouts: 100 });
+    expect(byId.c.scoreBreakdown).toEqual({ whip: 100, era: 0, strikeouts: 50 });
+    expect(byId.a.score).toBe(50);
+    expect(byId.b.score).toBe(37.5);
+    expect(byId.c.score).toBe(62.5);
+    expect(result.entries.map((entry) => entry.player.mmolbPlayerId)).toEqual(["c", "a", "b"]);
   });
 
   it("uses neutral rank 50 for a single pitcher and all-equal stats", () => {
     const single = recommendPitchingStaff([player("solo", "SP")]);
-    expect(single.entries[0].performanceScore).toBe(50);
-    expect(single.entries[0].blendedScore).toBe(62.5);
+    expect(single.entries[0].score).toBe(50);
 
     const equal = recommendPitchingStaff([player("a", "SP"), player("b", "SP"), player("c", "SP")]);
-    expect(equal.entries.map((entry) => entry.performanceScore)).toEqual([50, 50, 50]);
+    expect(equal.entries.map((entry) => entry.score)).toEqual([50, 50, 50]);
   });
 
   it("assigns the exact role map for closer ranks 4, 1, and 7", () => {
@@ -188,13 +191,23 @@ describe("recommendPitchingStaff", () => {
     });
   });
 
-  it("uses attribute score then player id as deterministic tie-breaks", () => {
+  it("uses score components then player id as deterministic qualified tie-breaks", () => {
     const highAttr = player("z-high", "SP", { stats: { velocity: 100 } });
     const lowAttr = player("a-low", "SP", { stats: { accuracy: 100 } });
-    expect(recommendPitchingStaff([lowAttr, highAttr]).entries[0].player.mmolbPlayerId).toBe("z-high");
+    const firstRun = recommendPitchingStaff([highAttr, lowAttr]).entries.map((entry) => entry.player.mmolbPlayerId);
+    const reversedInput = recommendPitchingStaff([lowAttr, highAttr]).entries.map((entry) => entry.player.mmolbPlayerId);
 
-    const idTie = recommendPitchingStaff([player("b", "SP"), player("a", "SP")]);
-    expect(idTie.entries.map((entry) => entry.player.mmolbPlayerId)).toEqual(["a", "b"]);
+    expect(firstRun).toEqual(["a-low", "z-high"]);
+    expect(reversedInput).toEqual(firstRun);
+  });
+
+  it("uses attribute score then player id only for below-floor fallbacks", () => {
+    const highAttr = player("z-high", "SP", { outs: 8, stats: { velocity: 100 } });
+    const lowAttr = player("a-low", "SP", { outs: 8, stats: { accuracy: 100 } });
+    const result = recommendPitchingStaff([lowAttr, highAttr]);
+
+    expect(result.entries[0].player.mmolbPlayerId).toBe("z-high");
+    expect(result.entries.every((entry) => entry.score == null && entry.scoreBreakdown == null)).toBe(true);
   });
 });
 

@@ -101,27 +101,29 @@ describe("computePreseasonBatting", () => {
 });
 
 describe("computePreseasonPitching", () => {
-  it("derives fractional innings from outs and computes ERA, WHIP, and K/9", () => {
+  it("derives fractional innings from outs and computes ERA, WHIP, K/9, and HR/9", () => {
     const result = computePreseasonPitching({
       outs: 17,
       earned_runs: 2,
       hits_allowed: 5,
       walks: 2,
       strikeouts: 8,
+      home_runs_allowed: 2,
     });
 
     expect(result?.IP).toBeCloseTo(17 / 3);
     expect(result?.ERA).toBeCloseTo((9 * 2) / (17 / 3));
     expect(result?.WHIP).toBeCloseTo(7 / (17 / 3));
     expect(result?.K9).toBeCloseTo((9 * 8) / (17 / 3));
+    expect(result?.HR9).toBeCloseTo((9 * 2) / (17 / 3));
   });
 
   it("returns null rate stats at zero outs and treats omitted counters as zero", () => {
     const noOuts = computePreseasonPitching({ earned_runs: 1 });
-    expect(noOuts).toMatchObject({ outs: 0, IP: 0, ERA: null, WHIP: null, K9: null });
+    expect(noOuts).toMatchObject({ outs: 0, IP: 0, ERA: null, WHIP: null, K9: null, HR9: null });
 
     const scoreless = computePreseasonPitching({ outs: 9, hits_allowed: 2, strikeouts: 4 });
-    expect(scoreless).toMatchObject({ earnedRuns: 0, walks: 0, ERA: 0 });
+    expect(scoreless).toMatchObject({ earnedRuns: 0, walks: 0, homeRunsAllowed: 0, ERA: 0, HR9: 0 });
   });
 });
 

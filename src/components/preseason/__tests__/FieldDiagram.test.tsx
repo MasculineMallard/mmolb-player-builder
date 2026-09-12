@@ -35,19 +35,20 @@ describe("FieldDiagram", () => {
   it("renders exactly eight designed fielder cards for a full assignment", () => {
     const positions = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
     const onLockPosition = vi.fn();
+    const fielders = positions.map((position, index) => ({
+      player: makePlayer(String(index + 1)),
+      assignedPosition: position,
+      personalBestPosition: position,
+      fitScore: 75,
+      isPersonalBest: true,
+      isLocked: false,
+      keyStats: [{ stat: "awareness", value: 123, weight: 0.12 }],
+      positionOptions: [],
+    }));
     const recommendation: PositionAssignmentRec = {
-      fielders: positions.map((position, index) => ({
-        player: makePlayer(String(index + 1)),
-        assignedPosition: position,
-        personalBestPosition: position,
-        fitScore: 75,
-        isPersonalBest: true,
-        isLocked: false,
-        keyStats: [{ stat: "awareness", value: 123, weight: 0.12 }],
-        positionOptions: [],
-      })),
-      designatedHitter: null,
-      bench: [],
+      fielders,
+      designatedHitter: { ...fielders[0], player: makePlayer("dh") },
+      bench: [{ ...fielders[1], player: makePlayer("bench") }],
       pitchers: [],
       alternatives: [{
         position: "C",
@@ -62,13 +63,14 @@ describe("FieldDiagram", () => {
     };
 
     render(<FieldDiagram recommendation={recommendation} onLockPosition={onLockPosition} />);
-    const fielders = screen.getAllByTestId("fielder-node");
-    expect(fielders).toHaveLength(8);
-    fielders.forEach((fielder) => {
-      expect(within(fielder).getByText("Awareness")).toBeTruthy();
+    const renderedFielders = screen.getAllByTestId("fielder-node");
+    expect(renderedFielders).toHaveLength(8);
+    renderedFielders.forEach((fielder) => {
+      expect(within(fielder).getByText("Aware")).toBeTruthy();
       expect(within(fielder).getByTestId("fit-stat-label").className).not.toContain("truncate");
-      expect(within(fielder).getByText("123").className).toContain("text-[9px]");
+      expect(within(fielder).getByText("123").className).toContain("text-[11px]");
       expect(within(fielder).getByTestId("fielder-card-header").textContent).toContain("Player");
+      expect(fielder.getAttribute("aria-label")).toContain("Awareness 123");
       expect(fielder.getAttribute("aria-label")).toContain("best position for this player");
     });
     expect(screen.getAllByTestId("defensive-field")).toHaveLength(1);
@@ -79,6 +81,10 @@ describe("FieldDiagram", () => {
     expect(screen.queryByText("9/9 best bats locked")).toBeNull();
     expect(screen.queryByText(/!/)).toBeNull();
     expect(screen.getAllByText("Player 2").length).toBeGreaterThan(0);
+    const reserveGrid = screen.getByTestId("reserve-bats-grid");
+    expect(reserveGrid.className).toContain("lg:grid-cols-5");
+    expect(within(reserveGrid).getByTestId("designated-hitter-card").textContent).toContain("Player dh");
+    expect(within(reserveGrid).getByText("Player bench")).toBeTruthy();
 
     const catcherSelect = screen.getByLabelText("Player assignment for C; current player Player 1");
     const catcherOptions = within(catcherSelect).getAllByRole("option");

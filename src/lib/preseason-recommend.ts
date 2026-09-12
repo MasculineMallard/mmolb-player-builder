@@ -17,13 +17,25 @@ import type { PreseasonPlayerData } from "./preseason-data";
 
 export type PitchingRole = "Starter" | "Closer" | "Reliever" | "Depth";
 
+export const PITCHING_SCORE_WEIGHTS = Object.freeze({
+  whip: 0.5,
+  era: 0.25,
+  strikeouts: 0.25,
+});
+
+export interface PitchingScoreBreakdown {
+  whip: number;
+  era: number;
+  strikeouts: number;
+}
+
 export interface PitchingStaffEntry {
   player: PreseasonPlayerData;
   rank: number | null;
   role: PitchingRole;
-  performanceScore: number | null;
+  score: number | null;
+  scoreBreakdown: PitchingScoreBreakdown | null;
   attributeScore: number;
-  blendedScore: number;
   roleEligible: boolean;
   lowSample: boolean;
   forcedStarter: boolean;
@@ -157,25 +169,33 @@ export function recommendPitchingStaff(
   const k9Ranks = rankMetric(qualifying, (player) => player.preseasonPitching?.K9 ?? null, "higher");
 
   const eligibleEntries = qualifying.map((player): PitchingStaffEntry => {
-    const performanceScore =
-      (0.34 * (eraRanks.get(player.mmolbPlayerId) ?? 50)) +
-      (0.33 * (whipRanks.get(player.mmolbPlayerId) ?? 50)) +
-      (0.33 * (k9Ranks.get(player.mmolbPlayerId) ?? 50));
+    const scoreBreakdown = {
+      whip: whipRanks.get(player.mmolbPlayerId) ?? 50,
+      era: eraRanks.get(player.mmolbPlayerId) ?? 50,
+      strikeouts: k9Ranks.get(player.mmolbPlayerId) ?? 50,
+    };
+    const score = Number((
+      (PITCHING_SCORE_WEIGHTS.whip * scoreBreakdown.whip) +
+      (PITCHING_SCORE_WEIGHTS.era * scoreBreakdown.era) +
+      (PITCHING_SCORE_WEIGHTS.strikeouts * scoreBreakdown.strikeouts)
+    ).toFixed(6));
     const attributeScore = computeAttributeScore(player, "pitcher");
     return {
       player,
       rank: null,
       role: "Depth",
-      performanceScore,
+      score,
+      scoreBreakdown,
       attributeScore,
-      blendedScore: (0.75 * performanceScore) + (0.25 * attributeScore),
       roleEligible: true,
       lowSample: player.sampleSize.outs < LOW_SAMPLE_OUTS,
       forcedStarter: false,
     };
   }).sort((a, b) =>
-    (b.blendedScore - a.blendedScore) ||
-    (b.attributeScore - a.attributeScore) ||
+    ((b.score ?? 0) - (a.score ?? 0)) ||
+    ((b.scoreBreakdown?.whip ?? 0) - (a.scoreBreakdown?.whip ?? 0)) ||
+    ((b.scoreBreakdown?.era ?? 0) - (a.scoreBreakdown?.era ?? 0)) ||
+    ((b.scoreBreakdown?.strikeouts ?? 0) - (a.scoreBreakdown?.strikeouts ?? 0)) ||
     a.player.mmolbPlayerId.localeCompare(b.player.mmolbPlayerId),
   );
 
@@ -187,9 +207,9 @@ export function recommendPitchingStaff(
         player,
         rank: null,
         role: "Depth",
-        performanceScore: null,
+        score: null,
+        scoreBreakdown: null,
         attributeScore,
-        blendedScore: attributeScore,
         roleEligible: false,
         lowSample: true,
         forcedStarter: false,

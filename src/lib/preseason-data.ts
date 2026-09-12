@@ -29,9 +29,11 @@ export interface PreseasonPitchingStats {
   hitsAllowed: number;
   walks: number;
   strikeouts: number;
+  homeRunsAllowed: number;
   ERA: number | null;
   WHIP: number | null;
   K9: number | null;
+  HR9: number | null;
 }
 
 export interface PreseasonSampleSize {
@@ -138,6 +140,7 @@ export function computePreseasonPitching(
   const hitsAllowed = stat(stats, "hits_allowed");
   const walks = stat(stats, "walks");
   const strikeouts = stat(stats, "strikeouts");
+  const homeRunsAllowed = stat(stats, "home_runs_allowed");
   const IP = outs / 3;
 
   return {
@@ -147,9 +150,11 @@ export function computePreseasonPitching(
     hitsAllowed,
     walks,
     strikeouts,
+    homeRunsAllowed,
     ERA: IP > 0 ? (9 * earnedRuns) / IP : null,
     WHIP: IP > 0 ? (walks + hitsAllowed) / IP : null,
     K9: IP > 0 ? (9 * strikeouts) / IP : null,
+    HR9: IP > 0 ? (9 * homeRunsAllowed) / IP : null,
   };
 }
 

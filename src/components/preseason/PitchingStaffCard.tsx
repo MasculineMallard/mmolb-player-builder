@@ -29,19 +29,20 @@ function PitcherTile({
         <div className="min-w-0">
           <div className="truncate text-sm font-semibold text-foreground">{entry.player.name}</div>
           <div className="text-[11px] text-muted-foreground">
-            {entry.roleEligible
-              ? `#${entry.rank} · ${entry.blendedScore.toFixed(1)} blend`
-              : `#${entry.rank} · ${entry.attributeScore} attr fallback`}
+            {entry.score == null
+              ? `#${entry.rank} · not scored · ${entry.attributeScore} attr fallback`
+              : `#${entry.rank} · ${entry.score.toFixed(1)} score`}
           </div>
         </div>
         <span className="shrink-0 rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">
           {entry.role === "Starter" ? "SP" : entry.role === "Reliever" ? "RP" : entry.role === "Closer" ? "CL" : "DEPTH"}
         </span>
       </div>
-      <div className="mt-1.5 grid grid-cols-3 gap-1 text-center text-[10px] text-muted-foreground">
+      <div className="mt-1.5 grid grid-cols-4 gap-1 text-center text-[10px] text-muted-foreground">
         <span><strong className="block text-xs text-foreground">{formatRate(stats?.ERA)}</strong>ERA</span>
         <span><strong className="block text-xs text-foreground">{formatRate(stats?.WHIP)}</strong>WHIP</span>
         <span><strong className="block text-xs text-foreground">{formatRate(stats?.K9, 1)}</strong>K/9</span>
+        <span><strong className="block text-xs text-foreground">{formatRate(stats?.HR9, 1)}</strong>HR/9</span>
       </div>
       {entry.lowSample && (
         <div className="mt-1.5 text-[10px] font-medium text-yellow-500">
@@ -99,7 +100,7 @@ export function PitchingStaffCard({ pitchers, defaultCloserRank = 4 }: PitchingS
     <section data-testid="pitching-staff-card" className="rounded-xl border border-border bg-card p-4 sm:p-5">
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-foreground">Recommended Pitching Staff</h2>
-        <p className="text-xs text-muted-foreground">5 starters · 3 relief pitchers · 1 closer · 75% Offseason performance / 25% attributes</p>
+        <p className="text-xs text-muted-foreground">5 starters · 3 relief pitchers · 1 closer · Score = 50% WHIP + 25% ERA + 25% K/9</p>
       </div>
 
       <div>
@@ -147,10 +148,14 @@ export function PitchingStaffCard({ pitchers, defaultCloserRank = 4 }: PitchingS
             {closer && (
               <div data-testid={`pitcher-tile-${closer.player.mmolbPlayerId}`} className="mt-1.5">
                 <div className="truncate text-sm font-semibold text-foreground">{closer.player.name}</div>
-                <div className="mt-1 grid grid-cols-3 gap-1 text-center text-[10px] text-muted-foreground">
+                <div className="text-[10px] text-muted-foreground">
+                  #{closer.rank} · {closer.score == null ? "not scored" : `${closer.score.toFixed(1)} score`}
+                </div>
+                <div className="mt-1 grid grid-cols-4 gap-1 text-center text-[10px] text-muted-foreground">
                   <span><strong className="block text-xs text-foreground">{formatRate(closer.player.preseasonPitching?.ERA)}</strong>ERA</span>
                   <span><strong className="block text-xs text-foreground">{formatRate(closer.player.preseasonPitching?.WHIP)}</strong>WHIP</span>
                   <span><strong className="block text-xs text-foreground">{formatRate(closer.player.preseasonPitching?.K9, 1)}</strong>K/9</span>
+                  <span><strong className="block text-xs text-foreground">{formatRate(closer.player.preseasonPitching?.HR9, 1)}</strong>HR/9</span>
                 </div>
               </div>
             )}

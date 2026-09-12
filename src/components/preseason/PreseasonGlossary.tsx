@@ -107,8 +107,13 @@ export function PreseasonGlossaryButton() {
                   <h3 className="font-bold text-foreground">Pitching Staff</h3>
                 </div>
                 <ul className="list-disc space-y-1.5 pl-5">
-                  <li><strong className="text-foreground">Ranking floor:</strong> {MIN_OUTS_STAFF / 3} IP. Qualified arms rank on ERA / WHIP / K/9 at 34% / 33% / 33%.</li>
-                  <li><strong className="text-foreground">Final score:</strong> 75% performance rank + 25% underlying pitching attributes. Ties share their occupied mid-rank.</li>
+                  <li><strong className="text-foreground">Scoring floor:</strong> {MIN_OUTS_STAFF / 3} IP. Pitchers below the floor are not assigned a pitching score.</li>
+                  <li>
+                    <strong className="text-foreground">Pitching score:</strong>
+                    <span className="mt-1 block rounded-md bg-background/70 px-2.5 py-2 font-mono text-[11px] text-primary">Score = (WHIP rank × 0.50) + (ERA rank × 0.25) + (K/9 rank × 0.25)</span>
+                  </li>
+                  <li><strong className="text-foreground">Component ranks:</strong> Each rate becomes a 0–100 roster rank. Lower WHIP and ERA are better; higher K/9 is better. Tied rates share their occupied mid-rank; a lone pitcher or all-equal rate receives a neutral 50.</li>
+                  <li><strong className="text-foreground">Deterministic ties:</strong> Equal scores resolve by WHIP rank, then ERA rank, then K/9 rank, then stable player ID. Attributes do not alter a qualified pitcher’s score.</li>
                   <li><strong className="text-foreground">Staff shape:</strong> 5 SP, 3 RP, and 1 closer when nine arms are available. Below-floor arms can fill vacancies by attribute score.</li>
                   <li><strong className="text-foreground">Overrides:</strong> “Force as SP” can lock up to five starters, even below the floor. The closer selection skips forced starters.</li>
                 </ul>
@@ -129,6 +134,7 @@ export function PreseasonGlossaryButton() {
                   <li>Batters need <strong className="text-foreground">{MIN_PA_LINEUP} PA</strong>. Each selected batter is removed before the next slot; attributes and player ID break ties.</li>
                   <li>Every row shows SO%. The menu can also re-sort the view by OBP, OPS, SLG, or lowest SO%.</li>
                   <li>Alternate sorts <strong className="text-foreground">do not replace</strong> the default nine used by Position Fit.</li>
+                  <li><strong className="text-foreground">Bars and “On fire”:</strong> OPS bars reach full width at 1.000 while the real value remains visible. The displayed metric catches fire at OPS &gt; 1.000, OBP ≥ .450, SLG ≥ .700, or SO% ≤ 10.0%.</li>
                 </ul>
                 <div className="mt-3 rounded-md bg-yellow-500/10 px-3 py-2 text-xs text-yellow-500">Below {LOW_SAMPLE_PA} PA is marked <strong>low sample</strong>.</div>
               </section>
@@ -166,6 +172,7 @@ export function PreseasonGlossaryButton() {
                   <div className="rounded-md bg-secondary p-2"><strong className="text-foreground">ERA</strong><span className="block font-mono">9 × ER / IP</span></div>
                   <div className="rounded-md bg-secondary p-2"><strong className="text-foreground">WHIP</strong><span className="block font-mono">(BB + H) / IP</span></div>
                   <div className="rounded-md bg-secondary p-2"><strong className="text-foreground">K/9</strong><span className="block font-mono">9 × K / IP</span></div>
+                  <div className="rounded-md bg-secondary p-2"><strong className="text-foreground">HR/9</strong><span className="block font-mono">9 × HR allowed / IP · display only</span></div>
                   <div className="rounded-md bg-secondary p-2"><strong className="text-foreground">IP</strong><span className="block font-mono">recorded outs / 3</span></div>
                 </div>
               </section>
