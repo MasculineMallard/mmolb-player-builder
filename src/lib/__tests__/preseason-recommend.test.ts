@@ -284,6 +284,33 @@ describe("recommendPositions", () => {
     expect(byPosition["1B"]).toMatchObject({ personalBestPosition: "C", isPersonalBest: false, fitScore: 90 });
   });
 
+  it("honors a position lock and re-optimizes every remaining fielding spot", () => {
+    const players = [
+      player("a-flex", "C", { stats: { awareness: 200, arm: 126 } }),
+      player("b-catcher", "C", { stats: { awareness: 198 } }),
+      player("c-2b", "2B", { stats: { agility: 140 } }),
+      player("d-3b", "3B", { stats: { reaction: 140 } }),
+      player("e-ss", "SS", { stats: { dexterity: 140 } }),
+      player("f-lf", "LF", { stats: { acrobatics: 140 } }),
+      player("g-cf", "CF", { stats: { composure: 140 } }),
+      player("h-rf", "RF", { stats: { patience: 140 } }),
+    ];
+
+    const automatic = recommendPositions(players, defense);
+    const locked = recommendPositions(players, defense, undefined, { C: "a-flex" });
+    const automaticByPosition = Object.fromEntries(automatic.fielders.map((assignment) => [assignment.assignedPosition, assignment]));
+    const lockedByPosition = Object.fromEntries(locked.fielders.map((assignment) => [assignment.assignedPosition, assignment]));
+
+    expect(automaticByPosition.C.player.mmolbPlayerId).toBe("b-catcher");
+    expect(lockedByPosition.C).toMatchObject({
+      isLocked: true,
+      player: { mmolbPlayerId: "a-flex" },
+    });
+    expect(lockedByPosition["1B"].player.mmolbPlayerId).toBe("b-catcher");
+    expect(new Set(locked.fielders.map((assignment) => assignment.player.mmolbPlayerId)).size).toBe(8);
+    expect(new Set(locked.startingBatterIds)).toEqual(new Set(automatic.startingBatterIds));
+  });
+
   it("handles missing defense stats, ignores gameStats, and spills extras to DH/bench", () => {
     const base = [
       player("a", "C", { stats: { awareness: 200 } }),

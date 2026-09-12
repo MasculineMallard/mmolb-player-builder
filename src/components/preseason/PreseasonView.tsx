@@ -39,6 +39,7 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
   const [loadState, setLoadState] = useState<LoadState>("idle");
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<PlotterTab>("pitching");
+  const [positionLocks, setPositionLocks] = useState<Record<string, string>>({});
 
   const pitchers = useMemo(
     () => players.filter((player) => player.preseasonPitching != null || ["SP", "RP", "CL", "P"].includes(player.position ?? "")),
@@ -56,15 +57,27 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
         players,
         positionDefense,
         battingRecommendation.lineup.map((entry) => entry.player.mmolbPlayerId),
+        positionLocks,
       )
       : null,
-    [battingRecommendation, players, positionDefense],
+    [battingRecommendation, players, positionDefense, positionLocks],
   );
   const warnings = useMemo(
     () => players.flatMap((player) => player.dataWarnings.map((warning) => `${player.name}: ${warning}`)),
     [players],
   );
   const hasPreseasonData = players.some((player) => player.sampleSize.PA > 0 || player.sampleSize.outs > 0);
+
+  const handlePositionLock = useCallback((position: string, playerId: string | null) => {
+    setPositionLocks((current) => {
+      const next = { ...current };
+      for (const [lockedPosition, lockedPlayerId] of Object.entries(next)) {
+        if (lockedPlayerId === playerId || lockedPosition === position) delete next[lockedPosition];
+      }
+      if (playerId) next[position] = playerId;
+      return next;
+    });
+  }, []);
 
   const handleTabKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, currentTab: PlotterTab) => {
     const currentIndex = PLOTTER_TABS.findIndex((tab) => tab.id === currentTab);
@@ -87,6 +100,7 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
     setError(null);
     setPlayers([]);
     setActiveTab("pitching");
+    setPositionLocks({});
 
     try {
       const [response, defense] = await Promise.all([
@@ -242,7 +256,13 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
                 <BattingLineupCard recommendation={battingRecommendation} />
               </div>
               <div id="plotter-panel-fielding" role="tabpanel" aria-labelledby="plotter-tab-fielding" hidden={activeTab !== "fielding"}>
-                {positionRecommendation && <FieldDiagram recommendation={positionRecommendation} />}
+                {positionRecommendation && (
+                  <FieldDiagram
+                    recommendation={positionRecommendation}
+                    onLockPosition={handlePositionLock}
+                    onResetLocks={() => setPositionLocks({})}
+                  />
+                )}
               </div>
             </>
           )}

@@ -73,6 +73,9 @@ describe("preseason controls", () => {
 
     expect(screen.getAllByText("RP")).toHaveLength(3);
     expect(screen.getByText("Choose your closer")).toBeTruthy();
+    const closerId = (screen.getByLabelText("Closer rank") as HTMLSelectElement).selectedOptions[0].textContent?.match(/—\s(.+)$/)?.[1];
+    const closer = screen.getByTestId(`pitcher-tile-${closerId}`);
+    expect(within(closer).queryByRole("button", { name: "Force as SP" })).toBeNull();
     const tiny = screen.getByTestId("pitcher-tile-tiny");
     fireEvent.click(within(tiny).getByRole("button", { name: "Force as SP" }));
     const forcedTiny = screen.getByTestId("pitcher-tile-tiny");

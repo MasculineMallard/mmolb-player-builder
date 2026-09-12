@@ -112,7 +112,8 @@ export function PreseasonGlossaryButton() {
               <section>
                 <h3 className="mb-1 font-semibold text-foreground">Position Fit</h3>
                 <p>The default batting-order nine are selected first. An exact optimizer then maximizes the combined fit of eight of those nine across C, 1B, 2B, 3B, SS, LF, CF, and RF; the ninth hitter becomes DH. This guarantees the defense graphic does not substitute a weaker bat solely for glove fit.</p>
-                <p className="mt-1">Position fit reuses POP’s defense model: primary-stat target 140, secondary-stat target 80, and catcher Awareness target 200. Each field card shows the two highest-weighted defensive attributes available for that position and the player’s raw values. “Next-best” lists the strongest alternative to the assigned player at each spot. Every bench bat shows their three highest-fit playable positions.</p>
+                <p className="mt-1">Position fit reuses POP’s defense model: primary-stat target 140, secondary-stat target 80, and catcher Awareness target 200. Each field card shows the two highest-weighted defensive attributes available for that position and the player’s raw values. Its attached “Next fit” box shows the strongest alternative at that spot. The summary is the average fit percentage across the displayed fielding assignments.</p>
+                <p className="mt-1">Choosing a player on a position card locks that starter to that spot. The optimizer immediately rearranges every unlocked starter for the best remaining combined fit; choosing “Auto” releases the lock. A player can only be locked at one position. Every bench bat still shows their three highest-fit playable positions.</p>
                 <p className="mt-1 text-xs">When fewer than nine batters clear the PA floor, missing starting spots are provisionally filled by OPS and then batting attributes; the tab says so explicitly.</p>
               </section>
 
