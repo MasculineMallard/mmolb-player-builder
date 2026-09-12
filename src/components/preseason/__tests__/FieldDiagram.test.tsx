@@ -75,6 +75,7 @@ describe("FieldDiagram", () => {
     });
     expect(screen.getAllByTestId("defensive-field")).toHaveLength(1);
     expect(screen.getByTestId("defensive-field").getAttribute("style")).toContain("/images/field-options-ai/field-ai-02.png");
+    expect(screen.getByTestId("defensive-field").className).toContain("min-w-[700px]");
     expect(screen.getByText("Average position fit 75%")).toBeTruthy();
     expect(screen.getByText("Equipped items included")).toBeTruthy();
     expect(screen.getByText(/Fit % = Σ\(weight × min\(item-adjusted stat ÷ target, 1\)\) ÷ Σ\(weights\) × 100/)).toBeTruthy();

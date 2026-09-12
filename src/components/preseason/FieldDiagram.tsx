@@ -195,7 +195,7 @@ export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: F
             role="region"
             data-testid="defensive-field"
             aria-label="Defensive alignment by field position"
-            className="relative aspect-[8/5] w-full min-w-[640px] overflow-hidden rounded-lg bg-cover bg-center"
+            className="relative aspect-[8/5] w-full min-w-[700px] overflow-hidden rounded-lg bg-cover bg-center"
             style={{ backgroundImage: `url(${BASE_PATH}/images/field-options-ai/field-ai-02.png)` }}
           >
             {recommendation.fielders.map((assignment) => (
