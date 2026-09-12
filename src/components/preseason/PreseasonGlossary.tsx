@@ -146,7 +146,8 @@ export function PreseasonGlossaryButton() {
                 </div>
                 <ul className="list-disc space-y-2 pl-5">
                   <li><strong className="text-foreground">The nine best bats come first.</strong> Eight field; the ninth becomes DH. Defense never swaps in a weaker bat just for glove fit.</li>
-                  <li><strong className="text-foreground">Items count here.</strong> Fit uses each player’s base attributes plus equipped item flats and percentages. Boons are not added. The cards show these item-adjusted values.</li>
+                  <li><strong className="text-foreground">Items and current player modifiers count here.</strong> Fit uses base attributes plus equipped-item and available canonical modifier effects. Boons are not added. The cards show these adjusted values.</li>
+                  <li><strong className="text-foreground">Modifier source:</strong> numeric effects use the active date window from the <a className="text-primary underline underline-offset-2" href="https://github.com/anodoze/mmolb-modifiers" target="_blank" rel="noreferrer">anodoze/mmolb-modifiers list</a>. If that source cannot be reached, Pop labels the field and leaves player-modifier effects out instead of guessing.</li>
                   <li>
                     <strong className="text-foreground">Fit equation:</strong>
                     <span className="mt-1 block rounded-md bg-background/70 px-2.5 py-2 font-mono text-[11px] text-primary">Σ(weight × min(item-adjusted stat ÷ target, 1)) ÷ Σ(weights) × 100</span>

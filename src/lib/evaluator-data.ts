@@ -10,6 +10,7 @@ import type { Archetype } from "./types";
 import { createJsonCache, isNonArrayObject } from "./json-cache";
 import { BASE_PATH } from "./constants";
 import statTiers from "../data/stat-tiers.json";
+import type { BoonEntry, BoonsMerged } from "./modifier-source";
 
 // ---------------------------------------------------------------------------
 // Stat Tiers (S15 regression — which stats actually matter). Sourced from the
@@ -303,37 +304,75 @@ export const loadPositionDefense = createJsonCache<PositionDefenseMap>(
   (d): d is PositionDefenseMap => isNonArrayObject(d),
 );
 
-interface BoonEntry {
-  name: string;
-  type: string;
-  emoji: string;
-  description: string;
-  bonuses: Record<string, number>;
-  penalties: Record<string, number>;
-}
-interface BoonsMerged {
-  lesser_boons: BoonEntry[];
-  greater_boons?: BoonEntry[];
+/** Dynamic effect data: deliberately not handled by the cache-forever static loader. */
+export async function loadBoons(): Promise<BoonsMerged> {
+  const response = await fetch(`${BASE_PATH}/api/modifiers`, {
+    signal: AbortSignal.timeout(10_000),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`Failed to load modifiers: ${response.status}`);
+  const data = await response.json() as unknown;
+  if (!isNonArrayObject(data) || !Array.isArray(data.lesser_boons)) {
+    throw new Error("Invalid response from /api/modifiers");
+  }
+  return data as unknown as BoonsMerged;
 }
 
-export const loadBoons = createJsonCache<BoonsMerged>(
-  "/data/boons_merged.json",
-  (d): d is BoonsMerged => {
-    if (!isNonArrayObject(d)) return false;
-    const obj = d as Record<string, unknown>;
-    return Array.isArray(obj.lesser_boons);
-  },
-);
+export type ModifierSourceStatus = "canonical" | "unavailable";
 
-/** Build a name → BoonEntry lookup from the merged boons list. */
-export async function getBoonLookup(): Promise<Map<string, BoonEntry>> {
-  const data = await loadBoons();
+/** Build a name → effect lookup from a validated merged response. */
+export function buildBoonLookup(data: BoonsMerged): Map<string, BoonEntry> {
   const map = new Map<string, BoonEntry>();
   for (const b of data.lesser_boons) map.set(b.name, b);
   if (data.greater_boons) {
     for (const b of data.greater_boons) map.set(b.name, b);
   }
+  for (const modifier of data.modifier_effects ?? []) {
+    const bonuses: Record<string, number> = {};
+    const penalties: Record<string, number> = {};
+    const flatBonuses: Record<string, number> = {};
+    const flatPenalties: Record<string, number> = {};
+    for (const [stat, amount] of Object.entries(modifier.multipliers)) {
+      if (amount > 0) bonuses[stat] = amount;
+      if (amount < 0) penalties[stat] = Math.abs(amount);
+    }
+    for (const [stat, amount] of Object.entries(modifier.flats)) {
+      if (amount > 0) flatBonuses[stat] = amount;
+      if (amount < 0) flatPenalties[stat] = Math.abs(amount);
+    }
+    map.set(modifier.name, {
+      name: modifier.name,
+      type: "modifier",
+      emoji: "",
+      description: "",
+      bonuses,
+      penalties,
+      flatBonuses,
+      flatPenalties,
+    });
+  }
   return map;
+}
+
+/** Load both the effect lookup and whether ordinary modifier data is available. */
+export async function getModifierLookup(): Promise<{
+  lookup: Map<string, BoonEntry>;
+  sourceStatus: ModifierSourceStatus;
+  boonList: BoonEntry[];
+  nextTransition: string | null;
+}> {
+  const data = await loadBoons();
+  return {
+    lookup: buildBoonLookup(data),
+    sourceStatus: data.modifier_source?.status ?? "unavailable",
+    boonList: data.lesser_boons,
+    nextTransition: data.modifier_source?.next_transition ?? null,
+  };
+}
+
+/** Backward-compatible lookup for consumers that only need effect values. */
+export async function getBoonLookup(): Promise<Map<string, BoonEntry>> {
+  return (await getModifierLookup()).lookup;
 }
 
 // ---------------------------------------------------------------------------

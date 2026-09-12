@@ -188,6 +188,7 @@ export function buildPreseasonPlayerData(
     : null;
   const lesserBoons = (raw?.LesserBoon ?? raw?.LesserBoons ?? []).map((boon) => boon.Name);
   const greaterBoons = (raw?.GreaterBoon ?? raw?.GreaterBoons ?? []).map((boon) => boon.Name);
+  const modifications = (raw?.Modification ?? raw?.Modifications ?? []).map((modification) => modification.Name);
   const pitches = (raw?.PitchTypes ?? []).map((name, index) => ({
     name: name.toLowerCase(),
     frequency: raw?.PitchSelection?.[index] ?? 0,
@@ -206,6 +207,7 @@ export function buildPreseasonPlayerData(
     equipment: raw ? transformEquipment(raw) : undefined,
     lesserBoons,
     greaterBoons,
+    modifications,
     mmolbPlayerId: raw?._id ?? rosterPlayer.mmolbPlayerId,
     pitches,
     isBench: rosterPlayer.isBench,

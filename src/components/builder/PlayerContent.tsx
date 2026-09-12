@@ -14,9 +14,8 @@ import { BoonAdvisor } from "./BoonAdvisor";
 import { PitchArsenal } from "@/components/pitcher/PitchArsenal";
 import { ExportShare } from "./ExportShare";
 import { useBoonEmojis } from "@/hooks/use-boon-emojis";
+import { useModifierLookup } from "@/hooks/use-modifier-lookup";
 import { recommendStatPriorities, recommendBoonsByLevel, scoreBoons } from "@/lib/advisor";
-import type { BoonData } from "@/lib/advisor";
-import { loadBoons, getBoonLookup } from "@/lib/evaluator-data";
 import { computeEquippedStats } from "@/lib/equipped-stats";
 import { calculateProgress, generateMilestones } from "@/lib/planner-utils";
 import { optimizePitchArsenal, computePitchFitPct, computeArchetypeFitPct, computePitchChips } from "@/lib/optimizer";
@@ -67,30 +66,12 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
   const isPitcher = playerType === "pitcher";
   const { pitchTypes, pitchTypesError } = usePitchTypes(isPitcher);
 
-  // Load boon data for scoring
-  const [boonList, setBoonList] = useState<BoonData[]>([]);
-  useEffect(() => {
-    let cancelled = false;
-    loadBoons()
-      .then((data) => {
-        if (!cancelled) setBoonList(data.lesser_boons as BoonData[]); // eslint-disable-line react-hooks/set-state-in-effect -- async load
-      })
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, []);
+  // Canonical effect values refresh at their next validity boundary. Local boon
+  // metadata remains available if the dynamic modifier endpoint is unreachable.
+  const { lookup: boonLookup, boonList, sourceStatus: modifierSourceStatus } = useModifierLookup();
 
-  // Load boon bonus/penalty lookup for the display-only "with items + boons" totals.
-  const [boonLookup, setBoonLookup] = useState<Map<string, { bonuses: Record<string, number>; penalties: Record<string, number> }>>(new Map());
-  useEffect(() => {
-    let cancelled = false;
-    getBoonLookup()
-      .then((m) => { if (!cancelled) setBoonLookup(m); }) // eslint-disable-line react-hooks/set-state-in-effect -- async load
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, []);
-
-  // Per-stat totals with equipped items + boons folded in (display-only; drives
-  // the stat grid's Base / With-items+boons toggle, never the planning math).
+  // Per-stat totals with items, boons, and modifiers folded in (display-only; drives
+  // the stat grid's Base / With-all-effects toggle, never the planning math).
   const equippedStats = useMemo(
     () => computeEquippedStats(player, boonLookup),
     [player, boonLookup],
@@ -288,6 +269,12 @@ export function PlayerContent({ player: rawPlayer, playerType, onChangePlayer, s
     <>
     {/* Share buttons portal into nav header */}
     <ExportShare player={player} archetype={hasArchetype ? activeArchetype : null} />
+
+    {(player.modifications?.length ?? 0) > 0 && modifierSourceStatus === "unavailable" && (
+      <div className="mb-2 rounded-lg border border-yellow-500/35 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-500" role="status">
+        Current player-modifier values are temporarily unavailable. The effects view still includes equipment and boons, but leaves those modifiers out instead of guessing.
+      </div>
+    )}
 
     <div data-player-content className="lg:grid lg:grid-cols-[420px_1fr] lg:gap-2 space-y-2 lg:space-y-0">
 

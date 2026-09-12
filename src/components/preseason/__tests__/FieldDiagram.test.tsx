@@ -86,8 +86,8 @@ describe("FieldDiagram", () => {
     expect(screen.getByTestId("defensive-field").getAttribute("style")).toContain("/images/field-options-ai/field-ai-02.png");
     expect(screen.getByTestId("defensive-field").className).toContain("min-w-[700px]");
     expect(screen.getByText("Average position fit 75%")).toBeTruthy();
-    expect(screen.getByText("Equipped items included")).toBeTruthy();
-    expect(screen.getByText(/Fit % = Σ\(weight × min\(item-adjusted stat ÷ target, 1\)\) ÷ Σ\(weights\) × 100/)).toBeTruthy();
+    expect(screen.getByText("Items + player modifiers included")).toBeTruthy();
+    expect(screen.getByText(/Fit % = Σ\(weight × min\(current-effect stat ÷ target, 1\)\) ÷ Σ\(weights\) × 100/)).toBeTruthy();
     expect(screen.queryByText("9/9 best bats locked")).toBeNull();
     expect(screen.queryByText(/!/)).toBeNull();
     expect(screen.getAllByText("Player 2").length).toBeGreaterThan(0);

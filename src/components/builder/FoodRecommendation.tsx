@@ -40,7 +40,7 @@ export function FoodRecommendation({ recommendations }: FoodRecommendationProps)
         <span className="w-0.5 h-3 bg-primary/40 rounded-full" />
         Feed Before Level-Up
       </h3>
-      <div className="flex items-center gap-4 h-[calc(100%-28px)]">
+      <div className="flex items-start gap-2 sm:gap-4 h-[calc(100%-28px)]">
         {(() => {
           // Expand doubled foods into individual slots
           const rows: Array<{ rec: typeof foodRecs[0]; index: number }> = [];
@@ -66,7 +66,9 @@ export function FoodRecommendation({ recommendations }: FoodRecommendationProps)
               return (
                 <div key={`${rec.stat}-${i}`} className="flex flex-col items-center text-center flex-1 min-w-0">
                   <span className="text-3xl">{rec.food.emoji}</span>
-                  <div className="text-sm font-semibold truncate w-full">{rec.food.name}</div>
+                  <div className="text-sm font-semibold leading-tight w-full min-h-8 flex items-center justify-center break-words">
+                    {rec.food.name}
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     <span className="capitalize">{rec.stat}</span>
                     {" "}

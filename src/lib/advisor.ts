@@ -234,10 +234,11 @@ export function scoreBoons(
     const baseBonus = playerStats[bonusStat] ?? 0;
     const basePenalty = penaltyStat ? (playerStats[penaltyStat] ?? 0) : 0;
 
-    // Lesser boons apply +25% of the current base to the bonus stat and
-    // -10% to the penalty stat (per the game's own boon data).
-    const absoluteGain = baseBonus * 0.25;
-    const absoluteLoss = basePenalty * 0.1;
+    // Use each source-provided magnitude rather than assuming one global boon value.
+    const bonusMagnitude = (bonusEntries[0]?.[1] ?? 0) / 100;
+    const penaltyMagnitude = (penaltyEntries[0]?.[1] ?? 0) / 100;
+    const absoluteGain = baseBonus * bonusMagnitude;
+    const absoluteLoss = basePenalty * penaltyMagnitude;
 
     // Score = tier weight * absolute gain (bonus) - tier weight * absolute loss (penalty)
     const bonusScore = TIER_WEIGHTS[bonusTier] * absoluteGain;

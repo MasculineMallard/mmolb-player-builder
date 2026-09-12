@@ -9,17 +9,20 @@ import { ArchetypeSelect } from "@/components/builder/ArchetypeSelect";
 import { PlayerHeader } from "@/components/builder/PlayerHeader";
 import { LoadingSkeleton } from "@/components/builder/LoadingSkeleton";
 import { PITCHER_POSITIONS, ITEM_TIERS } from "@/lib/constants";
-import { loadPositionDefense, getBoonLookup } from "@/lib/evaluator-data";
+import { loadPositionDefense } from "@/lib/evaluator-data";
 import type { PositionDefenseMap } from "@/lib/evaluator-data";
 import type { Archetype } from "@/lib/types";
+import { useModifierLookup } from "@/hooks/use-modifier-lookup";
 import { useBoonEmojis } from "@/hooks/use-boon-emojis";
 import {
   analyzeStatNeeds,
   recommendItems,
   computeBoonMultipliers,
+  computeModifierFlats,
   loadItemSlotAttributes,
 } from "@/lib/item-advisor";
 import type { SlotRecommendation } from "@/lib/item-advisor";
+import { computeUnequippedEffectStats } from "@/lib/equipped-stats";
 import { PlayerEquipmentGraphic } from "./PlayerEquipmentGraphic";
 import { StatBarPanel } from "./StatBarPanel";
 import { ShopGlossaryButton } from "./ShopGlossary";
@@ -45,7 +48,7 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
 
   // Data loading
   const [posDefense, setPosDefense] = useState<PositionDefenseMap>({});
-  const [boonLookup, setBoonLookup] = useState<Map<string, { bonuses: Record<string, number>; penalties: Record<string, number> }>>(new Map());
+  const { lookup: boonLookup, sourceStatus: modifierSourceStatus } = useModifierLookup();
   const [batterSlotData, setBatterSlotData] = useState<Record<string, { offensive?: string[]; defensive?: string[]; all?: string[] }> | null>(null);
   const [pitcherSlotData, setPitcherSlotData] = useState<Record<string, { offensive?: string[]; defensive?: string[]; all?: string[] }> | null>(null);
 
@@ -79,11 +82,10 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([loadPositionDefense(), getBoonLookup(), loadItemSlotAttributes()])
-      .then(([pd, bl, sd]) => {
+    Promise.all([loadPositionDefense(), loadItemSlotAttributes()])
+      .then(([pd, sd]) => {
         if (cancelled) return;
         setPosDefense(pd);
-        setBoonLookup(bl);
         setBatterSlotData(sd.batter);
         setPitcherSlotData(sd.pitcher ?? null);
       })
@@ -105,13 +107,35 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
 
   const boonMultipliers = useMemo(() => {
     if (!player) return {};
-    return computeBoonMultipliers(player.lesserBoons, boonLookup);
+    return computeBoonMultipliers(
+      [...player.lesserBoons, ...player.greaterBoons, ...(player.modifications ?? [])],
+      boonLookup,
+    );
   }, [player, boonLookup]);
 
+  const effectAdjustedStats = useMemo(() => {
+    if (!effectivePlayer) return {};
+    return computeUnequippedEffectStats(effectivePlayer, boonLookup);
+  }, [boonLookup, effectivePlayer]);
+
+  const projectionBaseStats = useMemo(() => {
+    if (!player) return {};
+    const modifierFlats = computeModifierFlats(player.modifications ?? [], boonLookup);
+    const keys = new Set([...Object.keys(player.stats), ...Object.keys(modifierFlats)]);
+    return Object.fromEntries(
+      [...keys].map((stat) => [stat, (player.stats[stat] ?? 0) + (modifierFlats[stat] ?? 0)]),
+    );
+  }, [boonLookup, player]);
+
   const statNeeds = useMemo(() => {
-    if (!effectivePlayer || !archetype) return [];
-    return analyzeStatNeeds(effectivePlayer, archetype, posDefense, boonMultipliers);
-  }, [effectivePlayer, archetype, posDefense, boonMultipliers]);
+    if (!effectivePlayer || !archetype || modifierSourceStatus === "loading") return [];
+    return analyzeStatNeeds(
+      { ...effectivePlayer, stats: effectAdjustedStats },
+      archetype,
+      posDefense,
+      boonMultipliers,
+    );
+  }, [effectivePlayer, archetype, modifierSourceStatus, effectAdjustedStats, posDefense, boonMultipliers]);
 
   const recommendations = useMemo<SlotRecommendation[]>(() => {
     if (statNeeds.length === 0 || !slotData || !archetype) return [];
@@ -198,6 +222,12 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
         </div>
       )}
 
+      {player && (player.modifications?.length ?? 0) > 0 && modifierSourceStatus === "unavailable" && (
+        <div className="rounded-lg border border-yellow-500/35 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-500" role="status">
+          Current player-modifier values are temporarily unavailable, so this shop plan excludes those modifiers instead of guessing.
+        </div>
+      )}
+
       {/* Main content — two column layout */}
       {player && !loading && (
         <div className="xl:grid xl:grid-cols-[420px_1fr] xl:gap-2 space-y-2 xl:space-y-0">
@@ -273,6 +303,12 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
               </div>
             )}
 
+            {archetype && modifierSourceStatus === "loading" && (
+              <div className="rounded-lg border border-border bg-card px-3 py-3 text-center text-sm text-muted-foreground" role="status">
+                Loading current boon and player-modifier values…
+              </div>
+            )}
+
             {archetype && recommendations.length === 0 && !slotData && (
               <div className="bg-card border border-destructive/50 rounded-lg p-6 text-center">
                 <div className="text-3xl mb-2">⚠️</div>
@@ -280,7 +316,7 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
               </div>
             )}
 
-            {archetype && recommendations.length === 0 && slotData && (
+            {archetype && modifierSourceStatus !== "loading" && recommendations.length === 0 && slotData && (
               <div className="bg-card border border-border rounded-lg p-6 text-center">
                 <div className="text-3xl mb-2">✅</div>
                 <p className="text-sm text-muted-foreground">No significant stat gaps found.</p>
@@ -303,7 +339,8 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
 
                 <StatBarPanel
                 recommendations={recommendations}
-                playerStats={player.stats}
+                playerStats={effectAdjustedStats}
+                effectBaseStats={projectionBaseStats}
                 boonMultipliers={boonMultipliers}
                 flatMax={selectedTier.flatMax}
                 pctMax={selectedTier.pctMax}

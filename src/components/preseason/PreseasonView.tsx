@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useTeamSearch } from "@/hooks/use-team-search";
+import { useModifierLookup } from "@/hooks/use-modifier-lookup";
 import { BASE_PATH } from "@/lib/constants";
 import { loadPositionDefense, type PositionDefenseMap } from "@/lib/evaluator-data";
 import type { PreseasonPlayerData } from "@/lib/preseason-data";
@@ -35,6 +36,7 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
   const [selectedTeam, setSelectedTeam] = useState<TeamSearchResult | null>(initialTeam);
   const [players, setPlayers] = useState<PreseasonPlayerData[]>([]);
   const [positionDefense, setPositionDefense] = useState<PositionDefenseMap | null>(null);
+  const { lookup: modifierLookup, sourceStatus: modifierSourceStatus } = useModifierLookup();
   const [seasonStatus, setSeasonStatus] = useState<string | null>(null);
   const [loadState, setLoadState] = useState<LoadState>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -58,9 +60,10 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
         positionDefense,
         battingRecommendation.lineup.map((entry) => entry.player.mmolbPlayerId),
         positionLocks,
+        modifierLookup,
       )
       : null,
-    [battingRecommendation, players, positionDefense, positionLocks],
+    [battingRecommendation, modifierLookup, players, positionDefense, positionLocks],
   );
   const warnings = useMemo(
     () => players.flatMap((player) => player.dataWarnings.map((warning) => `${player.name}: ${warning}`)),
@@ -259,6 +262,7 @@ export function PreseasonView({ initialTeam = null }: PreseasonViewProps) {
                 {positionRecommendation && (
                   <FieldDiagram
                     recommendation={positionRecommendation}
+                    modifierSourceStatus={modifierSourceStatus}
                     onLockPosition={handlePositionLock}
                     onResetLocks={() => setPositionLocks({})}
                   />

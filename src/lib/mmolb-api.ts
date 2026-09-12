@@ -59,6 +59,8 @@ export interface MmolbApiPlayer {
   LesserBoons?: MmolbApiBoonEntry[];
   GreaterBoon?: MmolbApiBoonEntry[];
   GreaterBoons?: MmolbApiBoonEntry[];
+  Modification?: MmolbApiBoonEntry[];
+  Modifications?: MmolbApiBoonEntry[];
   PitchTypes: string[];
   PitchSelection: number[];
   LesserDurability: number;

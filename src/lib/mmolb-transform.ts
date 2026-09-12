@@ -213,6 +213,9 @@ export function transformPlayer(
   const greaterBoons = (raw.GreaterBoon ?? raw.GreaterBoons ?? []).map(
     (b) => b.Name
   );
+  const modifications = (raw.Modification ?? raw.Modifications ?? []).map(
+    (modification) => modification.Name
+  );
 
   const pitches: PitchData[] = (raw.PitchTypes ?? []).map((type, i) => ({
     name: type.toLowerCase(),
@@ -242,6 +245,7 @@ export function transformPlayer(
     stats,
     lesserBoons,
     greaterBoons,
+    modifications,
     mmolbPlayerId: raw._id,
     pitches,
     gameStats,

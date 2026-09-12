@@ -154,6 +154,7 @@ describe("buildPreseasonPlayerData", () => {
       PitchSelection: [],
       LesserDurability: 5,
       GreaterDurability: 5,
+      Modifications: [{ Name: "Celestial Infusion", Description: "", Emoji: "🌌" }],
       Equipment: {
         Hands: {
           Slot: "Hands",
@@ -167,6 +168,7 @@ describe("buildPreseasonPlayerData", () => {
     const result = buildPreseasonPlayerData(rosterPlayer, raw, [], CURRENT_SEASON_ID, TEAM_ID);
 
     expect(result.stats.reaction).toBe(10);
+    expect(result.modifications).toEqual(["Celestial Infusion"]);
     expect(result.equipment?.hands.effects[0]).toEqual({
       attribute: "reaction",
       tier: 4,

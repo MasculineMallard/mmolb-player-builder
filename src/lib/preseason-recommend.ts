@@ -6,6 +6,7 @@ import {
 } from "./evaluator";
 import type { PositionDefenseMap } from "./evaluator-data";
 import { computeItemAdjustedStats } from "./equipped-stats";
+import type { BoonEntry } from "./modifier-source";
 import {
   FIELDING_POSITIONS,
   LOW_SAMPLE_OUTS,
@@ -346,8 +347,11 @@ interface AssignmentSolution {
   pairs: AssignmentPair[];
 }
 
-function itemAdjustedPlayer(player: PreseasonPlayerData): PreseasonPlayerData {
-  return { ...player, stats: computeItemAdjustedStats(player) };
+function itemAdjustedPlayer(
+  player: PreseasonPlayerData,
+  modifierLookup: Map<string, BoonEntry>,
+): PreseasonPlayerData {
+  return { ...player, stats: computeItemAdjustedStats(player, modifierLookup) };
 }
 
 interface AssignmentPriorityGroup {
@@ -537,6 +541,7 @@ export function recommendPositions(
   positionDefense: PositionDefenseMap,
   battingOrderIds?: readonly string[],
   positionLocks: Readonly<Partial<Record<string, string>>> = {},
+  modifierLookup: Map<string, BoonEntry> = new Map(),
 ): PositionAssignmentRec {
   const fitModel = positionDefense;
   const pitchers = players.filter((player) => getPlayerRole(player.position) === "pitcher");
@@ -561,7 +566,7 @@ export function recommendPositions(
   const starterById = new Map(startingBatters.map((player) => [player.mmolbPlayerId, player]));
   const fitPlayerById = new Map(batters.map((player) => [
     player.mmolbPlayerId,
-    itemAdjustedPlayer(player),
+    itemAdjustedPlayer(player, modifierLookup),
   ]));
   const fitPlayer = (player: PreseasonPlayerData) => fitPlayerById.get(player.mmolbPlayerId) ?? player;
   const lockedPlayerIds = new Set<string>();

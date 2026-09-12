@@ -46,6 +46,17 @@ function record(season: number, seasonId: string): MmolbApiPlayerRecord {
 }
 
 describe("mid-season recomp detection", () => {
+  it("preserves ordinary player modification names for canonical effect resolution", () => {
+    const transformed = transformPlayer(
+      player({
+        Modifications: [{ Name: "Celestial Infusion", Description: "", Emoji: "🌌" }],
+      }),
+      "Team",
+      null,
+    );
+    expect(transformed.modifications).toEqual(["Celestial Infusion"]);
+  });
+
   it("keeps stats for a player CREATED mid-season (no prior incarnation)", () => {
     // Jorbit Sherman: Birthseason 14 / Birthday 213, playerrecord only has S14.
     const p = transformPlayer(

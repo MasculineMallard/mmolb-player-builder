@@ -81,12 +81,18 @@ function StatRow({ stat, isDefense, pref, flatMax, pctMax, equipment }: {
   const diff = equipment ? computeDiff(stat, pref, idealValue, equipment) : null;
 
   return (
-    <div className="grid grid-cols-4 items-center text-[12px] h-[22px] px-0.5">
+    <div className="grid grid-cols-[minmax(0,1fr)_minmax(38px,1.2fr)_minmax(34px,1fr)_minmax(34px,1fr)] items-center text-[11px] min-h-[22px] py-0.5 px-0.5">
       <span aria-label={stat} title={stat} className={`capitalize font-medium ${isDefense ? "text-yellow-400" : "text-gray-100"}`}>
         {statLabel(stat)}
       </span>
       {has !== null ? (
-        <span className="text-right font-mono text-gray-500 truncate">{has}</span>
+        <span
+          aria-label={`Current ${stat}: ${has}`}
+          title={has}
+          className="text-right font-mono text-gray-400 leading-tight break-all"
+        >
+          {has}
+        </span>
       ) : (
         <span />
       )}
@@ -119,7 +125,7 @@ export function SlotCard({ recommendation: rec, flatMax, pctMax, statNeeds, equi
 
       {/* Column headers */}
       {hasEquipment && (
-        <div className="grid grid-cols-4 items-center px-3 pt-1 text-[10px] text-gray-500 uppercase tracking-wide">
+        <div className="grid grid-cols-[minmax(0,1fr)_minmax(38px,1.2fr)_minmax(34px,1fr)_minmax(34px,1fr)] items-center px-3 pt-1 text-[10px] text-gray-500 uppercase tracking-wide">
           <span>stat</span>
           <span className="text-right">has</span>
           <span className="text-right">ideal</span>

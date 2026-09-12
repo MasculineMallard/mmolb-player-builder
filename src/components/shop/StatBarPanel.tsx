@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import type { SlotRecommendation } from "@/lib/item-advisor";
+import { projectShopStat, type SlotRecommendation } from "@/lib/item-advisor";
 import type { Archetype } from "@/lib/types";
 import { calculateStatTargets } from "@/lib/optimizer";
 import { STAT_CATEGORIES, CATEGORY_LABELS } from "@/lib/constants";
@@ -9,6 +9,9 @@ import { STAT_DISPLAY_MAX, DEFENSE_DISPLAY_MAX } from "@/lib/utils";
 
 interface StatBarPanelProps {
   recommendations: SlotRecommendation[];
+  /** Base plus inherent flat modifiers, before any percentage effects or items. */
+  effectBaseStats: Record<string, number>;
+  /** Current no-items values after boons and inherent player modifiers. */
   playerStats: Record<string, number>;
   boonMultipliers: Record<string, number>;
   flatMax: number;
@@ -27,8 +30,22 @@ interface StatBar {
   group: "batting" | "pitching" | "baserunning" | "defense";
 }
 
+const MOBILE_STAT_LABELS: Record<string, string> = {
+  acrobatics: "Acro",
+  awareness: "Aware",
+  composure: "Comp",
+  determination: "Determ",
+  dexterity: "Dex",
+  discipline: "Disc",
+  intimidation: "Intim",
+  performance: "Perf",
+  persuasion: "Pers",
+  reaction: "React",
+};
+
 export function StatBarPanel({
   recommendations,
+  effectBaseStats,
   playerStats,
   boonMultipliers,
   flatMax,
@@ -61,12 +78,16 @@ export function StatBarPanel({
       if (!targetStats.has(stat)) return null;
 
       const current = playerStats[stat] ?? 0;
+      const effectBase = effectBaseStats[stat] ?? current;
       const count = itemContributions.get(stat) ?? 0;
       const boonMult = boonMultipliers[stat] ?? 1.0;
       const target = prioritySet.has(stat) ? corePer : secondarySet.has(stat) ? supportPer : 0;
 
-      const withFlat = count > 0 ? Math.round(current + flatMax * count * boonMult) : current;
-      const withPct = count > 0 ? Math.round(current * Math.pow(1 + pctMax / 100, count)) : current;
+      // Existing and item percentages are additive in the game's displayed-stat
+      // formula. Flats are added before that combined multiplier.
+      const projection = projectShopStat(effectBase, boonMult, count, flatMax, pctMax);
+      const withFlat = count > 0 ? projection.withFlat : current;
+      const withPct = count > 0 ? projection.withPct : current;
 
       return {
         stat, current, withFlat, withPct,
@@ -87,7 +108,7 @@ export function StatBarPanel({
     const defense = STAT_CATEGORIES.defense.map((s) => buildBar(s, "defense")).filter((b): b is StatBar => b !== null);
 
     return { primary, baserunning, defense };
-  }, [recommendations, playerStats, boonMultipliers, flatMax, pctMax, archetype, isPitcher]);
+  }, [recommendations, effectBaseStats, playerStats, boonMultipliers, flatMax, pctMax, archetype, isPitcher]);
 
   const allBars = [...bars.primary, ...bars.baserunning, ...bars.defense];
   if (allBars.length === 0) return null;
@@ -187,7 +208,10 @@ function BarRow({ bar, displayMax, isPriority, isSecondary }: {
           {isHighlighted && (
             <span className={`text-sm ${isPriority ? 'text-primary' : 'text-foreground/60'}`}>★</span>
           )}
-          <span className="truncate">{bar.stat}</span>
+          <span aria-label={bar.stat} title={bar.stat}>
+            <span className="sm:hidden">{MOBILE_STAT_LABELS[bar.stat] ?? bar.stat}</span>
+            <span className="hidden sm:inline">{bar.stat}</span>
+          </span>
         </span>
         <span className="flex items-center text-sm font-mono tabular-nums shrink-0">
           <span className="text-gray-400 w-10 text-right">{bar.current}</span>

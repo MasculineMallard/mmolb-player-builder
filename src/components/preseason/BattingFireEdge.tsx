@@ -14,6 +14,7 @@ export function BattingFireEdge({ width }: { width: number }) {
     let frame = 0;
     let disposed = false;
     let visible = true;
+    let rebuildGeneration = 0;
 
     const clearFlames = () => {
       flames.forEach((flame) => flame.destroy());
@@ -22,12 +23,13 @@ export function BattingFireEdge({ width }: { width: number }) {
     };
 
     const rebuild = async () => {
+      const generation = ++rebuildGeneration;
       clearFlames();
       const hostWidth = host.getBoundingClientRect().width;
       if (disposed || reducedMotion.matches || hostWidth < 1) return;
 
       const { FireFlame, Vector } = await import("@9am/fire-flame");
-      if (disposed) return;
+      if (disposed || generation !== rebuildGeneration) return;
 
       const emitterCount = Math.max(3, Math.ceil(hostWidth / 62));
       for (let index = 0; index < emitterCount; index += 1) {
@@ -43,8 +45,6 @@ export function BattingFireEdge({ width }: { width: number }) {
           x: 42,
           y: 36,
           mousemove: false,
-          fps: 30,
-          particleFPS: 14,
           particleNum: 9,
           particleDistance: 3,
           friction: 0.96,
@@ -74,6 +74,7 @@ export function BattingFireEdge({ width }: { width: number }) {
 
     return () => {
       disposed = true;
+      rebuildGeneration += 1;
       cancelAnimationFrame(frame);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();

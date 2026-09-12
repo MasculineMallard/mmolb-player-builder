@@ -1,4 +1,5 @@
 import { BASE_PATH } from "@/lib/constants";
+import type { ModifierSourceStatus } from "@/lib/evaluator-data";
 import type {
   PositionAlternative,
   PositionAssignment,
@@ -8,6 +9,7 @@ import type {
 
 export interface FieldDiagramProps {
   recommendation: PositionAssignmentRec;
+  modifierSourceStatus?: ModifierSourceStatus | "loading";
   onLockPosition?: (position: string, playerId: string | null) => void;
   onResetLocks?: () => void;
 }
@@ -138,7 +140,7 @@ function AssignmentCard({
   );
 }
 
-export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: FieldDiagramProps) {
+export function FieldDiagram({ recommendation, modifierSourceStatus = "canonical", onLockPosition, onResetLocks }: FieldDiagramProps) {
   if (recommendation.fielders.length === 0) {
     return (
       <section data-testid="field-diagram" className="rounded-lg border border-border bg-card px-4 py-6 text-center">
@@ -166,7 +168,7 @@ export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: F
       <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Best Defensive Alignment</h2>
-          <p className="mt-1 font-mono text-[11px] text-muted-foreground">Fit % = Σ(weight × min(item-adjusted stat ÷ target, 1)) ÷ Σ(weights) × 100</p>
+          <p className="mt-1 font-mono text-[11px] text-muted-foreground">Fit % = Σ(weight × min(current-effect stat ÷ target, 1)) ÷ Σ(weights) × 100</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {!recommendation.battingOrderLocked && (
@@ -175,9 +177,19 @@ export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: F
           <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
             Average position fit {averageFit}%
           </span>
-          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            Equipped items included
-          </span>
+          {modifierSourceStatus === "loading" ? (
+            <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-muted-foreground" role="status">
+              Checking player-modifier values…
+            </span>
+          ) : modifierSourceStatus === "unavailable" ? (
+            <span className="rounded-full bg-yellow-500/15 px-3 py-1 text-xs font-semibold text-yellow-500" role="status">
+              Items included · modifier values unavailable
+            </span>
+          ) : (
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+              Items + player modifiers included
+            </span>
+          )}
           {lockedCount > 0 && onResetLocks && (
             <button
               type="button"
@@ -191,9 +203,17 @@ export function FieldDiagram({ recommendation, onLockPosition, onResetLocks }: F
       </div>
 
       <div className="mx-auto max-w-5xl rounded-xl border border-border bg-background/40 p-2">
-        <div className="overflow-x-auto rounded-lg">
+        <div className="mb-2 flex items-center justify-center gap-2 text-xs font-semibold text-primary lg:hidden">
+          <span aria-hidden="true">↔</span>
+          Swipe left or right to explore every position
+        </div>
+        <div
+          role="region"
+          aria-label="Scrollable defensive field; swipe left or right to explore every position"
+          tabIndex={0}
+          className="overflow-x-auto rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
           <div
-            role="region"
             data-testid="defensive-field"
             aria-label="Defensive alignment by field position"
             className="relative aspect-[8/5] w-full min-w-[700px] overflow-hidden rounded-lg bg-cover bg-center"

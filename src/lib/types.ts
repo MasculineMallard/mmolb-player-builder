@@ -30,6 +30,8 @@ export interface PlayerData {
   stats: Record<string, number>; // stat name -> integer (0-1000 scale)
   lesserBoons: string[];
   greaterBoons: string[];
+  /** Current non-boon player modifications whose stat effects come from the canonical modifier source. */
+  modifications?: string[];
   mmolbPlayerId: string;
   pitches: PitchData[];
   gameStats?: import("./evaluator-types").GameStats | null;
