@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>POP Player Card Layouts</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #0b1118;
+      --panel: #111a24;
+      --panel-2: #172330;
+      --line: #2a3b4d;
+      --blue: #3b82f6;
+      --gold: #e4b94f;
+      --fit: #55dc84;
+      --text: #edf5ff;
+      --muted: #91a5ba;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--ink);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid var(--line);
+      background: rgba(11, 17, 24, .96);
+      backdrop-filter: blur(14px);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      max-width: 1500px;
+      margin: auto;
+      padding: 16px 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .17em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(21px, 2.6vw, 33px);
+      letter-spacing: -.03em;
+    }
+
+    .selection {
+      min-width: 230px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel);
+      padding: 8px 11px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .selection strong {
+      display: block;
+      margin-top: 2px;
+      color: var(--blue);
+      font-size: 14px;
+    }
+
+    .intro,
+    main {
+      max-width: 1500px;
+      margin: auto;
+      padding-right: 24px;
+      padding-left: 24px;
+    }
+
+    .intro {
+      padding-top: 24px;
+      padding-bottom: 18px;
+    }
+
+    .intro p:last-child {
+      max-width: 980px;
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    main { padding-bottom: 68px; }
+
+    .layout {
+      scroll-margin-top: 94px;
+      margin-bottom: 25px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      transition: border-color .18s, box-shadow .18s;
+    }
+
+    .layout.selected {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(228, 185, 79, .18), 0 18px 40px rgba(0, 0, 0, .32);
+    }
+
+    .layout-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 13px 15px;
+    }
+
+    .layout-title {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .layout-title span {
+      margin-right: 8px;
+      color: var(--gold);
+      font: 900 13px ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    .layout-description {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    button {
+      flex: none;
+      cursor: pointer;
+      border: 1px solid rgba(59, 130, 246, .75);
+      border-radius: 7px;
+      background: rgba(59, 130, 246, .12);
+      padding: 7px 10px;
+      color: var(--blue);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    button:hover {
+      background: var(--blue);
+      color: white;
+    }
+
+    .pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      border-top: 1px solid var(--line);
+      background: var(--line);
+    }
+
+    .field {
+      min-width: 0;
+      background: #080e14;
+    }
+
+    .field-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      height: 31px;
+      background: #0d151e;
+      padding: 0 11px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .field-label b {
+      color: var(--text);
+      font-size: 11px;
+    }
+
+    .field-stage {
+      position: relative;
+      aspect-ratio: 8 / 5;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .field-stage > img {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .player {
+      position: absolute;
+      z-index: 2;
+      transform: translate(-50%, -50%);
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .p-c { left: 50%; top: 87%; }
+    .p-1b { left: 80%; top: 68%; }
+    .p-2b { left: 65%; top: 49%; }
+    .p-3b { left: 20%; top: 68%; }
+    .p-ss { left: 35%; top: 49%; }
+    .p-lf { left: 19%; top: 24%; }
+    .p-cf { left: 50%; top: 14%; }
+    .p-rf { left: 81%; top: 24%; }
+
+    .pos,
+    .fit,
+    .stat b,
+    .alt b {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-weight: 900;
+    }
+
+    .pos {
+      display: grid;
+      place-items: center;
+      background: rgba(59, 130, 246, .2);
+      color: #6ca2ff;
+      font-size: 8px;
+    }
+
+    .name {
+      min-width: 0;
+      overflow: hidden;
+      color: var(--text);
+      font-size: 9px;
+      font-weight: 850;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .fit {
+      color: var(--fit);
+      font-size: 10px;
+    }
+
+    .stats {
+      color: var(--muted);
+      font-size: 7px;
+    }
+
+    .stat { white-space: nowrap; }
+    .stat b { color: var(--text); font-size: 8px; }
+
+    .alt {
+      color: var(--muted);
+      font-size: 6.5px;
+      white-space: nowrap;
+    }
+
+    .alt strong {
+      overflow: hidden;
+      color: var(--text);
+      font-weight: 800;
+      text-overflow: ellipsis;
+    }
+
+    .alt b {
+      color: #6ca2ff;
+      font-size: 7px;
+    }
+
+    /* A: low, horizontal scorebug with a centered alternative tab. */
+    .layout-a .player {
+      width: clamp(106px, 19vw, 142px);
+      filter: drop-shadow(0 4px 7px rgba(0, 0, 0, .5));
+    }
+
+    .layout-a .primary {
+      overflow: hidden;
+      border: 1px solid rgba(91, 126, 159, .72);
+      border-radius: 5px;
+      background: rgba(10, 18, 27, .96);
+    }
+
+    .layout-a .top {
+      display: grid;
+      grid-template-columns: 20px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 5px;
+      min-height: 21px;
+      padding: 3px 5px 2px 3px;
+    }
+
+    .layout-a .pos {
+      height: 15px;
+      border-radius: 3px;
+    }
+
+    .layout-a .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid rgba(91, 126, 159, .38);
+    }
+
+    .layout-a .stats:has(.stat:only-child) {
+      grid-template-columns: 1fr;
+    }
+
+    .layout-a .stat {
+      padding: 4px 4px;
+      text-align: center;
+    }
+
+    .layout-a .stat + .stat {
+      border-left: 1px solid rgba(91, 126, 159, .32);
+    }
+
+    .layout-a .alt {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 3px;
+      width: 84%;
+      margin: -1px auto 0;
+      border: 1px solid rgba(91, 126, 159, .52);
+      border-top: 0;
+      border-radius: 0 0 4px 4px;
+      background: rgba(18, 31, 44, .97);
+      padding: 3px 5px;
+    }
+
+    /* B: attached position rail, with the alternate spanning the body only. */
+    .layout-b .player {
+      display: grid;
+      grid-template-columns: 23px minmax(0, 1fr);
+      width: clamp(110px, 19vw, 145px);
+      filter: drop-shadow(0 4px 7px rgba(0, 0, 0, .5));
+    }
+
+    .layout-b .pos {
+      grid-row: 1 / span 2;
+      border: 1px solid rgba(59, 130, 246, .8);
+      border-radius: 6px 0 0 6px;
+      background: #2563bd;
+      color: white;
+      font-size: 9px;
+    }
+
+    .layout-b .primary {
+      overflow: hidden;
+      border: 1px solid rgba(91, 126, 159, .72);
+      border-radius: 0 5px 0 0;
+      background: rgba(10, 18, 27, .96);
+    }
+
+    .layout-b .top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 4px;
+      min-height: 21px;
+      padding: 4px 5px 3px;
+    }
+
+    .layout-b .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid rgba(91, 126, 159, .38);
+    }
+
+    .layout-b .stats:has(.stat:only-child) {
+      grid-template-columns: 1fr;
+    }
+
+    .layout-b .stat {
+      padding: 4px 3px;
+      text-align: center;
+    }
+
+    .layout-b .stat + .stat {
+      border-left: 1px solid rgba(91, 126, 159, .32);
+    }
+
+    .layout-b .alt {
+      grid-column: 2;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 3px;
+      margin-top: -1px;
+      border: 1px solid rgba(91, 126, 159, .58);
+      border-radius: 0 0 5px 5px;
+      background: rgba(18, 31, 44, .97);
+      padding: 3px 5px;
+    }
+
+    /* C: thin blue bracket and an offset corner alternative. */
+    .layout-c .player {
+      width: clamp(110px, 19vw, 145px);
+      padding-left: 17px;
+      filter: drop-shadow(0 4px 7px rgba(0, 0, 0, .5));
+    }
+
+    .layout-c .pos {
+      position: absolute;
+      top: 0;
+      bottom: 12px;
+      left: 0;
+      z-index: 2;
+      width: 19px;
+      border-radius: 5px 0 0 5px;
+      background: #2563bd;
+      color: white;
+      font-size: 8.5px;
+    }
+
+    .layout-c .primary {
+      border: 1px solid rgba(59, 130, 246, .82);
+      border-radius: 0 6px 0 4px;
+      background: rgba(10, 18, 27, .96);
+    }
+
+    .layout-c .top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 4px;
+      min-height: 21px;
+      padding: 4px 5px 3px;
+    }
+
+    .layout-c .stats {
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+      border-top: 1px solid rgba(91, 126, 159, .38);
+      padding: 4px 5px;
+    }
+
+    .layout-c .stats:has(.stat:only-child) {
+      justify-content: center;
+    }
+
+    .layout-c .alt {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 3px;
+      width: 79%;
+      margin: -1px 0 0 auto;
+      border: 1px solid rgba(59, 130, 246, .72);
+      border-top: 0;
+      border-radius: 0 0 5px 5px;
+      background: rgba(15, 26, 38, .98);
+      padding: 3px 5px;
+    }
+
+    /* D: restrained gold rule and a narrow offset under-tab. */
+    .layout-d .player {
+      width: clamp(108px, 19vw, 143px);
+      filter: drop-shadow(0 4px 7px rgba(0, 0, 0, .5));
+    }
+
+    .layout-d .primary {
+      overflow: hidden;
+      border: 1px solid rgba(91, 126, 159, .62);
+      border-top: 2px solid var(--gold);
+      border-radius: 6px;
+      background: rgba(10, 18, 27, .96);
+    }
+
+    .layout-d .top {
+      display: grid;
+      grid-template-columns: 19px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 4px;
+      min-height: 21px;
+      padding: 3px 5px 2px 3px;
+    }
+
+    .layout-d .pos {
+      height: 15px;
+      border-radius: 3px;
+    }
+
+    .layout-d .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+      border-top: 1px solid rgba(91, 126, 159, .34);
+      padding: 3px;
+    }
+
+    .layout-d .stats:has(.stat:only-child) {
+      grid-template-columns: 1fr;
+    }
+
+    .layout-d .stat {
+      border-radius: 3px;
+      background: rgba(255, 255, 255, .035);
+      padding: 3px 2px;
+      text-align: center;
+    }
+
+    .layout-d .alt {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 3px;
+      width: 82%;
+      margin: -1px 0 0 7%;
+      border: 1px solid rgba(91, 126, 159, .48);
+      border-top: 0;
+      border-radius: 0 0 5px 5px;
+      background: rgba(18, 31, 44, .97);
+      padding: 3px 5px;
+    }
+
+    .note {
+      margin-top: 24px;
+      border-left: 3px solid var(--gold);
+      background: rgba(228, 185, 79, .07);
+      padding: 11px 13px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .pair { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 620px) {
+      .header-inner,
+      .layout-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .selection { width: 100%; }
+      .intro,
+      main {
+        padding-right: 12px;
+        padding-left: 12px;
+      }
+
+      .field-stage { aspect-ratio: 4 / 3; }
+      .player { scale: .9; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <p class="eyebrow">Player card comparison</p>
+        <h1>Four compact layouts on fields 02 and 05</h1>
+      </div>
+      <div class="selection">Current selection<strong id="selection">None yet</strong></div>
+    </div>
+  </header>
+
+  <section class="intro">
+    <p class="eyebrow">Same lineup, same positions, same scale</p>
+    <p>Each layout keeps the player name in the top row, shows complete defensive stat names with raw values, and tucks the next-best fit into an attached tab. Every option is shown on both remaining field directions so the card and background can be judged together.</p>
+  </section>
+
+  <main>
+    <div id="layouts"></div>
+    <div class="note">Pick A, B, C, or D. Your selection is saved in the URL so you can send the exact comparison back.</div>
+  </main>
+
+  <script>
+    const layoutOptions = [
+      ["a", "A", "Horizontal scorebug", "Lowest visual weight; the alternate is centered underneath."],
+      ["b", "B", "Side position tab", "A stronger position cue without making the full card larger."],
+      ["c", "C", "Bracket corner", "Thin blue structure with the alternate tucked to one side."],
+      ["d", "D", "Gold rail", "Quiet rectangular nameplate with a small POP-yellow accent."]
+    ];
+
+    const players = [
+      { place: "p-c", pos: "C", name: "Honda Ripken", fit: "100%", stats: [["Awareness", "229"]], alt: ["Annie Law", "77%"] },
+      { place: "p-1b", pos: "1B", name: "Certainly Problems", fit: "93%", stats: [["Reaction", "119"], ["Composure", "216"]], alt: ["Annie Law", "100%"] },
+      { place: "p-2b", pos: "2B", name: "Josephine Sun", fit: "100%", stats: [["Reaction", "189"], ["Awareness", "110"]], alt: ["Annie Law", "100%"] },
+      { place: "p-3b", pos: "3B", name: "Annie Law", fit: "100%", stats: [["Reaction", "239"], ["Composure", "241"]], alt: ["Josephine Sun", "100%"] },
+      { place: "p-ss", pos: "SS", name: "Willow Riddle", fit: "78%", stats: [["Reaction", "348"], ["Composure", "81"]], alt: ["Josephine Sun", "98%"] },
+      { place: "p-lf", pos: "LF", name: "Sophia Locke", fit: "85%", stats: [["Acrobatics", "292"], ["Agility", "125"]], alt: ["Curtis Darroux", "93%"] },
+      { place: "p-cf", pos: "CF", name: "Elma Yoshida", fit: "87%", stats: [["Acrobatics", "212"], ["Agility", "46"]], alt: ["Curtis Darroux", "100%"] },
+      { place: "p-rf", pos: "RF", name: "Curtis Darroux", fit: "95%", stats: [["Acrobatics", "246"], ["Arm", "176"]], alt: ["Goomba Vanterpool", "89%"] }
+    ];
+
+    const roots = document.getElementById("layouts");
+    const selection = document.getElementById("selection");
+
+    function makePlayer(player, layoutKey) {
+      const node = document.createElement("div");
+      node.className = "player " + player.place;
+
+      const position = document.createElement("span");
+      position.className = "pos";
+      position.textContent = player.pos;
+
+      const primary = document.createElement("div");
+      primary.className = "primary";
+
+      const top = document.createElement("div");
+      top.className = "top";
+
+      const name = document.createElement("span");
+      name.className = "name";
+      name.textContent = player.name;
+
+      const fit = document.createElement("span");
+      fit.className = "fit";
+      fit.textContent = player.fit;
+
+      if (layoutKey !== "b" && layoutKey !== "c") top.appendChild(position);
+      top.append(name, fit);
+
+      const stats = document.createElement("div");
+      stats.className = "stats";
+      player.stats.forEach(function (entry) {
+        const stat = document.createElement("span");
+        stat.className = "stat";
+        stat.append(document.createTextNode(entry[0] + " "));
+        const value = document.createElement("b");
+        value.textContent = entry[1];
+        stat.appendChild(value);
+        stats.appendChild(stat);
+      });
+
+      primary.append(top, stats);
+
+      const alt = document.createElement("div");
+      alt.className = "alt";
+      if (layoutKey !== "c") alt.appendChild(document.createTextNode("Next "));
+      const altName = document.createElement("strong");
+      altName.textContent = player.alt[0];
+      const altFit = document.createElement("b");
+      altFit.textContent = player.alt[1];
+      alt.append(altName, altFit);
+
+      if (layoutKey === "b" || layoutKey === "c") node.appendChild(position);
+      node.append(primary, alt);
+      return node;
+    }
+
+    function makeField(number, title, layoutKey) {
+      const field = document.createElement("section");
+      field.className = "field";
+
+      const label = document.createElement("div");
+      label.className = "field-label";
+      label.innerHTML = "<b>Field " + number + "</b><span>" + title + "</span>";
+
+      const stage = document.createElement("div");
+      stage.className = "field-stage";
+      const image = document.createElement("img");
+      image.src = "./images/field-options-ai/field-ai-" + number + ".png";
+      image.alt = "Player card layout " + layoutKey.toUpperCase() + " over field " + number;
+      stage.appendChild(image);
+      players.forEach(function (player) { stage.appendChild(makePlayer(player, layoutKey)); });
+
+      field.append(label, stage);
+      return field;
+    }
+
+    layoutOptions.forEach(function (option) {
+      const key = option[0];
+      const letter = option[1];
+      const title = option[2];
+      const description = option[3];
+
+      const article = document.createElement("article");
+      article.className = "layout layout-" + key;
+      article.id = "layout-" + key;
+      article.dataset.choice = letter + " — " + title;
+
+      const head = document.createElement("div");
+      head.className = "layout-head";
+      const copy = document.createElement("div");
+      copy.innerHTML = '<h2 class="layout-title"><span>' + letter + "</span>" + title + '</h2><p class="layout-description">' + description + "</p>";
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = "Choose " + letter;
+      button.addEventListener("click", function () { choose(article); });
+      head.append(copy, button);
+
+      const pair = document.createElement("div");
+      pair.className = "pair";
+      pair.append(makeField("02", "Precision Blueprint", key), makeField("05", "Art Deco Diamond", key));
+
+      article.append(head, pair);
+      roots.appendChild(article);
+    });
+
+    function choose(article) {
+      document.querySelectorAll(".layout").forEach(function (node) {
+        node.classList.toggle("selected", node === article);
+      });
+      selection.textContent = article.dataset.choice;
+      location.hash = article.id;
+    }
+
+    const initial = document.querySelector(location.hash);
+    if (initial && initial.classList.contains("layout")) choose(initial);
+  </script>
+</body>
+</html>
