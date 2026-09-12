@@ -134,7 +134,7 @@ export function PreseasonGlossaryButton() {
                   <li>Batters need <strong className="text-foreground">{MIN_PA_LINEUP} PA</strong>. Each selected batter is removed before the next slot; attributes and player ID break ties.</li>
                   <li>Every row shows SO%. The menu can also re-sort the view by OBP, OPS, SLG, or lowest SO%.</li>
                   <li>Alternate sorts <strong className="text-foreground">do not replace</strong> the default nine used by Position Fit.</li>
-                  <li><strong className="text-foreground">Bars and “On fire”:</strong> OPS bars reach full width at 1.000 while the real value remains visible. The displayed metric catches fire at OPS &gt; 1.000, OBP ≥ .450, SLG ≥ .700, or SO% ≤ 10.0%.</li>
+                  <li><strong className="text-foreground">Bars and yellow glow:</strong> OPS bars reach full width at 1.000 while the real value remains visible. The row glows yellow at OPS &gt; 1.000, OBP ≥ .450, SLG ≥ .700, or SO% ≤ 10.0%.</li>
                 </ul>
                 <div className="mt-3 rounded-md bg-yellow-500/10 px-3 py-2 text-xs text-yellow-500">Below {LOW_SAMPLE_PA} PA is marked <strong>low sample</strong>.</div>
               </section>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { BattingFireEdge } from "@/components/preseason/BattingFireEdge";
 import {
   recommendBattingOrder,
   type BattingOrderEntry,
@@ -28,7 +27,7 @@ function barWidth(entry: BattingOrderEntry): number {
   return Math.min(100, Math.max(3, (entry.value / visualCeiling) * 100));
 }
 
-function isOnFire(entry: BattingOrderEntry): boolean {
+function shouldGlow(entry: BattingOrderEntry): boolean {
   if (entry.value == null) return false;
   if (entry.driver === "OPS") return entry.value > 1;
   if (entry.driver === "OBP") return entry.value >= 0.45;
@@ -95,25 +94,24 @@ export function BattingLineupCard({ recommendation }: BattingLineupCardProps) {
           </div>
         )}
 
-        <ol className="space-y-7 pt-7">
+        <ol className="space-y-3 pt-1">
           {displayedRecommendation.lineup.map((entry) => {
-            const fire = isOnFire(entry);
+            const glow = shouldGlow(entry);
             const width = barWidth(entry);
             return (
             <li
               key={entry.player.mmolbPlayerId}
               data-testid={`batting-row-${entry.player.mmolbPlayerId}`}
-              data-on-fire={fire ? "true" : "false"}
-              className={`relative min-h-16 rounded-lg border bg-secondary/40 px-3 py-3 sm:min-h-18 sm:px-4 ${fire ? "batting-on-fire" : "border-border"}`}
+              data-glowing={glow ? "true" : "false"}
+              className={`relative min-h-16 rounded-lg border bg-secondary/40 px-3 py-3 sm:min-h-18 sm:px-4 ${glow ? "batting-yellow-glow" : "border-border"}`}
             >
               <div aria-hidden="true" className="absolute inset-0 overflow-hidden rounded-[inherit]">
                 <div
                   data-testid={`batting-bar-${entry.player.mmolbPlayerId}`}
-                  className={`absolute inset-y-0 left-0 bg-primary/10 ${fire ? "batting-fire-bar" : ""}`}
+                  className={`absolute inset-y-0 left-0 bg-primary/10 ${glow ? "batting-yellow-glow-bar" : ""}`}
                   style={{ width: `${width}%` }}
                 />
               </div>
-              {fire && <BattingFireEdge width={width} />}
               <div className="relative z-10 flex items-center gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-base font-black text-primary-foreground shadow-sm">
                   {entry.slot}

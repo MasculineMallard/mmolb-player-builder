@@ -107,7 +107,7 @@ describe("preseason controls", () => {
     expect(screen.getByText(/defensive tab keeps the default recommended starting nine/i)).toBeTruthy();
   });
 
-  it("caps OPS bars at 1.000 and applies metric-specific on-fire thresholds", () => {
+  it("caps OPS bars at 1.000 and applies metric-specific yellow-glow thresholds", () => {
     const batters = Array.from({ length: 9 }, (_, index) => makePlayer(`b${index + 1}`, "C", index));
     batters[3].preseasonBatting!.OBP = 0.45;
     batters[6].preseasonBatting!.OPS = 1;
@@ -116,24 +116,23 @@ describe("preseason controls", () => {
 
     fireEvent.change(sort, { target: { value: "OPS" } });
     expect(screen.getByTestId("batting-bar-b9").getAttribute("style")).toContain("width: 100%");
-    expect(screen.getByTestId("batting-row-b9").getAttribute("data-on-fire")).toBe("true");
-    expect(screen.getByTestId("batting-bar-b9").className).toContain("batting-fire-bar");
-    expect(within(screen.getByTestId("batting-row-b9")).getByTestId("batting-fire-edge").getAttribute("style")).toContain("width: 100%");
-    expect(screen.queryByText("On fire")).toBeNull();
+    expect(screen.getByTestId("batting-row-b9").getAttribute("data-glowing")).toBe("true");
+    expect(screen.getByTestId("batting-row-b9").className).toContain("batting-yellow-glow");
+    expect(screen.getByTestId("batting-bar-b9").className).toContain("batting-yellow-glow-bar");
     expect(screen.getByTestId("batting-row-b9").textContent).toContain("1.040");
     expect(screen.getByTestId("batting-bar-b7").getAttribute("style")).toContain("width: 100%");
-    expect(screen.getByTestId("batting-row-b7").getAttribute("data-on-fire")).toBe("false");
+    expect(screen.getByTestId("batting-row-b7").getAttribute("data-glowing")).toBe("false");
 
     fireEvent.change(sort, { target: { value: "OBP" } });
-    expect(screen.getByTestId("batting-row-b4").getAttribute("data-on-fire")).toBe("true");
-    expect(screen.getByTestId("batting-row-b5").getAttribute("data-on-fire")).toBe("false");
+    expect(screen.getByTestId("batting-row-b4").getAttribute("data-glowing")).toBe("true");
+    expect(screen.getByTestId("batting-row-b5").getAttribute("data-glowing")).toBe("false");
 
     fireEvent.change(sort, { target: { value: "SLG" } });
-    expect(screen.getByTestId("batting-row-b9").getAttribute("data-on-fire")).toBe("true");
+    expect(screen.getByTestId("batting-row-b9").getAttribute("data-glowing")).toBe("true");
 
     fireEvent.change(sort, { target: { value: "SO%" } });
-    expect(screen.getByTestId("batting-row-b3").getAttribute("data-on-fire")).toBe("true");
-    expect(screen.getByTestId("batting-row-b4").getAttribute("data-on-fire")).toBe("false");
+    expect(screen.getByTestId("batting-row-b3").getAttribute("data-glowing")).toBe("true");
+    expect(screen.getByTestId("batting-row-b4").getAttribute("data-glowing")).toBe("false");
   });
 
   it("opens the full methodology dialog", () => {

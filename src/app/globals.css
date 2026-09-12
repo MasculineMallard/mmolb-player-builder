@@ -132,43 +132,17 @@
   50% { opacity: 0.5; transform: scale(1.08); }
 }
 
-.batting-on-fire {
-  border-color: rgb(228 185 79 / 0.85);
-  box-shadow: 0 0 14px rgb(228 185 79 / 0.22), inset 0 1px 0 rgb(255 244 198 / 0.4);
+.batting-yellow-glow {
+  border-color: rgb(250 204 21 / 0.9);
+  box-shadow:
+    0 0 0 1px rgb(250 204 21 / 0.2),
+    0 0 14px rgb(250 204 21 / 0.38),
+    0 0 28px rgb(250 204 21 / 0.16),
+    inset 0 0 12px rgb(250 204 21 / 0.08);
 }
 
-.batting-fire-bar {
-  background: linear-gradient(90deg, rgb(59 130 246 / 0.2), rgb(228 185 79 / 0.26));
-}
-
-.batting-fire-edge {
-  position: absolute;
-  z-index: 20;
-  top: -34px;
-  left: 0;
-  height: 38px;
-  overflow: visible;
-  pointer-events: none;
-  filter: drop-shadow(0 0 5px rgb(228 185 79 / 0.48));
-}
-
-.batting-fire-emitter {
-  position: absolute;
-  top: 0;
-  width: 84px;
-  height: 38px;
-  overflow: visible;
-  transform: translateX(-50%);
-}
-
-.batting-fire-emitter canvas {
-  display: block;
-  width: 84px;
-  height: 38px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .batting-fire-edge { display: none; }
+.batting-yellow-glow-bar {
+  background: linear-gradient(90deg, rgb(250 204 21 / 0.12), rgb(250 204 21 / 0.32));
 }
 
 
