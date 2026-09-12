@@ -75,7 +75,7 @@ function AssignmentCard({
       data-position={assignment.assignedPosition}
       data-locked={assignment.isLocked ? "true" : "false"}
       aria-label={`${assignment.assignedPosition}: ${assignment.player.name}, ${score == null ? "fit unavailable" : `${Math.round(score)} percent fit`}; ${assignment.keyStats.map((stat) => `${statLabel(stat.stat)} ${stat.value}`).join(", ")}${assignment.isPersonalBest ? "; best position for this player" : ""}`}
-      className="absolute z-10 w-[clamp(125px,19%,142px)] -translate-x-1/2 -translate-y-1/2 text-foreground drop-shadow-[0_4px_7px_rgb(0_0_0/0.5)]"
+      className="absolute z-10 w-[152px] -translate-x-1/2 -translate-y-1/2 text-foreground drop-shadow-[0_4px_7px_rgb(0_0_0/0.5)]"
       style={{
         left: FIELD_COORDS[assignment.assignedPosition]?.left ?? "50%",
         top: FIELD_COORDS[assignment.assignedPosition]?.top ?? "50%",
