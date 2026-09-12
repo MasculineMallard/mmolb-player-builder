@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>POP Field Direction Review</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #0b1118;
+      --panel: #111a24;
+      --panel-2: #172330;
+      --line: #2a3b4d;
+      --blue: #3b82f6;
+      --blue-deep: #163c5a;
+      --gold: #e4b94f;
+      --gold-soft: #f4dfa0;
+      --text: #edf5ff;
+      --muted: #91a5ba;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--ink); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    header { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--line); background: rgba(11,17,24,.96); backdrop-filter: blur(14px); }
+    .header-inner { max-width: 1500px; margin: 0 auto; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    h1 { margin: 0; font-size: clamp(20px, 2.4vw, 32px); letter-spacing: -.025em; }
+    .eyebrow { margin: 0 0 4px; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+    .intro { max-width: 1500px; margin: 0 auto; padding: 28px 24px 14px; }
+    .intro p { max-width: 900px; margin: 8px 0 0; color: var(--muted); line-height: 1.55; }
+    .selection { min-width: 230px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); padding: 10px 13px; color: var(--muted); font-size: 12px; }
+    .selection strong { display: block; margin-top: 2px; color: var(--blue); font-size: 14px; }
+    .card-demo { max-width: 1500px; margin: 0 auto; padding: 10px 24px 26px; }
+    .card-demo-inner { display: flex; align-items: center; gap: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 16px; }
+    .card-demo-copy { min-width: 230px; }
+    .card-demo-copy h2 { margin: 0 0 5px; font-size: 15px; }
+    .card-demo-copy p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .player-card { width: 260px; overflow: hidden; border: 2px solid rgba(59,130,246,.8); border-radius: 10px; background: #0e151d; box-shadow: 0 10px 25px rgba(0,0,0,.35); }
+    .player-main { padding: 8px; }
+    .player-head { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 7px; }
+    .pos { border-radius: 4px; background: rgba(59,130,246,.18); padding: 3px 6px; color: var(--blue); font-size: 10px; font-weight: 900; }
+    .player-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 800; }
+    .fit { color: #55dc84; font: 900 14px ui-monospace, monospace; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 7px; }
+    .stat { border-radius: 5px; background: rgba(0,0,0,.22); padding: 5px 7px; text-align: center; }
+    .stat span { display: block; color: var(--muted); font-size: 10px; font-weight: 700; }
+    .stat strong { display: block; margin-top: 2px; font: 900 17px ui-monospace, monospace; }
+    .next { display: flex; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); background: var(--panel-2); padding: 5px 8px; color: var(--muted); font-size: 10px; }
+    .next b { color: var(--text); }
+    .next strong { color: var(--blue); }
+    main { max-width: 1500px; margin: 0 auto; padding: 0 24px 70px; }
+    .options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+    .option { overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); transition: border-color .18s, transform .18s, box-shadow .18s; }
+    .option:hover { transform: translateY(-2px); border-color: rgba(59,130,246,.65); }
+    .option.selected { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(228,185,79,.22), 0 18px 40px rgba(0,0,0,.35); }
+    .option-copy { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 15px; }
+    .option-title { margin: 0; font-size: 15px; }
+    .option-title span { margin-right: 7px; color: var(--gold); font: 900 13px ui-monospace, monospace; }
+    .option-description { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
+    button { flex: 0 0 auto; cursor: pointer; border: 1px solid rgba(59,130,246,.7); border-radius: 7px; background: rgba(59,130,246,.12); padding: 7px 10px; color: var(--blue); font-family: inherit; font-size: 11px; font-weight: 800; }
+    button:hover { background: var(--blue); color: white; }
+    .field-stage { position: relative; aspect-ratio: 8 / 5; overflow: hidden; border-top: 1px solid var(--line); background: #080e14; }
+    .field-stage svg { display: block; width: 100%; height: 100%; }
+    .marker { position: absolute; z-index: 3; transform: translate(-50%,-50%); display: flex; align-items: center; gap: 4px; min-width: 54px; max-width: 95px; border: 1px solid rgba(255,255,255,.25); border-radius: 5px; background: rgba(11,17,24,.94); padding: 3px 5px; box-shadow: 0 4px 10px rgba(0,0,0,.38); color: var(--text); font-size: 8px; line-height: 1; }
+    .marker b { border-radius: 3px; background: rgba(59,130,246,.18); padding: 2px 3px; color: var(--blue); font-size: 7px; }
+    .marker span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .marker em { margin-left: auto; color: #55dc84; font: 800 8px ui-monospace, monospace; font-style: normal; }
+    .p-c { left: 50%; top: 89%; } .p-1b { left: 79%; top: 68%; } .p-2b { left: 63%; top: 49%; } .p-3b { left: 21%; top: 68%; }
+    .p-ss { left: 37%; top: 49%; } .p-lf { left: 18%; top: 23%; } .p-cf { left: 50%; top: 13%; } .p-rf { left: 82%; top: 23%; }
+    .note { margin: 24px 0 0; border-left: 3px solid var(--gold); background: rgba(228,185,79,.07); padding: 11px 13px; color: var(--muted); font-size: 12px; }
+    @media (max-width: 980px) { .options { grid-template-columns: 1fr; } .card-demo-inner { align-items: flex-start; flex-wrap: wrap; } }
+    @media (max-width: 620px) { .header-inner { align-items: flex-start; flex-direction: column; } .selection { width: 100%; } .player-card { width: 100%; } .field-stage { aspect-ratio: 4 / 3; } .marker span { display: none; } .marker { min-width: 30px; width: auto; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div><p class="eyebrow">POP visual review</p><h1>Choose the field direction</h1></div>
+      <div class="selection">Current selection<strong id="selection">None yet</strong></div>
+    </div>
+  </header>
+
+  <section class="intro">
+    <p class="eyebrow">Eight options</p>
+    <p>These are field-art directions only: flat colors, POP blue and yellow, correct top-down baseball geometry, no poles, no fake depth, and no photorealism. Pick the visual language you want and the final SVG can be refined at full size.</p>
+  </section>
+
+  <section class="card-demo">
+    <div class="card-demo-inner">
+      <div class="card-demo-copy"><h2>Shared card revision</h2><p>The player now lives in the top row. Defensive stat names are written in full underneath instead of being abbreviated.</p></div>
+      <div class="player-card">
+        <div class="player-main">
+          <div class="player-head"><span class="pos">SS</span><span class="player-name">Willow Riddle</span><span class="fit">78%</span></div>
+          <div class="stats"><div class="stat"><span>Reaction</span><strong>348</strong></div><div class="stat"><span>Composure</span><strong>81</strong></div></div>
+        </div>
+        <div class="next"><span>Next fit <b>Josephine Sun</b></span><strong>98%</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <div class="options">
+      <article id="option-1" class="option" data-choice="1 — Broadcast Clean">
+        <div class="option-copy"><div><h2 class="option-title"><span>01</span>Broadcast Clean</h2><p class="option-description">Traditional fan, restrained mowing arcs, crisp gold dirt.</p></div><button type="button">Choose 01</button></div>
+        <div class="field-stage">
+          <svg viewBox="0 0 600 375" aria-label="Broadcast Clean field">
+            <rect width="600" height="375" fill="#0a1118"/><path d="M300 362 30 130Q70 18 300 12q230 6 270 118Z" fill="#173f59" stroke="#3b82f6" stroke-width="4"/>
+            <path d="M47 135Q86 42 300 32t253 103" fill="none" stroke="#22516d" stroke-width="42"/><path d="M93 169Q130 93 300 82t207 87" fill="none" stroke="#193d55" stroke-width="38"/>
+            <path d="m300 354-124-117 124-108 124 108Z" fill="none" stroke="#9b732d" stroke-width="42"/><path d="m300 335-103-98 103-90 103 90Z" fill="#183d54" stroke="#e4b94f" stroke-width="2"/>
+            <path d="M300 354 30 130M300 354l270-224" stroke="#f4dfa0" stroke-width="3"/><path d="m300 120 9 9-9 9-9-9m127 99 9 9-9 9-9-9m-236 0 9 9-9 9-9-9" fill="#fff3cc" stroke="#e4b94f" stroke-width="2"/>
+          </svg>
+        </div>
+      </article>
+
+      <article id="option-2" class="option" data-choice="2 — POP Blueprint">
+        <div class="option-copy"><div><h2 class="option-title"><span>02</span>POP Blueprint</h2><p class="option-description">Technical linework on navy with subtle planning marks.</p></div><button type="button">Choose 02</button></div>
+        <div class="field-stage">
+          <svg viewBox="0 0 600 375" aria-label="POP Blueprint field">
+            <rect width="600" height="375" fill="#0b1722"/><g stroke="#153047" stroke-width="1" opacity=".8"><path d="M0 75h600M0 150h600M0 225h600M0 300h600M75 0v375M150 0v375M225 0v375M300 0v375M375 0v375M450 0v375M525 0v375"/></g>
+            <path d="M300 358 32 128Q78 16 300 14t268 114Z" fill="#10283b" stroke="#3b82f6" stroke-width="4"/><path d="M56 132Q95 42 300 34t244 98" fill="none" stroke="#e4b94f" stroke-width="2" stroke-dasharray="10 8"/>
+            <path d="m300 342-119-108 119-105 119 105Z" fill="none" stroke="#3b82f6" stroke-width="3"/><path d="M300 342 32 128M300 342l268-214" stroke="#718ca3" stroke-width="2"/>
+            <circle cx="300" cy="234" r="10" fill="none" stroke="#e4b94f" stroke-width="2"/><path d="m300 120 9 9-9 9-9-9m128 96 9 9-9 9-9-9m-238 0 9 9-9 9-9-9" fill="#0b1722" stroke="#e4b94f" stroke-width="2"/>
+          </svg>
+        </div>
+      </article>
+
+      <article id="option-3" class="option" data-choice="3 — Bold Pennant">
+        <div class="option-copy"><div><h2 class="option-title"><span>03</span>Bold Pennant</h2><p class="option-description">Graphic wedge silhouette with thick, poster-like boundaries.</p></div><button type="button">Choose 03</button></div>
+        <div class="field-stage">
+          <svg viewBox="0 0 600 375" aria-label="Bold Pennant field">
+            <rect width="600" height="375" fill="#0a1017"/><path d="M300 363 24 132Q74 10 300 10t276 122Z" fill="#0f2638" stroke="#e4b94f" stroke-width="10" stroke-linejoin="round"/>
+            <path d="M300 342 53 137Q99 42 300 38t247 99Z" fill="#25649a"/><path d="M300 342 173 236l127-112 127 112Z" fill="#172533" stroke="#f4dfa0" stroke-width="4"/>
+            <path d="M300 342 24 132M300 342l276-210" stroke="#f4dfa0" stroke-width="5"/><path d="m300 115 10 10-10 10-10-10m131 101 10 10-10 10-10-10m-242 0 10 10-10 10-10-10" fill="#e4b94f"/>
+          </svg>
+        </div>
+      </article>
+
+      <article id="option-4" class="option" data-choice="4 — Scorecard Classic">
+        <div class="option-copy"><div><h2 class="option-title"><span>04</span>Scorecard Classic</h2><p class="option-description">Compact diamond, broad foul territory, scorebook clarity.</p></div><button type="button">Choose 04</button></div>
+        <div class="field-stage">
+          <svg viewBox="0 0 600 375" aria-label="Scorecard Classic field">
+            <rect width="600" height="375" fill="#111a24"/><path d="M300 352 49 137Q92 26 300 22t251 115Z" fill="#173c55" stroke="#2c5975" stroke-width="5"/>
+            <path d="M76 141Q116 56 300 48t224 93" fill="none" stroke="#e4b94f" stroke-width="4"/><path d="m300 338-116-105 116-101 116 101Z" fill="#9b7029"/>
+            <path d="m300 316-91-83 91-78 91 78Z" fill="#152f42"/><path d="M300 352 49 137M300 352l251-215" stroke="#e7d9ab" stroke-width="3"/>
+            <g fill="#fff4cf"><rect x="294" y="126" width="12" height="12" transform="rotate(45 300 132)"/><rect x="410" y="227" width="12" height="12" transform="rotate(45 416 233)"/><rect x="178" y="227" width="12" height="12" transform="rotate(45 184 233)"/></g><circle cx="300" cy="233" r="8" fill="#e4b94f"/>
+          </svg>
+        </div>
+      </article>
+
+      <article id="option-5" class="option" data-choice="5 — Night Lines">
+        <div class="option-copy"><div><h2 class="option-title"><span>05</span>Night Lines</h2><p class="option-description">Near-black field with luminous blue and gold geometry.</p></div><button type="button">Choose 05</button></div>
+        <div class="field-stage">
+          <svg viewBox="0 0 600 375" aria-label="Night Lines field">
+            <rect width="600" height="375" fill="#070c12"/><path d="M300 358 29 130Q74 14 300 12t271 118Z" fill="#0c1823" stroke="#203548" stroke-width="8"/>
+            <path d="M44 132Q88 28 300 26t256 106" fill="none" stroke="#3b82f6" stroke-width="5"/><path d="M69 142Q109 57 300 49t231 93" fill="none" stroke="#3b82f6" stroke-width="2" opacity=".55"/>
+            <path d="m300 345-122-111 122-108 122 108Z" fill="#0b1720" stroke="#e4b94f" stroke-width="4"/><path d="M300 345 29 130M300 345l271-215" stroke="#e4b94f" stroke-width="3"/>
+            <path d="m300 117 9 9-9 9-9-9m131 99 9 9-9 9-9-9m-244 0 9 9-9 9-9-9" fill="#3b82f6" stroke="#b9d6ff"/>
+          </svg>
+        </div>
+      </article>
+
+      <article id="option-6" class="option" data-choice="6 — Arcade POP">
+        <div class="option-copy"><div><h2 class="option-title"><span>06</span>Arcade POP</h2><p class="option-description">High-contrast cobalt and yellow with chunky game-board forms.</p></div><button type="button">Choose 06</button></div>
+        <div class="field-stage">
+          <svg viewBox="0 0 600 375" aria-label="Arcade POP field">
+            <rect width="600" height="375" fill="#09121c"/><path d="M300 360 26 130Q70 11 300 11t274 119Z" fill="#1557a4" stroke="#ffd84d" stroke-width="6"/>
+            <path d="M51 134Q91 38 300 31t249 103" fill="none" stroke="#77adff" stroke-width="20" opacity=".35"/><path d="m300 345-124-111 124-109 124 109Z" fill="#c18b20" stroke="#ffd84d" stroke-width="4"/>
+            <path d="m300 317-92-83 92-79 92 79Z" fill="#0e2d4e"/><path d="M300 345 26 130M300 345l274-215" stroke="#fff0a4" stroke-width="5"/>
+            <g fill="#fff7ce" stroke="#0b1118" stroke-width="2"><rect x="292" y="117" width="16" height="16" transform="rotate(45 300 125)"/><rect x="416" y="226" width="16" height="16" transform="rotate(45 424 234)"/><rect x="168" y="226" width="16" height="16" transform="rotate(45 176 234)"/></g>
+          </svg>
+        </div>
+      </article>
+
+      <article id="option-7" class="option" data-choice="7 — Contour Zones">
+        <div class="option-copy"><div><h2 class="option-title"><span>07</span>Contour Zones</h2><p class="option-description">Layered flat defensive bands without faux mowing or perspective.</p></div><button type="button">Choose 07</button></div>
+        <div class="field-stage">
+          <svg viewBox="0 0 600 375" aria-label="Contour Zones field">
+            <rect width="600" height="375" fill="#0a1118"/><path d="M300 360 31 130Q73 16 300 12t269 118Z" fill="#112b3f" stroke="#315672" stroke-width="5"/>
+            <path d="M50 137Q90 39 300 33t250 104" fill="none" stroke="#1f4c68" stroke-width="38"/><path d="M94 171Q130 98 300 86t206 85" fill="none" stroke="#26617f" stroke-width="34"/><path d="M140 209Q174 154 300 143t160 66" fill="none" stroke="#1c455e" stroke-width="30"/>
+            <path d="m300 346-121-111 121-108 121 108Z" fill="none" stroke="#c69735" stroke-width="34"/><path d="m300 327-100-92 100-88 100 88Z" fill="#17384c"/>
+            <path d="M300 346 31 130M300 346l269-216" stroke="#f4dfa0" stroke-width="3"/><path d="m300 118 9 9-9 9-9-9m123 108 9 9-9 9-9-9m-228 0 9 9-9 9-9-9" fill="#fff4cf"/>
+          </svg>
+        </div>
+      </article>
+
+      <article id="option-8" class="option" data-choice="8 — Ultra Minimal">
+        <div class="option-copy"><div><h2 class="option-title"><span>08</span>Ultra Minimal</h2><p class="option-description">Maximum card legibility: one field plane and essential lines only.</p></div><button type="button">Choose 08</button></div>
+        <div class="field-stage">
+          <svg viewBox="0 0 600 375" aria-label="Ultra Minimal field">
+            <rect width="600" height="375" fill="#0d151e"/><path d="M300 358 35 130Q80 20 300 16t265 114Z" fill="#173c55" stroke="#3b82f6" stroke-width="3"/>
+            <path d="m300 343-121-109 121-107 121 107Z" fill="none" stroke="#e4b94f" stroke-width="5"/><path d="M300 343 35 130M300 343l265-213" stroke="#f4dfa0" stroke-width="3"/>
+            <path d="m300 118 9 9-9 9-9-9m123 107 9 9-9 9-9-9m-228 0 9 9-9 9-9-9" fill="#fff4cf"/><circle cx="300" cy="234" r="7" fill="#e4b94f"/>
+          </svg>
+        </div>
+      </article>
+    </div>
+    <div class="note">Click an option to highlight it, then send me its number. The selection is also stored in the URL hash so it survives a refresh.</div>
+  </main>
+
+  <script>
+    const players = [
+      ["p-c", "C", "Ripken", "100%"], ["p-1b", "1B", "Problems", "93%"], ["p-2b", "2B", "Sun", "100%"], ["p-3b", "3B", "Law", "100%"],
+      ["p-ss", "SS", "Riddle", "78%"], ["p-lf", "LF", "Locke", "85%"], ["p-cf", "CF", "Yoshida", "87%"], ["p-rf", "RF", "Durham", "95%"]
+    ];
+    document.querySelectorAll(".field-stage").forEach((stage) => {
+      players.forEach(([place, pos, name, fit]) => {
+        const marker = document.createElement("div");
+        marker.className = `marker ${place}`;
+        marker.innerHTML = `<b>${pos}</b><span>${name}</span><em>${fit}</em>`;
+        stage.appendChild(marker);
+      });
+    });
+    const selection = document.getElementById("selection");
+    function choose(option) {
+      document.querySelectorAll(".option").forEach((node) => node.classList.toggle("selected", node === option));
+      selection.textContent = option.dataset.choice;
+      location.hash = `option-${option.dataset.choice.split(" ")[0]}`;
+    }
+    document.querySelectorAll(".option").forEach((option) => {
+      option.querySelector("button").addEventListener("click", () => choose(option));
+      if (location.hash === `#option-${option.dataset.choice.split(" ")[0]}`) choose(option);
+    });
+  </script>
+</body>
+</html>

@@ -66,7 +66,9 @@ describe("FieldDiagram", () => {
     expect(fielders).toHaveLength(8);
     fielders.forEach((fielder) => {
       expect(within(fielder).getByText("Awareness")).toBeTruthy();
+      expect(within(fielder).getByTestId("fit-stat-label").className).not.toContain("truncate");
       expect(within(fielder).getByText("123").className).toContain("text-base");
+      expect(within(fielder).getByTestId("fielder-card-header").textContent).toContain("Player");
     });
     expect(screen.getByText("Average position fit 75%")).toBeTruthy();
     expect(screen.getByText("Equipped items included")).toBeTruthy();
