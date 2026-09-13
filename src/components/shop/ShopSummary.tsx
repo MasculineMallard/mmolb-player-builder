@@ -47,7 +47,7 @@ export function ShopSummary({ recommendations, statNeeds, flatMax, pctMax }: Sho
   if (rows.length === 0) return null;
 
   return (
-    <div className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-gray-700 bg-gray-900/90 backdrop-blur-sm">
+    <div data-testid="shopping-list-card" className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-gray-700 bg-gray-900/90 backdrop-blur-sm">
       {/* Header */}
       <div className="bg-gray-800/80 px-3 py-1.5 border-b border-gray-700 text-center">
         <span className="text-sm font-semibold text-gray-200">Shopping List</span>
@@ -56,17 +56,17 @@ export function ShopSummary({ recommendations, statNeeds, flatMax, pctMax }: Sho
       {/* Stat rows */}
       <div className="px-3 py-2 space-y-0.5">
         {rows.map((row) => (
-          <div key={row.stat} className="grid grid-cols-[1fr_auto_auto] items-center text-sm h-[22px] gap-x-3">
-            <div className="flex items-center gap-1.5 min-w-0">
+          <div data-testid="shopping-list-row" key={row.stat} className="grid h-[22px] grid-cols-3 items-center text-center text-sm">
+            <div className="flex min-w-0 items-center justify-center gap-1.5">
               <span className="truncate capitalize font-medium text-gray-100">
                 <ResponsiveStatLabel stat={row.stat} abbreviateLong />
               </span>
               {row.gap > 0 && <span className="text-xs text-gray-500">-{Math.round(row.gap)}</span>}
             </div>
-            <span className={`text-xs font-mono text-center min-w-[32px] ${row.pref === "flat" ? "text-sky-200" : "text-blue-400"}`}>
+            <span className={`text-center font-mono text-xs ${row.pref === "flat" ? "text-sky-200" : "text-blue-400"}`}>
               {row.pref === "flat" ? `+${flatMax}` : `${pctMax}%`}
             </span>
-            <span className="flex gap-0.5">
+            <span className="flex justify-center gap-0.5">
               {row.slots.map((s) => <span key={s} className="text-xs" title={s}>{SLOT_META[s as SlotName]?.emoji}</span>)}
             </span>
           </div>

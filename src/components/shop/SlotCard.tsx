@@ -65,7 +65,7 @@ function StatRow({ stat, isDefense, pref, flatMax, pctMax, equipment }: {
   const diff = equipment ? computeDiff(stat, pref, idealValue, equipment) : null;
 
   return (
-    <div data-testid="slot-stat-row" className="grid min-h-[22px] grid-cols-4 items-center px-0.5 py-0.5 text-[11px] sm:text-xs">
+    <div data-testid="slot-stat-row" className="grid min-h-[22px] grid-cols-4 items-center px-0.5 py-0.5 text-center text-[11px] sm:text-xs">
       <span className={`min-w-0 overflow-hidden capitalize font-medium ${isDefense ? "text-yellow-400" : "text-gray-100"}`}>
         <ResponsiveStatLabel stat={stat} abbreviateLong />
       </span>
@@ -73,18 +73,18 @@ function StatRow({ stat, isDefense, pref, flatMax, pctMax, equipment }: {
         <span
           aria-label={`Current ${stat}: ${has}`}
           title={has}
-          className="overflow-hidden text-ellipsis whitespace-nowrap text-right font-mono leading-tight text-gray-400"
+          className="overflow-hidden text-ellipsis whitespace-nowrap text-center font-mono leading-tight text-gray-400"
         >
           {has}
         </span>
       ) : (
         <span />
       )}
-      <span className={`text-right font-mono ${pref === "flat" ? "text-sky-200" : "text-blue-400"}`}>
+      <span className={`text-center font-mono ${pref === "flat" ? "text-sky-200" : "text-blue-400"}`}>
         {pref === "flat" ? `+${flatMax}` : `${pctMax}%`}
       </span>
       {diff !== null ? (
-        <span className={`text-right font-mono ${diff.isPos ? "text-green-400" : "text-red-400"}`}>
+        <span className={`text-center font-mono ${diff.isPos ? "text-green-400" : "text-red-400"}`}>
           {diff.value}
         </span>
       ) : (
@@ -98,7 +98,7 @@ export function SlotCard({ recommendation: rec, flatMax, pctMax, statNeeds, equi
   const hasEquipment = !!equipment;
 
   return (
-    <div className="bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-lg overflow-hidden flex flex-col">
+    <div data-testid="slot-card" className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-700 bg-gray-900/90 backdrop-blur-sm">
       {/* Header */}
       <div className="bg-gray-800/80 px-3 py-1.5 border-b border-gray-700 flex items-center gap-1.5 justify-center">
         <span className="text-base">{rec.emoji}</span>
@@ -109,11 +109,11 @@ export function SlotCard({ recommendation: rec, flatMax, pctMax, statNeeds, equi
 
       {/* Column headers */}
       {hasEquipment && (
-        <div data-testid="slot-stat-headings" className="grid grid-cols-4 items-center px-3 pt-1 text-[10px] uppercase tracking-wide text-gray-400 sm:text-[11px]">
+        <div data-testid="slot-stat-headings" className="grid grid-cols-4 items-center px-3 pt-1 text-center text-[10px] uppercase tracking-wide text-gray-400 sm:text-[11px]">
           <span>stat</span>
-          <span className="text-right">has</span>
-          <span className="text-right">ideal</span>
-          <span className="text-right">diff</span>
+          <span>has</span>
+          <span>ideal</span>
+          <span>diff</span>
         </div>
       )}
 

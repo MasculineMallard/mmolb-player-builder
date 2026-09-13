@@ -46,11 +46,11 @@
     .tier.active { background:var(--blue); color:white; }
     .tag { color:#4e97ff; } .tag.alt { color:white; }
     .select-look { display:flex; justify-content:space-between; margin-top:8px; border:1px solid var(--line); border-radius:6px; background:#1c2a36; padding:9px 10px; font-weight:700; }
-    .shop-row { display:grid; grid-template-columns:minmax(0,1fr) auto auto; align-items:center; gap:9px; font-size:13px; }
+    .shop-row { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); align-items:center; gap:0; text-align:center; font-size:13px; }
     .need { color:#667487; font-size:11px; } .gain { color:var(--sky); font:700 12px ui-monospace,Consolas,monospace; }
     .slot-row,.slot-labels { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); align-items:center; gap:0; font-size:12px; }
     .slot-labels { color:var(--muted); font-size:9px; text-transform:uppercase; }
-    .slot-row span:not(:first-child),.slot-labels span:not(:first-child) { text-align:right; }
+    .slot-row span,.slot-labels span { text-align:center; }
     .slot-row .stat { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .ideal { color:var(--sky); font-weight:700; } .bad { color:var(--red); } .good { color:var(--green); } .blue { color:#60a5fa; } .yellow { color:var(--yellow); }
     .projection-title { margin-bottom:9px; color:var(--muted); font-size:13px; letter-spacing:.06em; text-transform:uppercase; }
@@ -104,7 +104,7 @@
     ];
     defs.forEach(([id,title,body])=>stage.insertAdjacentHTML("beforeend",`<section class="panel ${slotRows[id]?'slot-panel':''}" data-id="${id}"><div class="panel-head">${title}<span class="dimensions"></span></div><div class="panel-body">${body}</div><div class="resize-handle" aria-label="Resize ${id}"></div></section>`));
     const panels=[...stage.querySelectorAll(".panel")];
-    const desktop={canvas:1400,controls:[0,0,360,460],shopping:[376,0,330,215],helmet:[722,0,320,126],jersey:[1058,0,320,150],gloves:[722,142,320,150],boots:[1058,166,320,150],pendant:[722,308,320,126],projected:[376,231,330,350]};
+    const desktop={canvas:1400,controls:[0,0,376,504],projected:[392,0,408,504],shopping:[816,0,272,200],helmet:[1104,0,272,200],jersey:[816,216,272,136],gloves:[1104,216,272,136],boots:[816,368,272,136],pendant:[1104,368,272,136]};
     const mobile={canvas:390,controls:[16,0,358,460],shopping:[16,476,358,215],helmet:[16,707,175,126],jersey:[199,707,175,150],gloves:[16,873,175,150],boots:[199,873,175,150],pendant:[16,1039,175,126],projected:[16,1181,358,350]};
     let gesture=null,z=10;
     const snap=n=>snapBox.checked?Math.round(n/8)*8:Math.round(n);

@@ -125,9 +125,7 @@ export function StatBarPanel({
       >
         {bars.primary.length > 0 && (
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1 border-b border-border pb-0.5">
-              {primaryLabel}
-            </h4>
+            <ProjectionSectionHeader label={primaryLabel} />
             <div data-testid="projected-build-primary-rows" className="space-y-0.5">
               {bars.primary.map((b) => (
                 <BarRow key={b.stat} bar={b} displayMax={STAT_DISPLAY_MAX} isPriority={prioritySet.has(b.stat)} isSecondary={secondarySet.has(b.stat)} />
@@ -138,9 +136,7 @@ export function StatBarPanel({
 
         {bars.baserunning.length > 0 && (
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1 border-b border-border pb-0.5">
-              {CATEGORY_LABELS.baserunning}
-            </h4>
+            <ProjectionSectionHeader label={CATEGORY_LABELS.baserunning} />
             <div data-testid="projected-build-baserunning-rows" className="space-y-0.5">
               {bars.baserunning.map((b) => (
                 <BarRow key={b.stat} bar={b} displayMax={STAT_DISPLAY_MAX} isPriority={prioritySet.has(b.stat)} isSecondary={secondarySet.has(b.stat)} />
@@ -151,9 +147,7 @@ export function StatBarPanel({
 
         {bars.defense.length > 0 && (
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1 border-b border-border pb-0.5">
-              {CATEGORY_LABELS.defense}
-            </h4>
+            <ProjectionSectionHeader label={CATEGORY_LABELS.defense} />
             <div data-testid="projected-build-defense-rows" className="space-y-0.5">
               {bars.defense.map((b) => (
                 <BarRow key={b.stat} bar={b} displayMax={DEFENSE_DISPLAY_MAX} isPriority={false} isSecondary={false} />
@@ -161,6 +155,22 @@ export function StatBarPanel({
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function ProjectionSectionHeader({ label }: { label: string }) {
+  return (
+    <div className="mb-1 flex items-end border-b border-border pb-0.5">
+      <h4 className="min-w-0 flex-1 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+      </h4>
+      <div data-testid="projected-column-headings" className="grid w-44 shrink-0 grid-cols-4 text-center font-mono text-[9px] uppercase tracking-wide text-muted-foreground/75 sm:text-[10px]">
+        <span>Now</span>
+        <span>Goal</span>
+        <span>Flat</span>
+        <span>Pct</span>
       </div>
     </div>
   );
@@ -204,22 +214,11 @@ function BarRow({ bar, displayMax, isPriority, isSecondary }: {
           )}
           <ResponsiveStatLabel stat={bar.stat} />
         </span>
-        <span className="flex items-center text-sm font-mono tabular-nums shrink-0">
-          <span className="text-gray-400 w-10 text-right">{bar.current}</span>
-          {bar.target > 0 && (
-            <>
-              <span className="text-gray-600 mx-1.5">|</span>
-              <span className="text-foreground/50 w-10 text-right">{bar.target}</span>
-            </>
-          )}
-          {hasImprovement && (
-            <>
-              <span className="text-gray-600 mx-1.5">|</span>
-              <span className="text-sky-200 w-10 text-right">+{flatDelta}</span>
-              <span className="text-gray-600 mx-1.5">|</span>
-              <span className="text-blue-400 w-10 text-right">+{pctDelta}</span>
-            </>
-          )}
+        <span data-testid="projected-values" className="grid w-44 shrink-0 grid-cols-4 items-center text-center font-mono text-sm tabular-nums">
+          <span className="text-gray-400">{bar.current}</span>
+          <span className="text-foreground/50">{bar.target > 0 ? bar.target : "—"}</span>
+          <span className="text-sky-200">{hasImprovement ? `+${flatDelta}` : "—"}</span>
+          <span className="text-blue-400">{hasImprovement ? `+${pctDelta}` : "—"}</span>
         </span>
       </div>
 

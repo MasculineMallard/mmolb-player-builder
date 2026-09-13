@@ -9,13 +9,15 @@ These principles capture the approved shop direction from the Pitcher Shop Layou
 - Put Projected Build beside the controls instead of below the equipment. This uses desktop width and avoids a long empty lower page.
 - Build the item area as a two-column matrix with a `16px` gutter. At `560px`, each card is `272px` wide.
 - Treat Shopping List as the first cell of that matrix, followed by Helmet, Jersey, Gloves, Boots, and Charm in reading order.
-- Align the top edge of Controls, Projected Build, Shopping List, and Helmet. Let card heights follow their content; do not stretch short cards merely to fill a row.
+- Align the top edge of Controls, Projected Build, Shopping List, and Helmet. Within the item matrix, each left/right pair must share both its top and bottom edge; the taller card defines that row's height.
 
 ## Card information design
 
 - Use the same internal four-column grid for headings and data: Stat, Has, Ideal, Diff.
 - Give all four columns equal width. Preserve a consistent visual rhythm instead of leaving a large flexible gap between the stat name and numeric columns.
-- Left-align the stat label and right-align tabular numeric values so comparisons remain quick.
+- Center every cell on its equal-width track so the visible Stat, Has, Ideal, and Diff anchors are evenly spaced. Keep numeric values tabular.
+- Give Shopping List three equal-width, centered tracks: stat plus gap, ideal gain, and matching item slots.
+- Give each Projected Build section four short, fixed numeric headings—Now, Goal, Flat, and Pct—and keep every row on those same tracks.
 - Use one centralized abbreviation for genuinely long attribute names; keep ordinary names written out when they fit. The same stat must use the same label rule on every item card.
 - Keep Shopping List and Projected Build as single reading sequences. Do not split either into multiple newspaper-style columns.
 
@@ -24,7 +26,7 @@ These principles capture the approved shop direction from the Pitcher Shop Layou
 - Reflow rather than squeeze. Below the wide-desktop breakpoint, stack the control and result zones in reading order.
 - On narrower screens, keep Shopping List on its own full-width row so its labels and item icons remain legible.
 - Keep item cards in two columns on mobile when they remain readable, and use the shared mobile abbreviations consistently.
-- Avoid equal-height stretching and placeholder space at every breakpoint; compact cards should end with their content.
+- Match heights only inside each left/right card pair. Do not impose one global height across every card or add placeholder rows.
 
 ## Shared implementation
 

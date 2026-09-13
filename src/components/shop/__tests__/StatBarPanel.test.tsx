@@ -44,5 +44,8 @@ describe("StatBarPanel responsive layout", () => {
     expect(screen.getByTestId("projected-build-panel").className).toContain("max-w-[680px]");
     expect(rows.className).toContain("space-y-0.5");
     expect(rows.className).not.toContain("grid-cols");
+    expect(screen.getByTestId("projected-column-headings").textContent).toBe("NowGoalFlatPct");
+    expect(screen.getByTestId("projected-column-headings").className).toContain("grid-cols-4");
+    expect(screen.getAllByTestId("projected-values").every((values) => values.className.includes("grid-cols-4"))).toBe(true);
   });
 });

@@ -58,16 +58,16 @@ export function PlayerEquipmentGraphic({
   );
 
   return (
-    <div data-testid="player-equipment-layout" className="space-y-2 2xl:grid 2xl:grid-cols-2 2xl:items-start 2xl:gap-4 2xl:space-y-0">
-      <div data-testid="shop-summary-row" className="w-full lg:max-w-[341px] 2xl:max-w-none">
+    <div data-testid="player-equipment-layout" className="space-y-2 2xl:grid 2xl:grid-cols-2 2xl:items-stretch 2xl:gap-4 2xl:space-y-0">
+      <div data-testid="shop-summary-row" className="h-full w-full lg:max-w-[341px] 2xl:max-w-none">
         <ShopSummary recommendations={recommendations} statNeeds={statNeeds} flatMax={flatMax} pctMax={pctMax} />
       </div>
-      <div data-testid="player-equipment-grid" className="grid grid-cols-2 items-start gap-2 lg:grid-cols-3 2xl:contents">
+      <div data-testid="player-equipment-grid" className="grid grid-cols-2 items-stretch gap-2 lg:grid-cols-3 2xl:contents">
         {SLOT_ORDER.map((slot) => {
           const rec = recMap.get(slot);
           if (!rec) return null;
           return (
-            <div key={slot} className="min-w-0 self-start">
+            <div data-testid="slot-card-cell" key={slot} className="h-full min-w-0 self-stretch">
               <SlotCard
                 recommendation={rec}
                 flatMax={flatMax}

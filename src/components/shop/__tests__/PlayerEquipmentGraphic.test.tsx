@@ -43,13 +43,19 @@ describe("PlayerEquipmentGraphic responsive layout", () => {
     );
 
     expect(screen.getByTestId("player-equipment-grid").className).toContain("grid-cols-2");
-    expect(screen.getByTestId("player-equipment-grid").className).toContain("items-start");
+    expect(screen.getByTestId("player-equipment-grid").className).toContain("items-stretch");
     expect(screen.getByTestId("player-equipment-grid").className).toContain("lg:grid-cols-3");
     expect(screen.getByTestId("player-equipment-grid").className).toContain("2xl:contents");
     expect(screen.getByTestId("player-equipment-layout").className).toContain("2xl:grid-cols-2");
+    expect(screen.getByTestId("player-equipment-layout").className).toContain("2xl:items-stretch");
     expect(screen.getByTestId("player-equipment-layout").className).toContain("2xl:gap-4");
     expect(screen.getByTestId("shop-summary-row").className).toContain("lg:max-w-[341px]");
     expect(screen.getByTestId("shop-summary-row").className).toContain("2xl:max-w-none");
+    expect(screen.getByTestId("shop-summary-row").className).toContain("h-full");
+    expect(screen.getAllByTestId("slot-card-cell").every((cell) => cell.className.includes("h-full"))).toBe(true);
+    expect(screen.getAllByTestId("slot-card").every((card) => card.className.includes("h-full"))).toBe(true);
+    expect(screen.getByTestId("shopping-list-card").className).toContain("h-full");
+    expect(screen.getAllByTestId("shopping-list-row").every((row) => row.className.includes("grid-cols-3"))).toBe(true);
     expect(screen.getAllByLabelText("intimidation").every((label) => label.textContent === "IntimIntim")).toBe(true);
     expect(screen.getByLabelText("awareness").textContent).toBe("AwareAware");
   });
@@ -68,7 +74,9 @@ describe("PlayerEquipmentGraphic responsive layout", () => {
     );
 
     expect(screen.getByTestId("slot-stat-headings").className).toContain("grid-cols-4");
+    expect(screen.getByTestId("slot-stat-headings").className).toContain("text-center");
     expect(screen.getAllByTestId("slot-stat-row").every((row) => row.className.includes("grid-cols-4"))).toBe(true);
+    expect(screen.getAllByTestId("slot-stat-row").every((row) => row.className.includes("text-center"))).toBe(true);
     expect(screen.getAllByLabelText("intimidation").some((label) => label.textContent === "IntimIntim")).toBe(true);
   });
 });
