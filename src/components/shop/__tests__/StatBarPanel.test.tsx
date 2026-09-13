@@ -46,6 +46,8 @@ describe("StatBarPanel responsive layout", () => {
     expect(rows.className).not.toContain("grid-cols");
     expect(screen.getByTestId("projected-column-headings").textContent).toBe("NowGoalFlatPct");
     expect(screen.getByTestId("projected-column-headings").className).toContain("grid-cols-4");
+    expect(screen.getByTestId("projected-column-headings").className).toContain("text-left");
     expect(screen.getAllByTestId("projected-values").every((values) => values.className.includes("grid-cols-4"))).toBe(true);
+    expect(screen.getAllByTestId("projected-values").every((values) => values.className.includes("text-left"))).toBe(true);
   });
 });

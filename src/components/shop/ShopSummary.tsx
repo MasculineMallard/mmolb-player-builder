@@ -56,17 +56,17 @@ export function ShopSummary({ recommendations, statNeeds, flatMax, pctMax }: Sho
       {/* Stat rows */}
       <div className="px-3 py-2 space-y-0.5">
         {rows.map((row) => (
-          <div data-testid="shopping-list-row" key={row.stat} className="grid h-[22px] grid-cols-3 items-center text-center text-sm">
-            <div className="flex min-w-0 items-center justify-center gap-1.5">
+          <div data-testid="shopping-list-row" key={row.stat} className="grid h-[22px] grid-cols-3 items-center text-left text-sm">
+            <div className="flex min-w-0 items-center justify-start gap-1.5">
               <span className="truncate capitalize font-medium text-gray-100">
                 <ResponsiveStatLabel stat={row.stat} abbreviateLong />
               </span>
               {row.gap > 0 && <span className="text-xs text-gray-500">-{Math.round(row.gap)}</span>}
             </div>
-            <span className={`text-center font-mono text-xs ${row.pref === "flat" ? "text-sky-200" : "text-blue-400"}`}>
+            <span className={`font-mono text-xs ${row.pref === "flat" ? "text-sky-200" : "text-blue-400"}`}>
               {row.pref === "flat" ? `+${flatMax}` : `${pctMax}%`}
             </span>
-            <span className="flex justify-center gap-0.5">
+            <span className="flex justify-start gap-0.5">
               {row.slots.map((s) => <span key={s} className="text-xs" title={s}>{SLOT_META[s as SlotName]?.emoji}</span>)}
             </span>
           </div>

@@ -166,7 +166,7 @@ function ProjectionSectionHeader({ label }: { label: string }) {
       <h4 className="min-w-0 flex-1 text-sm font-medium uppercase tracking-wider text-muted-foreground">
         {label}
       </h4>
-      <div data-testid="projected-column-headings" className="grid w-44 shrink-0 grid-cols-4 text-center font-mono text-[9px] uppercase tracking-wide text-muted-foreground/75 sm:text-[10px]">
+      <div data-testid="projected-column-headings" className="grid w-44 shrink-0 grid-cols-4 text-left font-mono text-[9px] uppercase tracking-wide text-muted-foreground/75 sm:text-[10px]">
         <span>Now</span>
         <span>Goal</span>
         <span>Flat</span>
@@ -214,7 +214,7 @@ function BarRow({ bar, displayMax, isPriority, isSecondary }: {
           )}
           <ResponsiveStatLabel stat={bar.stat} />
         </span>
-        <span data-testid="projected-values" className="grid w-44 shrink-0 grid-cols-4 items-center text-center font-mono text-sm tabular-nums">
+        <span data-testid="projected-values" className="grid w-44 shrink-0 grid-cols-4 items-center text-left font-mono text-sm tabular-nums">
           <span className="text-gray-400">{bar.current}</span>
           <span className="text-foreground/50">{bar.target > 0 ? bar.target : "—"}</span>
           <span className="text-sky-200">{hasImprovement ? `+${flatDelta}` : "—"}</span>

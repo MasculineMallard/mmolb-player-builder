@@ -74,9 +74,9 @@ describe("PlayerEquipmentGraphic responsive layout", () => {
     );
 
     expect(screen.getByTestId("slot-stat-headings").className).toContain("grid-cols-4");
-    expect(screen.getByTestId("slot-stat-headings").className).toContain("text-center");
+    expect(screen.getByTestId("slot-stat-headings").className).toContain("text-left");
     expect(screen.getAllByTestId("slot-stat-row").every((row) => row.className.includes("grid-cols-4"))).toBe(true);
-    expect(screen.getAllByTestId("slot-stat-row").every((row) => row.className.includes("text-center"))).toBe(true);
+    expect(screen.getAllByTestId("slot-stat-row").every((row) => row.className.includes("text-left"))).toBe(true);
     expect(screen.getAllByLabelText("intimidation").some((label) => label.textContent === "IntimIntim")).toBe(true);
   });
 });
