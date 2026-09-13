@@ -116,6 +116,8 @@ describe("FieldDiagram", () => {
     fireEvent.change(catcherSelect, { target: { value: "bench" } });
     expect(onLockPosition).toHaveBeenCalledWith("C", "bench");
     const dhSelect = screen.getByLabelText("Player assignment for DH; current player Player dh");
+    expect(dhSelect.className).toContain("[color-scheme:dark]");
+    expect(within(dhSelect).getAllByRole("option").every((option) => option.className.includes("bg-slate-950"))).toBe(true);
     expect(within(dhSelect).getAllByRole("option").some((option) => option.textContent === "Lock · Player bench · Bench")).toBe(true);
     fireEvent.change(dhSelect, { target: { value: "bench" } });
     expect(onLockPosition).toHaveBeenCalledWith("DH", "bench");

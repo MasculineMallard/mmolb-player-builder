@@ -106,11 +106,11 @@ function AssignmentCard({
                 aria-label={`Player assignment for ${assignment.assignedPosition}; current player ${assignment.player.name}`}
                 value={selectValue}
                 onChange={(event) => onLockPosition(assignment.assignedPosition, event.target.value || null)}
-                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                className="absolute inset-0 h-full w-full cursor-pointer bg-background text-foreground opacity-0 [color-scheme:dark]"
               >
-                <option value="">Auto · {assignment.player.name}</option>
+                <option value="" className="bg-slate-950 text-slate-100">Auto · {assignment.player.name}</option>
                 {selectablePlayers.map(({ player, rosterRole }) => (
-                  <option key={player.mmolbPlayerId} value={player.mmolbPlayerId}>
+                  <option key={player.mmolbPlayerId} value={player.mmolbPlayerId} className="bg-slate-950 text-slate-100">
                     Lock · {player.name} · {rosterRole}
                   </option>
                 ))}
@@ -258,11 +258,11 @@ export function FieldDiagram({ recommendation, modifierSourceStatus = "canonical
                       aria-label={`Player assignment for DH; current player ${recommendation.designatedHitter.player.name}`}
                       value={recommendation.designatedHitter.isLocked ? recommendation.designatedHitter.player.mmolbPlayerId : ""}
                       onChange={(event) => onLockPosition("DH", event.target.value || null)}
-                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                      className="absolute inset-0 h-full w-full cursor-pointer bg-background text-foreground opacity-0 [color-scheme:dark]"
                     >
-                      <option value="">Auto · {recommendation.designatedHitter.player.name}</option>
+                      <option value="" className="bg-slate-950 text-slate-100">Auto · {recommendation.designatedHitter.player.name}</option>
                       {selectablePlayers.map(({ player, rosterRole }) => (
-                        <option key={player.mmolbPlayerId} value={player.mmolbPlayerId}>
+                        <option key={player.mmolbPlayerId} value={player.mmolbPlayerId} className="bg-slate-950 text-slate-100">
                           Lock · {player.name} · {rosterRole}
                         </option>
                       ))}
