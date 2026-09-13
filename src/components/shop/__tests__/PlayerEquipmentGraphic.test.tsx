@@ -55,7 +55,7 @@ describe("PlayerEquipmentGraphic responsive layout", () => {
     expect(screen.getAllByTestId("slot-card-cell").every((cell) => cell.className.includes("h-full"))).toBe(true);
     expect(screen.getAllByTestId("slot-card").every((card) => card.className.includes("h-full"))).toBe(true);
     expect(screen.getByTestId("shopping-list-card").className).toContain("h-full");
-    expect(screen.getAllByTestId("shopping-list-row").every((row) => row.className.includes("grid-cols-3"))).toBe(true);
+    expect(screen.getAllByTestId("shopping-list-row").every((row) => row.className.includes("grid-cols-[1.15fr_0.85fr_1fr]"))).toBe(true);
     expect(screen.getAllByLabelText("intimidation").every((label) => label.textContent === "IntimIntim")).toBe(true);
     expect(screen.getByLabelText("awareness").textContent).toBe("AwareAware");
   });

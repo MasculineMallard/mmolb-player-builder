@@ -16,7 +16,7 @@ These principles capture the approved shop direction from the Pitcher Shop Layou
 - Use the same internal four-column grid for headings and data: Stat, Has, Ideal, Diff.
 - Give all four columns equal width. Preserve a consistent visual rhythm instead of leaving a large flexible gap between the stat name and numeric columns.
 - Left-align every cell inside its equal-width track so each value has a predictable reading edge. Keep numeric values tabular.
-- Give Shopping List three equal-width, left-aligned tracks: stat plus gap, ideal gain, and matching item slots.
+- Give Shopping List three left-aligned tracks for stat plus gap, ideal gain, and matching item slots. Use a `1.15fr / 0.85fr / 1fr` balance so the longer stat group gets enough room and the short gain column sits visually midway between it and the item icons.
 - Give each Projected Build section four short, fixed numeric headings—Now, Goal, Flat, and Pct—and keep every row on those same tracks.
 - Use one centralized abbreviation for genuinely long attribute names; keep ordinary names written out when they fit. The same stat must use the same label rule on every item card.
 - Keep Shopping List and Projected Build as single reading sequences. Do not split either into multiple newspaper-style columns.

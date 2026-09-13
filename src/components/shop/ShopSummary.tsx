@@ -56,7 +56,7 @@ export function ShopSummary({ recommendations, statNeeds, flatMax, pctMax }: Sho
       {/* Stat rows */}
       <div className="px-3 py-2 space-y-0.5">
         {rows.map((row) => (
-          <div data-testid="shopping-list-row" key={row.stat} className="grid h-[22px] grid-cols-3 items-center text-left text-sm">
+          <div data-testid="shopping-list-row" key={row.stat} className="grid h-[22px] grid-cols-[1.15fr_0.85fr_1fr] items-center text-left text-sm">
             <div className="flex min-w-0 items-center justify-start gap-1.5">
               <span className="truncate capitalize font-medium text-gray-100">
                 <ResponsiveStatLabel stat={row.stat} abbreviateLong />
