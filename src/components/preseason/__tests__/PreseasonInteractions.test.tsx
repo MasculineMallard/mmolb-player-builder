@@ -113,7 +113,10 @@ describe("preseason controls", () => {
 
   it("caps OPS bars at 1.000 and applies metric-specific yellow-glow thresholds", () => {
     const batters = Array.from({ length: 9 }, (_, index) => makePlayer(`b${index + 1}`, "C", index));
-    batters[3].preseasonBatting!.OBP = 0.45;
+    batters[3].preseasonBatting!.OBP = 0.4;
+    batters[4].preseasonBatting!.OBP = 0.399;
+    batters[8].preseasonBatting!.SLG = 0.6;
+    batters[7].preseasonBatting!.SLG = 0.599;
     batters[6].preseasonBatting!.OPS = 1;
     render(<BattingLineupCard recommendation={recommendBattingOrder(batters)} />);
     const sort = screen.getByLabelText("Batting order sort");
@@ -133,6 +136,7 @@ describe("preseason controls", () => {
 
     fireEvent.change(sort, { target: { value: "SLG" } });
     expect(screen.getByTestId("batting-row-b9").getAttribute("data-glowing")).toBe("true");
+    expect(screen.getByTestId("batting-row-b8").getAttribute("data-glowing")).toBe("false");
 
     fireEvent.change(sort, { target: { value: "SO%" } });
     expect(screen.getByTestId("batting-row-b3").getAttribute("data-glowing")).toBe("true");
@@ -149,7 +153,7 @@ describe("preseason controls", () => {
     expect(screen.getByText("Rate Formulas")).toBeTruthy();
     expect(screen.getByText(/Σ\(weight × min\(item-adjusted stat ÷ target, 1\)\) ÷ Σ\(weights\) × 100/)).toBeTruthy();
     expect(screen.getByText(/Score = \(WHIP rank × 0.50\) \+ \(ERA rank × 0.25\) \+ \(K\/9 rank × 0.25\)/)).toBeTruthy();
-    expect(screen.getByText(/OPS > 1.000, OBP ≥ .450, SLG ≥ .700, or SO% ≤ 10.0%/)).toBeTruthy();
+    expect(screen.getByText(/OPS > 1.000, OBP ≥ .400, SLG ≥ .600, or SO% ≤ 10.0%/)).toBeTruthy();
     expect(screen.getByText("HR/9").parentElement?.textContent).toContain("display only");
     const close = screen.getByRole("button", { name: "Close methodology" });
     expect(document.activeElement).toBe(close);

@@ -160,7 +160,8 @@ export function FieldDiagram({ recommendation, modifierSourceStatus = "canonical
   const alternativeByPosition = new Map(
     recommendation.alternatives.map((alternative) => [alternative.position, alternative]),
   );
-  const lockedCount = recommendation.fielders.filter((assignment) => assignment.isLocked).length;
+  const lockedCount = recommendation.fielders.filter((assignment) => assignment.isLocked).length
+    + Number(recommendation.designatedHitter?.isLocked ?? false);
   const averageFit = Math.round(recommendation.totalFit / recommendation.fielders.length);
 
   return (
@@ -239,9 +240,39 @@ export function FieldDiagram({ recommendation, modifierSourceStatus = "canonical
           </h3>
           <div data-testid="reserve-bats-grid" className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
             {recommendation.designatedHitter && (
-              <div data-testid="designated-hitter-card" className="rounded-lg border border-primary/35 bg-primary/5 p-2.5">
-                <div className="text-[10px] font-black uppercase tracking-wider text-primary">Designated hitter</div>
-                <div className="mt-1 truncate text-sm font-bold text-foreground">{recommendation.designatedHitter.player.name}</div>
+              <div
+                data-testid="designated-hitter-card"
+                data-locked={recommendation.designatedHitter.isLocked ? "true" : "false"}
+                className={`rounded-lg border bg-primary/5 p-2.5 ${recommendation.designatedHitter.isLocked ? "border-primary" : "border-primary/35"}`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-[10px] font-black uppercase tracking-wider text-primary">
+                    Designated hitter{recommendation.designatedHitter.isLocked ? " · locked" : ""}
+                  </div>
+                  {onLockPosition && (
+                    <span data-testid="dh-menu-cue" aria-hidden="true" className="grid h-5 w-5 shrink-0 place-items-center rounded border border-primary/50 bg-primary/20 text-[12px] font-black leading-none text-primary shadow-sm">▼</span>
+                  )}
+                </div>
+                {onLockPosition ? (
+                  <label className="relative mt-1 flex h-6 min-w-0 cursor-pointer items-center rounded-sm focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-primary">
+                    <span className="min-w-0 flex-1 truncate text-sm font-bold text-foreground">{recommendation.designatedHitter.player.name}</span>
+                    <select
+                      aria-label={`Player assignment for DH; current player ${recommendation.designatedHitter.player.name}`}
+                      value={recommendation.designatedHitter.isLocked ? recommendation.designatedHitter.player.mmolbPlayerId : ""}
+                      onChange={(event) => onLockPosition("DH", event.target.value || null)}
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    >
+                      <option value="">Auto · {recommendation.designatedHitter.player.name}</option>
+                      {selectablePlayers.map(({ player, rosterRole }) => (
+                        <option key={player.mmolbPlayerId} value={player.mmolbPlayerId}>
+                          Lock · {player.name} · {rosterRole}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : (
+                  <div className="mt-1 truncate text-sm font-bold text-foreground">{recommendation.designatedHitter.player.name}</div>
+                )}
                 <div className="mt-0.5 text-[11px] text-muted-foreground">
                   Best field fit: <strong className="text-foreground">{recommendation.designatedHitter.personalBestPosition}</strong>
                 </div>

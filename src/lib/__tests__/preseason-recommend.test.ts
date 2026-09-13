@@ -411,6 +411,23 @@ describe("recommendPositions", () => {
     ];
     expect(new Set(rosterPartition).size).toBe(rosterPartition.length);
     expect([...rosterPartition].sort()).toEqual([...base, dh, bench].map((entry) => entry.mmolbPlayerId).sort());
+
+    const benchAtDh = recommendPositions([...base, dh, bench], defense, startingNine, { DH: "bench" });
+    expect(benchAtDh.designatedHitter).toMatchObject({
+      isLocked: true,
+      player: { mmolbPlayerId: "bench" },
+    });
+    expect(benchAtDh.fielders).toHaveLength(8);
+    expect(benchAtDh.startingBatterIds).toContain("bench");
+    expect(benchAtDh.bench.some((entry) => startingNine.includes(entry.player.mmolbPlayerId))).toBe(true);
+    expect(benchAtDh.battingOrderLocked).toBe(false);
+    const dhRosterPartition = [
+      ...benchAtDh.fielders.map((entry) => entry.player.mmolbPlayerId),
+      ...(benchAtDh.designatedHitter ? [benchAtDh.designatedHitter.player.mmolbPlayerId] : []),
+      ...benchAtDh.bench.map((entry) => entry.player.mmolbPlayerId),
+    ];
+    expect(new Set(dhRosterPartition).size).toBe(dhRosterPartition.length);
+    expect([...dhRosterPartition].sort()).toEqual([...base, dh, bench].map((entry) => entry.mmolbPlayerId).sort());
   });
 
   it("exposes the two highest-weighted raw stats for each assigned position", () => {

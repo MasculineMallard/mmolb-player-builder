@@ -65,9 +65,9 @@ function StatRow({ stat, isDefense, pref, flatMax, pctMax, equipment }: {
   const diff = equipment ? computeDiff(stat, pref, idealValue, equipment) : null;
 
   return (
-    <div className="grid min-h-[22px] grid-cols-[minmax(0,1fr)_minmax(38px,1.2fr)_minmax(34px,1fr)_minmax(34px,1fr)] items-center px-0.5 py-0.5 text-[11px] sm:text-xs">
-      <span className={`capitalize font-medium ${isDefense ? "text-yellow-400" : "text-gray-100"}`}>
-        <ResponsiveStatLabel stat={stat} />
+    <div data-testid="slot-stat-row" className="grid min-h-[22px] grid-cols-4 items-center px-0.5 py-0.5 text-[11px] sm:text-xs">
+      <span className={`min-w-0 overflow-hidden capitalize font-medium ${isDefense ? "text-yellow-400" : "text-gray-100"}`}>
+        <ResponsiveStatLabel stat={stat} abbreviateLong />
       </span>
       {has !== null ? (
         <span
@@ -109,7 +109,7 @@ export function SlotCard({ recommendation: rec, flatMax, pctMax, statNeeds, equi
 
       {/* Column headers */}
       {hasEquipment && (
-        <div className="grid grid-cols-[minmax(0,1fr)_minmax(38px,1.2fr)_minmax(34px,1fr)_minmax(34px,1fr)] items-center px-3 pt-1 text-[10px] uppercase tracking-wide text-gray-400 sm:text-[11px]">
+        <div data-testid="slot-stat-headings" className="grid grid-cols-4 items-center px-3 pt-1 text-[10px] uppercase tracking-wide text-gray-400 sm:text-[11px]">
           <span>stat</span>
           <span className="text-right">has</span>
           <span className="text-right">ideal</span>

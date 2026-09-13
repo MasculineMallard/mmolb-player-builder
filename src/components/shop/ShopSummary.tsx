@@ -59,7 +59,7 @@ export function ShopSummary({ recommendations, statNeeds, flatMax, pctMax }: Sho
           <div key={row.stat} className="grid grid-cols-[1fr_auto_auto] items-center text-sm h-[22px] gap-x-3">
             <div className="flex items-center gap-1.5 min-w-0">
               <span className="truncate capitalize font-medium text-gray-100">
-                <ResponsiveStatLabel stat={row.stat} />
+                <ResponsiveStatLabel stat={row.stat} abbreviateLong />
               </span>
               {row.gap > 0 && <span className="text-xs text-gray-500">-{Math.round(row.gap)}</span>}
             </div>

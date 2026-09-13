@@ -96,6 +96,7 @@ describe("FieldDiagram", () => {
     expect(reserveGrid.className).toContain("lg:grid-cols-5");
     expect(within(reserveGrid).getByTestId("designated-hitter-card").textContent).toContain("Player dh");
     expect(within(reserveGrid).getByText("Player bench")).toBeTruthy();
+    expect(within(reserveGrid).getByTestId("dh-menu-cue")).toBeTruthy();
 
     const catcherSelect = screen.getByLabelText("Player assignment for C; current player Player 1");
     const catcherOptions = within(catcherSelect).getAllByRole("option");
@@ -114,6 +115,12 @@ describe("FieldDiagram", () => {
     expect(onLockPosition).toHaveBeenCalledWith("C", "dh");
     fireEvent.change(catcherSelect, { target: { value: "bench" } });
     expect(onLockPosition).toHaveBeenCalledWith("C", "bench");
+    const dhSelect = screen.getByLabelText("Player assignment for DH; current player Player dh");
+    expect(within(dhSelect).getAllByRole("option").some((option) => option.textContent === "Lock · Player bench · Bench")).toBe(true);
+    fireEvent.change(dhSelect, { target: { value: "bench" } });
+    expect(onLockPosition).toHaveBeenCalledWith("DH", "bench");
+    fireEvent.change(dhSelect, { target: { value: "" } });
+    expect(onLockPosition).toHaveBeenCalledWith("DH", null);
     expect(screen.getByText("Next").parentElement?.className).toContain("w-[84%]");
   });
 });

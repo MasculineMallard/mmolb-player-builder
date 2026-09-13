@@ -232,7 +232,7 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
       {player && !loading && (
         <div
           data-testid="shop-main-layout"
-          className="space-y-2 2xl:grid 2xl:grid-cols-[360px_minmax(0,1fr)] 2xl:gap-4 2xl:space-y-0"
+          className="space-y-2 2xl:grid 2xl:grid-cols-[376px_984px] 2xl:items-start 2xl:justify-center 2xl:gap-4 2xl:space-y-0"
         >
 
           {/* LEFT PANEL */}
@@ -333,29 +333,32 @@ export function ShopView({ forcePlayerType, toolName = "Super Slugger Sartoria",
           {/* RIGHT PANEL: Item cards + Stat bars */}
           <div
             data-testid="shop-results-panel"
-            className="mx-auto flex w-full max-w-[1040px] min-w-0 flex-col space-y-2 2xl:max-w-none"
+            className="mx-auto flex w-full max-w-[1040px] min-w-0 flex-col space-y-2 2xl:grid 2xl:max-w-none 2xl:grid-cols-[408px_560px] 2xl:items-start 2xl:gap-4 2xl:space-y-0"
           >
             {archetype && recommendations.length > 0 && (
               <>
-                {/* Summary + Item cards in a row */}
-                <PlayerEquipmentGraphic
-                  recommendations={recommendations}
-                  flatMax={selectedTier.flatMax}
-                  pctMax={selectedTier.pctMax}
-                  statNeeds={statNeeds}
-                  equipment={player.equipment}
-                />
+                <div className="order-1 2xl:order-2">
+                  <PlayerEquipmentGraphic
+                    recommendations={recommendations}
+                    flatMax={selectedTier.flatMax}
+                    pctMax={selectedTier.pctMax}
+                    statNeeds={statNeeds}
+                    equipment={player.equipment}
+                  />
+                </div>
 
-                <StatBarPanel
-                recommendations={recommendations}
-                playerStats={effectAdjustedStats}
-                effectBaseStats={projectionBaseStats}
-                boonMultipliers={boonMultipliers}
-                flatMax={selectedTier.flatMax}
-                pctMax={selectedTier.pctMax}
-                archetype={archetype}
-                playerType={playerType}
-              />
+                <div className="order-2 2xl:order-1">
+                  <StatBarPanel
+                    recommendations={recommendations}
+                    playerStats={effectAdjustedStats}
+                    effectBaseStats={projectionBaseStats}
+                    boonMultipliers={boonMultipliers}
+                    flatMax={selectedTier.flatMax}
+                    pctMax={selectedTier.pctMax}
+                    archetype={archetype}
+                    playerType={playerType}
+                  />
+                </div>
               </>
             )}
           </div>

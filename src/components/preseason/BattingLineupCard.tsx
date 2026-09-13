@@ -30,8 +30,8 @@ function barWidth(entry: BattingOrderEntry): number {
 function shouldGlow(entry: BattingOrderEntry): boolean {
   if (entry.value == null) return false;
   if (entry.driver === "OPS") return entry.value > 1;
-  if (entry.driver === "OBP") return entry.value >= 0.45;
-  if (entry.driver === "SLG") return entry.value >= 0.7;
+  if (entry.driver === "OBP") return entry.value >= 0.4;
+  if (entry.driver === "SLG") return entry.value >= 0.6;
   return entry.value <= 0.1;
 }
 

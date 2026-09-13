@@ -568,7 +568,8 @@ export function recommendPositions(
     itemAdjustedPlayer(player, modifierLookup),
   ]));
   const fitPlayer = (player: PreseasonPlayerData) => fitPlayerById.get(player.mmolbPlayerId) ?? player;
-  const lockedPlayerIds = new Set<string>();
+  const lockedDhPlayer = positionLocks.DH ? batterById.get(positionLocks.DH) ?? null : null;
+  const lockedPlayerIds = new Set<string>(lockedDhPlayer ? [lockedDhPlayer.mmolbPlayerId] : []);
   const makeAssignment = (
     player: PreseasonPlayerData,
     assignedPosition: string,
@@ -623,7 +624,9 @@ export function recommendPositions(
       FIELDING_POSITIONS.indexOf(b.assignedPosition as typeof FIELDING_POSITIONS[number]),
     );
   const fieldedIds = new Set(fielders.map((assignment) => assignment.player.mmolbPlayerId));
-  const designatedHitter = startingBatters.find((player) => !fieldedIds.has(player.mmolbPlayerId)) ?? null;
+  const designatedHitter = lockedDhPlayer
+    ?? startingBatters.find((player) => !fieldedIds.has(player.mmolbPlayerId))
+    ?? null;
   const activeStartingIds = new Set([
     ...fieldedIds,
     ...(designatedHitter ? [designatedHitter.mmolbPlayerId] : []),
@@ -638,13 +641,17 @@ export function recommendPositions(
   const battingOrderLocked = defaultBattingOrderLocked
     && activeStartingBatters.length === startingBatters.length
     && activeStartingBatters.every((player) => defaultStartingIds.has(player.mmolbPlayerId));
-  const asSpillover = (player: PreseasonPlayerData, assignedPosition: "DH" | "Bench"): PositionAssignment => ({
+  const asSpillover = (
+    player: PreseasonPlayerData,
+    assignedPosition: "DH" | "Bench",
+    isLocked = false,
+  ): PositionAssignment => ({
     player,
     assignedPosition,
     personalBestPosition: findBestFitPosition(fitPlayer(player), fitModel),
     fitScore: null,
     isPersonalBest: false,
-    isLocked: false,
+    isLocked,
     keyStats: [],
     positionOptions: positionOptionsFor(fitPlayer(player), fitModel).slice(0, 3),
   });
@@ -671,7 +678,7 @@ export function recommendPositions(
 
   return {
     fielders,
-    designatedHitter: designatedHitter ? asSpillover(designatedHitter, "DH") : null,
+    designatedHitter: designatedHitter ? asSpillover(designatedHitter, "DH", designatedHitter === lockedDhPlayer) : null,
     bench: benchBatters.map((player) => asSpillover(player, "Bench")),
     pitchers,
     alternatives,

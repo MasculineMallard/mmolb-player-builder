@@ -38,11 +38,13 @@ export const STAT_SHORT_LABELS: Record<string, string> = {
   luck: "Luck",
 };
 
-export function ResponsiveStatLabel({ stat }: { stat: string }) {
+export function ResponsiveStatLabel({ stat, abbreviateLong = false }: { stat: string; abbreviateLong?: boolean }) {
+  const useCompactDesktopLabel = abbreviateLong && stat.length > 8;
+
   return (
     <span aria-label={stat} title={stat}>
       <span className="sm:hidden">{STAT_SHORT_LABELS[stat] ?? stat}</span>
-      <span className="hidden sm:inline">{stat}</span>
+      <span className="hidden sm:inline">{useCompactDesktopLabel ? (STAT_SHORT_LABELS[stat] ?? stat) : stat}</span>
     </span>
   );
 }
