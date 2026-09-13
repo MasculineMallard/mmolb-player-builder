@@ -1,5 +1,5 @@
 import { PRESEASON_STATUS, PITCHER_POSITIONS } from "./constants";
-import { buildBaseStatMap } from "./mmolb-transform";
+import { buildBaseStatMap, transformEquipment } from "./mmolb-transform";
 import type { MmolbApiPlayer, MmolbApiPlayerRecord } from "./mmolb-api";
 import type { PlayerData, RosterPlayer } from "./types";
 
@@ -14,10 +14,12 @@ export interface PreseasonBattingStats {
   walks: number;
   hitByPitch: number;
   sacrificeFlies: number;
+  strikeouts: number;
   totalBases: number;
   OBP: number | null;
   SLG: number | null;
   OPS: number | null;
+  SO_PCT: number | null;
 }
 
 export interface PreseasonPitchingStats {
@@ -27,9 +29,11 @@ export interface PreseasonPitchingStats {
   hitsAllowed: number;
   walks: number;
   strikeouts: number;
+  homeRunsAllowed: number;
   ERA: number | null;
   WHIP: number | null;
   K9: number | null;
+  HR9: number | null;
 }
 
 export interface PreseasonSampleSize {
@@ -96,6 +100,7 @@ export function computePreseasonBatting(
   const walks = stat(stats, "walked");
   const hitByPitch = stat(stats, "hit_by_pitch");
   const sacrificeFlies = stat(stats, "sac_flies");
+  const strikeouts = stat(stats, "struck_out");
   const H = singles + doubles + triples + homeRuns;
   const totalBases = singles + (2 * doubles) + (3 * triples) + (4 * homeRuns);
   const obpDenominator = AB + walks + hitByPitch + sacrificeFlies;
@@ -115,10 +120,12 @@ export function computePreseasonBatting(
     walks,
     hitByPitch,
     sacrificeFlies,
+    strikeouts,
     totalBases,
     OBP,
     SLG,
     OPS: OBP != null && SLG != null ? OBP + SLG : null,
+    SO_PCT: PA > 0 ? strikeouts / PA : null,
   };
 }
 
@@ -133,6 +140,7 @@ export function computePreseasonPitching(
   const hitsAllowed = stat(stats, "hits_allowed");
   const walks = stat(stats, "walks");
   const strikeouts = stat(stats, "strikeouts");
+  const homeRunsAllowed = stat(stats, "home_runs_allowed");
   const IP = outs / 3;
 
   return {
@@ -142,9 +150,11 @@ export function computePreseasonPitching(
     hitsAllowed,
     walks,
     strikeouts,
+    homeRunsAllowed,
     ERA: IP > 0 ? (9 * earnedRuns) / IP : null,
     WHIP: IP > 0 ? (walks + hitsAllowed) / IP : null,
     K9: IP > 0 ? (9 * strikeouts) / IP : null,
+    HR9: IP > 0 ? (9 * homeRunsAllowed) / IP : null,
   };
 }
 
@@ -178,6 +188,7 @@ export function buildPreseasonPlayerData(
     : null;
   const lesserBoons = (raw?.LesserBoon ?? raw?.LesserBoons ?? []).map((boon) => boon.Name);
   const greaterBoons = (raw?.GreaterBoon ?? raw?.GreaterBoons ?? []).map((boon) => boon.Name);
+  const modifications = (raw?.Modification ?? raw?.Modifications ?? []).map((modification) => modification.Name);
   const pitches = (raw?.PitchTypes ?? []).map((name, index) => ({
     name: name.toLowerCase(),
     frequency: raw?.PitchSelection?.[index] ?? 0,
@@ -193,8 +204,10 @@ export function buildPreseasonPlayerData(
     position,
     durability: Math.min(Math.max(Math.round(raw?.LesserDurability ?? 5), 0), 5),
     stats: raw ? buildBaseStatMap(raw) : {},
+    equipment: raw ? transformEquipment(raw) : undefined,
     lesserBoons,
     greaterBoons,
+    modifications,
     mmolbPlayerId: raw?._id ?? rosterPlayer.mmolbPlayerId,
     pitches,
     isBench: rosterPlayer.isBench,

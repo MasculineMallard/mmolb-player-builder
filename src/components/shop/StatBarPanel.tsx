@@ -1,14 +1,18 @@
 "use client";
 
 import { useMemo } from "react";
-import type { SlotRecommendation } from "@/lib/item-advisor";
+import { projectShopStat, type SlotRecommendation } from "@/lib/item-advisor";
 import type { Archetype } from "@/lib/types";
 import { calculateStatTargets } from "@/lib/optimizer";
 import { STAT_CATEGORIES, CATEGORY_LABELS } from "@/lib/constants";
 import { STAT_DISPLAY_MAX, DEFENSE_DISPLAY_MAX } from "@/lib/utils";
+import { ResponsiveStatLabel } from "./ResponsiveStatLabel";
 
 interface StatBarPanelProps {
   recommendations: SlotRecommendation[];
+  /** Base plus inherent flat modifiers, before any percentage effects or items. */
+  effectBaseStats: Record<string, number>;
+  /** Current no-items values after boons and inherent player modifiers. */
   playerStats: Record<string, number>;
   boonMultipliers: Record<string, number>;
   flatMax: number;
@@ -29,6 +33,7 @@ interface StatBar {
 
 export function StatBarPanel({
   recommendations,
+  effectBaseStats,
   playerStats,
   boonMultipliers,
   flatMax,
@@ -61,12 +66,16 @@ export function StatBarPanel({
       if (!targetStats.has(stat)) return null;
 
       const current = playerStats[stat] ?? 0;
+      const effectBase = effectBaseStats[stat] ?? current;
       const count = itemContributions.get(stat) ?? 0;
       const boonMult = boonMultipliers[stat] ?? 1.0;
       const target = prioritySet.has(stat) ? corePer : secondarySet.has(stat) ? supportPer : 0;
 
-      const withFlat = count > 0 ? Math.round(current + flatMax * count * boonMult) : current;
-      const withPct = count > 0 ? Math.round(current * Math.pow(1 + pctMax / 100, count)) : current;
+      // Existing and item percentages are additive in the game's displayed-stat
+      // formula. Flats are added before that combined multiplier.
+      const projection = projectShopStat(effectBase, boonMult, count, flatMax, pctMax);
+      const withFlat = count > 0 ? projection.withFlat : current;
+      const withPct = count > 0 ? projection.withPct : current;
 
       return {
         stat, current, withFlat, withPct,
@@ -87,7 +96,7 @@ export function StatBarPanel({
     const defense = STAT_CATEGORIES.defense.map((s) => buildBar(s, "defense")).filter((b): b is StatBar => b !== null);
 
     return { primary, baserunning, defense };
-  }, [recommendations, playerStats, boonMultipliers, flatMax, pctMax, archetype, isPitcher]);
+  }, [recommendations, effectBaseStats, playerStats, boonMultipliers, flatMax, pctMax, archetype, isPitcher]);
 
   const allBars = [...bars.primary, ...bars.baserunning, ...bars.defense];
   if (allBars.length === 0) return null;
@@ -98,7 +107,10 @@ export function StatBarPanel({
   const primaryLabel = isPitcher ? CATEGORY_LABELS.pitching : CATEGORY_LABELS.batting;
 
   return (
-    <div className="bg-card border border-border rounded-lg px-3 py-2">
+    <div
+      data-testid="projected-build-panel"
+      className="w-full max-w-[680px] rounded-lg border border-border bg-card px-3 py-2"
+    >
       <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2 mb-2">
         <span className="w-0.5 h-3.5 bg-primary/40 rounded-full" />
         Projected Build
@@ -107,13 +119,14 @@ export function StatBarPanel({
         </span>
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-12 gap-y-4 md:gap-y-6">
+      <div
+        data-testid="projected-build-sections"
+        className="space-y-3"
+      >
         {bars.primary.length > 0 && (
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1 border-b border-border pb-0.5">
-              {primaryLabel}
-            </h4>
-            <div className="space-y-0.5">
+            <ProjectionSectionHeader label={primaryLabel} />
+            <div data-testid="projected-build-primary-rows" className="space-y-0.5">
               {bars.primary.map((b) => (
                 <BarRow key={b.stat} bar={b} displayMax={STAT_DISPLAY_MAX} isPriority={prioritySet.has(b.stat)} isSecondary={secondarySet.has(b.stat)} />
               ))}
@@ -123,10 +136,8 @@ export function StatBarPanel({
 
         {bars.baserunning.length > 0 && (
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1 border-b border-border pb-0.5">
-              {CATEGORY_LABELS.baserunning}
-            </h4>
-            <div className="space-y-0.5">
+            <ProjectionSectionHeader label={CATEGORY_LABELS.baserunning} />
+            <div data-testid="projected-build-baserunning-rows" className="space-y-0.5">
               {bars.baserunning.map((b) => (
                 <BarRow key={b.stat} bar={b} displayMax={STAT_DISPLAY_MAX} isPriority={prioritySet.has(b.stat)} isSecondary={secondarySet.has(b.stat)} />
               ))}
@@ -136,16 +147,30 @@ export function StatBarPanel({
 
         {bars.defense.length > 0 && (
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1 border-b border-border pb-0.5">
-              {CATEGORY_LABELS.defense}
-            </h4>
-            <div className="space-y-0.5">
+            <ProjectionSectionHeader label={CATEGORY_LABELS.defense} />
+            <div data-testid="projected-build-defense-rows" className="space-y-0.5">
               {bars.defense.map((b) => (
                 <BarRow key={b.stat} bar={b} displayMax={DEFENSE_DISPLAY_MAX} isPriority={false} isSecondary={false} />
               ))}
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function ProjectionSectionHeader({ label }: { label: string }) {
+  return (
+    <div className="mb-1 flex items-end border-b border-border pb-0.5">
+      <h4 className="min-w-0 flex-1 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+      </h4>
+      <div data-testid="projected-column-headings" className="grid w-44 shrink-0 grid-cols-4 text-left font-mono text-[9px] uppercase tracking-wide text-muted-foreground/75 sm:text-[10px]">
+        <span>Now</span>
+        <span>Goal</span>
+        <span>Flat</span>
+        <span>Pct</span>
       </div>
     </div>
   );
@@ -180,31 +205,20 @@ function BarRow({ bar, displayMax, isPriority, isSecondary }: {
   const seg2Pct = maxProjPct - minProjPct;
 
   return (
-    <div className="py-1 px-1 rounded">
+    <div className="py-1 rounded">
       {/* Stat name | Base | +flat | +pct */}
       <div className="flex items-center mb-0.5">
         <span className="text-sm capitalize text-muted-foreground flex items-center gap-1 flex-1 min-w-0">
           {isHighlighted && (
             <span className={`text-sm ${isPriority ? 'text-primary' : 'text-foreground/60'}`}>★</span>
           )}
-          <span className="truncate">{bar.stat}</span>
+          <ResponsiveStatLabel stat={bar.stat} />
         </span>
-        <span className="flex items-center text-sm font-mono tabular-nums shrink-0">
-          <span className="text-gray-400 w-10 text-right">{bar.current}</span>
-          {bar.target > 0 && (
-            <>
-              <span className="text-gray-600 mx-1.5">|</span>
-              <span className="text-foreground/50 w-10 text-right">{bar.target}</span>
-            </>
-          )}
-          {hasImprovement && (
-            <>
-              <span className="text-gray-600 mx-1.5">|</span>
-              <span className="text-sky-200 w-10 text-right">+{flatDelta}</span>
-              <span className="text-gray-600 mx-1.5">|</span>
-              <span className="text-blue-400 w-10 text-right">+{pctDelta}</span>
-            </>
-          )}
+        <span data-testid="projected-values" className="grid w-44 shrink-0 grid-cols-4 items-center text-left font-mono text-sm tabular-nums">
+          <span className="text-gray-400">{bar.current}</span>
+          <span className="text-foreground/50">{bar.target > 0 ? bar.target : "—"}</span>
+          <span className="text-sky-200">{hasImprovement ? `+${flatDelta}` : "—"}</span>
+          <span className="text-blue-400">{hasImprovement ? `+${pctDelta}` : "—"}</span>
         </span>
       </div>
 

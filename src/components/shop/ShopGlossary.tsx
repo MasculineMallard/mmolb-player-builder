@@ -104,7 +104,7 @@ export function ShopGlossaryButton({ toolName = "Super Slugger Sartoria", isPitc
 
               <section>
                 <h3 className="text-foreground font-semibold mb-1">Boon Interaction</h3>
-                <p>Boons that boost a stat make flat items more effective for that stat (+50% boon = flat items give 1.5x value). This is factored into the flat vs. percent recommendation and the stat priority scoring.</p>
+                <p>Boons and player modifiers that boost a stat make flat items more effective (+25% means a flat item gives 1.25x value). Available canonical, date-windowed values are factored into the current stats, flat-vs-percent recommendation, and priority score. If the source is unavailable, the page warns you and excludes player modifiers instead of guessing.</p>
               </section>
 
               {!isPitcher && (

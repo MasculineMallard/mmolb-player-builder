@@ -166,10 +166,10 @@ export function ExportShare({ player, archetype }: ExportShareProps) {
   return (
     <>
       {portalTarget && createPortal(
-        <div className="hidden md:flex items-center gap-2">{buttons}</div>,
+        <div className="hidden 2xl:flex items-center gap-2">{buttons}</div>,
         portalTarget
       )}
-      <div className="flex items-center gap-2 md:hidden">{buttons}</div>
+      <div className="flex items-center gap-2 2xl:hidden">{buttons}</div>
     </>
   );
 }

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>POP Pitcher Shop Layout Lab</title>
+  <style>
+    :root { color-scheme: dark; --page:#0c1117; --panel:#141b23; --head:#1c2838; --card:#0d1727; --line:#344050; --text:#eef3f8; --muted:#93a4b7; --blue:#3b82f6; --sky:#bce7ff; --yellow:#f5c842; --green:#3fe17a; --red:#ff5e68; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:var(--page); color:var(--text); font-family:Georgia,"Times New Roman",serif; }
+    button,input { font:inherit; }
+    header { position:sticky; top:0; z-index:1000; border-bottom:1px solid var(--line); background:rgba(12,17,23,.97); backdrop-filter:blur(12px); }
+    .header-inner { display:flex; align-items:center; justify-content:space-between; gap:20px; max-width:1500px; margin:auto; padding:12px 20px; }
+    .eyebrow { margin:0 0 2px; color:var(--yellow); font:700 10px/1.2 ui-sans-serif,system-ui,sans-serif; letter-spacing:.16em; text-transform:uppercase; }
+    h1 { margin:0; font-size:clamp(20px,2.4vw,30px); }
+    .instructions { max-width:680px; margin:4px 0 0; color:var(--muted); font:12px/1.45 ui-sans-serif,system-ui,sans-serif; }
+    .back { color:var(--sky); font:600 12px ui-sans-serif,system-ui,sans-serif; }
+    .toolbar { position:sticky; top:78px; z-index:900; display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; border-bottom:1px solid var(--line); background:rgba(20,27,35,.97); padding:9px 20px; font:12px ui-sans-serif,system-ui,sans-serif; }
+    .toolbar button { border:1px solid var(--line); border-radius:6px; background:#202c39; color:var(--text); padding:6px 10px; cursor:pointer; }
+    .toolbar button:hover { border-color:var(--blue); }
+    .toolbar .primary { border-color:var(--blue); background:var(--blue); }
+    .toolbar label { display:inline-flex; align-items:center; gap:6px; color:var(--muted); }
+    #width-range { width:180px; accent-color:var(--blue); }
+    #width-output { min-width:54px; color:var(--sky); font-variant-numeric:tabular-nums; }
+    #copy-status { min-width:70px; color:var(--green); }
+    .workspace { max-width:100vw; overflow-x:auto; padding:20px; }
+    .stage { position:relative; width:1400px; min-width:390px; height:760px; overflow:hidden; border:1px solid var(--line); border-radius:10px; background-color:#0a0f14; background-image:linear-gradient(rgba(59,130,246,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.055) 1px,transparent 1px),linear-gradient(rgba(59,130,246,.11) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.11) 1px,transparent 1px); background-size:8px 8px,8px 8px,40px 40px,40px 40px; box-shadow:0 20px 50px rgba(0,0,0,.35); }
+    .stage-note { position:absolute; right:12px; bottom:8px; color:rgba(147,164,183,.6); font:10px ui-monospace,Consolas,monospace; pointer-events:none; }
+    .stage-resizer { position:absolute; top:0; right:0; z-index:800; width:10px; height:100%; cursor:ew-resize; background:linear-gradient(90deg,transparent,rgba(59,130,246,.58)); }
+    .panel { position:absolute; min-width:160px; min-height:92px; overflow:auto; border:1px solid var(--line); border-radius:9px; background:var(--panel); box-shadow:0 8px 22px rgba(0,0,0,.22); }
+    .panel.selected { border-color:var(--blue); box-shadow:0 0 0 2px rgba(59,130,246,.18),0 12px 28px rgba(0,0,0,.3); }
+    .panel-head { display:flex; align-items:center; justify-content:center; gap:7px; min-height:38px; border-bottom:1px solid var(--line); background:var(--head); padding:8px 48px 8px 12px; cursor:grab; user-select:none; touch-action:none; font-size:14px; font-weight:700; }
+    .panel-head:active { cursor:grabbing; }
+    .dimensions { position:absolute; top:7px; right:8px; border:1px solid rgba(147,164,183,.25); border-radius:4px; background:rgba(8,13,19,.72); color:var(--muted); padding:2px 4px; font:9px ui-monospace,Consolas,monospace; pointer-events:none; }
+    .panel-body { padding:10px 12px; }
+    .resize-handle { position:absolute; right:0; bottom:0; z-index:5; width:24px; height:24px; cursor:nwse-resize; touch-action:none; background:linear-gradient(135deg,transparent 45%,var(--blue) 46%,var(--blue) 54%,transparent 55%) 8px 8px/10px 10px no-repeat,linear-gradient(135deg,transparent 45%,var(--blue) 46%,var(--blue) 54%,transparent 55%) 14px 14px/7px 7px no-repeat; opacity:.85; }
+    .stack,.rows { display:grid; gap:7px; }
+    .mini { border:1px solid #27313d; border-radius:7px; background:rgba(13,23,39,.72); padding:9px 10px; }
+    .player { display:flex; align-items:center; gap:8px; }
+    .player strong { font-size:18px; }
+    .muted { color:var(--muted); }
+    .cyan { color:#38dcff; font-weight:700; }
+    .pips { color:#62a2ff; letter-spacing:1px; }
+    .tier-row,.tags { display:flex; flex-wrap:wrap; align-items:center; gap:5px; }
+    .tier,.tag { border-radius:4px; background:#202c39; padding:4px 8px; color:var(--muted); font-size:12px; }
+    .tier.active { background:var(--blue); color:white; }
+    .tag { color:#4e97ff; } .tag.alt { color:white; }
+    .select-look { display:flex; justify-content:space-between; margin-top:8px; border:1px solid var(--line); border-radius:6px; background:#1c2a36; padding:9px 10px; font-weight:700; }
+    .shop-row { display:grid; grid-template-columns:1.15fr .85fr 1fr; align-items:center; gap:0; text-align:left; font-size:13px; }
+    .need { color:#667487; font-size:11px; } .gain { color:var(--sky); font:700 12px ui-monospace,Consolas,monospace; }
+    .slot-row,.slot-labels { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); align-items:center; gap:0; font-size:12px; }
+    .slot-labels { color:var(--muted); font-size:9px; text-transform:uppercase; }
+    .slot-row span,.slot-labels span { text-align:left; }
+    .slot-row .stat { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .ideal { color:var(--sky); font-weight:700; } .bad { color:var(--red); } .good { color:var(--green); } .blue { color:#60a5fa; } .yellow { color:var(--yellow); }
+    .projection-title { margin-bottom:9px; color:var(--muted); font-size:13px; letter-spacing:.06em; text-transform:uppercase; }
+    .projection-note { font-size:10px; letter-spacing:0; text-transform:none; opacity:.72; }
+    .category { margin:0 0 7px; border-bottom:1px solid var(--line); padding-bottom:4px; color:var(--muted); font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+    .bar-row { margin-bottom:9px; }
+    .bar-copy { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; }
+    .numbers { display:flex; gap:9px; color:var(--muted); font:12px ui-monospace,Consolas,monospace; }
+    .numbers b { color:var(--sky); } .numbers em { color:var(--blue); font-style:normal; }
+    .bar { position:relative; height:11px; margin-top:3px; overflow:hidden; border-radius:999px; background:#1c2833; }
+    .bar .current { display:block; height:100%; background:#5c6575; }
+    .bar .flat,.bar .pct,.bar .target { position:absolute; top:0; height:100%; }
+    .bar .flat { background:#7f9aaa; } .bar .pct { background:#245dcf; } .bar .target { top:-1px; width:3px; height:13px; background:rgba(255,255,255,.55); }
+    .footer-note { max-width:1500px; margin:0 auto; padding:0 20px 24px; color:var(--muted); font:11px/1.5 ui-sans-serif,system-ui,sans-serif; }
+    .slot-panel { container-type:inline-size; }
+    @container (max-width:220px) {
+      .slot-panel .panel-body { padding-right:8px; padding-left:8px; }
+      .slot-row,.slot-labels { grid-template-columns:repeat(4,minmax(0,1fr)); gap:0; font-size:10px; }
+      .slot-row .stat { font-size:0; }
+      .slot-row .stat::after { content:attr(data-short); font-size:10px; }
+    }
+    @media (max-width:720px) { .header-inner{align-items:flex-start}.back{display:none}.toolbar{top:102px}.workspace{padding:10px 0 18px}.stage{border-radius:0} }
+  </style>
+</head>
+<body>
+  <header><div class="header-inner"><div><p class="eyebrow">Temporary design tool · not the live shop</p><h1>Pitcher Shop Layout Lab</h1><p class="instructions">Drag cards by their headers. Resize from the blue bottom-right corner. Your layout saves in this browser.</p></div><a class="back" href="/pop/pitcher-shop">Back to dev shop →</a></div></header>
+  <div class="toolbar" aria-label="Layout controls">
+    <button class="primary" id="compact" type="button">Compact desktop</button><button id="mobile" type="button">Mobile stack</button><button id="reset" type="button">Reset saved layout</button><button id="copy" type="button">Copy measurements</button>
+    <label><input id="snap" type="checkbox" checked> Snap to 8px</label><label for="width-range">Canvas width</label><input id="width-range" type="range" min="390" max="1600" step="10" value="1400"><output id="width-output">1400px</output><span id="copy-status" role="status"></span>
+  </div>
+  <main class="workspace"><div class="stage" id="stage" aria-label="Draggable pitcher shop layout canvas"><span class="stage-note">Drag this blue edge to resize the canvas →</span><div class="stage-resizer" id="stage-resizer"></div></div></main>
+  <p class="footer-note">Arrange the cards until the whitespace feels intentional, then click <strong>Copy measurements</strong> and paste the JSON into chat. This lab stores positions locally; it does not change the actual shop.</p>
+  <script>
+    const stage=document.getElementById("stage"),range=document.getElementById("width-range"),output=document.getElementById("width-output"),snapBox=document.getElementById("snap"),status=document.getElementById("copy-status"),key="pop-pitcher-shop-layout-lab-v1";
+    const slotRows={
+      helmet:[["Presence","6","+13","-7","bad"],["Accuracy","13","+13","+0","good"]],
+      jersey:[["Presence","8","+13","-5","bad"],["Stamina","—","+13","-13","bad"],["Guts","—","+13","-13","bad"]],
+      gloves:[["Accuracy","—","+13","-13","bad"],["Control","—","+13","-13","bad"],["Rotation","17","+13","+4","good"]],
+      boots:[["Control","—","+13","-13","bad"],["Stamina","5","+13","-8","bad"],["Guts","—","+13","-13","bad"]],
+      pendant:[["Presence","2%","+13","~2","bad"],["Accuracy","11","+13","-2","bad"]]
+    };
+    const slotMeta={helmet:["🪖 Helmet <span class='blue'>★</span>"],jersey:["👕 Jersey <span class='blue'>★</span> <span class='yellow'>★</span>"],gloves:["🧤 Gloves <span class='yellow'>★</span>"],boots:["👢 Boots"],pendant:["🧿 Pendant"]};
+    const short={Presence:"Pres",Accuracy:"Acc",Stamina:"Stam",Control:"Ctrl",Guts:"Guts",Rotation:"Rot"};
+    const slotBody=id=>`<div class="rows"><div class="slot-labels"><span>stat</span><span>has</span><span>ideal</span><span>diff</span></div>${slotRows[id].map(r=>`<div class="slot-row"><span class="stat" data-short="${short[r[0]]}">${r[0]}</span><span>${r[1]}</span><span class="ideal">${r[2]}</span><span class="${r[4]}">${r[3]}</span></div>`).join("")}</div>`;
+    const controls=`<div class="stack"><div class="mini">🏇 Money Lovers | SP</div><div class="mini player"><strong>Joann Moroz</strong><span class="muted">Lv.30</span><span class="pips">●●●●●</span><span class="cyan">SP</span></div><div class="mini stack"><div class="tier-row"><strong>Item Tier:</strong>${[1,2,3,4,5,6,7].map(n=>`<span class="tier ${n===3?'active':''}">T${n}</span>`).join("")}</div><div class="muted">+13 flat / 6% · current · target · +flat · +percent</div></div><div class="mini"><div class="muted">ARCHETYPE · 44% stat</div><div class="select-look"><span>🎯 Control Artist 44%</span><span>⌄</span></div><div class="tags" style="margin-top:8px"><span class="tag">Control</span><span class="tag">Accuracy</span><span class="tag">Presence</span><span class="tag alt">Rotation</span><span class="tag alt">Guts</span><span class="tag alt">Stamina</span></div><p class="muted" style="margin:8px 0 0;line-height:1.45">Elite command keeps runners off base. Minimizes walks and hit batters with pinpoint accuracy and persuasion.</p></div></div>`;
+    const shopping=`<div class="rows">${[["Presence",-134,"🪖 👕 🧿"],["Accuracy",-53,"🪖 🧿 🧤"],["Stamina",-55,"👕 👢"],["Control",-34,"🧤 👢"],["Guts",-15,"👕 👢"],["Rotation",-2,"🧤"]].map(r=>`<div class="shop-row"><span>${r[0]} <span class="need">${r[1]}</span></span><span class="gain">+13</span><span>${r[2]}</span></div>`).join("")}</div>`;
+    const stats=[["Control",157,191,26,19,31,38,42],["Accuracy",138,191,39,25,28,34,38],["Rotation",113,115,13,7,23,30,30],["Presence",57,191,39,10,12,19,38],["Stamina",60,115,26,7,13,19,23],["Guts",100,115,26,12,28,31,32]];
+    const projected=`<div class="projection-title">Pitching <span class="projection-note">· all five items</span></div><div class="category">Pitching</div>${stats.map(s=>`<div class="bar-row"><div class="bar-copy"><span>★ ${s[0]}</span><span class="numbers"><span>${s[1]}</span><span>|</span><span>${s[2]}</span><span>|</span><b>+${s[3]}</b><span>|</span><em>+${s[4]}</em></span></div><div class="bar"><span class="current" style="width:${s[5]}%"></span><span class="flat" style="left:${s[5]}%;width:${Math.max(0,s[6]-s[5])}%"></span><span class="pct" style="left:${s[6]}%;width:3%"></span><span class="target" style="left:${s[7]}%"></span></div></div>`).join("")}`;
+    const defs=[
+      ["controls","⚾ Joann Moroz · Controls",controls],["shopping","Shopping List",shopping],["helmet",slotMeta.helmet[0],slotBody("helmet")],["jersey",slotMeta.jersey[0],slotBody("jersey")],["gloves",slotMeta.gloves[0],slotBody("gloves")],["boots",slotMeta.boots[0],slotBody("boots")],["pendant",slotMeta.pendant[0],slotBody("pendant")],["projected","Projected Build",projected]
+    ];
+    defs.forEach(([id,title,body])=>stage.insertAdjacentHTML("beforeend",`<section class="panel ${slotRows[id]?'slot-panel':''}" data-id="${id}"><div class="panel-head">${title}<span class="dimensions"></span></div><div class="panel-body">${body}</div><div class="resize-handle" aria-label="Resize ${id}"></div></section>`));
+    const panels=[...stage.querySelectorAll(".panel")];
+    const desktop={canvas:1400,controls:[0,0,376,504],projected:[392,0,408,504],shopping:[816,0,272,200],helmet:[1104,0,272,200],jersey:[816,216,272,136],gloves:[1104,216,272,136],boots:[816,368,272,136],pendant:[1104,368,272,136]};
+    const mobile={canvas:390,controls:[16,0,358,460],shopping:[16,476,358,215],helmet:[16,707,175,126],jersey:[199,707,175,150],gloves:[16,873,175,150],boots:[199,873,175,150],pendant:[16,1039,175,126],projected:[16,1181,358,350]};
+    let gesture=null,z=10;
+    const snap=n=>snapBox.checked?Math.round(n/8)*8:Math.round(n);
+    const dims=p=>p.querySelector(".dimensions").textContent=`${Math.round(p.offsetWidth)}×${Math.round(p.offsetHeight)}`;
+    function setWidth(n){n=Math.max(390,Math.min(1600,Math.round(n)));stage.style.width=`${n}px`;range.value=n;output.textContent=`${n}px`;}
+    function setPanel(p,v){p.style.left=`${v[0]}px`;p.style.top=`${v[1]}px`;p.style.width=`${v[2]}px`;p.style.height=`${v[3]}px`;dims(p);}
+    function setHeight(){stage.style.height=`${Math.max(700,...panels.map(p=>p.offsetTop+p.offsetHeight))+44}px`;}
+    function data(){return{canvas:stage.offsetWidth,...Object.fromEntries(panels.map(p=>[p.dataset.id,[p.offsetLeft,p.offsetTop,p.offsetWidth,p.offsetHeight]]))};}
+    function save(){localStorage.setItem(key,JSON.stringify(data()));}
+    function preset(o,store=true){setWidth(o.canvas);panels.forEach(p=>setPanel(p,o[p.dataset.id]));setHeight();if(store)save();}
+    function select(p){panels.forEach(x=>x.classList.toggle("selected",x===p));p.style.zIndex=++z;}
+    panels.forEach(p=>{p.querySelector(".panel-head").addEventListener("pointerdown",e=>{if(e.button!==0)return;select(p);gesture={type:"drag",p,x:e.clientX,y:e.clientY,left:p.offsetLeft,top:p.offsetTop};e.preventDefault()});p.querySelector(".resize-handle").addEventListener("pointerdown",e=>{if(e.button!==0)return;select(p);gesture={type:"resize",p,x:e.clientX,y:e.clientY,w:p.offsetWidth,h:p.offsetHeight};e.preventDefault()});});
+    document.addEventListener("pointermove",e=>{if(!gesture||gesture.type==="stage")return;const g=gesture,p=g.p;if(g.type==="drag"){p.style.left=`${Math.max(0,Math.min(snap(g.left+e.clientX-g.x),stage.offsetWidth-p.offsetWidth))}px`;p.style.top=`${Math.max(0,snap(g.top+e.clientY-g.y))}px`}else{p.style.width=`${Math.max(160,Math.min(snap(g.w+e.clientX-g.x),stage.offsetWidth-p.offsetLeft))}px`;p.style.height=`${Math.max(92,snap(g.h+e.clientY-g.y))}px`;dims(p)}setHeight()});
+    document.addEventListener("pointerup",()=>{if(!gesture)return;if(gesture.p)dims(gesture.p);gesture=null;save()});
+    document.getElementById("stage-resizer").addEventListener("pointerdown",e=>{gesture={type:"stage",x:e.clientX,w:stage.offsetWidth};e.preventDefault()});
+    document.addEventListener("pointermove",e=>{if(gesture?.type==="stage")setWidth(gesture.w+e.clientX-gesture.x)});
+    range.addEventListener("input",()=>setWidth(range.value));range.addEventListener("change",save);
+    document.getElementById("compact").addEventListener("click",()=>preset(desktop));document.getElementById("mobile").addEventListener("click",()=>preset(mobile));document.getElementById("reset").addEventListener("click",()=>{localStorage.removeItem(key);preset(desktop)});
+    document.getElementById("copy").addEventListener("click",async()=>{const value=JSON.stringify(data(),null,2);try{await navigator.clipboard.writeText(value);status.textContent="Copied"}catch{window.prompt("Copy these measurements",value);status.textContent="Ready"}setTimeout(()=>status.textContent="",1800)});
+    try{const saved=JSON.parse(localStorage.getItem(key));saved?.canvas?preset(saved,false):preset(desktop,false)}catch{preset(desktop,false)}
+  </script>
+</body>
+</html>

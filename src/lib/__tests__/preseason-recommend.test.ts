@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import type { PositionDefenseMap } from "@/lib/evaluator-data";
 import type {
   PreseasonBattingStats,
@@ -23,6 +25,8 @@ function player(
     ERA?: number | null;
     WHIP?: number | null;
     K9?: number | null;
+    HR9?: number | null;
+    SO_PCT?: number | null;
     stats?: Record<string, number>;
   } = {},
 ): PreseasonPlayerData {
@@ -40,10 +44,12 @@ function player(
     walks: 0,
     hitByPitch: 0,
     sacrificeFlies: 0,
+    strikeouts: Math.round(PA * (options.SO_PCT ?? 0.2)),
     totalBases: 0,
     OBP: options.OBP ?? 0,
     SLG: options.SLG ?? 0,
     OPS: options.OPS ?? ((options.OBP ?? 0) + (options.SLG ?? 0)),
+    SO_PCT: options.SO_PCT ?? 0.2,
   };
   const pitching: PreseasonPitchingStats | null = isPitcher ? {
     outs,
@@ -52,9 +58,11 @@ function player(
     hitsAllowed: 0,
     walks: 0,
     strikeouts: 0,
+    homeRunsAllowed: 0,
     ERA: options.ERA ?? 3,
     WHIP: options.WHIP ?? 1,
     K9: options.K9 ?? 9,
+    HR9: options.HR9 ?? 0,
   } : null;
 
   return {
@@ -91,7 +99,7 @@ function roleMap(count: number, closerRank: number) {
 }
 
 describe("recommendPitchingStaff", () => {
-  it("computes exact rank-weighted performance and 75/25 blend values", () => {
+  it("computes the exact 50% WHIP, 25% ERA, 25% K/9 pitching score", () => {
     const result = recommendPitchingStaff([
       player("a", "SP", { ERA: 1, WHIP: 2, K9: 1 }),
       player("b", "SP", { ERA: 2, WHIP: 3, K9: 3 }),
@@ -99,21 +107,21 @@ describe("recommendPitchingStaff", () => {
     ]);
     const byId = Object.fromEntries(result.entries.map((entry) => [entry.player.mmolbPlayerId, entry]));
 
-    expect(byId.a.performanceScore).toBeCloseTo(50.5);
-    expect(byId.b.performanceScore).toBeCloseTo(50);
-    expect(byId.c.performanceScore).toBeCloseTo(49.5);
-    expect(byId.a.blendedScore).toBeCloseTo(62.875);
-    expect(byId.b.blendedScore).toBeCloseTo(62.5);
-    expect(byId.c.blendedScore).toBeCloseTo(62.125);
+    expect(byId.a.scoreBreakdown).toEqual({ whip: 50, era: 100, strikeouts: 0 });
+    expect(byId.b.scoreBreakdown).toEqual({ whip: 0, era: 50, strikeouts: 100 });
+    expect(byId.c.scoreBreakdown).toEqual({ whip: 100, era: 0, strikeouts: 50 });
+    expect(byId.a.score).toBe(50);
+    expect(byId.b.score).toBe(37.5);
+    expect(byId.c.score).toBe(62.5);
+    expect(result.entries.map((entry) => entry.player.mmolbPlayerId)).toEqual(["c", "a", "b"]);
   });
 
   it("uses neutral rank 50 for a single pitcher and all-equal stats", () => {
     const single = recommendPitchingStaff([player("solo", "SP")]);
-    expect(single.entries[0].performanceScore).toBe(50);
-    expect(single.entries[0].blendedScore).toBe(62.5);
+    expect(single.entries[0].score).toBe(50);
 
     const equal = recommendPitchingStaff([player("a", "SP"), player("b", "SP"), player("c", "SP")]);
-    expect(equal.entries.map((entry) => entry.performanceScore)).toEqual([50, 50, 50]);
+    expect(equal.entries.map((entry) => entry.score)).toEqual([50, 50, 50]);
   });
 
   it("assigns the exact role map for closer ranks 4, 1, and 7", () => {
@@ -131,7 +139,7 @@ describe("recommendPitchingStaff", () => {
     });
   });
 
-  it("clamps closer rank, handles overflow, and excludes below-floor arms", () => {
+  it("clamps closer rank, fills roster roles, and flags below-floor fallbacks", () => {
     const three = recommendPitchingStaff([
       player("p1", "SP", { ERA: 1 }),
       player("p2", "SP", { ERA: 2 }),
@@ -149,9 +157,9 @@ describe("recommendPitchingStaff", () => {
 
     const tiny = player("tiny", "SP", { outs: 8, stats: { velocity: 1000 } });
     const regular = player("regular", "SP", { outs: 9, stats: { accuracy: 100 } });
-    const floor = recommendPitchingStaff([tiny, regular]);
+    const floor = recommendPitchingStaff([tiny, regular], 1);
     expect(floor.entries.find((entry) => entry.player.mmolbPlayerId === "tiny")).toMatchObject({
-      role: "Depth", roleEligible: false, rank: null, lowSample: true,
+      role: "Starter", roleEligible: false, rank: 2, lowSample: true,
     });
     expect(floor.entries.find((entry) => entry.player.mmolbPlayerId === "regular")?.role).toBe("Closer");
 
@@ -163,13 +171,43 @@ describe("recommendPitchingStaff", () => {
     expect(softBoundary.entries.find((entry) => entry.player.mmolbPlayerId === "outs30")?.lowSample).toBe(false);
   });
 
-  it("uses attribute score then player id as deterministic tie-breaks", () => {
+  it("always allocates three relievers when nine arms exist and can force a below-floor SP", () => {
+    const qualified = Array.from({ length: 9 }, (_, index) => player(`q${index + 1}`, "SP", {
+      ERA: index + 1,
+      WHIP: index + 1,
+      K9: 20 - index,
+    }));
+    const tiny = player("tiny", "SP", { outs: 0, stats: { velocity: 1000 } });
+    const result = recommendPitchingStaff([...qualified, tiny], 4, new Set(["tiny"]));
+
+    expect(result.entries.filter((entry) => entry.role === "Starter")).toHaveLength(5);
+    expect(result.entries.filter((entry) => entry.role === "Reliever")).toHaveLength(3);
+    expect(result.entries.filter((entry) => entry.role === "Closer")).toHaveLength(1);
+    expect(result.entries.find((entry) => entry.player.mmolbPlayerId === "tiny")).toMatchObject({
+      role: "Starter",
+      forcedStarter: true,
+      roleEligible: false,
+      lowSample: true,
+    });
+  });
+
+  it("uses score components then player id as deterministic qualified tie-breaks", () => {
     const highAttr = player("z-high", "SP", { stats: { velocity: 100 } });
     const lowAttr = player("a-low", "SP", { stats: { accuracy: 100 } });
-    expect(recommendPitchingStaff([lowAttr, highAttr]).entries[0].player.mmolbPlayerId).toBe("z-high");
+    const firstRun = recommendPitchingStaff([highAttr, lowAttr]).entries.map((entry) => entry.player.mmolbPlayerId);
+    const reversedInput = recommendPitchingStaff([lowAttr, highAttr]).entries.map((entry) => entry.player.mmolbPlayerId);
 
-    const idTie = recommendPitchingStaff([player("b", "SP"), player("a", "SP")]);
-    expect(idTie.entries.map((entry) => entry.player.mmolbPlayerId)).toEqual(["a", "b"]);
+    expect(firstRun).toEqual(["a-low", "z-high"]);
+    expect(reversedInput).toEqual(firstRun);
+  });
+
+  it("uses attribute score then player id only for below-floor fallbacks", () => {
+    const highAttr = player("z-high", "SP", { outs: 8, stats: { velocity: 100 } });
+    const lowAttr = player("a-low", "SP", { outs: 8, stats: { accuracy: 100 } });
+    const result = recommendPitchingStaff([lowAttr, highAttr]);
+
+    expect(result.entries[0].player.mmolbPlayerId).toBe("z-high");
+    expect(result.entries.every((entry) => entry.score == null && entry.scoreBreakdown == null)).toBe(true);
   });
 });
 
@@ -213,6 +251,19 @@ describe("recommendBattingOrder", () => {
       "z-high", "a-low", "a", "b",
     ]);
   });
+
+  it("supports OBP, OPS, SLG, and lowest-SO% alternate sorts", () => {
+    const batters = [
+      player("a", "C", { OBP: 0.5, SLG: 0.3, OPS: 0.8, SO_PCT: 0.3 }),
+      player("b", "C", { OBP: 0.4, SLG: 0.8, OPS: 1.2, SO_PCT: 0.1 }),
+      player("c", "C", { OBP: 0.3, SLG: 0.6, OPS: 0.9, SO_PCT: 0.2 }),
+    ];
+
+    expect(recommendBattingOrder(batters, "OBP").lineup.map((entry) => entry.player.mmolbPlayerId)).toEqual(["a", "b", "c"]);
+    expect(recommendBattingOrder(batters, "OPS").lineup.map((entry) => entry.player.mmolbPlayerId)).toEqual(["b", "c", "a"]);
+    expect(recommendBattingOrder(batters, "SLG").lineup.map((entry) => entry.player.mmolbPlayerId)).toEqual(["b", "c", "a"]);
+    expect(recommendBattingOrder(batters, "SO%").lineup.map((entry) => entry.player.mmolbPlayerId)).toEqual(["b", "c", "a"]);
+  });
 });
 
 const defense: PositionDefenseMap = {
@@ -225,6 +276,22 @@ const defense: PositionDefenseMap = {
   CF: { stat_weights: { composure: 1 }, primary_stats: ["composure"], secondary_stats: [] },
   RF: { stat_weights: { patience: 1 }, primary_stats: ["patience"], secondary_stats: [] },
 };
+
+const realDefense = JSON.parse(
+  readFileSync(join(process.cwd(), "public/data/archetypes/position_defense_weights.json"), "utf-8"),
+) as PositionDefenseMap;
+
+function equipFlat(playerData: PreseasonPlayerData, attribute: string, value: number): PreseasonPlayerData {
+  playerData.equipment = {
+    hands: {
+      slot: "hands",
+      name: "Test glove",
+      emoji: "",
+      effects: [{ attribute, tier: 5, type: "flat", value }],
+    },
+  };
+  return playerData;
+}
 
 describe("recommendPositions", () => {
   it("uses per-cell position overrides and finds a known non-greedy optimum", () => {
@@ -248,6 +315,33 @@ describe("recommendPositions", () => {
     expect(byPosition["1B"]).toMatchObject({ personalBestPosition: "C", isPersonalBest: false, fitScore: 90 });
   });
 
+  it("honors a position lock and re-optimizes every remaining fielding spot", () => {
+    const players = [
+      player("a-flex", "C", { stats: { awareness: 200, arm: 126 } }),
+      player("b-catcher", "C", { stats: { awareness: 198 } }),
+      player("c-2b", "2B", { stats: { agility: 140 } }),
+      player("d-3b", "3B", { stats: { reaction: 140 } }),
+      player("e-ss", "SS", { stats: { dexterity: 140 } }),
+      player("f-lf", "LF", { stats: { acrobatics: 140 } }),
+      player("g-cf", "CF", { stats: { composure: 140 } }),
+      player("h-rf", "RF", { stats: { patience: 140 } }),
+    ];
+
+    const automatic = recommendPositions(players, defense);
+    const locked = recommendPositions(players, defense, undefined, { C: "a-flex" });
+    const automaticByPosition = Object.fromEntries(automatic.fielders.map((assignment) => [assignment.assignedPosition, assignment]));
+    const lockedByPosition = Object.fromEntries(locked.fielders.map((assignment) => [assignment.assignedPosition, assignment]));
+
+    expect(automaticByPosition.C.player.mmolbPlayerId).toBe("b-catcher");
+    expect(lockedByPosition.C).toMatchObject({
+      isLocked: true,
+      player: { mmolbPlayerId: "a-flex" },
+    });
+    expect(lockedByPosition["1B"].player.mmolbPlayerId).toBe("b-catcher");
+    expect(new Set(locked.fielders.map((assignment) => assignment.player.mmolbPlayerId)).size).toBe(8);
+    expect(new Set(locked.startingBatterIds)).toEqual(new Set(automatic.startingBatterIds));
+  });
+
   it("handles missing defense stats, ignores gameStats, and spills extras to DH/bench", () => {
     const base = [
       player("a", "C", { stats: { awareness: 200 } }),
@@ -263,11 +357,157 @@ describe("recommendPositions", () => {
     missing.gameStats = { PA: 999, OBP: 1, SLG: 4, OPS: 5 };
     const bench = player("bench", "C", { stats: {}, OPS: 1 });
     const pitcher = player("pitcher", "SP");
-    const result = recommendPositions([...base, missing, bench, pitcher], defense);
+    const startingNine = [...base.map((entry) => entry.mmolbPlayerId), missing.mmolbPlayerId];
+    const result = recommendPositions([...base, missing, bench, pitcher], defense, startingNine);
 
     expect(result.fielders).toHaveLength(8);
     expect(result.designatedHitter?.player.mmolbPlayerId).toBe("missing");
     expect(result.bench.map((assignment) => assignment.player.mmolbPlayerId)).toContain("bench");
     expect(result.pitchers.map((entry) => entry.mmolbPlayerId)).toEqual(["pitcher"]);
+    expect(new Set(result.startingBatterIds)).toEqual(new Set(startingNine));
+    expect(result.battingOrderLocked).toBe(true);
+    expect(result.alternatives).toHaveLength(8);
+    expect(result.bench[0].positionOptions).toHaveLength(3);
+  });
+
+  it("allows manual field locks to promote the DH or a bench batter and reflows reserves", () => {
+    const base = [
+      player("a", "C", { stats: { awareness: 200 } }),
+      player("b", "1B", { stats: { arm: 140 } }),
+      player("c", "2B", { stats: { agility: 140 } }),
+      player("d", "3B", { stats: { reaction: 140 } }),
+      player("e", "SS", { stats: { dexterity: 140 } }),
+      player("f", "LF", { stats: { acrobatics: 140 } }),
+      player("g", "CF", { stats: { composure: 140 } }),
+      player("h", "RF", { stats: { patience: 140 } }),
+    ];
+    const dh = player("dh", "DH", { stats: {}, OPS: 2 });
+    const bench = player("bench", "C", { stats: { awareness: 50 }, OPS: 1 });
+    const startingNine = [...base.map((entry) => entry.mmolbPlayerId), dh.mmolbPlayerId];
+
+    const dhLocked = recommendPositions([...base, dh, bench], defense, startingNine, { C: "dh" });
+    expect(dhLocked.fielders.find((entry) => entry.assignedPosition === "C")).toMatchObject({
+      isLocked: true,
+      player: { mmolbPlayerId: "dh" },
+    });
+    expect(dhLocked.designatedHitter?.player.mmolbPlayerId).not.toBe("dh");
+
+    const benchLocked = recommendPositions([...base, dh, bench], defense, startingNine, { C: "bench" });
+    expect(benchLocked.fielders.find((entry) => entry.assignedPosition === "C")).toMatchObject({
+      isLocked: true,
+      player: { mmolbPlayerId: "bench" },
+    });
+    expect(benchLocked.fielders).toHaveLength(8);
+    expect(new Set(benchLocked.fielders.map((entry) => entry.player.mmolbPlayerId)).size).toBe(8);
+    expect(benchLocked.startingBatterIds).toHaveLength(9);
+    expect(benchLocked.startingBatterIds).toContain("bench");
+    expect(benchLocked.bench.map((entry) => entry.player.mmolbPlayerId)).not.toContain("bench");
+    expect(benchLocked.bench.some((entry) => startingNine.includes(entry.player.mmolbPlayerId))).toBe(true);
+    expect(benchLocked.battingOrderLocked).toBe(false);
+    const rosterPartition = [
+      ...benchLocked.fielders.map((entry) => entry.player.mmolbPlayerId),
+      ...(benchLocked.designatedHitter ? [benchLocked.designatedHitter.player.mmolbPlayerId] : []),
+      ...benchLocked.bench.map((entry) => entry.player.mmolbPlayerId),
+    ];
+    expect(new Set(rosterPartition).size).toBe(rosterPartition.length);
+    expect([...rosterPartition].sort()).toEqual([...base, dh, bench].map((entry) => entry.mmolbPlayerId).sort());
+
+    const benchAtDh = recommendPositions([...base, dh, bench], defense, startingNine, { DH: "bench" });
+    expect(benchAtDh.designatedHitter).toMatchObject({
+      isLocked: true,
+      player: { mmolbPlayerId: "bench" },
+    });
+    expect(benchAtDh.fielders).toHaveLength(8);
+    expect(benchAtDh.startingBatterIds).toContain("bench");
+    expect(benchAtDh.bench.some((entry) => startingNine.includes(entry.player.mmolbPlayerId))).toBe(true);
+    expect(benchAtDh.battingOrderLocked).toBe(false);
+    const dhRosterPartition = [
+      ...benchAtDh.fielders.map((entry) => entry.player.mmolbPlayerId),
+      ...(benchAtDh.designatedHitter ? [benchAtDh.designatedHitter.player.mmolbPlayerId] : []),
+      ...benchAtDh.bench.map((entry) => entry.player.mmolbPlayerId),
+    ];
+    expect(new Set(dhRosterPartition).size).toBe(dhRosterPartition.length);
+    expect([...dhRosterPartition].sort()).toEqual([...base, dh, bench].map((entry) => entry.mmolbPlayerId).sort());
+  });
+
+  it("exposes the two highest-weighted raw stats for each assigned position", () => {
+    const weightedDefense: PositionDefenseMap = {
+      ...defense,
+      "1B": {
+        stat_weights: { reaction: 0.12, composure: 0.07, awareness: 0.05 },
+        primary_stats: ["reaction"],
+        secondary_stats: ["composure", "awareness"],
+      },
+    };
+    const players = Array.from({ length: 8 }, (_, index) => player(`raw-${index}`, "C", {
+      stats: { reaction: 321 - index, composure: 210 - index, awareness: 99 },
+    }));
+    const result = recommendPositions(players, weightedDefense, players.map((entry) => entry.mmolbPlayerId));
+    const firstBase = result.fielders.find((entry) => entry.assignedPosition === "1B");
+
+    expect(firstBase?.keyStats.map((entry) => entry.stat)).toEqual(["reaction", "composure"]);
+    expect(firstBase?.keyStats.map((entry) => entry.value)).toEqual([
+      firstBase?.player.stats.reaction,
+      firstBase?.player.stats.composure,
+    ]);
+  });
+
+  it("uses equipped items and enforces the saved Reaction and outfield Arm placement order", () => {
+    const players = [
+      player("catcher", "C", { stats: { awareness: 200 } }),
+      equipFlat(player("if-gear", "SS", { stats: { reaction: 10, composure: 80, awareness: 80 } }), "reaction", 140),
+      player("if-high", "3B", { stats: { reaction: 130, composure: 80, awareness: 80 } }),
+      player("if-mid", "2B", { stats: { reaction: 110, composure: 80, awareness: 80 } }),
+      player("if-low", "1B", { stats: { reaction: 90, composure: 80, awareness: 80 } }),
+      player("of-high", "RF", { stats: { acrobatics: 140, agility: 80, arm: 120 } }),
+      player("of-mid", "CF", { stats: { acrobatics: 140, agility: 80, arm: 90 } }),
+      player("of-low", "LF", { stats: { acrobatics: 140, agility: 80, arm: 60 } }),
+      player("dh", "DH", { stats: { contact: 300 } }),
+    ];
+    const startingNine = players.map((entry) => entry.mmolbPlayerId);
+    const before = JSON.stringify(players);
+    const result = recommendPositions(players, realDefense, startingNine);
+    const repeated = recommendPositions(players, realDefense, startingNine);
+    const byPosition = Object.fromEntries(result.fielders.map((entry) => [entry.assignedPosition, entry]));
+
+    expect(byPosition.SS.player.mmolbPlayerId).toBe("if-gear");
+    expect(byPosition["3B"].player.mmolbPlayerId).toBe("if-high");
+    expect(byPosition["2B"].player.mmolbPlayerId).toBe("if-mid");
+    expect(byPosition["1B"].player.mmolbPlayerId).toBe("if-low");
+    expect(byPosition.RF.player.mmolbPlayerId).toBe("of-high");
+    expect(new Set([byPosition.CF.player.mmolbPlayerId, byPosition.LF.player.mmolbPlayerId]))
+      .toEqual(new Set(["of-mid", "of-low"]));
+    expect(byPosition.SS.keyStats[0]).toMatchObject({ stat: "reaction", value: 150 });
+    expect(byPosition.RF.keyStats.map((entry: { stat: string }) => entry.stat)).toEqual(["acrobatics", "arm"]);
+    expect(repeated.fielders.map((entry) => [entry.assignedPosition, entry.player.mmolbPlayerId]))
+      .toEqual(result.fielders.map((entry) => [entry.assignedPosition, entry.player.mmolbPlayerId]));
+    expect(JSON.stringify(players)).toBe(before);
+    expect(players[1].stats.reaction).toBe(10);
+  });
+
+  it("lets a lock override the Reaction order and prioritizes the remaining infield spots", () => {
+    const players = [
+      player("catcher", "C", { stats: { awareness: 200 } }),
+      equipFlat(player("if-gear", "SS", { stats: { reaction: 10, composure: 80, awareness: 80 } }), "reaction", 140),
+      player("if-high", "3B", { stats: { reaction: 130, composure: 80, awareness: 80 } }),
+      player("if-mid", "2B", { stats: { reaction: 110, composure: 80, awareness: 80 } }),
+      player("if-low", "1B", { stats: { reaction: 90, composure: 80, awareness: 80 } }),
+      player("of-high", "RF", { stats: { acrobatics: 140, agility: 80, arm: 120 } }),
+      player("of-mid", "CF", { stats: { acrobatics: 140, agility: 80, arm: 90 } }),
+      player("of-low", "LF", { stats: { acrobatics: 140, agility: 80, arm: 60 } }),
+      player("dh", "DH", { stats: { contact: 300 } }),
+    ];
+    const result = recommendPositions(
+      players,
+      realDefense,
+      players.map((entry) => entry.mmolbPlayerId),
+      { SS: "if-low" },
+    );
+    const byPosition = Object.fromEntries(result.fielders.map((entry) => [entry.assignedPosition, entry]));
+
+    expect(byPosition.SS).toMatchObject({ isLocked: true, player: { mmolbPlayerId: "if-low" } });
+    expect(byPosition["3B"].player.mmolbPlayerId).toBe("if-gear");
+    expect(byPosition["2B"].player.mmolbPlayerId).toBe("if-high");
+    expect(byPosition["1B"].player.mmolbPlayerId).toBe("if-mid");
   });
 });

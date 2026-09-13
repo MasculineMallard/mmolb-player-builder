@@ -2,6 +2,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { BASE_PATH } from "@/lib/constants";
 
+const HOME_TOOLS = [
+  { href: "/preseason", emoji: "📋", label: "Perfunctory Preseason Plotter", description: "Plan your pitching staff, batting order, and defensive alignment" },
+  { href: "/mulch", emoji: "⚾", label: "Mulch-o-Meter", description: "Evaluate your roster: mulch, hold, or keep" },
+  { href: "/pitcher", emoji: "🎯", label: "Perfect Pitcher Planner", description: "Optimize pitching builds and pitch arsenals" },
+  { href: "/batter", emoji: "💪", label: "Better Batter Builder", description: "Plan batting stat allocation and boon choices" },
+  { href: "/shop", emoji: "🧵", label: "Super Slugger Sartoria", description: "Build your ideal batter items to fill stat gaps" },
+  { href: "/pitcher-shop", emoji: "🎩", label: "Heroic Hurler Haberdashery", description: "Build your ideal pitcher items to fill stat gaps" },
+] as const;
+
 export default function Home() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center gap-8 p-8">
@@ -27,47 +36,18 @@ export default function Home() {
         evaluate rosters, and figure out who to mulch.
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 max-w-5xl w-full">
-        <Link
-          href="/pitcher"
-          className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
-        >
-          <span className="text-3xl">🎯</span>
-          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Perfect Pitcher Planner</span>
-          <span className="text-xs text-muted-foreground text-center">Optimize pitching builds and pitch arsenals</span>
-        </Link>
-        <Link
-          href="/batter"
-          className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
-        >
-          <span className="text-3xl">💪</span>
-          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Better Batter Builder</span>
-          <span className="text-xs text-muted-foreground text-center">Plan batting stat allocation and boon choices</span>
-        </Link>
-        <Link
-          href="/mulch"
-          className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
-        >
-          <span className="text-3xl">⚾</span>
-          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Mulch-o-Meter</span>
-          <span className="text-xs text-muted-foreground text-center">Evaluate your roster: mulch, hold, or keep</span>
-        </Link>
-        <Link
-          href="/shop"
-          className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
-        >
-          <span className="text-3xl">🧵</span>
-          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Super Slugger Sartoria</span>
-          <span className="text-xs text-muted-foreground text-center">Build your ideal batter items to fill stat gaps</span>
-        </Link>
-        <Link
-          href="/pitcher-shop"
-          className="group flex flex-col items-center gap-3 rounded-xl bg-card border-2 border-border px-6 py-6 hover:border-primary hover:bg-card/80 transition-all active:scale-95 cursor-pointer"
-        >
-          <span className="text-3xl">🎩</span>
-          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Heroic Hurler Haberdashery</span>
-          <span className="text-xs text-muted-foreground text-center">Build your ideal pitcher items to fill stat gaps</span>
-        </Link>
+      <div className="grid w-full max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {HOME_TOOLS.map((tool) => (
+          <Link
+            key={tool.href}
+            href={tool.href}
+            className="group flex flex-col items-center justify-center gap-2.5 rounded-xl border-2 border-border bg-card px-5 py-5 text-center transition-all hover:border-primary hover:bg-card/80 active:scale-95"
+          >
+            <span className="text-3xl" aria-hidden="true">{tool.emoji}</span>
+            <span className="font-semibold text-foreground transition-colors group-hover:text-primary">{tool.label}</span>
+            <span className="text-xs text-muted-foreground">{tool.description}</span>
+          </Link>
+        ))}
       </div>
     </div>
   );

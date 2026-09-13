@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import type { TeamSearchResult, RosterPlayer, PlayerData, Archetype } from "@/lib/types";
 import type { EvaluatedPlayer, GameStats, PlayerRole } from "@/lib/evaluator-types";
-import { GlossaryButton } from "@/components/evaluator/glossary-modal";
+import { GlossaryButton } from "@/components/evaluator/MulchGlossary";
 import { evaluatePlayer, findBestFitPosition, getPlayerRole } from "@/lib/evaluator";
 import {
   loadBatterArchetypes,

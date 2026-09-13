@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { MmolbApiPlayerRecord } from "@/lib/mmolb-api";
+import type { MmolbApiPlayer, MmolbApiPlayerRecord } from "@/lib/mmolb-api";
+import type { RosterPlayer } from "@/lib/types";
 import {
+  buildPreseasonPlayerData,
   computePreseasonBatting,
   computePreseasonPitching,
   extractPreseasonStats,
@@ -66,6 +68,8 @@ describe("computePreseasonBatting", () => {
       walked: 4,
       hit_by_pitch: 1,
       sac_flies: 1,
+      struck_out: 6,
+      strikeouts: 99,
     });
 
     expect(result).not.toBeNull();
@@ -74,6 +78,7 @@ describe("computePreseasonBatting", () => {
     expect(result?.OBP).toBeCloseTo(13 / 26);
     expect(result?.SLG).toBeCloseTo(15 / 20);
     expect(result?.OPS).toBeCloseTo((13 / 26) + (15 / 20));
+    expect(result?.SO_PCT).toBeCloseTo(6 / 30);
   });
 
   it("guards a zero OBP denominator and permits OBP when AB is zero", () => {
@@ -81,35 +86,94 @@ describe("computePreseasonBatting", () => {
     expect(empty?.OBP).toBeNull();
     expect(empty?.SLG).toBeNull();
     expect(empty?.OPS).toBeNull();
+    expect(empty?.SO_PCT).toBeNull();
 
     const walksOnly = computePreseasonBatting({ plate_appearances: 2, walked: 2 });
     expect(walksOnly?.OBP).toBe(1);
     expect(walksOnly?.SLG).toBeNull();
     expect(walksOnly?.OPS).toBeNull();
   });
+
+  it("uses the batter strikeout field while pitching keeps its separate field", () => {
+    expect(computePreseasonBatting({ plate_appearances: 10, struck_out: 2, strikeouts: 9 })?.SO_PCT).toBe(0.2);
+    expect(computePreseasonPitching({ outs: 27, strikeouts: 9 })?.K9).toBe(9);
+  });
 });
 
 describe("computePreseasonPitching", () => {
-  it("derives fractional innings from outs and computes ERA, WHIP, and K/9", () => {
+  it("derives fractional innings from outs and computes ERA, WHIP, K/9, and HR/9", () => {
     const result = computePreseasonPitching({
       outs: 17,
       earned_runs: 2,
       hits_allowed: 5,
       walks: 2,
       strikeouts: 8,
+      home_runs_allowed: 2,
     });
 
     expect(result?.IP).toBeCloseTo(17 / 3);
     expect(result?.ERA).toBeCloseTo((9 * 2) / (17 / 3));
     expect(result?.WHIP).toBeCloseTo(7 / (17 / 3));
     expect(result?.K9).toBeCloseTo((9 * 8) / (17 / 3));
+    expect(result?.HR9).toBeCloseTo((9 * 2) / (17 / 3));
   });
 
   it("returns null rate stats at zero outs and treats omitted counters as zero", () => {
     const noOuts = computePreseasonPitching({ earned_runs: 1 });
-    expect(noOuts).toMatchObject({ outs: 0, IP: 0, ERA: null, WHIP: null, K9: null });
+    expect(noOuts).toMatchObject({ outs: 0, IP: 0, ERA: null, WHIP: null, K9: null, HR9: null });
 
     const scoreless = computePreseasonPitching({ outs: 9, hits_allowed: 2, strikeouts: 4 });
-    expect(scoreless).toMatchObject({ earnedRuns: 0, walks: 0, ERA: 0 });
+    expect(scoreless).toMatchObject({ earnedRuns: 0, walks: 0, homeRunsAllowed: 0, ERA: 0, HR9: 0 });
+  });
+});
+
+describe("buildPreseasonPlayerData", () => {
+  it("preserves normalized equipment without applying it to base stats", () => {
+    const rosterPlayer: RosterPlayer = {
+      mmolbPlayerId: "player-1",
+      firstName: "Test",
+      lastName: "Fielder",
+      name: "Test Fielder",
+      level: 20,
+      slot: "Lineup",
+      position: "SS",
+      isBench: false,
+    };
+    const raw = {
+      _id: "player-1",
+      FirstName: "Test",
+      LastName: "Fielder",
+      Level: 20,
+      Position: "SS",
+      PositionType: "Batter",
+      TeamID: TEAM_ID,
+      BaseAttributeBonuses: [{ attribute: "Reaction", amount: 0.1, source: "base" }],
+      ScheduledLevelUps: [],
+      AugmentHistory: [],
+      PitchTypes: [],
+      PitchSelection: [],
+      LesserDurability: 5,
+      GreaterDurability: 5,
+      Modifications: [{ Name: "Celestial Infusion", Description: "", Emoji: "🌌" }],
+      Equipment: {
+        Hands: {
+          Slot: "Hands",
+          Name: "Quick Glove",
+          Emoji: "",
+          Effects: [{ Attribute: "Reaction", Tier: 4, Type: "FlatBonus", Value: 0.5 }],
+        },
+      },
+    } as MmolbApiPlayer;
+
+    const result = buildPreseasonPlayerData(rosterPlayer, raw, [], CURRENT_SEASON_ID, TEAM_ID);
+
+    expect(result.stats.reaction).toBe(10);
+    expect(result.modifications).toEqual(["Celestial Infusion"]);
+    expect(result.equipment?.hands.effects[0]).toEqual({
+      attribute: "reaction",
+      tier: 4,
+      type: "flat",
+      value: 50,
+    });
   });
 });

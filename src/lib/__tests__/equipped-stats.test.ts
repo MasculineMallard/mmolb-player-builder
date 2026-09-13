@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { computeEquippedStats, hasGearEffect } from "../equipped-stats";
+import { computeEquippedStats, computeItemAdjustedStats, computeUnequippedEffectStats, hasGearEffect } from "../equipped-stats";
+import { projectShopStat } from "../item-advisor";
 import type { PlayerData, ItemEffect } from "../types";
 
 type BoonEffect = { bonuses: Record<string, number>; penalties: Record<string, number> };
@@ -11,6 +12,7 @@ function makePlayer(
   opts: {
     lesserBoons?: string[];
     greaterBoons?: string[];
+    modifications?: string[];
     equipment?: Record<string, ItemEffect[]>;
   } = {},
 ): PlayerData {
@@ -34,6 +36,7 @@ function makePlayer(
     stats,
     lesserBoons: opts.lesserBoons ?? [],
     greaterBoons: opts.greaterBoons ?? [],
+    modifications: opts.modifications ?? [],
     mmolbPlayerId: "x",
     pitches: [],
     equipment,
@@ -129,6 +132,59 @@ describe("computeEquippedStats — formula", () => {
     // vision has both a -50% test penalty twice; never goes negative
     const visionPlayer = makePlayer({ vision: 300 }, { lesserBoons: ["Weak1", "Weak2"] });
     expect(computeEquippedStats(visionPlayer, boonLookup).vision.total).toBe(0);
+  });
+
+  it("builds an item-only map without applying a player's boons", () => {
+    const boonLookup = new Map<string, BoonEffect>([
+      ["Quick", { bonuses: { reaction: 25 }, penalties: {} }],
+    ]);
+    const player = makePlayer(
+      { reaction: 100 },
+      { lesserBoons: ["Quick"], equipment: { hands: [flat("reaction", 20), pct("reaction", 10)] } },
+    );
+
+    expect(computeItemAdjustedStats(player).reaction).toBe(132);
+    expect(computeEquippedStats(player, boonLookup).reaction.total).toBe(162);
+  });
+
+  it("applies canonical flat and multiplier player modifications in display order", () => {
+    const modifierLookup = new Map([
+      ["Celestial Infusion", {
+        bonuses: {},
+        penalties: {},
+        flatBonuses: { muscle: 25, presence: 25 },
+        flatPenalties: {},
+      }],
+      ["Corrupted", {
+        bonuses: { muscle: 20, presence: 20 },
+        penalties: {},
+        flatBonuses: {},
+        flatPenalties: {},
+      }],
+    ]);
+    const player = makePlayer(
+      { muscle: 100, presence: 200 },
+      { modifications: ["Celestial Infusion", "Corrupted"] },
+    );
+
+    const equipped = computeEquippedStats(player, modifierLookup);
+    expect(equipped.muscle.modifierFlat).toBe(25);
+    expect(equipped.muscle.modifierPct).toBeCloseTo(0.2);
+    expect(equipped.muscle.total).toBe(150); // (100 + 25) × 1.2
+    expect(equipped.presence.total).toBe(270); // (200 + 25) × 1.2
+    expect(computeItemAdjustedStats(player, modifierLookup).muscle).toBe(150);
+    expect(computeUnequippedEffectStats(player, modifierLookup)).toMatchObject({ muscle: 150, presence: 270 });
+  });
+
+  it("projects shop flats and percentages from modifier-adjusted current values", () => {
+    // Base 100 + inherent flat 25, then existing +20% effect = current 150.
+    // Two candidate +10 flat items are also multiplied by 1.2. Two +10%
+    // item effects add to the existing +20%, rather than compounding it.
+    expect(projectShopStat(125, 1.2, 2, 10, 10)).toEqual({
+      current: 150,
+      withFlat: 174,
+      withPct: 175,
+    });
   });
 });
 

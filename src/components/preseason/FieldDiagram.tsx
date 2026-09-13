@@ -1,18 +1,28 @@
-import type { PositionAssignmentRec } from "@/lib/preseason-recommend";
+import { BASE_PATH } from "@/lib/constants";
+import type { ModifierSourceStatus } from "@/lib/evaluator-data";
+import type {
+  PositionAlternative,
+  PositionAssignment,
+  PositionAssignmentRec,
+  PositionFitStat,
+} from "@/lib/preseason-recommend";
 
 export interface FieldDiagramProps {
   recommendation: PositionAssignmentRec;
+  modifierSourceStatus?: ModifierSourceStatus | "loading";
+  onLockPosition?: (position: string, playerId: string | null) => void;
+  onResetLocks?: () => void;
 }
 
-const FIELD_COORDS: Record<string, { x: number; y: number }> = {
-  C: { x: 200, y: 315 },
-  "1B": { x: 292, y: 230 },
-  "2B": { x: 247, y: 165 },
-  "3B": { x: 108, y: 230 },
-  SS: { x: 153, y: 165 },
-  LF: { x: 82, y: 95 },
-  CF: { x: 200, y: 62 },
-  RF: { x: 318, y: 95 },
+const FIELD_COORDS: Record<string, { left: string; top: string }> = {
+  C: { left: "50%", top: "87%" },
+  "1B": { left: "80%", top: "68%" },
+  "2B": { left: "65%", top: "49%" },
+  "3B": { left: "20%", top: "68%" },
+  SS: { left: "35%", top: "49%" },
+  LF: { left: "19%", top: "24%" },
+  CF: { left: "50%", top: "14%" },
+  RF: { left: "81%", top: "24%" },
 };
 
 function fitColor(score: number | null): string {
@@ -23,11 +33,114 @@ function fitColor(score: number | null): string {
   return "var(--destructive)";
 }
 
-function shortName(name: string): string {
-  return name.length > 15 ? `${name.slice(0, 14)}…` : name;
+function statLabel(stat: string): string {
+  return stat.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-export function FieldDiagram({ recommendation }: FieldDiagramProps) {
+function cardStatLabel(stat: string): string {
+  const abbreviations: Record<string, string> = {
+    acrobatics: "Acro",
+    composure: "Comp",
+    awareness: "Aware",
+    reaction: "React",
+  };
+  return abbreviations[stat.toLowerCase()] ?? statLabel(stat);
+}
+
+function FitStats({ stats }: { stats: PositionFitStat[] }) {
+  if (stats.length === 0) return <div className="text-xs text-muted-foreground">No weighted stats</div>;
+  return (
+    <div className={`grid border-t border-white/15 ${stats.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+      {stats.map((stat, index) => (
+        <div
+          key={stat.stat}
+          className={`min-w-0 px-1 py-1 text-center ${index > 0 ? "border-l border-white/15" : ""}`}
+        >
+          <span data-testid="fit-stat-label" className="whitespace-nowrap text-[12px] font-semibold leading-none text-muted-foreground">
+            {cardStatLabel(stat.stat)}
+          </span>
+          <strong className="ml-1 font-mono text-[14px] font-black leading-none text-foreground">{stat.value}</strong>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function AssignmentCard({
+  assignment,
+  alternative,
+  selectablePlayers,
+  onLockPosition,
+}: {
+  assignment: PositionAssignment;
+  alternative?: PositionAlternative;
+  selectablePlayers: Array<{ player: PositionAssignment["player"]; rosterRole: "Field" | "DH" | "Bench" }>;
+  onLockPosition?: (position: string, playerId: string | null) => void;
+}) {
+  const score = assignment.fitScore;
+  const selectValue = assignment.isLocked ? assignment.player.mmolbPlayerId : "";
+
+  return (
+    <div
+      role="group"
+      data-testid="fielder-node"
+      data-position={assignment.assignedPosition}
+      data-locked={assignment.isLocked ? "true" : "false"}
+      aria-label={`${assignment.assignedPosition}: ${assignment.player.name}, ${score == null ? "fit unavailable" : `${Math.round(score)} percent fit`}; ${assignment.keyStats.map((stat) => `${statLabel(stat.stat)} ${stat.value}`).join(", ")}${assignment.isPersonalBest ? "; best position for this player" : ""}`}
+      className="absolute z-10 w-[180px] -translate-x-1/2 -translate-y-1/2 text-foreground drop-shadow-[0_4px_7px_rgb(0_0_0/0.5)]"
+      style={{
+        left: FIELD_COORDS[assignment.assignedPosition]?.left ?? "50%",
+        top: FIELD_COORDS[assignment.assignedPosition]?.top ?? "50%",
+      }}
+      title={assignment.isPersonalBest ? "This is this player's best position" : undefined}
+    >
+      <div className={`overflow-hidden rounded-[5px] border bg-background/95 backdrop-blur-sm ${assignment.isPersonalBest ? "border-primary" : "border-white/25"}`}>
+        <div data-testid="fielder-card-header" className="grid min-h-[30px] grid-cols-[24px_minmax(0,1fr)_auto] items-center gap-1 px-[5px] py-px pl-[3px]">
+          <span className="grid h-5 place-items-center rounded-[3px] bg-primary/20 font-mono text-[11px] font-black leading-none tracking-wide text-primary">{assignment.assignedPosition}</span>
+          {onLockPosition ? (
+            <label className="relative flex h-6 min-w-0 cursor-pointer items-center gap-1 rounded-sm px-0.5 focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-primary">
+              <span className="sr-only">Player assignment for {assignment.assignedPosition}</span>
+              <span className="min-w-0 flex-1 truncate text-[13px] font-extrabold leading-none">{assignment.player.name}</span>
+              <span data-testid="fielder-menu-cue" aria-hidden="true" className="grid h-5 w-5 shrink-0 place-items-center rounded border border-primary/50 bg-primary/20 text-[12px] font-black leading-none text-primary shadow-sm">▼</span>
+              <select
+                aria-label={`Player assignment for ${assignment.assignedPosition}; current player ${assignment.player.name}`}
+                value={selectValue}
+                onChange={(event) => onLockPosition(assignment.assignedPosition, event.target.value || null)}
+                className="absolute inset-0 h-full w-full cursor-pointer bg-background text-foreground opacity-0 [color-scheme:dark]"
+              >
+                <option value="" className="bg-slate-950 text-slate-100">Auto · {assignment.player.name}</option>
+                {selectablePlayers.map(({ player, rosterRole }) => (
+                  <option key={player.mmolbPlayerId} value={player.mmolbPlayerId} className="bg-slate-950 text-slate-100">
+                    Lock · {player.name} · {rosterRole}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <span className="min-w-0 truncate text-[13px] font-extrabold leading-none">{assignment.player.name}</span>
+          )}
+          <span className="font-mono text-[15px] font-black leading-none" style={{ color: fitColor(score) }}>
+            {score == null ? "N/A" : `${Math.round(score)}%`}
+          </span>
+        </div>
+
+        <FitStats stats={assignment.keyStats} />
+      </div>
+
+      {alternative && (
+        <div className="mx-auto -mt-px grid w-[84%] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-[3px] rounded-b-[4px] border border-t-0 border-white/20 bg-secondary/95 px-[5px] py-1 text-[10px] leading-none">
+          <span className="text-muted-foreground">Next</span>
+          <span className="min-w-0 truncate text-muted-foreground">
+            <strong className="text-foreground">{alternative.player.name}</strong>
+          </span>
+          <strong className="shrink-0 font-mono text-[10px] text-primary">{Math.round(alternative.fitScore)}%</strong>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function FieldDiagram({ recommendation, modifierSourceStatus = "canonical", onLockPosition, onResetLocks }: FieldDiagramProps) {
   if (recommendation.fielders.length === 0) {
     return (
       <section data-testid="field-diagram" className="rounded-lg border border-border bg-card px-4 py-6 text-center">
@@ -37,91 +150,150 @@ export function FieldDiagram({ recommendation }: FieldDiagramProps) {
     );
   }
 
+  const selectablePlayers = [
+    ...recommendation.fielders.map((assignment) => ({ player: assignment.player, rosterRole: "Field" as const })),
+    ...(recommendation.designatedHitter
+      ? [{ player: recommendation.designatedHitter.player, rosterRole: "DH" as const }]
+      : []),
+    ...recommendation.bench.map((assignment) => ({ player: assignment.player, rosterRole: "Bench" as const })),
+  ];
+  const alternativeByPosition = new Map(
+    recommendation.alternatives.map((alternative) => [alternative.position, alternative]),
+  );
+  const lockedCount = recommendation.fielders.filter((assignment) => assignment.isLocked).length
+    + Number(recommendation.designatedHitter?.isLocked ?? false);
+  const averageFit = Math.round(recommendation.totalFit / recommendation.fielders.length);
+
   return (
-    <section data-testid="field-diagram" className="rounded-lg border border-border bg-card p-3">
-      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+    <section data-testid="field-diagram" className="rounded-xl border border-border bg-card p-4 sm:p-5">
+      <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-semibold text-foreground">Best Defensive Alignment</h2>
-          <p className="text-xs text-muted-foreground">Optimal eight-player fit · ! marks a player away from their personal-best spot</p>
+          <h2 className="text-lg font-semibold text-foreground">Best Defensive Alignment</h2>
+          <p className="mt-1 font-mono text-[11px] text-muted-foreground">Fit % = Σ(weight × min(current-effect stat ÷ target, 1)) ÷ Σ(weights) × 100</p>
         </div>
-        <span className="rounded-full bg-secondary px-2 py-1 text-xs text-secondary-foreground">
-          Total fit {Math.round(recommendation.totalFit)}
-        </span>
-      </div>
-
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_13rem]">
-        <svg
-          viewBox="0 0 400 360"
-          role="img"
-          aria-labelledby="field-title field-description"
-          className="h-auto w-full min-h-[20rem] rounded-md bg-secondary/40"
-        >
-          <title id="field-title">Recommended defensive field alignment</title>
-          <desc id="field-description">Eight fielding positions with assigned player names and fit percentages.</desc>
-          <path d="M200 338 L42 180 Q200 -28 358 180 Z" fill="var(--muted)" stroke="var(--border)" strokeWidth="2" />
-          <path d="M200 315 L108 223 L200 132 L292 223 Z" fill="var(--card)" stroke="var(--border)" strokeWidth="2" />
-          <path d="M200 315 L108 223 M200 315 L292 223" fill="none" stroke="var(--border)" strokeWidth="1.5" />
-          <circle cx="200" cy="224" r="5" fill="var(--foreground)" opacity="0.45" />
-
-          {recommendation.fielders.map((assignment) => {
-            const coords = FIELD_COORDS[assignment.assignedPosition] ?? { x: 200, y: 180 };
-            const score = assignment.fitScore;
-            return (
-              <g
-                key={assignment.assignedPosition}
-                data-testid="fielder-node"
-                data-position={assignment.assignedPosition}
-                transform={`translate(${coords.x} ${coords.y})`}
-              >
-                <title>
-                  {assignment.player.name}: {assignment.assignedPosition}, {score == null ? "N/A" : `${Math.round(score)}% fit`}
-                  {!assignment.isPersonalBest ? `; personal best is ${assignment.personalBestPosition}` : ""}
-                </title>
-                <circle r="28" fill={fitColor(score)} stroke="var(--background)" strokeWidth="3" />
-                <text y="-10" textAnchor="middle" fill="var(--primary-foreground)" fontSize="10" fontWeight="700">
-                  {assignment.assignedPosition}{assignment.isPersonalBest ? "" : " !"}
-                </text>
-                <text y="3" textAnchor="middle" fill="var(--primary-foreground)" fontSize="8.5">
-                  {shortName(assignment.player.name)}
-                </text>
-                <text y="16" textAnchor="middle" fill="var(--primary-foreground)" fontSize="9" fontWeight="600">
-                  {score == null ? "N/A" : `${Math.round(score)}%`}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-
-        <div className="space-y-3">
-          <div>
-            <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Off field</h3>
-            <div className="flex flex-wrap gap-1.5 lg:flex-col">
-              {recommendation.designatedHitter && (
-                <span className="rounded-md border border-border bg-secondary px-2 py-1.5 text-xs">
-                  <strong className="text-foreground">DH</strong>{" "}{recommendation.designatedHitter.player.name}
-                </span>
-              )}
-              {recommendation.pitchers.map((player) => (
-                <span key={player.mmolbPlayerId} className="rounded-md border border-border bg-secondary px-2 py-1.5 text-xs text-muted-foreground">
-                  <strong className="text-foreground">P</strong>{" "}{player.name}
-                </span>
-              ))}
-            </div>
-          </div>
-          {recommendation.bench.length > 0 && (
-            <div>
-              <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Bench bats</h3>
-              <div className="flex flex-wrap gap-1.5 lg:flex-col">
-                {recommendation.bench.map((assignment) => (
-                  <span key={assignment.player.mmolbPlayerId} className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground">
-                    {assignment.player.name} · best {assignment.personalBestPosition}
-                  </span>
-                ))}
-              </div>
-            </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {!recommendation.battingOrderLocked && (
+            <span className="rounded-full bg-yellow-500/15 px-3 py-1 text-xs font-bold text-yellow-500">Provisional starting nine</span>
+          )}
+          <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
+            Average position fit {averageFit}%
+          </span>
+          {modifierSourceStatus === "loading" ? (
+            <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-muted-foreground" role="status">
+              Checking player-modifier values…
+            </span>
+          ) : modifierSourceStatus === "unavailable" ? (
+            <span className="rounded-full bg-yellow-500/15 px-3 py-1 text-xs font-semibold text-yellow-500" role="status">
+              Items included · modifier values unavailable
+            </span>
+          ) : (
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+              Items + player modifiers included
+            </span>
+          )}
+          {lockedCount > 0 && onResetLocks && (
+            <button
+              type="button"
+              onClick={onResetLocks}
+              className="rounded-md border border-border bg-background px-2.5 py-1 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-foreground"
+            >
+              Reset {lockedCount} {lockedCount === 1 ? "lock" : "locks"}
+            </button>
           )}
         </div>
       </div>
+
+      <div className="mx-auto max-w-5xl rounded-xl border border-border bg-background/40 p-2">
+        <div className="mb-2 flex items-center justify-center gap-2 text-xs font-semibold text-primary lg:hidden">
+          <span aria-hidden="true">↔</span>
+          Swipe left or right to explore every position
+        </div>
+        <div
+          role="region"
+          aria-label="Scrollable defensive field; swipe left or right to explore every position"
+          tabIndex={0}
+          className="overflow-x-auto rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          <div
+            data-testid="defensive-field"
+            aria-label="Defensive alignment by field position"
+            className="relative aspect-[8/5] w-full min-w-[700px] overflow-hidden rounded-lg bg-cover bg-center"
+            style={{ backgroundImage: `url(${BASE_PATH}/images/field-options-ai/field-ai-02.png)` }}
+          >
+            {recommendation.fielders.map((assignment) => (
+              <AssignmentCard
+                key={assignment.assignedPosition}
+                assignment={assignment}
+                alternative={alternativeByPosition.get(assignment.assignedPosition)}
+                selectablePlayers={selectablePlayers}
+                onLockPosition={onLockPosition}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {(recommendation.designatedHitter || recommendation.bench.length > 0) && (
+        <div className="mt-5 border-t border-border pt-4">
+          <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted-foreground">
+            {recommendation.designatedHitter ? "Designated hitter + bench bats" : "Bench bats"} · playable spots
+          </h3>
+          <div data-testid="reserve-bats-grid" className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+            {recommendation.designatedHitter && (
+              <div
+                data-testid="designated-hitter-card"
+                data-locked={recommendation.designatedHitter.isLocked ? "true" : "false"}
+                className={`rounded-lg border bg-primary/5 p-2.5 ${recommendation.designatedHitter.isLocked ? "border-primary" : "border-primary/35"}`}
+              >
+                {onLockPosition ? (
+                  <label className="relative block min-w-0 cursor-pointer rounded-sm focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-primary">
+                    <span className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-primary">
+                        Designated hitter{recommendation.designatedHitter.isLocked ? " · locked" : ""}
+                      </span>
+                      <span data-testid="dh-menu-cue" aria-hidden="true" className="grid h-5 w-5 shrink-0 place-items-center rounded border border-primary/50 bg-primary/20 text-[12px] font-black leading-none text-primary shadow-sm">▼</span>
+                    </span>
+                    <span className="mt-1 block min-w-0 truncate text-sm font-bold text-foreground">{recommendation.designatedHitter.player.name}</span>
+                    <select
+                      aria-label={`Player assignment for DH; current player ${recommendation.designatedHitter.player.name}`}
+                      value={recommendation.designatedHitter.isLocked ? recommendation.designatedHitter.player.mmolbPlayerId : ""}
+                      onChange={(event) => onLockPosition("DH", event.target.value || null)}
+                      className="absolute inset-0 h-full w-full cursor-pointer bg-background text-foreground opacity-0 [color-scheme:dark]"
+                    >
+                      <option value="" className="bg-slate-950 text-slate-100">Auto · {recommendation.designatedHitter.player.name}</option>
+                      {selectablePlayers.map(({ player, rosterRole }) => (
+                        <option key={player.mmolbPlayerId} value={player.mmolbPlayerId} className="bg-slate-950 text-slate-100">
+                          Lock · {player.name} · {rosterRole}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : (
+                  <>
+                    <div className="text-[10px] font-black uppercase tracking-wider text-primary">Designated hitter</div>
+                    <div className="mt-1 truncate text-sm font-bold text-foreground">{recommendation.designatedHitter.player.name}</div>
+                  </>
+                )}
+                <div className="mt-0.5 text-[11px] text-muted-foreground">
+                  Best field fit: <strong className="text-foreground">{recommendation.designatedHitter.personalBestPosition}</strong>
+                </div>
+              </div>
+            )}
+            {recommendation.bench.map((assignment) => (
+              <div key={assignment.player.mmolbPlayerId} className="rounded-lg border border-border bg-secondary/35 p-2.5">
+                <div className="truncate text-sm font-semibold text-foreground">{assignment.player.name}</div>
+                <div className="mt-1 flex flex-wrap gap-1">
+                  {assignment.positionOptions.map((option) => (
+                    <span key={option.position} className="rounded-md bg-background/70 px-1.5 py-1 text-[10px] text-muted-foreground">
+                      <strong className="text-foreground">{option.position}</strong> {Math.round(option.fitScore)}%
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

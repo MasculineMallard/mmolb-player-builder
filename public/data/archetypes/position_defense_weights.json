@@ -16,6 +16,7 @@
     "description": "Reaction for scooping throws. Composure for error avoidance. Awareness for double-play turns (1B takes the final out of most DPs).",
     "primary_stats": ["reaction"],
     "secondary_stats": ["composure", "awareness"],
+    "assignment_priority": { "stat": "reaction", "rank": 1 },
     "stat_weights": {
       "reaction": 0.12,
       "composure": 0.07,
@@ -28,6 +29,7 @@
     "description": "Reaction-dominant. Awareness and composure contribute marginally.",
     "primary_stats": ["reaction"],
     "secondary_stats": ["awareness", "composure"],
+    "assignment_priority": { "stat": "reaction", "rank": 2 },
     "stat_weights": {
       "reaction": 0.12,
       "awareness": 0.05,
@@ -40,6 +42,7 @@
     "description": "Reaction for ground balls. Composure under pressure. Arm for relay throws.",
     "primary_stats": ["reaction"],
     "secondary_stats": ["composure", "awareness", "arm"],
+    "assignment_priority": { "stat": "reaction", "rank": 4 },
     "stat_weights": {
       "reaction": 0.12,
       "composure": 0.07,
@@ -53,6 +56,7 @@
     "description": "Reaction-dominant hot corner. Composure and awareness are minor factors.",
     "primary_stats": ["reaction"],
     "secondary_stats": ["composure", "awareness"],
+    "assignment_priority": { "stat": "reaction", "rank": 3 },
     "stat_weights": {
       "reaction": 0.12,
       "composure": 0.06,
@@ -65,6 +69,7 @@
     "description": "Acrobatics for catches. Agility for range. Arm for throws home. Dexterity contributes.",
     "primary_stats": ["acrobatics"],
     "secondary_stats": ["agility", "arm", "dexterity"],
+    "assignment_priority": { "stat": "arm", "rank": 1 },
     "stat_weights": {
       "acrobatics": 0.12,
       "agility": 0.09,
@@ -78,6 +83,7 @@
     "description": "Acrobatics for catches. Agility for range. Arm for throws.",
     "primary_stats": ["acrobatics"],
     "secondary_stats": ["agility", "arm"],
+    "assignment_priority": { "stat": "arm", "rank": 1 },
     "stat_weights": {
       "acrobatics": 0.12,
       "agility": 0.09,
@@ -90,6 +96,7 @@
     "description": "Acrobatics for catches. Arm for throws to third. Agility for range. Dexterity contributes.",
     "primary_stats": ["acrobatics"],
     "secondary_stats": ["arm", "agility", "dexterity"],
+    "assignment_priority": { "stat": "arm", "rank": 2 },
     "stat_weights": {
       "acrobatics": 0.12,
       "arm": 0.08,

@@ -1,7 +1,7 @@
 /**
  * Item Shopping Advisor calculation engine.
  *
- * Analyzes a player's stat needs (archetype + defense + boon synergy)
+ * Analyzes a player's stat needs (archetype + defense + active-effect synergy)
  * and builds the "ideal item" for each equipment slot.
  *
  * Items roll 3 offensive + 2 defensive attributes per slot.
@@ -98,18 +98,19 @@ const DEDUP_DEFAULT = 0.4; // 4+ slots
 const MET_TARGET_FLOOR = 0.01;
 
 // ---------------------------------------------------------------------------
-// Boon multiplier computation
+// Boon / player-modifier multiplier computation
 // ---------------------------------------------------------------------------
 
 interface BoonEffect {
   bonuses: Record<string, number>;
   penalties: Record<string, number>;
+  flatBonuses?: Record<string, number>;
+  flatPenalties?: Record<string, number>;
 }
 
 /**
- * Build a stat → boon multiplier map from the player's boons.
- * +50% boon = items are 1.5x effective. Two +50% = 2.0x.
- * -50% penalty = items are 0.5x effective.
+ * Build a stat → multiplier map from named boons or player modifications.
+ * +25% means flat items are 1.25x effective; two +25% effects yield 1.5x.
  */
 export function computeBoonMultipliers(
   playerBoons: string[],
@@ -132,6 +133,27 @@ export function computeBoonMultipliers(
   }
 
   return multipliers;
+}
+
+/** Build a stat → signed flat adjustment map for effects such as Celestial Infusion. */
+export function computeModifierFlats(
+  modifierNames: string[],
+  modifierLookup: Map<string, BoonEffect>,
+): Record<string, number> {
+  const flats: Record<string, number> = {};
+  for (const modifierName of modifierNames) {
+    const effect = modifierLookup.get(modifierName);
+    if (!effect) continue;
+    for (const [stat, value] of Object.entries(effect.flatBonuses ?? {})) {
+      const key = stat.toLowerCase();
+      flats[key] = (flats[key] ?? 0) + value;
+    }
+    for (const [stat, value] of Object.entries(effect.flatPenalties ?? {})) {
+      const key = stat.toLowerCase();
+      flats[key] = (flats[key] ?? 0) - value;
+    }
+  }
+  return flats;
 }
 
 // ---------------------------------------------------------------------------
@@ -242,9 +264,9 @@ export function analyzeStatNeeds(
       }
     }
     if (boonMult > 1.0) {
-      parts.push(`+${Math.round((boonMult - 1) * 100)}% boon`);
+      parts.push(`+${Math.round((boonMult - 1) * 100)}% active effect`);
     } else if (boonMult < 1.0) {
-      parts.push(`${Math.round((boonMult - 1) * 100)}% boon`);
+      parts.push(`${Math.round((boonMult - 1) * 100)}% active effect`);
     }
 
     needs.push({
@@ -391,6 +413,22 @@ function rankPool(
 // ---------------------------------------------------------------------------
 // Stat Projection
 // ---------------------------------------------------------------------------
+
+/** Deterministic shop projection using the same additive-percent order as the game. */
+export function projectShopStat(
+  effectBase: number,
+  existingEffectMultiplier: number,
+  itemCount: number,
+  flatPerItem: number,
+  percentPerItem: number,
+): { current: number; withFlat: number; withPct: number } {
+  const clamp = (value: number) => Math.max(0, Math.min(1000, Math.round(value)));
+  return {
+    current: clamp(effectBase * existingEffectMultiplier),
+    withFlat: clamp((effectBase + flatPerItem * itemCount) * existingEffectMultiplier),
+    withPct: clamp(effectBase * (existingEffectMultiplier + (percentPerItem / 100) * itemCount)),
+  };
+}
 
 /**
  * Project what a stat will be after applying an item bonus.

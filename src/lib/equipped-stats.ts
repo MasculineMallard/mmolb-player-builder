@@ -1,6 +1,7 @@
 /**
- * Compute a player's *displayed* attribute totals with equipped items + boons
- * folded in — the "Equipment ON / Boons ON" view the game shows.
+ * Compute a player's displayed attribute totals with equipped items, boons,
+ * and ordinary player modifications
+ * folded in — the game-facing "effects on" view.
  *
  * This is DISPLAY-ONLY. It never feeds the evaluator, archetype fit, or the
  * percentile baseline (all of which stay on base stats, Equipment OFF / Boons
@@ -14,18 +15,21 @@
  *   - Item flats add fixed points to the attribute (FlatBonus, display scale).
  *   - Item percents are multipliers (Multiplier, ItemEffect.value = percent number).
  *   - The flat is added to the base FIRST, then the combined percent multiplier
- *     (items + boons) applies to that sum:
- *       total = (base + Σitem_flat) × (1 + Σitem_pct + Σboon_pct), clamp [0, 1000].
+ *     (items + multiplier effects) applies to that sum:
+ *       total = (base + Σitem_flat + Σmodifier_flat)
+ *             × (1 + Σitem_pct + Σboon_pct + Σmodifier_pct), clamp [0, 1000].
  *   Every calibrated stat reproduces the game's "both on" column exactly this way
  *   (e.g. Control (341+16)×(1+0.10+0.25)=482; Deception (0+62)×(1-0.10)=56).
  */
 
-import { computeBoonMultipliers } from "./item-advisor";
+import { computeBoonMultipliers, computeModifierFlats } from "./item-advisor";
 import type { PlayerData } from "./types";
 
 interface BoonEffect {
   bonuses: Record<string, number>;
   penalties: Record<string, number>;
+  flatBonuses?: Record<string, number>;
+  flatPenalties?: Record<string, number>;
 }
 
 /** Attribute ceiling — the game clamps attributes to 0-1000. */
@@ -38,14 +42,18 @@ export interface EquippedStat {
   itemFlat: number;
   /** Sum of item percent bonuses to this stat (percent number, e.g. 3 = +3%). */
   itemPct: number;
-  /** Net boon percent for this stat as a fraction (e.g. 0.5 = +50%, -0.5 = -50%). */
+  /** Signed flat points from ordinary player modifications. */
+  modifierFlat: number;
+  /** Net boon percent for this stat as a fraction (e.g. 0.25 = +25%, -0.1 = -10%). */
   boonPct: number;
-  /** Displayed total with items + boons, clamped to [0, 1000]. */
+  /** Net percent from ordinary player modifications as a fraction. */
+  modifierPct: number;
+  /** Displayed total with items, boons, and player modifiers, clamped to [0, 1000]. */
   total: number;
 }
 
 /**
- * Build a per-stat breakdown + total for a player's equipped items and boons.
+ * Build a per-stat breakdown + total for a player's equipped items, boons, and modifiers.
  * Returns an entry for every stat that has a base value OR an item contribution.
  */
 export function computeEquippedStats(
@@ -56,6 +64,9 @@ export function computeEquippedStats(
     [...player.lesserBoons, ...player.greaterBoons],
     boonLookup,
   );
+  const modifierNames = player.modifications ?? [];
+  const modifierMult = computeBoonMultipliers(modifierNames, boonLookup);
+  const modifierFlat = computeModifierFlats(modifierNames, boonLookup);
 
   // Sum actual equipped item effects per stat.
   const flat: Record<string, number> = {};
@@ -72,19 +83,64 @@ export function computeEquippedStats(
     ...Object.keys(player.stats),
     ...Object.keys(flat),
     ...Object.keys(pct),
+    ...Object.keys(modifierMult),
+    ...Object.keys(modifierFlat),
   ]);
 
   const out: Record<string, EquippedStat> = {};
   for (const stat of statKeys) {
     const base = player.stats[stat] ?? 0;
     const boonPct = (boonMult[stat] ?? 1) - 1;
+    const modifierPct = (modifierMult[stat] ?? 1) - 1;
     const itemFlat = flat[stat] ?? 0;
     const itemPctNum = pct[stat] ?? 0;
-    const raw = (base + itemFlat) * (1 + boonPct + itemPctNum / 100);
+    const modifierFlatNum = modifierFlat[stat] ?? 0;
+    const raw = (base + itemFlat + modifierFlatNum) * (1 + boonPct + modifierPct + itemPctNum / 100);
     const total = Math.max(0, Math.min(ATTR_MAX, Math.round(raw)));
-    out[stat] = { base, itemFlat, itemPct: itemPctNum, boonPct, total };
+    out[stat] = { base, itemFlat, itemPct: itemPctNum, modifierFlat: modifierFlatNum, boonPct, modifierPct, total };
   }
   return out;
+}
+
+/**
+ * Build the attribute map used for an owned player's defensive placement.
+ * Equipment and inherent player modifications are included, while boons are
+ * deliberately excluded: this is the plotter's current-player view, not a
+ * replacement for the base-stat evaluator.
+ */
+export function computeItemAdjustedStats(
+  player: PlayerData,
+  modifierLookup: Map<string, BoonEffect> = new Map(),
+): Record<string, number> {
+  const itemOnlyPlayer: PlayerData = {
+    ...player,
+    lesserBoons: [],
+    greaterBoons: [],
+  };
+  return Object.fromEntries(
+    Object.entries(computeEquippedStats(itemOnlyPlayer, modifierLookup)).map(([stat, value]) => [
+      stat,
+      value.total,
+    ]),
+  );
+}
+
+/**
+ * Build the no-items current-value map used by the shop. Boons and inherent
+ * player modifiers remain active, while equipped items are removed because the
+ * shop is projecting a replacement five-item build.
+ */
+export function computeUnequippedEffectStats(
+  player: PlayerData,
+  effectLookup: Map<string, BoonEffect>,
+): Record<string, number> {
+  const withoutItems: PlayerData = { ...player, equipment: {} };
+  return Object.fromEntries(
+    Object.entries(computeEquippedStats(withoutItems, effectLookup)).map(([stat, value]) => [
+      stat,
+      value.total,
+    ]),
+  );
 }
 
 /** True if any stat's total differs from its base (i.e. the toggle is meaningful). */

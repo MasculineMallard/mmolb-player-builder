@@ -27,8 +27,8 @@ interface StatGridInteractiveProps {
   hasOverrides?: boolean;
   extraColumn?: React.ReactNode;
   /**
-   * Per-stat totals with equipped items + boons folded in (display-only). When
-   * present and non-trivial, a Base / With-items+boons toggle appears; flipping it
+   * Per-stat totals with equipped items, boons, and modifiers folded in. When
+   * present and non-trivial, a Base / With-all-effects toggle appears; flipping it
    * shows the totals instead of base values. Never affects planning math.
    */
   equippedStats?: Record<string, EquippedStat>;
@@ -129,13 +129,13 @@ export function StatGridInteractive({
                 onClick={() => { setShowGear(true); setEditing(false); setEditingStatName(null); }}
                 className={`px-2 py-0.5 transition-colors ${gearOn ? "bg-primary/20 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
               >
-                With items + boons
+                With all effects
               </button>
             </span>
           ) : (
             <>
               <span className="normal-case tracking-normal font-medium text-amber-500 text-sm ml-1">Base Only</span>
-              <span className="normal-case tracking-normal font-normal text-muted-foreground/70 text-xs">(no boons or items)</span>
+              <span className="normal-case tracking-normal font-normal text-muted-foreground/70 text-xs">(no item, boon, or modifier effects)</span>
             </>
           )}
         </h3>
@@ -222,6 +222,8 @@ export function StatGridInteractive({
                                 {gear.itemFlat !== 0 && <> · items +{gear.itemFlat}{gear.itemPct !== 0 ? ` / +${gear.itemPct}%` : ""}</>}
                                 {gear.itemFlat === 0 && gear.itemPct !== 0 && <> · items +{gear.itemPct}%</>}
                                 {gear.boonPct !== 0 && <> · boon {gear.boonPct > 0 ? "+" : ""}{Math.round(gear.boonPct * 100)}%</>}
+                                {gear.modifierFlat !== 0 && <> · modifier {gear.modifierFlat > 0 ? "+" : ""}{gear.modifierFlat}</>}
+                                {gear.modifierPct !== 0 && <> · modifier {gear.modifierPct > 0 ? "+" : ""}{Math.round(gear.modifierPct * 100)}%</>}
                               </p>
                             </>
                           ) : (

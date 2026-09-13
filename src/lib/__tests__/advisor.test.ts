@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   recommendStatPriorities,
   recommendBoonsByLevel,
+  scoreBoons,
 } from "../advisor";
 import type { Archetype } from "../types";
 
@@ -92,6 +93,25 @@ describe("recommendStatPriorities", () => {
     expect(velocityRec?.target).toBe(143);
     expect(stuffRec?.target).toBe(143);
     expect(stuffRec?.reasoning).toContain("core stat");
+  });
+});
+
+describe("scoreBoons source magnitudes", () => {
+  it("uses each boon record's percentages instead of fixed 25/10 assumptions", () => {
+    const [score] = scoreBoons(
+      { velocity: 200, control: 100 },
+      "pitcher",
+      [],
+      [{
+        name: "Variable",
+        emoji: "",
+        description: "",
+        bonuses: { Velocity: 50 },
+        penalties: { Control: 20 },
+      }],
+    );
+    expect(score.absoluteGain).toBe(100);
+    expect(score.absoluteLoss).toBe(20);
   });
 });
 
