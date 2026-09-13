@@ -245,17 +245,15 @@ export function FieldDiagram({ recommendation, modifierSourceStatus = "canonical
                 data-locked={recommendation.designatedHitter.isLocked ? "true" : "false"}
                 className={`rounded-lg border bg-primary/5 p-2.5 ${recommendation.designatedHitter.isLocked ? "border-primary" : "border-primary/35"}`}
               >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="text-[10px] font-black uppercase tracking-wider text-primary">
-                    Designated hitter{recommendation.designatedHitter.isLocked ? " · locked" : ""}
-                  </div>
-                  {onLockPosition && (
-                    <span data-testid="dh-menu-cue" aria-hidden="true" className="grid h-5 w-5 shrink-0 place-items-center rounded border border-primary/50 bg-primary/20 text-[12px] font-black leading-none text-primary shadow-sm">▼</span>
-                  )}
-                </div>
                 {onLockPosition ? (
-                  <label className="relative mt-1 flex h-6 min-w-0 cursor-pointer items-center rounded-sm focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-primary">
-                    <span className="min-w-0 flex-1 truncate text-sm font-bold text-foreground">{recommendation.designatedHitter.player.name}</span>
+                  <label className="relative block min-w-0 cursor-pointer rounded-sm focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-primary">
+                    <span className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-primary">
+                        Designated hitter{recommendation.designatedHitter.isLocked ? " · locked" : ""}
+                      </span>
+                      <span data-testid="dh-menu-cue" aria-hidden="true" className="grid h-5 w-5 shrink-0 place-items-center rounded border border-primary/50 bg-primary/20 text-[12px] font-black leading-none text-primary shadow-sm">▼</span>
+                    </span>
+                    <span className="mt-1 block min-w-0 truncate text-sm font-bold text-foreground">{recommendation.designatedHitter.player.name}</span>
                     <select
                       aria-label={`Player assignment for DH; current player ${recommendation.designatedHitter.player.name}`}
                       value={recommendation.designatedHitter.isLocked ? recommendation.designatedHitter.player.mmolbPlayerId : ""}
@@ -271,7 +269,10 @@ export function FieldDiagram({ recommendation, modifierSourceStatus = "canonical
                     </select>
                   </label>
                 ) : (
-                  <div className="mt-1 truncate text-sm font-bold text-foreground">{recommendation.designatedHitter.player.name}</div>
+                  <>
+                    <div className="text-[10px] font-black uppercase tracking-wider text-primary">Designated hitter</div>
+                    <div className="mt-1 truncate text-sm font-bold text-foreground">{recommendation.designatedHitter.player.name}</div>
+                  </>
                 )}
                 <div className="mt-0.5 text-[11px] text-muted-foreground">
                   Best field fit: <strong className="text-foreground">{recommendation.designatedHitter.personalBestPosition}</strong>
