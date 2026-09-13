@@ -205,7 +205,7 @@ function BarRow({ bar, displayMax, isPriority, isSecondary }: {
   const seg2Pct = maxProjPct - minProjPct;
 
   return (
-    <div className="py-1 px-1 rounded">
+    <div className="py-1 rounded">
       {/* Stat name | Base | +flat | +pct */}
       <div className="flex items-center mb-0.5">
         <span className="text-sm capitalize text-muted-foreground flex items-center gap-1 flex-1 min-w-0">
