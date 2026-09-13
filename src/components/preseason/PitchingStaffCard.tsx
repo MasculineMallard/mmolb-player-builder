@@ -13,6 +13,11 @@ function formatRate(value: number | null | undefined, digits = 2): string {
   return value == null ? "—" : value.toFixed(digits);
 }
 
+function formatInnings(outs: number): string {
+  const wholeOuts = Math.max(0, Math.round(outs));
+  return `${Math.floor(wholeOuts / 3)}.${wholeOuts % 3}`;
+}
+
 function PitcherTile({
   entry,
   onToggleStarter,
@@ -30,8 +35,8 @@ function PitcherTile({
           <div className="truncate text-sm font-semibold text-foreground">{entry.player.name}</div>
           <div className="text-[11px] text-muted-foreground">
             {entry.score == null
-              ? `#${entry.rank} · not scored · ${entry.attributeScore} attr fallback`
-              : `#${entry.rank} · ${entry.score.toFixed(1)} score`}
+              ? `#${entry.rank} · not scored · ${formatInnings(entry.player.sampleSize.outs)} IP · ${entry.attributeScore} attr fallback`
+              : `#${entry.rank} · ${entry.score.toFixed(1)} score · ${formatInnings(entry.player.sampleSize.outs)} IP`}
           </div>
         </div>
         <span className="shrink-0 rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">
@@ -149,7 +154,7 @@ export function PitchingStaffCard({ pitchers, defaultCloserRank = 4 }: PitchingS
               <div data-testid={`pitcher-tile-${closer.player.mmolbPlayerId}`} className="mt-1.5">
                 <div className="truncate text-sm font-semibold text-foreground">{closer.player.name}</div>
                 <div className="text-[10px] text-muted-foreground">
-                  #{closer.rank} · {closer.score == null ? "not scored" : `${closer.score.toFixed(1)} score`}
+                  #{closer.rank} · {closer.score == null ? "not scored" : `${closer.score.toFixed(1)} score`} · {formatInnings(closer.player.sampleSize.outs)} IP
                 </div>
                 <div className="mt-1 grid grid-cols-4 gap-1 text-center text-[10px] text-muted-foreground">
                   <span><strong className="block text-xs text-foreground">{formatRate(closer.player.preseasonPitching?.ERA)}</strong>ERA</span>

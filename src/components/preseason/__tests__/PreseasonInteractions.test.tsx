@@ -71,6 +71,9 @@ describe("preseason controls", () => {
       ...Array.from({ length: 9 }, (_, index) => makePlayer(`p${index + 1}`, "SP", index)),
       makePlayer("tiny", "SP", 10),
     ];
+    pitchers[0].preseasonPitching!.outs = 31;
+    pitchers[0].preseasonPitching!.IP = 31 / 3;
+    pitchers[0].sampleSize.outs = 31;
     render(<PitchingStaffCard pitchers={pitchers} />);
 
     expect(screen.getAllByText("RP")).toHaveLength(3);
@@ -78,6 +81,7 @@ describe("preseason controls", () => {
     expect(screen.getByTestId("relief-grid").firstElementChild).toBe(screen.getByTestId("closer-selector"));
     expect(screen.getByTestId("closer-selector").className).toContain("border-primary");
     expect(screen.getByTestId("pitcher-tile-p1").textContent).toMatch(/\d+\.\d score/);
+    expect(screen.getByTestId("pitcher-tile-p1").textContent).toMatch(/\d+\.\d score · 10\.1 IP/);
     expect(screen.getAllByText("HR/9").length).toBeGreaterThan(0);
     const closerId = (screen.getByLabelText("Closer rank") as HTMLSelectElement).selectedOptions[0].textContent?.match(/—\s(.+)$/)?.[1];
     const closer = screen.getByTestId(`pitcher-tile-${closerId}`);
