@@ -52,6 +52,7 @@ export function MulchView() {
   const [error, setError] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
   const evalRef = useRef<EvalRefData | null>(null);
+  const [percentileTables, setPercentileTables] = useState<LivePercentileTables | null>(null);
   // Raw fetched players + bench membership, kept so a position override can
   // re-evaluate in place without a re-fetch.
   const playersRef = useRef<PlayerData[]>([]);
@@ -146,6 +147,7 @@ export function MulchView() {
       playersRef.current = players;
       benchIdsRef.current = benchPlayerIds;
 
+      setPercentileTables(percentileTables);
       setEvaluated(evaluateAll());
       setLoadState("ready");
     } catch (e) {
@@ -298,7 +300,7 @@ export function MulchView() {
               ⚠ {evaluated.filter(ev => ev.player.recomped).length} player(s) recently recomposed. Season stats suppressed (from previous build).
             </div>
           )}
-          <RosterTable players={evaluated} onPositionChange={handlePositionChange} percentileTables={evalRef.current?.percentileTables ?? undefined} />
+          <RosterTable players={evaluated} onPositionChange={handlePositionChange} percentileTables={percentileTables ?? undefined} />
         </>
       )}
 

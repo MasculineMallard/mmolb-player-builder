@@ -168,7 +168,7 @@ describe("mid-season recomp detection", () => {
 
 describe("extractGameStats E1 fallback (PR-G — keep cumulative fallback, decided 2026-08)", () => {
   const REG = (stats: Record<string, number>): MmolbApiPlayerRecord =>
-    ({ Season: 15, SeasonID: "S15", SeasonStatus: "Regular Season", Stats: { t1: stats } }) as MmolbApiPlayerRecord;
+    ({ Season: 15, SeasonID: "S15", SeasonStatus: "Regular Season", Stats: { t1: stats } }) as unknown as MmolbApiPlayerRecord;
   const line = (pa: number) => ({
     plate_appearances: pa, at_bats: Math.round(pa * 0.9), singles: 20, doubles: 4,
     triples: 1, home_runs: 3, walked: 6, hit_by_pitch: 1, sac_flies: 1, struck_out: 15,

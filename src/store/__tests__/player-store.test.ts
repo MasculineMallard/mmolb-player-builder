@@ -42,6 +42,7 @@ const mockPlayer = {
   teamName: "Bats",
   teamEmoji: null,
   position: "pitcher",
+  durability: 5,
   stats: { velocity: 200, control: 150 },
   lesserBoons: [],
   greaterBoons: [],

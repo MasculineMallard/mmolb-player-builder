@@ -68,7 +68,7 @@ describe("PlayerEquipmentGraphic responsive layout", () => {
         pctMax={6}
         statNeeds={statNeeds}
         equipment={{
-          head: { name: "Test Helmet", emoji: "helmet", effects: [] },
+          head: { slot: "head", name: "Test Helmet", emoji: "helmet", effects: [] },
         }}
       />,
     );

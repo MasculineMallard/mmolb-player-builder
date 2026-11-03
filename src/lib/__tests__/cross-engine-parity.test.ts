@@ -9,7 +9,8 @@ import {
   getRecommendation,
 } from "../evaluator";
 import type { PositionDefenseMap } from "../evaluator-data";
-import type { PlayerData, PlayerRole } from "../evaluator-types";
+import type { PlayerRole } from "../evaluator-types";
+import type { PlayerData } from "../types";
 
 // ---------------------------------------------------------------------------
 // Cross-engine parity: the TS engine (evaluator.ts) and the Python CLI

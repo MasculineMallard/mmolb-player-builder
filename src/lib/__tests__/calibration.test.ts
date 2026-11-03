@@ -11,7 +11,8 @@ import {
   getRecommendation,
 } from "../evaluator";
 import type { PositionDefenseMap } from "../evaluator-data";
-import type { PlayerData, PercentileEntry, GameStats, PlayerRole } from "../evaluator-types";
+import type { PercentileEntry, GameStats, PlayerRole } from "../evaluator-types";
+import type { PlayerData } from "../types";
 
 // ---------------------------------------------------------------------------
 // S15 threshold calibration (deterministic; reads FROZEN live samples).

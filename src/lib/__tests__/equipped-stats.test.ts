@@ -5,7 +5,12 @@ import { computeEquippedStats, computeItemAdjustedStats, computeUnequippedEffect
 import { projectShopStat } from "../item-advisor";
 import type { PlayerData, ItemEffect } from "../types";
 
-type BoonEffect = { bonuses: Record<string, number>; penalties: Record<string, number> };
+type BoonEffect = {
+  bonuses: Record<string, number>;
+  penalties: Record<string, number>;
+  flatBonuses?: Record<string, number>;
+  flatPenalties?: Record<string, number>;
+};
 
 function makePlayer(
   stats: Record<string, number>,
@@ -148,7 +153,7 @@ describe("computeEquippedStats — formula", () => {
   });
 
   it("applies canonical flat and multiplier player modifications in display order", () => {
-    const modifierLookup = new Map([
+    const modifierLookup = new Map<string, BoonEffect>([
       ["Celestial Infusion", {
         bonuses: {},
         penalties: {},

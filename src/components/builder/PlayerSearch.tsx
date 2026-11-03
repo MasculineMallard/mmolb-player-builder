@@ -157,7 +157,7 @@ function TeamBrowser({
   // Restore last team/roster from store
   useEffect(() => {
     if (lastTeam && lastRoster.length > 0 && !selectedTeam) {
-      setSelectedTeam(lastTeam);
+      setSelectedTeam(lastTeam); // eslint-disable-line react-hooks/set-state-in-effect -- restore persisted team after hydration
       setRoster(lastRoster);
     }
   }, [lastTeam, lastRoster, selectedTeam]);
