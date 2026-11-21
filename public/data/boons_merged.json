@@ -37,6 +37,18 @@
       }
     },
     {
+      "name": "Alert",
+      "type": "lesser",
+      "emoji": "🚨",
+      "description": "This Player is always on alert",
+      "bonuses": {
+        "Reaction": 25
+      },
+      "penalties": {
+        "Performance": 10
+      }
+    },
+    {
       "name": "Ambassador",
       "type": "lesser",
       "emoji": "🎖️",
@@ -97,6 +109,18 @@
       }
     },
     {
+      "name": "Angler",
+      "type": "lesser",
+      "emoji": "",
+      "description": "",
+      "bonuses": {
+        "Patience": 25
+      },
+      "penalties": {
+        "Performance": 10
+      }
+    },
+    {
       "name": "Arachnid",
       "type": "lesser",
       "emoji": "🕷️",
@@ -118,6 +142,30 @@
       },
       "penalties": {
         "Discipline": 10
+      }
+    },
+    {
+      "name": "Baker",
+      "type": "lesser",
+      "emoji": "",
+      "description": "",
+      "bonuses": {
+        "Patience": 25
+      },
+      "penalties": {
+        "Contact": 10
+      }
+    },
+    {
+      "name": "Ballerina",
+      "type": "lesser",
+      "emoji": "🩰",
+      "description": "This Player makes difficult plays look graceful",
+      "bonuses": {
+        "Acrobatics": 25
+      },
+      "penalties": {
+        "Performance": 10
       }
     },
     {
@@ -166,6 +214,18 @@
       },
       "penalties": {
         "Cunning": 10
+      }
+    },
+    {
+      "name": "Calligrapher",
+      "type": "lesser",
+      "emoji": "",
+      "description": "",
+      "bonuses": {
+        "Dexterity": 25
+      },
+      "penalties": {
+        "Muscle": 10
       }
     },
     {
@@ -349,6 +409,18 @@
       }
     },
     {
+      "name": "Elusive",
+      "type": "lesser",
+      "emoji": "",
+      "description": "",
+      "bonuses": {
+        "Agility": 25
+      },
+      "penalties": {
+        "Contact": 10
+      }
+    },
+    {
       "name": "Elvish",
       "type": "lesser",
       "emoji": "🧝",
@@ -382,6 +454,18 @@
       },
       "penalties": {
         "Discipline": 10
+      }
+    },
+    {
+      "name": "Fencer",
+      "type": "lesser",
+      "emoji": "🤺",
+      "description": "This Player wins every battle of footwork",
+      "bonuses": {
+        "Agility": 25
+      },
+      "penalties": {
+        "Performance": 10
       }
     },
     {
@@ -421,6 +505,18 @@
       }
     },
     {
+      "name": "Gamer",
+      "type": "lesser",
+      "emoji": "🎮",
+      "description": "This Player is quick on the controls",
+      "bonuses": {
+        "Reaction": 25
+      },
+      "penalties": {
+        "Muscle": 10
+      }
+    },
+    {
       "name": "Geometry Expert",
       "type": "lesser",
       "emoji": "📐",
@@ -442,6 +538,18 @@
       },
       "penalties": {
         "Insight": 10
+      }
+    },
+    {
+      "name": "Goalkeeper",
+      "type": "lesser",
+      "emoji": "🥅",
+      "description": "This Player refuses to let anything through",
+      "bonuses": {
+        "Reaction": 25
+      },
+      "penalties": {
+        "Contact": 10
       }
     },
     {
@@ -493,6 +601,18 @@
       }
     },
     {
+      "name": "Gymnast",
+      "type": "lesser",
+      "emoji": "🤸",
+      "description": "This Player turns every catch into a routine",
+      "bonuses": {
+        "Acrobatics": 25
+      },
+      "penalties": {
+        "Contact": 10
+      }
+    },
+    {
       "name": "Hardy",
       "type": "lesser",
       "emoji": "🐪",
@@ -502,6 +622,18 @@
       },
       "penalties": {
         "Velocity": 10
+      }
+    },
+    {
+      "name": "Harpoon",
+      "type": "lesser",
+      "emoji": "",
+      "description": "",
+      "bonuses": {
+        "Arm": 25
+      },
+      "penalties": {
+        "Contact": 10
       }
     },
     {
@@ -586,6 +718,18 @@
       },
       "penalties": {
         "Greed": 10
+      }
+    },
+    {
+      "name": "Juggler",
+      "type": "lesser",
+      "emoji": "🤹",
+      "description": "This Player keeps everything in hand",
+      "bonuses": {
+        "Dexterity": 25
+      },
+      "penalties": {
+        "Performance": 10
       }
     },
     {
@@ -781,6 +925,18 @@
       }
     },
     {
+      "name": "Nimble",
+      "type": "lesser",
+      "emoji": "🦋",
+      "description": "This Player floats across the field",
+      "bonuses": {
+        "Agility": 25
+      },
+      "penalties": {
+        "Muscle": 10
+      }
+    },
+    {
       "name": "Observer",
       "type": "lesser",
       "emoji": "🦉",
@@ -841,6 +997,18 @@
       }
     },
     {
+      "name": "Penguin",
+      "type": "lesser",
+      "emoji": "",
+      "description": "",
+      "bonuses": {
+        "Composure": 25
+      },
+      "penalties": {
+        "Performance": 10
+      }
+    },
+    {
       "name": "Pinpoint",
       "type": "lesser",
       "emoji": "📌",
@@ -865,6 +1033,18 @@
       }
     },
     {
+      "name": "Poised",
+      "type": "lesser",
+      "emoji": "",
+      "description": "",
+      "bonuses": {
+        "Composure": 25
+      },
+      "penalties": {
+        "Contact": 10
+      }
+    },
+    {
       "name": "Psychic",
       "type": "lesser",
       "emoji": "🔮",
@@ -886,6 +1066,18 @@
       },
       "penalties": {
         "Control": 10
+      }
+    },
+    {
+      "name": "Safecracker",
+      "type": "lesser",
+      "emoji": "",
+      "description": "",
+      "bonuses": {
+        "Dexterity": 25
+      },
+      "penalties": {
+        "Contact": 10
       }
     },
     {
@@ -949,6 +1141,30 @@
       }
     },
     {
+      "name": "Sentry",
+      "type": "lesser",
+      "emoji": "🔦",
+      "description": "This Player keeps watch over the field",
+      "bonuses": {
+        "Awareness": 25
+      },
+      "penalties": {
+        "Muscle": 10
+      }
+    },
+    {
+      "name": "Serene",
+      "type": "lesser",
+      "emoji": "",
+      "description": "",
+      "bonuses": {
+        "Composure": 25
+      },
+      "penalties": {
+        "Muscle": 10
+      }
+    },
+    {
       "name": "Shiny",
       "type": "lesser",
       "emoji": "🌟",
@@ -970,6 +1186,18 @@
       },
       "penalties": {
         "Persuasion": 10
+      }
+    },
+    {
+      "name": "Slinger",
+      "type": "lesser",
+      "emoji": "",
+      "description": "",
+      "bonuses": {
+        "Arm": 25
+      },
+      "penalties": {
+        "Performance": 10
       }
     },
     {
@@ -1045,6 +1273,18 @@
       }
     },
     {
+      "name": "Springy",
+      "type": "lesser",
+      "emoji": "🦘",
+      "description": "This Player always bounces back",
+      "bonuses": {
+        "Acrobatics": 25
+      },
+      "penalties": {
+        "Muscle": 10
+      }
+    },
+    {
       "name": "Stargazer",
       "type": "lesser",
       "emoji": "🌠",
@@ -1105,6 +1345,18 @@
       }
     },
     {
+      "name": "Surveyor",
+      "type": "lesser",
+      "emoji": "🧭",
+      "description": "This Player always knows where they stand",
+      "bonuses": {
+        "Awareness": 25
+      },
+      "penalties": {
+        "Contact": 10
+      }
+    },
+    {
       "name": "Sweet Tooth",
       "type": "lesser",
       "emoji": "🍬",
@@ -1138,6 +1390,18 @@
       },
       "penalties": {
         "Intuition": 10
+      }
+    },
+    {
+      "name": "Tentacled",
+      "type": "lesser",
+      "emoji": "",
+      "description": "",
+      "bonuses": {
+        "Arm": 25
+      },
+      "penalties": {
+        "Muscle": 10
       }
     },
     {
@@ -1270,6 +1534,30 @@
       },
       "penalties": {
         "Persuasion": 10
+      }
+    },
+    {
+      "name": "Vigilant",
+      "type": "lesser",
+      "emoji": "👀",
+      "description": "This Player never looks away",
+      "bonuses": {
+        "Awareness": 25
+      },
+      "penalties": {
+        "Performance": 10
+      }
+    },
+    {
+      "name": "Watchmaker",
+      "type": "lesser",
+      "emoji": "",
+      "description": "",
+      "bonuses": {
+        "Patience": 25
+      },
+      "penalties": {
+        "Muscle": 10
       }
     },
     {
